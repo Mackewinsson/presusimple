@@ -51,10 +51,10 @@ const Summary: React.FC = () => {
 
       // Create Budget Summary worksheet
       const summaryData = [
-        ['Budget Summary'],
-        ['Total Budgeted', totalBudgeted],
-        ['Total Spent', totalSpent],
-        ['Remaining', totalBudgeted - totalSpent],
+        ['Budget Summary', ''],
+        ['Total Budgeted', totalBudgeted.toString()],
+        ['Total Spent', totalSpent.toString()],
+        ['Remaining', (totalBudgeted - totalSpent).toString()],
         [],
         ['Category', 'Budgeted', 'Spent', 'Remaining']
       ];
@@ -62,9 +62,9 @@ const Summary: React.FC = () => {
       categories.forEach(category => {
         summaryData.push([
           category.name,
-          category.budgeted,
-          category.spent,
-          category.budgeted - category.spent
+          category.budgeted.toString(),
+          category.spent.toString(),
+          (category.budgeted - category.spent).toString()
         ]);
       });
 
@@ -72,7 +72,7 @@ const Summary: React.FC = () => {
 
       // Create Expenses worksheet
       const expensesData = [
-        ['Expenses'],
+        ['Expenses', '', '', ''],
         ['Date', 'Category', 'Description', 'Amount']
       ];
 
@@ -82,7 +82,7 @@ const Summary: React.FC = () => {
           new Date(expense.date).toLocaleDateString(),
           category?.name || 'Unknown',
           expense.description || '-',
-          expense.amount
+          expense.amount.toString()
         ]);
       });
 

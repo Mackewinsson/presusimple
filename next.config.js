@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  // Remove output: 'export' as we want server-side rendering for Vercel
   eslint: {
     ignoreDuringBuilds: true,
   },
