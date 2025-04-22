@@ -2029,17 +2029,6 @@ eval("\nmodule.exports = __webpack_require__(/*! ../../module.compiled */ \"(ssr
 
 /***/ }),
 
-/***/ "(ssr)/./node_modules/next/dist/server/future/route-modules/app-page/vendored/shared/react-jsx-runtime.js":
-/*!**********************************************************************************************************!*\
-  !*** ./node_modules/next/dist/server/future/route-modules/app-page/vendored/shared/react-jsx-runtime.js ***!
-  \**********************************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-eval("\nmodule.exports = __webpack_require__(/*! ../../module.compiled */ \"(ssr)/./node_modules/next/dist/server/future/route-modules/app-page/module.compiled.js?b374\").vendored[\"react-shared\"].ReactJsxRuntime;\n\n//# sourceMappingURL=react-jsx-runtime.js.map//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHNzcikvLi9ub2RlX21vZHVsZXMvbmV4dC9kaXN0L3NlcnZlci9mdXR1cmUvcm91dGUtbW9kdWxlcy9hcHAtcGFnZS92ZW5kb3JlZC9zaGFyZWQvcmVhY3QtanN4LXJ1bnRpbWUuanMiLCJtYXBwaW5ncyI6IkFBQWE7QUFDYix5TUFBMEY7O0FBRTFGIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vc2ltcGxlLWJ1ZGdldC8uL25vZGVfbW9kdWxlcy9uZXh0L2Rpc3Qvc2VydmVyL2Z1dHVyZS9yb3V0ZS1tb2R1bGVzL2FwcC1wYWdlL3ZlbmRvcmVkL3NoYXJlZC9yZWFjdC1qc3gtcnVudGltZS5qcz82ZWYyIl0sInNvdXJjZXNDb250ZW50IjpbIlwidXNlIHN0cmljdFwiO1xubW9kdWxlLmV4cG9ydHMgPSByZXF1aXJlKFwiLi4vLi4vbW9kdWxlLmNvbXBpbGVkXCIpLnZlbmRvcmVkW1wicmVhY3Qtc2hhcmVkXCJdLlJlYWN0SnN4UnVudGltZTtcblxuLy8jIHNvdXJjZU1hcHBpbmdVUkw9cmVhY3QtanN4LXJ1bnRpbWUuanMubWFwIl0sIm5hbWVzIjpbXSwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///(ssr)/./node_modules/next/dist/server/future/route-modules/app-page/vendored/shared/react-jsx-runtime.js\n");
-
-/***/ }),
-
 /***/ "(ssr)/./node_modules/next/dist/server/future/route-modules/app-page/vendored/ssr/react-dom.js":
 /*!***********************************************************************************************!*\
   !*** ./node_modules/next/dist/server/future/route-modules/app-page/vendored/ssr/react-dom.js ***!
