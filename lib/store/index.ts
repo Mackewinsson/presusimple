@@ -14,6 +14,7 @@ import expenseReducer from './expenseSlice';
 import monthlyBudgetReducer from './monthlyBudgetSlice';
 import budgetTemplateReducer from './budgetTemplateSlice';
 import savingsGoalReducer from './savingsGoalSlice';
+import currencyReducer from './currencySlice';
 
 const createNoopStorage = () => {
   return {
@@ -48,6 +49,7 @@ const rootReducer = combineReducers({
   monthlyBudgets: monthlyBudgetReducer,
   budgetTemplates: budgetTemplateReducer,
   savingsGoals: savingsGoalReducer,
+  currency: currencyReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

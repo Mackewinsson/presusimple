@@ -1,10 +1,18 @@
+import { Currency } from '@/lib/store/currencySlice';
+
+const DEFAULT_CURRENCY: Currency = {
+  code: 'USD',
+  symbol: '$',
+  name: 'US Dollar'
+};
+
 /**
  * Format a number as a currency string
  */
-export const formatMoney = (amount: number): string => {
+export const formatMoney = (amount: number, currency: Currency = DEFAULT_CURRENCY): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: currency?.code || DEFAULT_CURRENCY.code,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);

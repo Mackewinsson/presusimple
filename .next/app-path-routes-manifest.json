@@ -4,8 +4,8 @@
   "/history/page": "/history",
   "/history/insights/page": "/history/insights",
   "/app/page": "/app",
-  "/auth/register/page": "/auth/register",
   "/app/settings/page": "/app/settings",
   "/auth/login/page": "/auth/login",
-  "/auth/reset-password/page": "/auth/reset-password"
+  "/auth/reset-password/page": "/auth/reset-password",
+  "/auth/register/page": "/auth/register"
 }

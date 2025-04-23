@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 const Summary: React.FC = () => {
   const { sections, categories, totalBudgeted, totalSpent } = useAppSelector(state => state.budget);
   const expenses = useAppSelector(state => state.expenses.expenses);
+  const currency = useAppSelector(state => state.currency.selected);
   
   // Get the top 5 categories by spent amount
   const topCategories = [...categories]
@@ -34,10 +35,10 @@ const Summary: React.FC = () => {
         <div className="bg-popover/95 backdrop-blur-sm border rounded-lg p-3 shadow-lg">
           <p className="font-medium mb-1">{label}</p>
           <p className="text-sm text-muted-foreground">
-            Spent: <span className="font-medium text-foreground">{formatMoney(data.spent)}</span>
+            Spent: <span className="font-medium text-foreground">{formatMoney(data.spent, currency)}</span>
           </p>
           <p className="text-sm text-muted-foreground">
-            Budgeted: <span className="font-medium text-foreground">{formatMoney(data.budgeted)}</span>
+            Budgeted: <span className="font-medium text-foreground">{formatMoney(data.budgeted, currency)}</span>
           </p>
         </div>
       );
@@ -93,7 +94,7 @@ const Summary: React.FC = () => {
           new Date(expense.date).toLocaleDateString(),
           category?.name || 'Unknown',
           expense.description || '-',
-          String(expense.amount), // Convert number to string
+          String(expense.amount),
           expense.type
         ]);
       });
@@ -151,18 +152,18 @@ const Summary: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="p-4 rounded-xl bg-secondary/50 backdrop-blur text-center">
             <div className="text-sm text-muted-foreground mb-1">Total Budgeted</div>
-            <div className="text-2xl font-semibold">{formatMoney(totalBudgeted)}</div>
+            <div className="text-2xl font-semibold">{formatMoney(totalBudgeted, currency)}</div>
           </div>
           
           <div className="p-4 rounded-xl bg-primary/5 backdrop-blur text-center">
             <div className="text-sm text-muted-foreground mb-1">Total Spent</div>
-            <div className="text-2xl font-semibold">{formatMoney(totalSpent)}</div>
+            <div className="text-2xl font-semibold">{formatMoney(totalSpent, currency)}</div>
           </div>
           
           <div className="p-4 rounded-xl bg-secondary/50 backdrop-blur text-center">
             <div className="text-sm text-muted-foreground mb-1">Remaining</div>
             <div className={`text-2xl font-semibold ${totalBudgeted - totalSpent < 0 ? 'text-destructive' : ''}`}>
-              {formatMoney(totalBudgeted - totalSpent)}
+              {formatMoney(totalBudgeted - totalSpent, currency)}
             </div>
           </div>
         </div>
@@ -200,7 +201,7 @@ const Summary: React.FC = () => {
                     textAnchor="middle"
                   />
                   <YAxis 
-                    tickFormatter={(value) => formatMoney(value)}
+                    tickFormatter={(value) => formatMoney(value, currency)}
                     tick={{ 
                       fill: 'hsl(var(--muted-foreground))',
                       fontSize: 12 
@@ -236,7 +237,7 @@ const Summary: React.FC = () => {
                     <LabelList 
                       dataKey="spent" 
                       position="top" 
-                      formatter={(value: number) => formatMoney(value)}
+                      formatter={(value: number) => formatMoney(value, currency)}
                       style={{
                         fontSize: '12px',
                         fill: 'hsl(var(--muted-foreground))',

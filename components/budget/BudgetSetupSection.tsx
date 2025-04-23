@@ -19,6 +19,7 @@ const BudgetSetupSection: React.FC = () => {
   const [totalBudget, setTotalBudget] = useState('');
   
   const { sections, totalBudgeted, totalAvailable } = useAppSelector(state => state.budget);
+  const currency = useAppSelector(state => state.currency.selected);
 
   const handleSetTotalBudget = () => {
     const amount = parseFloat(totalBudget);
@@ -77,7 +78,7 @@ const BudgetSetupSection: React.FC = () => {
                 className="p-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-colors cursor-pointer"
               >
                 <div className="text-lg font-medium">
-                  {formatMoney(totalBudgeted + totalAvailable)}
+                  {formatMoney(totalBudgeted + totalAvailable, currency)}
                 </div>
                 <div className="text-sm text-muted-foreground">
                   Total Budget (click to edit)
@@ -90,11 +91,11 @@ const BudgetSetupSection: React.FC = () => {
         <div className="mt-4 grid grid-cols-2 gap-4">
           <div className="p-4 rounded-xl bg-secondary/50 backdrop-blur">
             <div className="text-sm text-muted-foreground">Budgeted</div>
-            <div className="text-lg font-medium mt-1">{formatMoney(totalBudgeted)}</div>
+            <div className="text-lg font-medium mt-1">{formatMoney(totalBudgeted, currency)}</div>
           </div>
           <div className="p-4 rounded-xl bg-primary/5 backdrop-blur">
             <div className="text-sm text-muted-foreground">Available to Budget</div>
-            <div className="text-lg font-medium mt-1">{formatMoney(totalAvailable)}</div>
+            <div className="text-lg font-medium mt-1">{formatMoney(totalAvailable, currency)}</div>
           </div>
         </div>
       </CardHeader>

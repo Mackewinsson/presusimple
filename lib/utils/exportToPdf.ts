@@ -1,19 +1,9 @@
-import { jsPDF } from "jspdf";
+import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { format } from "date-fns";
 import { BudgetCategory, BudgetSection } from "@/lib/store/budgetSlice";
 import { Expense } from "@/lib/store/expenseSlice";
 import { formatMoney } from "./formatMoney";
-
-// Extend jsPDF type to include autoTable
-declare module "jspdf" {
-  interface jsPDF {
-    lastAutoTable: {
-      finalY: number;
-    };
-    autoTable: typeof autoTable;
-  }
-}
 
 export const exportToPdf = (
   sections: BudgetSection[],
@@ -24,23 +14,27 @@ export const exportToPdf = (
 ) => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.width;
+  let yPos = 15; // Start position
 
   // Title
   doc.setFontSize(20);
-  doc.text("Budget Report", pageWidth / 2, 15, { align: "center" });
+  doc.text("Budget Report", pageWidth / 2, yPos, { align: "center" });
+  yPos += 20;
 
   // Date
   doc.setFontSize(12);
-  doc.text(`Generated on ${format(new Date(), "PPP")}`, pageWidth / 2, 25, {
+  doc.text(`Generated on ${format(new Date(), "PPP")}`, pageWidth / 2, yPos, {
     align: "center",
   });
+  yPos += 20;
 
   // Summary
   doc.setFontSize(14);
-  doc.text("Summary", 14, 40);
+  doc.text("Summary", 14, yPos);
+  yPos += 10;
 
   autoTable(doc, {
-    startY: 45,
+    startY: yPos,
     head: [["Total Budgeted", "Total Spent", "Remaining"]],
     body: [
       [
@@ -49,20 +43,24 @@ export const exportToPdf = (
         formatMoney(totalBudgeted - totalSpent),
       ],
     ],
+    didDrawPage: (data) => {
+      if (data.cursor) {
+        yPos = data.cursor.y + 15;
+      }
+    },
   });
 
   // Categories by Section
-  let yPos = doc.lastAutoTable.finalY + 15;
-
   sections.forEach((section) => {
     // Add page if needed
-    if (yPos > pageWidth - 20) {
+    if (yPos > doc.internal.pageSize.height - 20) {
       doc.addPage();
       yPos = 15;
     }
 
     doc.setFontSize(14);
     doc.text(section.name, 14, yPos);
+    yPos += 10;
 
     const sectionCategories = categories.filter(
       (c) => c.sectionId === section.id
@@ -70,7 +68,7 @@ export const exportToPdf = (
 
     if (sectionCategories.length > 0) {
       autoTable(doc, {
-        startY: yPos + 5,
+        startY: yPos,
         head: [["Category", "Budgeted", "Spent", "Remaining"]],
         body: sectionCategories.map((category) => [
           category.name,
@@ -78,20 +76,25 @@ export const exportToPdf = (
           formatMoney(category.spent),
           formatMoney(category.budgeted - category.spent),
         ]),
+        didDrawPage: (data) => {
+          if (data.cursor) {
+            yPos = data.cursor.y + 15;
+          }
+        },
       });
-
-      yPos = doc.lastAutoTable.finalY + 15;
     }
   });
 
   // Transactions
   doc.addPage();
+  yPos = 15;
   doc.setFontSize(14);
-  doc.text("Transactions", 14, 15);
+  doc.text("Transactions", 14, yPos);
+  yPos += 10;
 
   if (expenses.length > 0) {
     autoTable(doc, {
-      startY: 20,
+      startY: yPos,
       head: [["Date", "Category", "Description", "Amount", "Type"]],
       body: expenses.map((expense) => {
         const category = categories.find((c) => c.id === expense.categoryId);
