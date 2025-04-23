@@ -2,9 +2,13 @@
 
 import { useState } from 'react';
 import { useAppDispatch } from '@/lib/hooks/useAppDispatch';
+import { useAppSelector } from '@/lib/hooks/useAppSelector';
 import { resetBudget } from '@/lib/store/budgetSlice';
 import { clearExpenses } from '@/lib/store/expenseSlice';
+import { saveBudget } from '@/lib/store/monthlyBudgetSlice';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Trash2 } from 'lucide-react';
 import { 
   AlertDialog,
@@ -18,16 +22,31 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
 
 const ResetButton: React.FC = () => {
   const dispatch = useAppDispatch();
+  const [monthName, setMonthName] = useState(() => format(new Date(), 'MMMM yyyy'));
+  
+  const { sections, categories, totalBudgeted, totalSpent } = useAppSelector(state => state.budget);
+  const expenses = useAppSelector(state => state.expenses.expenses);
   
   const handleReset = () => {
+    // Save current month's data
+    dispatch(saveBudget({
+      name: monthName,
+      sections,
+      categories,
+      expenses,
+      totalBudgeted,
+      totalSpent,
+    }));
+    
     // Reset spending but keep categories
     dispatch(resetBudget());
     dispatch(clearExpenses());
     
-    toast.success('All expenses have been cleared for a new month');
+    toast.success('Current month saved and reset for a new month');
   };
   
   return (
@@ -43,16 +62,27 @@ const ResetButton: React.FC = () => {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Reset Monthly Budget</AlertDialogTitle>
+          <AlertDialogTitle>Save and Reset Monthly Budget</AlertDialogTitle>
           <AlertDialogDescription>
-            This will clear all spending data, but keep your budget categories 
-            and their assigned amounts. Use this when starting a new month.
+            This will save your current month's data and reset all spending, 
+            but keep your budget categories and their assigned amounts.
           </AlertDialogDescription>
         </AlertDialogHeader>
+        
+        <div className="space-y-2 py-4">
+          <Label htmlFor="monthName">Month Name</Label>
+          <Input
+            id="monthName"
+            value={monthName}
+            onChange={(e) => setMonthName(e.target.value)}
+            placeholder="Enter a name for this month"
+          />
+        </div>
+        
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={handleReset}>
-            Reset Month
+            Save and Reset
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

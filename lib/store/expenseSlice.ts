@@ -1,12 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { v4 as uuidv4 } from 'uuid';
 
+export type TransactionType = 'expense' | 'income';
+
 export interface Expense {
   id: string;
   amount: number;
   description: string;
   categoryId: string;
   date: string;
+  type: TransactionType;
 }
 
 interface ExpenseState {
@@ -25,15 +28,18 @@ const expenseSlice = createSlice({
       amount: number; 
       description: string; 
       categoryId: string;
+      date: string;
+      type: TransactionType;
     }>) => {
-      const { amount, description, categoryId } = action.payload;
+      const { amount, description, categoryId, date, type } = action.payload;
       
       const newExpense: Expense = {
         id: uuidv4(),
         amount,
         description,
         categoryId,
-        date: new Date().toISOString(),
+        date,
+        type,
       };
       
       state.expenses.push(newExpense);
@@ -44,6 +50,8 @@ const expenseSlice = createSlice({
       amount?: number;
       description?: string;
       categoryId?: string;
+      date?: string;
+      type?: TransactionType;
     }>) => {
       const { id, ...updates } = action.payload;
       const expense = state.expenses.find(e => e.id === id);

@@ -1,39 +1,25 @@
-// import { Schema, model, models, Document } from 'mongoose';
+import { Schema, model, models, Document } from 'mongoose';
 
-// export interface IUser extends Document {
-//   email: string;
-//   name: string;
-//   createdAt: Date;
-//   updatedAt: Date;
-// }
-
-// const userSchema = new Schema<IUser>({
-//   email: {
-//     type: String,
-//     required: [true, 'Email is required'],
-//     unique: true,
-//   },
-//   name: {
-//     type: String,
-//     required: [true, 'Name is required'],
-//   }
-// }, {
-//   timestamps: true,
-// });
-
-// // Check if the model exists before creating a new one
-// export const User = models.User || model<IUser>('User', userSchema);
-
-// Temporary mock until MongoDB is needed
-export interface IUser {
+export interface IUser extends Document {
   email: string;
   name: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export const User = {
-  find: () => Promise.resolve([]),
-  findOne: () => Promise.resolve(null),
-  create: () => Promise.resolve({}),
-};
+const userSchema = new Schema<IUser>({
+  email: {
+    type: String,
+    required: [true, 'Email is required'],
+    unique: true,
+  },
+  name: {
+    type: String,
+    required: [true, 'Name is required'],
+  }
+}, {
+  timestamps: true,
+});
+
+// Check if the model exists before creating a new one
+export const User = models.User || model<IUser>('User', userSchema);

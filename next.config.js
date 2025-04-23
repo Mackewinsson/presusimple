@@ -1,10 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Remove output: 'export' as we want server-side rendering for Vercel
+  output: 'export',
   eslint: {
     ignoreDuringBuilds: true,
   },
   images: { unoptimized: true },
+  optimizeFonts: false,
   webpack: (config, { isServer }) => {
     // Disable cache for both client and server builds
     config.cache = false;

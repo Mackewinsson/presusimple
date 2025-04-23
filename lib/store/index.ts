@@ -11,8 +11,10 @@ import {
 } from 'redux-persist';
 import budgetReducer from './budgetSlice';
 import expenseReducer from './expenseSlice';
+import monthlyBudgetReducer from './monthlyBudgetSlice';
+import budgetTemplateReducer from './budgetTemplateSlice';
+import savingsGoalReducer from './savingsGoalSlice';
 
-// Improved storage implementation that properly returns Promises
 const createNoopStorage = () => {
   return {
     getItem(_key: string) {
@@ -38,13 +40,14 @@ const storage = typeof window !== 'undefined'
 const persistConfig = {
   key: 'root',
   storage,
-  // You might want to blacklist some parts of the state
-  // blacklist: ['someReducer']
 };
 
 const rootReducer = combineReducers({
   budget: budgetReducer,
   expenses: expenseReducer,
+  monthlyBudgets: monthlyBudgetReducer,
+  budgetTemplates: budgetTemplateReducer,
+  savingsGoals: savingsGoalReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

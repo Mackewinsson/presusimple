@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks/useAppSelector';
-import { addExpense } from '@/lib/store/expenseSlice';
+import { addExpense, TransactionType } from '@/lib/store/expenseSlice';
 import { addExpenseToCategory } from '@/lib/store/budgetSlice';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,8 +14,9 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Plus } from 'lucide-react';
+import { Plus, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
 
 const NewExpenseForm: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -24,6 +25,8 @@ const NewExpenseForm: React.FC = () => {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState('');
+  const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [type, setType] = useState<TransactionType>('expense');
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,37 +36,67 @@ const NewExpenseForm: React.FC = () => {
       return;
     }
     
-    const expenseAmount = parseFloat(amount);
+    const transactionAmount = parseFloat(amount);
     
-    if (isNaN(expenseAmount) || expenseAmount <= 0) {
+    if (isNaN(transactionAmount) || transactionAmount <= 0) {
       toast.error('Please enter a valid amount');
       return;
     }
     
-    // Add the expense
+    // Add the transaction
     dispatch(addExpense({ 
-      amount: expenseAmount, 
+      amount: transactionAmount, 
       description: description.trim(), 
-      categoryId 
+      categoryId,
+      date,
+      type
     }));
     
     // Update the category's spent amount
     dispatch(addExpenseToCategory({ 
       categoryId, 
-      amount: expenseAmount 
+      amount: type === 'expense' ? transactionAmount : -transactionAmount 
     }));
     
     // Reset the form
     setAmount('');
     setDescription('');
+    setDate(format(new Date(), 'yyyy-MM-dd'));
+    setType('expense');
     
-    toast.success('Expense added successfully');
+    toast.success(`${type === 'expense' ? 'Expense' : 'Income'} added successfully`);
   };
   
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="type">Type*</Label>
+            <Select 
+              value={type} 
+              onValueChange={(value: TransactionType) => setType(value)}
+            >
+              <SelectTrigger id="type">
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="expense">
+                  <div className="flex items-center gap-2">
+                    <ArrowUpCircle className="h-4 w-4 text-destructive" />
+                    Expense
+                  </div>
+                </SelectItem>
+                <SelectItem value="income">
+                  <div className="flex items-center gap-2">
+                    <ArrowDownCircle className="h-4 w-4 text-primary" />
+                    Income
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
           <div className="space-y-2">
             <Label htmlFor="amount">Amount*</Label>
             <Input
@@ -77,7 +110,9 @@ const NewExpenseForm: React.FC = () => {
               required
             />
           </div>
-          
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="category">Category*</Label>
             <Select 
@@ -102,6 +137,17 @@ const NewExpenseForm: React.FC = () => {
               </SelectContent>
             </Select>
           </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="date">Date*</Label>
+            <Input
+              id="date"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              required
+            />
+          </div>
         </div>
         
         <div className="space-y-2">
@@ -111,7 +157,7 @@ const NewExpenseForm: React.FC = () => {
             type="text"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="What did you spend on?"
+            placeholder="What was this transaction for?"
           />
         </div>
       </div>
@@ -122,7 +168,7 @@ const NewExpenseForm: React.FC = () => {
         disabled={amount === '' || categoryId === '' || categories.length === 0}
       >
         <Plus className="h-4 w-4 mr-2" />
-        Add Expense
+        Add {type === 'expense' ? 'Expense' : 'Income'}
       </Button>
     </form>
   );

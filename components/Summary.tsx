@@ -6,12 +6,13 @@ import { formatMoney } from '@/lib/utils/formatMoney';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import { motion } from 'framer-motion';
 import { Button } from './ui/button';
-import { Download } from 'lucide-react';
+import { Download, FileSpreadsheet } from 'lucide-react';
+import { exportToPdf } from '@/lib/utils/exportToPdf';
 import { utils, writeFile } from 'xlsx';
 import { toast } from 'sonner';
 
 const Summary: React.FC = () => {
-  const { categories, totalBudgeted, totalSpent } = useAppSelector(state => state.budget);
+  const { sections, categories, totalBudgeted, totalSpent } = useAppSelector(state => state.budget);
   const expenses = useAppSelector(state => state.expenses.expenses);
   
   // Get the top 5 categories by spent amount
@@ -44,6 +45,16 @@ const Summary: React.FC = () => {
     return null;
   };
 
+  const handleExportToPdf = () => {
+    try {
+      exportToPdf(sections, categories, expenses, totalBudgeted, totalSpent);
+      toast.success('PDF report generated successfully');
+    } catch (error) {
+      console.error('PDF export failed:', error);
+      toast.error('Failed to generate PDF report');
+    }
+  };
+
   const handleExportToExcel = () => {
     try {
       // Create workbook
@@ -52,9 +63,9 @@ const Summary: React.FC = () => {
       // Create Budget Summary worksheet
       const summaryData = [
         ['Budget Summary', ''],
-        ['Total Budgeted', totalBudgeted.toString()],
-        ['Total Spent', totalSpent.toString()],
-        ['Remaining', (totalBudgeted - totalSpent).toString()],
+        ['Total Budgeted', totalBudgeted],
+        ['Total Spent', totalSpent],
+        ['Remaining', totalBudgeted - totalSpent],
         [],
         ['Category', 'Budgeted', 'Spent', 'Remaining']
       ];
@@ -62,9 +73,9 @@ const Summary: React.FC = () => {
       categories.forEach(category => {
         summaryData.push([
           category.name,
-          category.budgeted.toString(),
-          category.spent.toString(),
-          (category.budgeted - category.spent).toString()
+          category.budgeted,
+          category.spent,
+          category.budgeted - category.spent
         ]);
       });
 
@@ -72,8 +83,8 @@ const Summary: React.FC = () => {
 
       // Create Expenses worksheet
       const expensesData = [
-        ['Expenses', '', '', ''],
-        ['Date', 'Category', 'Description', 'Amount']
+        ['Transactions', '', '', ''],
+        ['Date', 'Category', 'Description', 'Amount', 'Type']
       ];
 
       expenses.forEach(expense => {
@@ -82,7 +93,8 @@ const Summary: React.FC = () => {
           new Date(expense.date).toLocaleDateString(),
           category?.name || 'Unknown',
           expense.description || '-',
-          expense.amount.toString()
+          String(expense.amount), // Convert number to string
+          expense.type
         ]);
       });
 
@@ -90,14 +102,14 @@ const Summary: React.FC = () => {
 
       // Add worksheets to workbook
       utils.book_append_sheet(wb, summaryWs, 'Budget Summary');
-      utils.book_append_sheet(wb, expensesWs, 'Expenses');
+      utils.book_append_sheet(wb, expensesWs, 'Transactions');
 
       // Generate Excel file
       writeFile(wb, 'budget-report.xlsx');
-      toast.success('Budget report exported successfully');
+      toast.success('Excel report exported successfully');
     } catch (error) {
-      console.error('Export failed:', error);
-      toast.error('Failed to export budget report');
+      console.error('Excel export failed:', error);
+      toast.error('Failed to export Excel report');
     }
   };
   
@@ -113,15 +125,26 @@ const Summary: React.FC = () => {
               Overview of your budget and top spending categories
             </CardDescription>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExportToExcel}
-            className="flex items-center gap-2"
-          >
-            <Download className="h-4 w-4" />
-            Export
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportToExcel}
+              className="flex items-center gap-2"
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              Excel
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportToPdf}
+              className="flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              PDF
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Expense } from '@/lib/store/expenseSlice';
+import { Expense, TransactionType } from '@/lib/store/expenseSlice';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks/useAppSelector';
 import { removeExpense, updateExpense } from '@/lib/store/expenseSlice';
 import { addExpenseToCategory } from '@/lib/store/budgetSlice';
@@ -10,7 +10,7 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Edit2, Save, Trash2, X } from 'lucide-react';
+import { Edit2, Save, Trash2, X, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 
@@ -24,6 +24,8 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense }) => {
   const [editedAmount, setEditedAmount] = useState(expense.amount.toString());
   const [editedDescription, setEditedDescription] = useState(expense.description);
   const [editedCategoryId, setEditedCategoryId] = useState(expense.categoryId);
+  const [editedDate, setEditedDate] = useState(expense.date);
+  const [editedType, setEditedType] = useState<TransactionType>(expense.type);
   
   const categories = useAppSelector(state => state.budget.categories);
   const category = categories.find(cat => cat.id === expense.categoryId);
@@ -32,7 +34,7 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense }) => {
     if (category) {
       dispatch(addExpenseToCategory({ 
         categoryId: expense.categoryId, 
-        amount: -expense.amount 
+        amount: expense.type === 'expense' ? -expense.amount : expense.amount
       }));
     }
     
@@ -51,13 +53,13 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense }) => {
     // Remove old amount from old category
     dispatch(addExpenseToCategory({
       categoryId: expense.categoryId,
-      amount: -expense.amount
+      amount: expense.type === 'expense' ? -expense.amount : expense.amount
     }));
     
     // Add new amount to new (or same) category
     dispatch(addExpenseToCategory({
       categoryId: editedCategoryId,
-      amount: newAmount
+      amount: editedType === 'expense' ? newAmount : -newAmount
     }));
     
     // Update the expense
@@ -65,7 +67,9 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense }) => {
       id: expense.id,
       amount: newAmount,
       description: editedDescription.trim(),
-      categoryId: editedCategoryId
+      categoryId: editedCategoryId,
+      date: editedDate,
+      type: editedType
     }));
     
     setIsEditing(false);
@@ -76,6 +80,8 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense }) => {
     setEditedAmount(expense.amount.toString());
     setEditedDescription(expense.description);
     setEditedCategoryId(expense.categoryId);
+    setEditedDate(expense.date);
+    setEditedType(expense.type);
     setIsEditing(false);
   };
   
@@ -91,6 +97,30 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense }) => {
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
+              <Select 
+                value={editedType} 
+                onValueChange={(value: TransactionType) => setEditedType(value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="expense">
+                    <div className="flex items-center gap-2">
+                      <ArrowUpCircle className="h-4 w-4 text-destructive" />
+                      Expense
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="income">
+                    <div className="flex items-center gap-2">
+                      <ArrowDownCircle className="h-4 w-4 text-primary" />
+                      Income
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
               <Input
                 type="number"
                 value={editedAmount}
@@ -101,6 +131,9 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense }) => {
                 className="h-9"
               />
             </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Select 
                 value={editedCategoryId} 
@@ -117,6 +150,14 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense }) => {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Input
+                type="date"
+                value={editedDate}
+                onChange={(e) => setEditedDate(e.target.value)}
+                className="h-9"
+              />
             </div>
           </div>
           
@@ -153,7 +194,7 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense }) => {
           <div className="flex justify-between items-start">
             <div className="space-y-1">
               <div className="font-medium">
-                {expense.description || `Expense for ${category.name}`}
+                {expense.description || `${expense.type === 'expense' ? 'Expense' : 'Income'} for ${category.name}`}
               </div>
               <div className="text-sm text-muted-foreground">
                 {category.name} • {formattedDate}
@@ -161,7 +202,16 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense }) => {
             </div>
             <div className="flex items-start space-x-2">
               <div className="text-right">
-                <div className="font-medium">{formatMoney(expense.amount)}</div>
+                <div className={`font-medium flex items-center gap-1 ${
+                  expense.type === 'expense' ? 'text-destructive' : 'text-primary'
+                }`}>
+                  {expense.type === 'expense' ? (
+                    <ArrowUpCircle className="h-4 w-4" />
+                  ) : (
+                    <ArrowDownCircle className="h-4 w-4" />
+                  )}
+                  {formatMoney(expense.amount)}
+                </div>
               </div>
               <div className="flex items-center space-x-1 ml-4">
                 <Button
