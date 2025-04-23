@@ -6,9 +6,14 @@ const nextConfig = {
   },
   images: { unoptimized: true },
   optimizeFonts: false,
-  webpack: (config, { isServer }) => {
-    // Disable cache for both client and server builds
-    config.cache = false;
+  experimental: {
+    cpus: 2 // Limit CPU usage during build
+  },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': '.',
+    };
     return config;
   },
 };
