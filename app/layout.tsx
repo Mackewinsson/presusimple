@@ -1,19 +1,21 @@
-import './globals.css';
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import Providers from '@/components/Providers';
+import "./globals.css";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import Providers from "@/components/Providers";
+import Navigation from "@/components/Navigation";
 
 // Load Inter font locally instead of from Google Fonts
-const inter = Inter({ 
-  subsets: ['latin'],
-  display: 'swap',
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
   preload: true,
-  adjustFontFallback: false
+  adjustFontFallback: false,
 });
 
 export const metadata: Metadata = {
-  title: 'Zero-Based Budget App',
-  description: 'Track your budget and expenses with this zero-based budgeting app',
+  title: "Zero-Based Budget App",
+  description:
+    "Track your budget and expenses with this zero-based budgeting app",
 };
 
 export default function RootLayout({
@@ -24,7 +26,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          {/* <Navigation /> */}
+          <main>{children}</main>
+        </Providers>
       </body>
     </html>
   );

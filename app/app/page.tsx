@@ -1,18 +1,39 @@
-import React from 'react';
-import Link from 'next/link';
-import BudgetSetupSection from '@/components/budget/BudgetSetupSection';
-import DailySpendingTracker from '@/components/expenses/DailySpendingTracker';
-import ResetButton from '@/components/ResetButton';
-import Summary from '@/components/Summary';
-import { DollarSign, History } from 'lucide-react';
+"use client";
+
+import React, { useEffect } from "react";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import BudgetSetupSection from "@/components/budget/BudgetSetupSection";
+import DailySpendingTracker from "@/components/expenses/DailySpendingTracker";
+import ResetButton from "@/components/ResetButton";
+import Summary from "@/components/Summary";
+import { DollarSign, History } from "lucide-react";
 
 export default function BudgetApp() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "loading") return;
+    if (!session) {
+      router.replace("/auth/signin");
+    }
+  }, [session, status, router]);
+
+  if (status === "loading" || !session) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
       <header className="border-b bg-card/80 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2 sm:gap-3 w-fit hover:opacity-90 transition-opacity">
+            <Link
+              href="/"
+              className="flex items-center gap-2 sm:gap-3 w-fit hover:opacity-90 transition-opacity"
+            >
               <div className="bg-primary text-primary-foreground p-1.5 sm:p-2 rounded-xl">
                 <DollarSign className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
@@ -20,7 +41,7 @@ export default function BudgetApp() {
                 Simple Budget
               </h1>
             </Link>
-            <Link 
+            <Link
               href="/history"
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
             >
@@ -30,7 +51,7 @@ export default function BudgetApp() {
           </div>
         </div>
       </header>
-      
+
       <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="grid gap-6 sm:gap-8 grid-cols-1 lg:grid-cols-2">
           <div className="space-y-6 sm:space-y-8">
@@ -43,11 +64,12 @@ export default function BudgetApp() {
           </div>
         </div>
       </main>
-      
+
       <footer className="border-t py-4 sm:py-6 mt-6 sm:mt-8 bg-card/50">
         <div className="container mx-auto px-4 sm:px-6">
           <p className="text-center text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Simple Budget. All rights reserved.
+            &copy; {new Date().getFullYear()} Simple Budget. All rights
+            reserved.
           </p>
         </div>
       </footer>
