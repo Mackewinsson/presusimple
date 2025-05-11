@@ -1,1 +1,1 @@
-self.__NEXT_FONT_MANIFEST='{"pages":{},"app":{"/Users/mackewinssonp./projects/simple-budget/app/layout":["static/media/a34f9d1faa5f3315.p.woff2"]},"appUsingSizeAdjust":false,"pagesUsingSizeAdjust":false}';
+self.__NEXT_FONT_MANIFEST="{\"pages\":{},\"app\":{\"/Users/mackewinssonp./projects/simple-budget/app/layout\":[\"static/media/a34f9d1faa5f3315.p.woff2\"]},\"appUsingSizeAdjust\":false,\"pagesUsingSizeAdjust\":false}"
