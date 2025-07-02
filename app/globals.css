@@ -87,7 +87,7 @@
 }
 
 .hover-card {
-  @apply transition-all duration-200 hover:shadow-xl hover:scale-[1.01] hover:bg-white/98 dark:hover:bg-black/98;
+  @apply transition-all duration-200 hover:shadow-xl hover:scale-[1.01] hover:bg-white dark:hover:bg-black;
 }
 
 .budget-progress {
