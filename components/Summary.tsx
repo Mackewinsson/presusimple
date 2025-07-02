@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useAppSelector } from "@/lib/hooks/useAppSelector";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { exportToPdf } from "@/lib/utils/exportToPdf";
 import {
@@ -27,12 +26,43 @@ import { Download, FileSpreadsheet } from "lucide-react";
 import { utils, writeFile } from "xlsx";
 import { toast } from "sonner";
 
-const Summary: React.FC = () => {
-  const { sections, categories, totalBudgeted, totalSpent } = useAppSelector(
-    (state) => state.budget
-  );
-  const expenses = useAppSelector((state) => state.expenses.expenses);
-  const currency = useAppSelector((state) => state.currency.selected);
+interface Budget {
+  _id: string;
+  totalBudgeted: number;
+  totalAvailable: number;
+}
+
+interface Category {
+  _id?: string;
+  id?: string;
+  name: string;
+  budgeted: number;
+  spent: number;
+  sectionId: string;
+}
+
+interface Expense {
+  _id: string;
+  categoryId: string;
+  amount: number;
+  description: string;
+  date: string;
+  type: "expense" | "income";
+}
+
+interface SummaryProps {
+  budget: Budget;
+  categories: Category[];
+  expenses: Expense[];
+}
+
+const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
+  // Calculate total spent from expenses
+  const totalSpent = expenses.reduce((sum, expense) => {
+    return (
+      sum + (expense.type === "expense" ? expense.amount : -expense.amount)
+    );
+  }, 0);
 
   // Get the top 5 categories by spent amount
   const topCategories = [...categories]
@@ -55,13 +85,13 @@ const Summary: React.FC = () => {
           <p className="text-sm text-muted-foreground">
             Spent:{" "}
             <span className="font-medium text-foreground">
-              {formatMoney(data.spent, currency)}
+              {formatMoney(data.spent)}
             </span>
           </p>
           <p className="text-sm text-muted-foreground">
             Budgeted:{" "}
             <span className="font-medium text-foreground">
-              {formatMoney(data.budgeted, currency)}
+              {formatMoney(data.budgeted)}
             </span>
           </p>
         </div>
@@ -72,7 +102,35 @@ const Summary: React.FC = () => {
 
   const handleExportToPdf = () => {
     try {
-      exportToPdf(sections, categories, expenses, totalBudgeted, totalSpent);
+      // Create sections array for PDF export (since we don't have sections in MongoDB)
+      const sections = [{ id: "default", name: "Budget Categories" }];
+
+      // Convert MongoDB categories to the format expected by exportToPdf
+      const convertedCategories = categories.map((cat) => ({
+        id: cat._id || cat.id || "",
+        name: cat.name,
+        budgeted: cat.budgeted,
+        spent: cat.spent,
+        sectionId: cat.sectionId,
+      }));
+
+      // Convert MongoDB expenses to the format expected by exportToPdf
+      const convertedExpenses = expenses.map((expense) => ({
+        id: expense._id,
+        categoryId: expense.categoryId,
+        amount: expense.amount,
+        description: expense.description,
+        date: expense.date,
+        type: expense.type,
+      }));
+
+      exportToPdf(
+        sections,
+        convertedCategories,
+        convertedExpenses,
+        budget.totalBudgeted,
+        totalSpent
+      );
       toast.success("PDF report generated successfully");
     } catch (error) {
       console.error("PDF export failed:", error);
@@ -88,9 +146,9 @@ const Summary: React.FC = () => {
       // Create Budget Summary worksheet
       const summaryData = [
         ["Budget Summary", ""],
-        ["Total Budgeted", totalBudgeted],
+        ["Total Budgeted", budget.totalBudgeted],
         ["Total Spent", totalSpent],
-        ["Remaining", totalBudgeted - totalSpent],
+        ["Remaining", budget.totalBudgeted - totalSpent],
         [],
         ["Category", "Budgeted", "Spent", "Remaining"],
       ];
@@ -113,7 +171,9 @@ const Summary: React.FC = () => {
       ];
 
       expenses.forEach((expense) => {
-        const category = categories.find((c) => c.id === expense.categoryId);
+        const category = categories.find(
+          (c) => c._id === expense.categoryId || c.id === expense.categoryId
+        );
         expensesData.push([
           new Date(expense.date).toLocaleDateString(),
           category?.name || "Unknown",
@@ -180,7 +240,7 @@ const Summary: React.FC = () => {
               Total Budgeted
             </div>
             <div className="text-lg sm:text-xl md:text-2xl font-semibold">
-              {formatMoney(totalBudgeted, currency)}
+              {formatMoney(budget.totalBudgeted)}
             </div>
           </div>
 
@@ -189,7 +249,7 @@ const Summary: React.FC = () => {
               Total Spent
             </div>
             <div className="text-lg sm:text-xl md:text-2xl font-semibold">
-              {formatMoney(totalSpent, currency)}
+              {formatMoney(totalSpent)}
             </div>
           </div>
 
@@ -199,10 +259,10 @@ const Summary: React.FC = () => {
             </div>
             <div
               className={`text-lg sm:text-xl md:text-2xl font-semibold ${
-                totalBudgeted - totalSpent < 0 ? "text-destructive" : ""
+                budget.totalBudgeted - totalSpent < 0 ? "text-destructive" : ""
               }`}
             >
-              {formatMoney(totalBudgeted - totalSpent, currency)}
+              {formatMoney(budget.totalBudgeted - totalSpent)}
             </div>
           </div>
         </div>
@@ -241,7 +301,7 @@ const Summary: React.FC = () => {
                     height={80}
                   />
                   <YAxis
-                    tickFormatter={(value) => formatMoney(value, currency)}
+                    tickFormatter={(value) => formatMoney(value)}
                     tick={{
                       fill: "hsl(var(--muted-foreground))",
                       fontSize: 10,
@@ -274,9 +334,7 @@ const Summary: React.FC = () => {
                     <LabelList
                       dataKey="spent"
                       position="top"
-                      formatter={(value: number) =>
-                        formatMoney(value, currency)
-                      }
+                      formatter={(value: number) => formatMoney(value)}
                       style={{
                         fontSize: "10px",
                         fill: "hsl(var(--muted-foreground))",
