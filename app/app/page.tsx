@@ -26,8 +26,8 @@ export default function BudgetApp() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
-      <header className="border-b bg-card/80 backdrop-blur-lg sticky top-0 z-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
+      <header className="border-b bg-card/90 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <Link
@@ -67,7 +67,7 @@ export default function BudgetApp() {
         </div>
       </main>
 
-      <footer className="border-t py-3 sm:py-4 md:py-6 mt-4 sm:mt-6 md:mt-8 bg-card/50">
+      <footer className="border-t py-3 sm:py-4 md:py-6 mt-4 sm:mt-6 md:mt-8 bg-card/70 backdrop-blur">
         <div className="container mx-auto px-4 sm:px-6">
           <p className="text-center text-xs sm:text-sm text-muted-foreground">
             &copy; {new Date().getFullYear()} Simple Budget. All rights

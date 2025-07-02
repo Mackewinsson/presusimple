@@ -15,8 +15,8 @@ export default function LandingPage() {
   const { data: session } = useSession();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
-      <header className="border-b bg-card/80 backdrop-blur-lg sticky top-0 z-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
+      <header className="border-b bg-card/90 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <Link
@@ -95,13 +95,13 @@ export default function LandingPage() {
         </section>
 
         {/* Features Section */}
-        <section className="py-12 sm:py-16 md:py-20 bg-secondary/30">
+        <section className="py-12 sm:py-16 md:py-20 bg-white/30 dark:bg-black/20 backdrop-blur-sm">
           <div className="container mx-auto px-4">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-6 sm:mb-8 md:mb-12">
               Everything you need to succeed
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-5xl mx-auto">
-              <div className="p-4 sm:p-6 rounded-xl bg-card/50 backdrop-blur hover:bg-card/80 transition-colors">
+              <div className="p-4 sm:p-6 rounded-xl bg-card/90 backdrop-blur hover:bg-card transition-colors shadow-lg">
                 <Calendar className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-primary mb-3 sm:mb-4" />
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2">
                   Monthly Planning
@@ -112,7 +112,7 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              <div className="p-4 sm:p-6 rounded-xl bg-card/50 backdrop-blur hover:bg-card/80 transition-colors">
+              <div className="p-4 sm:p-6 rounded-xl bg-card/90 backdrop-blur hover:bg-card transition-colors shadow-lg">
                 <TrendingUp className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-primary mb-3 sm:mb-4" />
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2">
                   Expense Tracking
@@ -123,7 +123,7 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              <div className="p-4 sm:p-6 rounded-xl bg-card/50 backdrop-blur hover:bg-card/80 transition-colors sm:col-span-2 lg:col-span-1 sm:max-w-md lg:max-w-none mx-auto w-full">
+              <div className="p-4 sm:p-6 rounded-xl bg-card/90 backdrop-blur hover:bg-card transition-colors shadow-lg sm:col-span-2 lg:col-span-1 sm:max-w-md lg:max-w-none mx-auto w-full">
                 <Shield className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-primary mb-3 sm:mb-4" />
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2">
                   Secure & Private
@@ -149,7 +149,7 @@ export default function LandingPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
               {/* Free Plan */}
-              <div className="rounded-xl border bg-card p-4 sm:p-6 md:p-8">
+              <div className="rounded-xl border bg-card/90 backdrop-blur p-4 sm:p-6 md:p-8 shadow-lg">
                 <h3 className="text-lg sm:text-xl font-semibold mb-2">Free</h3>
                 <p className="text-2xl sm:text-3xl font-bold mb-4">
                   $0
@@ -186,7 +186,7 @@ export default function LandingPage() {
               </div>
 
               {/* Pro Plan */}
-              <div className="rounded-xl border bg-primary p-4 sm:p-6 md:p-8 relative">
+              <div className="rounded-xl border bg-primary p-4 sm:p-6 md:p-8 relative shadow-lg">
                 <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 bg-primary px-2 sm:px-3 py-1 rounded-full text-primary-foreground text-xs sm:text-sm">
                   Most Popular
                 </div>
@@ -234,7 +234,7 @@ export default function LandingPage() {
               </div>
 
               {/* Enterprise Plan */}
-              <div className="rounded-xl border bg-card p-4 sm:p-6 md:p-8 md:col-span-2 lg:col-span-1">
+              <div className="rounded-xl border bg-card/90 backdrop-blur p-4 sm:p-6 md:p-8 md:col-span-2 lg:col-span-1 shadow-lg">
                 <h3 className="text-lg sm:text-xl font-semibold mb-2">
                   Enterprise
                 </h3>
@@ -280,9 +280,9 @@ export default function LandingPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-12 sm:py-16 md:py-20 bg-secondary/30">
+        <section className="py-12 sm:py-16 md:py-20 bg-white/30 dark:bg-black/20 backdrop-blur-sm">
           <div className="container mx-auto px-4 text-center">
-            <div className="max-w-3xl mx-auto p-4 sm:p-6 md:p-8 rounded-2xl bg-primary/5 backdrop-blur">
+            <div className="max-w-3xl mx-auto p-4 sm:p-6 md:p-8 rounded-2xl bg-card/90 backdrop-blur shadow-lg">
               <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">
                 Ready to take control of your finances?
               </h2>
@@ -302,7 +302,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t py-4 sm:py-6 md:py-8 bg-card/50">
+      <footer className="border-t py-4 sm:py-6 md:py-8 bg-card/70 backdrop-blur">
         <div className="container mx-auto px-4 text-center text-xs sm:text-sm text-muted-foreground">
           <p>
             &copy; {new Date().getFullYear()} Simple Budget. All rights

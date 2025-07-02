@@ -83,11 +83,11 @@
 }
 
 .glass-card {
-  @apply bg-white/80 dark:bg-black/80 backdrop-blur-lg;
+  @apply bg-white/95 dark:bg-black/95 backdrop-blur-lg shadow-lg border border-white/20 dark:border-white/10;
 }
 
 .hover-card {
-  @apply transition-all duration-200 hover:shadow-lg hover:scale-[1.01];
+  @apply transition-all duration-200 hover:shadow-xl hover:scale-[1.01] hover:bg-white/98 dark:hover:bg-black/98;
 }
 
 .budget-progress {
