@@ -1,26 +1,31 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { 
-  ChevronDown, 
-  ChevronUp, 
-  Plus, 
-  Trash2 
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useAppDispatch, useAppSelector } from '@/lib/hooks/useAppSelector';
-import { BudgetSection, removeSection } from '@/lib/store/budgetSlice';
-import BudgetCategoryItem from './BudgetCategoryItem';
-import NewCategoryForm from './NewCategoryForm';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/useAppSelector";
+import { BudgetSection, removeSection } from "@/lib/store/budgetSlice";
+import BudgetCategoryItem from "./BudgetCategoryItem";
+import NewCategoryForm from "./NewCategoryForm";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface BudgetSectionItemProps {
   section: BudgetSection;
@@ -30,52 +35,74 @@ const BudgetSectionItem: React.FC<BudgetSectionItemProps> = ({ section }) => {
   const dispatch = useAppDispatch();
   const [isExpanded, setIsExpanded] = useState(true);
   const [isAddingCategory, setIsAddingCategory] = useState(false);
-  
-  const categories = useAppSelector(state => 
-    state.budget.categories.filter(category => category.sectionId === section.id)
+
+  const categories = useAppSelector((state) =>
+    state.budget.categories.filter(
+      (category) => category.sectionId === section.id
+    )
   );
-  
+
   const handleRemoveSection = () => {
     dispatch(removeSection({ id: section.id }));
   };
-  
-  const totalBudgeted = categories.reduce((sum, category) => sum + category.budgeted, 0);
-  const totalSpent = categories.reduce((sum, category) => sum + category.spent, 0);
+
+  const totalBudgeted = categories.reduce(
+    (sum, category) => sum + category.budgeted,
+    0
+  );
+  const totalSpent = categories.reduce(
+    (sum, category) => sum + category.spent,
+    0
+  );
 
   return (
     <Card className="w-full mb-4 shadow-sm overflow-hidden">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-lg font-medium">{section.name}</CardTitle>
-          <div className="flex items-center space-x-2">
+          <CardTitle className="text-base sm:text-lg font-medium">
+            {section.name}
+          </CardTitle>
+          <div className="flex items-center space-x-1 sm:space-x-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="h-8 w-8 p-0"
+              className="h-7 w-7 sm:h-8 sm:w-8 p-0"
             >
               {isExpanded ? (
-                <ChevronUp className="h-4 w-4" />
+                <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
               ) : (
-                <ChevronDown className="h-4 w-4" />
+                <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
               )}
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive">
-                  <Trash2 className="h-4 w-4" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 sm:h-8 sm:w-8 p-0 text-destructive"
+                >
+                  <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent className="sm:max-w-md">
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete Budget Section</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Are you sure you want to delete this section? This will remove all categories and their budgeted amounts.
+                  <AlertDialogTitle className="text-lg sm:text-xl">
+                    Delete Budget Section
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="text-sm sm:text-base">
+                    Are you sure you want to delete this section? This will
+                    remove all categories and their budgeted amounts.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleRemoveSection}>
+                  <AlertDialogCancel className="text-sm sm:text-base">
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleRemoveSection}
+                    className="text-sm sm:text-base"
+                  >
                     Delete
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -83,42 +110,42 @@ const BudgetSectionItem: React.FC<BudgetSectionItemProps> = ({ section }) => {
             </AlertDialog>
           </div>
         </div>
-        <CardDescription className="flex justify-between mt-1 text-sm">
+        <CardDescription className="flex flex-col sm:flex-row sm:justify-between mt-1 text-xs sm:text-sm gap-1 sm:gap-0">
           <span>Total: {categories.length} categories</span>
-          <span>{totalSpent.toFixed(2)} / {totalBudgeted.toFixed(2)} ({Math.round((totalSpent / totalBudgeted) * 100) || 0}%)</span>
+          <span>
+            {totalSpent.toFixed(2)} / {totalBudgeted.toFixed(2)} (
+            {Math.round((totalSpent / totalBudgeted) * 100) || 0}%)
+          </span>
         </CardDescription>
       </CardHeader>
-      
+
       {isExpanded && (
         <>
           <CardContent className="pb-4">
             {categories.length > 0 ? (
               <div className="space-y-3">
-                {categories.map(category => (
-                  <BudgetCategoryItem 
-                    key={category.id} 
-                    category={category}
-                  />
+                {categories.map((category) => (
+                  <BudgetCategoryItem key={category.id} category={category} />
                 ))}
               </div>
             ) : (
-              <div className="text-center py-4 text-muted-foreground">
+              <div className="text-center py-4 text-muted-foreground text-sm sm:text-base">
                 No categories yet. Add one below.
               </div>
             )}
           </CardContent>
-          
+
           <CardFooter className="flex justify-center pt-0 pb-4">
             {isAddingCategory ? (
-              <NewCategoryForm 
-                sectionId={section.id} 
+              <NewCategoryForm
+                sectionId={section.id}
                 onComplete={() => setIsAddingCategory(false)}
               />
             ) : (
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
-                className="w-full flex items-center justify-center"
+                className="w-full flex items-center justify-center text-sm sm:text-base"
                 onClick={() => setIsAddingCategory(true)}
               >
                 <Plus className="h-4 w-4 mr-2" />

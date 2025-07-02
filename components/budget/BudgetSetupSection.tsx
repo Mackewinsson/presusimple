@@ -1,60 +1,68 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useAppSelector, useAppDispatch } from '@/lib/hooks/useAppSelector';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Plus, DollarSign } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import BudgetSectionItem from './BudgetSectionItem';
-import NewSectionForm from './NewSectionForm';
-import { formatMoney } from '@/lib/utils/formatMoney';
-import { setTotalAvailable } from '@/lib/store/budgetSlice';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { useAppSelector, useAppDispatch } from "@/lib/hooks/useAppSelector";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Plus, DollarSign } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import BudgetSectionItem from "./BudgetSectionItem";
+import NewSectionForm from "./NewSectionForm";
+import { formatMoney } from "@/lib/utils/formatMoney";
+import { setTotalAvailable } from "@/lib/store/budgetSlice";
+import { toast } from "sonner";
 
 const BudgetSetupSection: React.FC = () => {
   const dispatch = useAppDispatch();
   const [isAddingSection, setIsAddingSection] = useState(false);
   const [isEditingTotal, setIsEditingTotal] = useState(false);
-  const [totalBudget, setTotalBudget] = useState('');
-  
-  const { sections, totalBudgeted, totalAvailable } = useAppSelector(state => state.budget);
-  const currency = useAppSelector(state => state.currency.selected);
+  const [totalBudget, setTotalBudget] = useState("");
+
+  const { sections, totalBudgeted, totalAvailable } = useAppSelector(
+    (state) => state.budget
+  );
+  const currency = useAppSelector((state) => state.currency.selected);
 
   const handleSetTotalBudget = () => {
     const amount = parseFloat(totalBudget);
-    
+
     if (isNaN(amount) || amount < 0) {
-      toast.error('Please enter a valid amount');
+      toast.error("Please enter a valid amount");
       return;
     }
-    
+
     if (amount < totalBudgeted) {
-      toast.error('New total cannot be less than currently budgeted amount');
+      toast.error("New total cannot be less than currently budgeted amount");
       return;
     }
-    
+
     dispatch(setTotalAvailable(amount - totalBudgeted));
     setIsEditingTotal(false);
-    setTotalBudget('');
-    toast.success('Total budget updated');
+    setTotalBudget("");
+    toast.success("Total budget updated");
   };
 
   return (
     <Card className="glass-card hover-card">
       <CardHeader>
-        <div className="flex justify-between items-start">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-0">
           <div>
-            <CardTitle className="text-2xl font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            <CardTitle className="text-xl sm:text-2xl font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
               Budget Setup
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm sm:text-base">
               Create budget sections and categories to track your spending
             </CardDescription>
           </div>
           <div className="text-right">
             {isEditingTotal ? (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -62,72 +70,88 @@ const BudgetSetupSection: React.FC = () => {
                     value={totalBudget}
                     onChange={(e) => setTotalBudget(e.target.value)}
                     placeholder="Total budget"
-                    className="w-40 pl-9"
+                    className="w-full sm:w-40 pl-9"
                     min={totalBudgeted}
                     step="0.01"
                   />
                 </div>
-                <Button size="sm" onClick={handleSetTotalBudget}>Set</Button>
-                <Button size="sm" variant="ghost" onClick={() => setIsEditingTotal(false)}>
-                  Cancel
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={handleSetTotalBudget}
+                    className="flex-1 sm:flex-none"
+                  >
+                    Set
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setIsEditingTotal(false)}
+                    className="flex-1 sm:flex-none"
+                  >
+                    Cancel
+                  </Button>
+                </div>
               </div>
             ) : (
-              <div 
-                onClick={() => setIsEditingTotal(true)} 
+              <div
+                onClick={() => setIsEditingTotal(true)}
                 className="p-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-colors cursor-pointer"
               >
-                <div className="text-lg font-medium">
+                <div className="text-base sm:text-lg font-medium">
                   {formatMoney(totalBudgeted + totalAvailable, currency)}
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-xs sm:text-sm text-muted-foreground">
                   Total Budget (click to edit)
                 </div>
               </div>
             )}
           </div>
         </div>
-        
-        <div className="mt-4 grid grid-cols-2 gap-4">
-          <div className="p-4 rounded-xl bg-secondary/50 backdrop-blur">
-            <div className="text-sm text-muted-foreground">Budgeted</div>
-            <div className="text-lg font-medium mt-1">{formatMoney(totalBudgeted, currency)}</div>
+
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="p-3 sm:p-4 rounded-xl bg-secondary/50 backdrop-blur">
+            <div className="text-xs sm:text-sm text-muted-foreground">
+              Budgeted
+            </div>
+            <div className="text-base sm:text-lg font-medium mt-1">
+              {formatMoney(totalBudgeted, currency)}
+            </div>
           </div>
-          <div className="p-4 rounded-xl bg-primary/5 backdrop-blur">
-            <div className="text-sm text-muted-foreground">Available to Budget</div>
-            <div className="text-lg font-medium mt-1">{formatMoney(totalAvailable, currency)}</div>
+          <div className="p-3 sm:p-4 rounded-xl bg-primary/5 backdrop-blur">
+            <div className="text-xs sm:text-sm text-muted-foreground">
+              Available to Budget
+            </div>
+            <div className="text-base sm:text-lg font-medium mt-1">
+              {formatMoney(totalAvailable, currency)}
+            </div>
           </div>
         </div>
       </CardHeader>
-      
+
       <CardContent>
         <div className="space-y-4">
           {sections.length > 0 ? (
             <div className="space-y-4">
-              {sections.map(section => (
-                <BudgetSectionItem 
-                  key={section.id} 
-                  section={section}
-                />
+              {sections.map((section) => (
+                <BudgetSectionItem key={section.id} section={section} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 px-4 rounded-lg bg-muted/30">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
-                <DollarSign className="h-6 w-6 text-primary" />
+            <div className="text-center py-8 sm:py-12 px-4 rounded-lg bg-muted/30">
+              <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 mb-3 sm:mb-4">
+                <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
-              <p className="text-muted-foreground">
+              <p className="text-sm sm:text-base text-muted-foreground">
                 No budget sections yet. Add one to get started.
               </p>
             </div>
           )}
-          
+
           {isAddingSection ? (
-            <NewSectionForm 
-              onComplete={() => setIsAddingSection(false)}
-            />
+            <NewSectionForm onComplete={() => setIsAddingSection(false)} />
           ) : (
-            <Button 
+            <Button
               onClick={() => setIsAddingSection(true)}
               className="w-full mt-4"
               variant="outline"

@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useAppDispatch, useAppSelector } from '@/lib/hooks/useAppSelector';
-import { setCurrency, currencies, Currency } from '@/lib/store/currencySlice';
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/useAppSelector";
+import { setCurrency, currencies, Currency } from "@/lib/store/currencySlice";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 
 export default function CurrencySelector() {
   const dispatch = useAppDispatch();
@@ -21,7 +21,7 @@ export default function CurrencySelector() {
 
   return (
     <Select value={selectedCurrency.code} onValueChange={handleCurrencyChange}>
-      <SelectTrigger className="w-[130px]">
+      <SelectTrigger className="w-[100px] sm:w-[130px] text-sm sm:text-base">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
