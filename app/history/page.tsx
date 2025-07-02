@@ -48,7 +48,7 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
+    <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
       <header className="border-b bg-card/90 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
@@ -173,7 +173,7 @@ export default function HistoryPage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 px-4 rounded-lg bg-card/90 backdrop-blur shadow-lg">
+            <div className="text-center py-12 px-4 rounded-lg bg-card/95 backdrop-blur shadow-lg">
               <p className="text-muted-foreground">
                 {searchTerm
                   ? "No budgets found matching your search."

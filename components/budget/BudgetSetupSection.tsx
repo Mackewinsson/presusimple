@@ -53,10 +53,10 @@ const BudgetSetupSection: React.FC = () => {
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-0">
           <div>
-            <CardTitle className="text-xl sm:text-2xl font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            <CardTitle className="text-xl sm:text-2xl font-semibold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
               Budget Setup
             </CardTitle>
-            <CardDescription className="text-sm sm:text-base">
+            <CardDescription className="text-sm sm:text-base text-slate-700 dark:text-white/70">
               Create budget sections and categories to track your spending
             </CardDescription>
           </div>
@@ -96,12 +96,12 @@ const BudgetSetupSection: React.FC = () => {
             ) : (
               <div
                 onClick={() => setIsEditingTotal(true)}
-                className="p-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-colors cursor-pointer"
+                className="p-3 rounded-lg bg-slate-900/10 dark:bg-white/10 hover:bg-slate-900/20 dark:hover:bg-white/20 transition-all duration-200 cursor-pointer border border-slate-900/20 dark:border-white/20"
               >
-                <div className="text-base sm:text-lg font-medium">
+                <div className="text-base sm:text-lg font-medium text-slate-900 dark:text-white">
                   {formatMoney(totalBudgeted + totalAvailable, currency)}
                 </div>
-                <div className="text-xs sm:text-sm text-muted-foreground">
+                <div className="text-xs sm:text-sm text-slate-600 dark:text-white/60">
                   Total Budget (click to edit)
                 </div>
               </div>
@@ -110,19 +110,19 @@ const BudgetSetupSection: React.FC = () => {
         </div>
 
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          <div className="p-3 sm:p-4 rounded-xl bg-secondary/50 backdrop-blur">
-            <div className="text-xs sm:text-sm text-muted-foreground">
+          <div className="p-3 sm:p-4 rounded-xl bg-slate-900/10 dark:bg-white/10 backdrop-blur-sm border border-slate-900/20 dark:border-white/20">
+            <div className="text-xs sm:text-sm text-slate-600 dark:text-white/60">
               Budgeted
             </div>
-            <div className="text-base sm:text-lg font-medium mt-1">
+            <div className="text-base sm:text-lg font-medium mt-1 text-slate-900 dark:text-white">
               {formatMoney(totalBudgeted, currency)}
             </div>
           </div>
-          <div className="p-3 sm:p-4 rounded-xl bg-primary/5 backdrop-blur">
-            <div className="text-xs sm:text-sm text-muted-foreground">
+          <div className="p-3 sm:p-4 rounded-xl bg-slate-900/10 dark:bg-white/10 backdrop-blur-sm border border-slate-900/20 dark:border-white/20">
+            <div className="text-xs sm:text-sm text-slate-600 dark:text-white/60">
               Available to Budget
             </div>
-            <div className="text-base sm:text-lg font-medium mt-1">
+            <div className="text-base sm:text-lg font-medium mt-1 text-slate-900 dark:text-white">
               {formatMoney(totalAvailable, currency)}
             </div>
           </div>
@@ -138,11 +138,11 @@ const BudgetSetupSection: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 sm:py-12 px-4 rounded-lg bg-muted/30">
-              <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 mb-3 sm:mb-4">
-                <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+            <div className="text-center py-8 sm:py-12 px-4 rounded-lg bg-slate-900/5 dark:bg-white/5 backdrop-blur-sm border border-slate-900/10 dark:border-white/10">
+              <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900/20 dark:bg-white/20 mb-3 sm:mb-4">
+                <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-slate-900 dark:text-white" />
               </div>
-              <p className="text-sm sm:text-base text-muted-foreground">
+              <p className="text-sm sm:text-base text-slate-700 dark:text-white/70">
                 No budget sections yet. Add one to get started.
               </p>
             </div>

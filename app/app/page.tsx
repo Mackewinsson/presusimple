@@ -8,6 +8,7 @@ import BudgetSetupSection from "@/components/budget/BudgetSetupSection";
 import DailySpendingTracker from "@/components/expenses/DailySpendingTracker";
 import ResetButton from "@/components/ResetButton";
 import Summary from "@/components/Summary";
+import ThemeToggle from "@/components/ThemeToggle";
 import { DollarSign, History } from "lucide-react";
 
 export default function BudgetApp() {
@@ -26,30 +27,33 @@ export default function BudgetApp() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
-      <header className="border-b bg-card/90 backdrop-blur-lg sticky top-0 z-50">
+    <div className="min-h-screen gradient-bg-dark">
+      <header className="border-b border-slate-300/50 dark:border-white/10 bg-white/5 dark:bg-white/5 backdrop-blur-xl sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <Link
               href="/"
               className="flex items-center gap-2 sm:gap-3 w-fit hover:opacity-90 transition-opacity"
             >
-              <div className="bg-primary text-primary-foreground p-1.5 sm:p-2 rounded-xl">
+              <div className="bg-white dark:bg-white text-slate-900 p-1.5 sm:p-2 rounded-xl shadow-lg">
                 <DollarSign className="h-4 w-4 sm:h-6 sm:w-6" />
               </div>
-              <h1 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                 Simple Budget
               </h1>
             </Link>
-            <Link
-              href="/history"
-              className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <History className="h-4 w-4 sm:h-5 sm:w-5" />
-              <span className="hidden sm:inline text-sm sm:text-base">
-                History
-              </span>
-            </Link>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <ThemeToggle />
+              <Link
+                href="/history"
+                className="flex items-center gap-1.5 sm:gap-2 text-slate-700 dark:text-white/70 hover:text-slate-900 dark:hover:text-white transition-colors"
+              >
+                <History className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline text-sm sm:text-base">
+                  History
+                </span>
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -67,9 +71,9 @@ export default function BudgetApp() {
         </div>
       </main>
 
-      <footer className="border-t py-3 sm:py-4 md:py-6 mt-4 sm:mt-6 md:mt-8 bg-card/70 backdrop-blur">
+      <footer className="border-t border-slate-300/50 dark:border-white/10 py-3 sm:py-4 md:py-6 mt-4 sm:mt-6 md:mt-8 bg-white/5 dark:bg-white/5 backdrop-blur-sm">
         <div className="container mx-auto px-4 sm:px-6">
-          <p className="text-center text-xs sm:text-sm text-muted-foreground">
+          <p className="text-center text-xs sm:text-sm text-slate-600 dark:text-white/60">
             &copy; {new Date().getFullYear()} Simple Budget. All rights
             reserved.
           </p>
