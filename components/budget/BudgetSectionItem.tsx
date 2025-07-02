@@ -11,8 +11,6 @@ import {
 } from "@/components/ui/card";
 import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks/useAppSelector";
-import { BudgetSection, removeSection } from "@/lib/store/budgetSlice";
 import BudgetCategoryItem from "./BudgetCategoryItem";
 import NewCategoryForm from "./NewCategoryForm";
 import {
@@ -27,30 +25,56 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-interface BudgetSectionItemProps {
-  section: BudgetSection;
+interface Category {
+  _id?: string;
+  id?: string;
+  name: string;
+  budgeted: number;
+  spent: number;
+  sectionId: string;
 }
 
-const BudgetSectionItem: React.FC<BudgetSectionItemProps> = ({ section }) => {
-  const dispatch = useAppDispatch();
+interface Section {
+  id?: string;
+  _id?: string;
+  name: string;
+  amount: number;
+}
+
+interface BudgetSectionItemProps {
+  section: Section;
+  categories: Category[];
+  onRemove: (sectionName: string) => void;
+  onAddCategory: (sectionId: string, name: string, budgeted: number) => void;
+  onRemoveCategory: (categoryId: string) => void;
+  onUpdateCategory: (
+    categoryId: string,
+    name: string,
+    budgeted: number
+  ) => void;
+  totalAvailable: number;
+}
+
+const BudgetSectionItem: React.FC<BudgetSectionItemProps> = ({
+  section,
+  categories,
+  onRemove,
+  onAddCategory,
+  onRemoveCategory,
+  onUpdateCategory,
+  totalAvailable,
+}) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isAddingCategory, setIsAddingCategory] = useState(false);
 
-  const categories = useAppSelector((state) =>
-    state.budget.categories.filter(
-      (category) => category.sectionId === section.id
-    )
+  const sectionCategories = categories.filter(
+    (category) => category.sectionId === (section.id || section._id)
   );
-
-  const handleRemoveSection = () => {
-    dispatch(removeSection({ id: section.id }));
-  };
-
-  const totalBudgeted = categories.reduce(
+  const totalBudgeted = sectionCategories.reduce(
     (sum, category) => sum + category.budgeted,
     0
   );
-  const totalSpent = categories.reduce(
+  const totalSpent = sectionCategories.reduce(
     (sum, category) => sum + category.spent,
     0
   );
@@ -100,7 +124,7 @@ const BudgetSectionItem: React.FC<BudgetSectionItemProps> = ({ section }) => {
                     Cancel
                   </AlertDialogCancel>
                   <AlertDialogAction
-                    onClick={handleRemoveSection}
+                    onClick={() => onRemove(section.name)}
                     className="text-sm sm:text-base"
                   >
                     Delete
@@ -111,10 +135,10 @@ const BudgetSectionItem: React.FC<BudgetSectionItemProps> = ({ section }) => {
           </div>
         </div>
         <CardDescription className="flex flex-col sm:flex-row sm:justify-between mt-1 text-xs sm:text-sm gap-1 sm:gap-0">
-          <span>Total: {categories.length} categories</span>
+          <span>Total: {sectionCategories.length} categories</span>
           <span>
             {totalSpent.toFixed(2)} / {totalBudgeted.toFixed(2)} (
-            {Math.round((totalSpent / totalBudgeted) * 100) || 0}%)
+            {Math.round((totalSpent / totalBudgeted) * 100) || 0}% )
           </span>
         </CardDescription>
       </CardHeader>
@@ -122,10 +146,16 @@ const BudgetSectionItem: React.FC<BudgetSectionItemProps> = ({ section }) => {
       {isExpanded && (
         <>
           <CardContent className="pb-4">
-            {categories.length > 0 ? (
+            {sectionCategories.length > 0 ? (
               <div className="space-y-3">
-                {categories.map((category) => (
-                  <BudgetCategoryItem key={category.id} category={category} />
+                {sectionCategories.map((category) => (
+                  <BudgetCategoryItem
+                    key={category._id || category.id}
+                    category={category}
+                    onRemove={onRemoveCategory}
+                    onUpdate={onUpdateCategory}
+                    totalAvailable={totalAvailable}
+                  />
                 ))}
               </div>
             ) : (
@@ -138,8 +168,17 @@ const BudgetSectionItem: React.FC<BudgetSectionItemProps> = ({ section }) => {
           <CardFooter className="flex justify-center pt-0 pb-4">
             {isAddingCategory ? (
               <NewCategoryForm
-                sectionId={section.id}
-                onComplete={() => setIsAddingCategory(false)}
+                sectionId={section.id || section._id || ""}
+                onComplete={(name: string, budgeted: number) => {
+                  onAddCategory(
+                    section.id || section._id || "",
+                    name,
+                    budgeted
+                  );
+                  setIsAddingCategory(false);
+                }}
+                onCancel={() => setIsAddingCategory(false)}
+                totalAvailable={totalAvailable}
               />
             ) : (
               <Button

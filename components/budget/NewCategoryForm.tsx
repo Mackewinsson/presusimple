@@ -12,18 +12,19 @@ import { formatMoney } from "@/lib/utils/formatMoney";
 
 interface NewCategoryFormProps {
   sectionId: string;
-  onComplete: () => void;
+  onComplete: (name: string, budgeted: number) => void;
+  onCancel: () => void;
+  totalAvailable: number;
 }
 
 const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
   sectionId,
   onComplete,
+  onCancel,
+  totalAvailable,
 }) => {
-  const dispatch = useAppDispatch();
   const [name, setName] = useState("");
   const [budgeted, setBudgeted] = useState("");
-
-  const totalAvailable = useAppSelector((state) => state.budget.totalAvailable);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,17 +50,9 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
       return;
     }
 
-    dispatch(
-      addCategory({
-        name: name.trim(),
-        budgeted: budgetAmount,
-        sectionId,
-      })
-    );
-
     setName("");
     setBudgeted("");
-    onComplete();
+    onComplete(name.trim(), budgetAmount);
 
     toast.success("Category added successfully");
   };
@@ -99,7 +92,7 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
             type="button"
             variant="ghost"
             size="sm"
-            onClick={onComplete}
+            onClick={onCancel}
             className="h-9 sm:h-8 text-sm sm:text-base"
           >
             <X className="h-4 w-4 mr-1" />

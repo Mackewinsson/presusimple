@@ -8,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useAppSelector } from "@/lib/hooks/useAppSelector";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -16,9 +15,47 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import NewExpenseForm from "./NewExpenseForm";
 import ExpenseList from "./ExpenseList";
 
-const DailySpendingTracker: React.FC = () => {
-  const { totalBudgeted, totalSpent } = useAppSelector((state) => state.budget);
-  const remaining = totalBudgeted - totalSpent;
+interface Budget {
+  _id: string;
+  totalBudgeted: number;
+  totalAvailable: number;
+}
+
+interface Category {
+  _id?: string;
+  id?: string;
+  name: string;
+  budgeted: number;
+  spent: number;
+  sectionId: string;
+}
+
+interface Expense {
+  _id: string;
+  categoryId: string;
+  amount: number;
+  description: string;
+  date: string;
+  type: "expense" | "income";
+}
+
+interface DailySpendingTrackerProps {
+  budget: Budget;
+  categories: Category[];
+  expenses: Expense[];
+}
+
+const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
+  budget,
+  categories,
+  expenses,
+}) => {
+  const totalSpent = expenses.reduce((sum, expense) => {
+    return (
+      sum + (expense.type === "expense" ? expense.amount : -expense.amount)
+    );
+  }, 0);
+  const remaining = budget.totalBudgeted - totalSpent;
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -71,7 +108,11 @@ const DailySpendingTracker: React.FC = () => {
           </TabsList>
 
           <TabsContent value="add" className="space-y-4">
-            <NewExpenseForm />
+            <NewExpenseForm
+              budget={budget}
+              categories={categories}
+              expenses={expenses}
+            />
           </TabsContent>
 
           <TabsContent value="history">
@@ -81,7 +122,7 @@ const DailySpendingTracker: React.FC = () => {
               }`}
             >
               <div className="h-full overflow-y-auto pr-2 scrollbar-thin">
-                <ExpenseList />
+                <ExpenseList categories={categories} expenses={expenses} />
               </div>
             </div>
           </TabsContent>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -10,19 +10,70 @@ import ResetButton from "@/components/ResetButton";
 import Summary from "@/components/Summary";
 import ThemeToggle from "@/components/ThemeToggle";
 import { DollarSign, History } from "lucide-react";
+import { useUserId, useBudget, useCategories, useExpenses } from "@/lib/hooks";
+
+// Add interfaces for Budget and Category to type state
+interface Category {
+  _id?: string;
+  id?: string;
+  name: string;
+  budgeted: number;
+  spent: number;
+  sectionId: string;
+}
+
+interface Section {
+  _id?: string;
+  name: string;
+}
+
+interface Budget {
+  _id: string;
+  month: string;
+  year: number;
+  sections: Section[];
+  totalBudgeted: number;
+  totalAvailable: number;
+}
+
+interface Expense {
+  _id: string;
+  categoryId: string;
+  amount: number;
+  description: string;
+  date: string;
+  type: "expense" | "income";
+}
 
 export default function BudgetApp() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  useEffect(() => {
+  // Get user ID using React Query
+  const { data: userId, isLoading: userIdLoading } = useUserId();
+
+  // Get data using React Query
+  const { data: budget, isLoading: budgetLoading } = useBudget(userId || "");
+  const { data: categories = [], isLoading: categoriesLoading } = useCategories(
+    userId || ""
+  );
+  const { data: expenses = [], isLoading: expensesLoading } = useExpenses(
+    userId || ""
+  );
+
+  // Check if any data is loading
+  const isLoading =
+    userIdLoading || budgetLoading || categoriesLoading || expensesLoading;
+
+  React.useEffect(() => {
     if (status === "loading") return;
     if (!session) {
       router.replace("/auth/signin");
+      return;
     }
   }, [session, status, router]);
 
-  if (status === "loading" || !session) {
+  if (status === "loading" || !session || isLoading) {
     return null;
   }
 
@@ -61,12 +112,31 @@ export default function BudgetApp() {
       <main className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8">
         <div className="grid gap-4 sm:gap-6 md:gap-8 grid-cols-1 xl:grid-cols-2">
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
-            <BudgetSetupSection />
-            <ResetButton />
+            <BudgetSetupSection
+              budget={budget || null}
+              categories={categories}
+            />
+            <ResetButton
+              budget={budget || null}
+              categories={categories}
+              expenses={expenses}
+            />
           </div>
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
-            <DailySpendingTracker />
-            <Summary />
+            {budget && (
+              <DailySpendingTracker
+                budget={budget}
+                categories={categories}
+                expenses={expenses}
+              />
+            )}
+            {budget && (
+              <Summary
+                budget={budget}
+                categories={categories}
+                expenses={expenses}
+              />
+            )}
           </div>
         </div>
       </main>

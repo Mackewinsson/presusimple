@@ -1,9 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks/useAppSelector";
-import { addExpense, TransactionType } from "@/lib/store/expenseSlice";
-import { addExpenseToCategory } from "@/lib/store/budgetSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,10 +14,49 @@ import { Label } from "@/components/ui/label";
 import { Plus, ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useSession } from "next-auth/react";
+import { useUserId, useCreateExpense } from "@/lib/hooks";
 
-const NewExpenseForm: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const categories = useAppSelector((state) => state.budget.categories);
+interface Budget {
+  _id: string;
+  totalBudgeted: number;
+  totalAvailable: number;
+}
+
+interface Category {
+  _id?: string;
+  id?: string;
+  name: string;
+  budgeted: number;
+  spent: number;
+  sectionId: string;
+}
+
+interface Expense {
+  _id: string;
+  categoryId: string;
+  amount: number;
+  description: string;
+  date: string;
+  type: "expense" | "income";
+}
+
+type TransactionType = "expense" | "income";
+
+interface NewExpenseFormProps {
+  budget: Budget;
+  categories: Category[];
+  expenses: Expense[];
+}
+
+const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
+  budget,
+  categories,
+  expenses,
+}) => {
+  const { data: session } = useSession();
+  const { data: userId } = useUserId();
+  const createExpenseMutation = useCreateExpense();
 
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -28,163 +64,139 @@ const NewExpenseForm: React.FC = () => {
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [type, setType] = useState<TransactionType>("expense");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (amount === "" || categoryId === "") {
+    if (!amount || !description || !categoryId) {
       toast.error("Please fill in all required fields");
       return;
     }
 
-    const transactionAmount = parseFloat(amount);
-
-    if (isNaN(transactionAmount) || transactionAmount <= 0) {
+    const numAmount = parseFloat(amount);
+    if (isNaN(numAmount) || numAmount <= 0) {
       toast.error("Please enter a valid amount");
       return;
     }
 
-    // Add the transaction
-    dispatch(
-      addExpense({
-        amount: transactionAmount,
-        description: description.trim(),
+    if (!userId) {
+      toast.error("You must be signed in to add transactions");
+      return;
+    }
+
+    try {
+      await createExpenseMutation.mutateAsync({
         categoryId,
+        amount: numAmount,
+        description: description.trim(),
         date,
         type,
-      })
-    );
+        userId,
+      });
 
-    // Update the category's spent amount
-    dispatch(
-      addExpenseToCategory({
-        categoryId,
-        amount: type === "expense" ? transactionAmount : -transactionAmount,
-      })
-    );
-
-    // Reset the form
-    setAmount("");
-    setDescription("");
-    setDate(format(new Date(), "yyyy-MM-dd"));
-    setType("expense");
-
-    toast.success(
-      `${type === "expense" ? "Expense" : "Income"} added successfully`
-    );
+      // Reset form
+      setAmount("");
+      setDescription("");
+      setCategoryId("");
+      setDate(format(new Date(), "yyyy-MM-dd"));
+      setType("expense");
+    } catch (error) {
+      console.error("Error adding expense:", error);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="type" className="text-sm sm:text-base">
-              Type*
-            </Label>
-            <Select
-              value={type}
-              onValueChange={(value: TransactionType) => setType(value)}
-            >
-              <SelectTrigger id="type" className="text-sm sm:text-base">
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="expense">
-                  <div className="flex items-center gap-2">
-                    <ArrowUpCircle className="h-4 w-4 text-destructive" />
-                    Expense
-                  </div>
-                </SelectItem>
-                <SelectItem value="income">
-                  <div className="flex items-center gap-2">
-                    <ArrowDownCircle className="h-4 w-4 text-primary" />
-                    Income
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="amount" className="text-sm sm:text-base">
-              Amount*
-            </Label>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="amount">Amount</Label>
+          <div className="relative">
             <Input
               id="amount"
               type="number"
+              placeholder="0.00"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder="0.00"
-              min="0.01"
+              min="0"
               step="0.01"
               required
-              className="text-sm sm:text-base"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="category" className="text-sm sm:text-base">
-              Category*
-            </Label>
-            <Select value={categoryId} onValueChange={setCategoryId}>
-              <SelectTrigger id="category" className="text-sm sm:text-base">
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.length > 0 ? (
-                  categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))
-                ) : (
-                  <SelectItem value="none" disabled>
-                    No categories available
-                  </SelectItem>
-                )}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="date" className="text-sm sm:text-base">
-              Date*
-            </Label>
-            <Input
-              id="date"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              required
-              className="text-sm sm:text-base"
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="description" className="text-sm sm:text-base">
-            Description (optional)
-          </Label>
+          <Label htmlFor="type">Type</Label>
+          <Select
+            value={type}
+            onValueChange={(value: TransactionType) => setType(value)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="expense">
+                <div className="flex items-center gap-2">
+                  <ArrowUpCircle className="h-4 w-4 text-destructive" />
+                  Expense
+                </div>
+              </SelectItem>
+              <SelectItem value="income">
+                <div className="flex items-center gap-2">
+                  <ArrowDownCircle className="h-4 w-4 text-primary" />
+                  Income
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="description">Description</Label>
+        <Input
+          id="description"
+          type="text"
+          placeholder="What was this transaction for?"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+        />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="category">Category</Label>
+          <Select value={categoryId} onValueChange={setCategoryId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((category) => (
+                <SelectItem
+                  key={category._id || category.id}
+                  value={category._id || category.id || ""}
+                >
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="date">Date</Label>
           <Input
-            id="description"
-            type="text"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="What was this transaction for?"
-            className="text-sm sm:text-base"
+            id="date"
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
           />
         </div>
       </div>
 
-      <Button
-        type="submit"
-        className="w-full text-sm sm:text-base"
-        disabled={amount === "" || categoryId === "" || categories.length === 0}
-      >
+      <Button type="submit" className="w-full">
         <Plus className="h-4 w-4 mr-2" />
-        Add {type === "expense" ? "Expense" : "Income"}
+        Add Transaction
       </Button>
     </form>
   );

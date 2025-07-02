@@ -1,11 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useAppDispatch } from "@/lib/hooks/useAppDispatch";
-import { useAppSelector } from "@/lib/hooks/useAppSelector";
-import { resetBudget } from "@/lib/store/budgetSlice";
-import { clearExpenses } from "@/lib/store/expenseSlice";
-import { saveBudget } from "@/lib/store/monthlyBudgetSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,36 +18,92 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useUserId, useResetBudget, useSaveMonthlyBudget } from "@/lib/hooks";
 
-const ResetButton: React.FC = () => {
-  const dispatch = useAppDispatch();
+interface Category {
+  _id?: string;
+  id?: string;
+  name: string;
+  budgeted: number;
+  spent: number;
+  sectionId: string;
+}
+
+interface Expense {
+  _id: string;
+  categoryId: string;
+  amount: number;
+  description: string;
+  date: string;
+  type: "expense" | "income";
+}
+
+interface Budget {
+  _id: string;
+  month: string;
+  year: number;
+  sections: any[];
+  totalBudgeted: number;
+  totalAvailable: number;
+}
+
+interface ResetButtonProps {
+  budget: Budget | null;
+  categories: Category[];
+  expenses: Expense[];
+}
+
+const ResetButton: React.FC<ResetButtonProps> = ({
+  budget,
+  categories,
+  expenses,
+}) => {
+  const { data: userId } = useUserId();
+  const resetBudgetMutation = useResetBudget();
+  const saveMonthlyBudgetMutation = useSaveMonthlyBudget();
+
   const [monthName, setMonthName] = useState(() =>
     format(new Date(), "MMMM yyyy")
   );
 
-  const { sections, categories, totalBudgeted, totalSpent } = useAppSelector(
-    (state) => state.budget
-  );
-  const expenses = useAppSelector((state) => state.expenses.expenses);
+  const handleReset = async () => {
+    if (!budget || !userId) {
+      toast.error("No budget found to reset");
+      return;
+    }
 
-  const handleReset = () => {
-    // Save current month's data
-    dispatch(
-      saveBudget({
+    try {
+      // Calculate total spent from expenses
+      const totalSpent = expenses.reduce((sum, expense) => {
+        return (
+          sum + (expense.type === "expense" ? expense.amount : -expense.amount)
+        );
+      }, 0);
+
+      // First, save the current month's data
+      await saveMonthlyBudgetMutation.mutateAsync({
         name: monthName,
-        sections,
-        categories,
-        expenses,
-        totalBudgeted,
-        totalSpent,
-      })
-    );
+        month: budget.month,
+        year: budget.year,
+        categories: categories.map((cat) => ({
+          name: cat.name,
+          budgeted: cat.budgeted,
+          spent: cat.spent,
+        })),
+        totalBudgeted: budget.totalBudgeted,
+        totalSpent: totalSpent,
+        expensesCount: expenses.length,
+        userId,
+      });
 
-    // Reset spending but keep categories
-    dispatch(resetBudget());
-    dispatch(clearExpenses());
+      // Then reset the budget (clear expenses and reset spent amounts)
+      await resetBudgetMutation.mutateAsync(userId);
 
-    toast.success("Current month saved and reset for a new month");
+      toast.success("Current month saved and reset for a new month");
+    } catch (error) {
+      console.error("Error during reset:", error);
+      toast.error("Failed to reset budget. Please try again.");
+    }
   };
 
   return (
@@ -61,6 +112,7 @@ const ResetButton: React.FC = () => {
         <Button
           variant="outline"
           className="w-full flex items-center justify-center text-destructive border-destructive/30 hover:bg-destructive/10 text-sm sm:text-base"
+          disabled={!budget}
         >
           <Trash2 className="h-4 w-4 mr-2" />
           Reset Month

@@ -1,64 +1,66 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { 
-  Card,
-  CardContent
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Edit2, Trash2 } from 'lucide-react';
-import { useAppDispatch, useAppSelector } from '@/lib/hooks/useAppSelector';
-import { 
-  BudgetCategory, 
-  removeCategory, 
-  updateCategory 
-} from '@/lib/store/budgetSlice';
-import { formatMoney } from '@/lib/utils/formatMoney';
-import { Input } from '@/components/ui/input';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Edit2, Trash2 } from "lucide-react";
+import { formatMoney } from "@/lib/utils/formatMoney";
+import { Input } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 interface BudgetCategoryItemProps {
-  category: BudgetCategory;
+  category: any;
+  onRemove: (categoryId: string) => void;
+  onUpdate: (categoryId: string, name: string, budgeted: number) => void;
+  totalAvailable: number;
 }
 
-const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({ category }) => {
-  const dispatch = useAppDispatch();
+const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
+  category,
+  onRemove,
+  onUpdate,
+  totalAvailable,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(category.name);
   const [budgeted, setBudgeted] = useState(category.budgeted.toString());
-  
-  const totalAvailable = useAppSelector(state => state.budget.totalAvailable);
-  
+
   const handleRemoveCategory = () => {
-    dispatch(removeCategory({ id: category.id }));
-    toast.success('Category removed');
+    onRemove(category._id || category.id);
+    toast.success("Category removed");
   };
-  
+
   const handleSaveEdit = () => {
     const budgetAmount = parseFloat(budgeted);
-    
     if (isNaN(budgetAmount) || budgetAmount < 0) {
-      toast.error('Please enter a valid amount');
+      toast.error("Please enter a valid amount");
       return;
     }
-    
     const budgetDiff = budgetAmount - category.budgeted;
     if (budgetDiff > totalAvailable) {
-      toast.error(`Cannot increase budget by more than available amount (${formatMoney(totalAvailable)})`);
+      toast.error(
+        `Cannot increase budget by more than available amount (${formatMoney(
+          totalAvailable
+        )})`
+      );
       return;
     }
-    
-    dispatch(updateCategory({ 
-      id: category.id, 
-      name, 
-      budgeted: budgetAmount 
-    }));
-    
+    onUpdate(category._id || category.id, name, budgetAmount);
     setIsEditing(false);
-    toast.success('Category updated');
+    toast.success("Category updated");
   };
-  
+
   const handleCancelEdit = () => {
     setName(category.name);
     setBudgeted(category.budgeted.toString());
@@ -67,9 +69,9 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({ category }) => 
 
   const getProgressColor = () => {
     const percentage = (category.spent / category.budgeted) * 100;
-    if (percentage >= 100) return 'danger';
-    if (percentage >= 80) return 'warning';
-    return 'success';
+    if (percentage >= 100) return "danger";
+    if (percentage >= 80) return "warning";
+    return "success";
   };
 
   return (
@@ -134,7 +136,6 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({ category }) => 
                 >
                   <Edit2 className="h-4 w-4" />
                 </Button>
-                
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button
@@ -149,7 +150,9 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({ category }) => 
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete Category</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Are you sure you want to delete this category? This will remove the budgeted amount and any expenses assigned to it.
+                        Are you sure you want to delete this category? This will
+                        remove the budgeted amount and any expenses assigned to
+                        it.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -162,30 +165,37 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({ category }) => 
                 </AlertDialog>
               </div>
             </div>
-            
             <div className="flex justify-between text-sm mb-1">
               <span className="text-muted-foreground">
-                {formatMoney(category.spent)} of {formatMoney(category.budgeted)}
+                {formatMoney(category.spent)} of{" "}
+                {formatMoney(category.budgeted)}
               </span>
-              <span className={
-                category.spent > category.budgeted 
-                  ? 'text-destructive font-medium' 
-                  : category.spent / category.budgeted > 0.8 
-                    ? 'text-amber-500 font-medium' 
-                    : 'text-muted-foreground'
-              }>
-                {category.spent >= category.budgeted 
-                  ? `${((category.spent / category.budgeted - 1) * 100).toFixed(0)}% over` 
-                  : `${((category.spent / category.budgeted) * 100).toFixed(0)}%`
+              <span
+                className={
+                  category.spent > category.budgeted
+                    ? "text-destructive font-medium"
+                    : category.spent / category.budgeted > 0.8
+                    ? "text-amber-500 font-medium"
+                    : "text-muted-foreground"
                 }
+              >
+                {category.spent >= category.budgeted
+                  ? `${((category.spent / category.budgeted - 1) * 100).toFixed(
+                      0
+                    )}% over`
+                  : `${((category.spent / category.budgeted) * 100).toFixed(
+                      0
+                    )}%`}
               </span>
             </div>
-            
             <div className="budget-progress">
-              <div 
+              <div
                 className={`budget-progress-bar ${getProgressColor()}`}
-                style={{ 
-                  width: `${Math.min(100, (category.spent / category.budgeted) * 100)}%`
+                style={{
+                  width: `${Math.min(
+                    100,
+                    (category.spent / category.budgeted) * 100
+                  )}%`,
                 }}
               />
             </div>

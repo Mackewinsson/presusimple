@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useAppSelector, useAppDispatch } from "@/lib/hooks/useAppSelector";
 import {
   Card,
   CardContent,
@@ -12,42 +11,335 @@ import {
 import { Button } from "@/components/ui/button";
 import { Plus, DollarSign } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import BudgetSectionItem from "./BudgetSectionItem";
 import NewSectionForm from "./NewSectionForm";
 import { formatMoney } from "@/lib/utils/formatMoney";
-import { setTotalAvailable } from "@/lib/store/budgetSlice";
 import { toast } from "sonner";
+import { currencies, Currency } from "@/lib/store/currencySlice";
+import { useSession } from "next-auth/react";
+import {
+  useUserId,
+  useCreateBudget,
+  useCreateCategory,
+  useUpdateCategory,
+  useDeleteCategory,
+  useUpdateBudget,
+} from "@/lib/hooks";
 
-const BudgetSetupSection: React.FC = () => {
-  const dispatch = useAppDispatch();
+interface Category {
+  _id?: string;
+  id?: string;
+  name: string;
+  budgeted: number;
+  spent: number;
+  sectionId: string;
+}
+
+interface Section {
+  _id?: string;
+  id?: string;
+  name: string;
+  amount: number;
+}
+
+interface Budget {
+  _id: string;
+  sections: Section[];
+  totalBudgeted: number;
+  totalAvailable: number;
+}
+
+interface BudgetSetupSectionProps {
+  budget: Budget | null;
+  categories: Category[];
+}
+
+const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
+  budget,
+  categories,
+}) => {
+  const { data: session } = useSession();
+  const { data: userId } = useUserId();
+
+  // React Query mutations
+  const createBudgetMutation = useCreateBudget();
+  const createCategoryMutation = useCreateCategory();
+  const updateCategoryMutation = useUpdateCategory();
+  const deleteCategoryMutation = useDeleteCategory();
+  const updateBudgetMutation = useUpdateBudget();
+
   const [isAddingSection, setIsAddingSection] = useState(false);
   const [isEditingTotal, setIsEditingTotal] = useState(false);
   const [totalBudget, setTotalBudget] = useState("");
+  const currency: Currency = currencies[0]; // Default to USD, or fetch from user/session if needed
+  const [newTotal, setNewTotal] = useState("");
+  const [newMonth, setNewMonth] = useState("January");
+  const [newYear, setNewYear] = useState(new Date().getFullYear());
 
-  const { sections, totalBudgeted, totalAvailable } = useAppSelector(
-    (state) => state.budget
-  );
-  const currency = useAppSelector((state) => state.currency.selected);
+  // Month names array
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
-  const handleSetTotalBudget = () => {
+  // Convert month name to number
+  const getMonthNumber = (monthName: string) => {
+    return months.indexOf(monthName) + 1;
+  };
+
+  // Category CRUD handlers
+  const handleAddCategory = async (
+    sectionId: string,
+    name: string,
+    budgeted: number
+  ) => {
+    if (!userId) return;
+
+    try {
+      await createCategoryMutation.mutateAsync({
+        name,
+        budgeted,
+        sectionId,
+        userId,
+      });
+
+      // Update budget totals
+      if (budget) {
+        const updatedBudget = {
+          ...budget,
+          totalBudgeted: budget.totalBudgeted + budgeted,
+          totalAvailable: budget.totalAvailable - budgeted,
+        };
+
+        await updateBudgetMutation.mutateAsync({
+          id: budget._id,
+          updates: updatedBudget,
+        });
+      }
+    } catch (error) {
+      console.error("Error adding category:", error);
+    }
+  };
+
+  const handleRemoveCategory = async (categoryId: string) => {
+    try {
+      const category = categories.find(
+        (c) => c._id === categoryId || c.id === categoryId
+      );
+      if (!category) return;
+
+      await deleteCategoryMutation.mutateAsync(categoryId);
+
+      // Update budget totals
+      if (budget) {
+        const updatedBudget = {
+          ...budget,
+          totalBudgeted: budget.totalBudgeted - category.budgeted,
+          totalAvailable: budget.totalAvailable + category.budgeted,
+        };
+
+        await updateBudgetMutation.mutateAsync({
+          id: budget._id,
+          updates: updatedBudget,
+        });
+      }
+    } catch (error) {
+      console.error("Error removing category:", error);
+    }
+  };
+
+  const handleUpdateCategory = async (
+    categoryId: string,
+    name: string,
+    budgeted: number
+  ) => {
+    try {
+      const category = categories.find(
+        (c) => c._id === categoryId || c.id === categoryId
+      );
+      if (!category) return;
+
+      const budgetDiff = budgeted - category.budgeted;
+
+      await updateCategoryMutation.mutateAsync({
+        id: categoryId,
+        updates: { name, budgeted },
+      });
+
+      // Update budget totals if budgeted amount changed
+      if (budget && budgetDiff !== 0) {
+        const updatedBudget = {
+          ...budget,
+          totalBudgeted: budget.totalBudgeted + budgetDiff,
+          totalAvailable: budget.totalAvailable - budgetDiff,
+        };
+
+        await updateBudgetMutation.mutateAsync({
+          id: budget._id,
+          updates: updatedBudget,
+        });
+      }
+    } catch (error) {
+      console.error("Error updating category:", error);
+    }
+  };
+
+  // Update total budget
+  const handleSetTotalBudget = async () => {
+    if (!budget) return;
     const amount = parseFloat(totalBudget);
-
     if (isNaN(amount) || amount < 0) {
       toast.error("Please enter a valid amount");
       return;
     }
-
-    if (amount < totalBudgeted) {
+    if (amount < budget.totalBudgeted) {
       toast.error("New total cannot be less than currently budgeted amount");
       return;
     }
 
-    dispatch(setTotalAvailable(amount - totalBudgeted));
+    await updateBudgetMutation.mutateAsync({
+      id: budget._id,
+      updates: {
+        ...budget,
+        totalAvailable: amount - budget.totalBudgeted,
+      },
+    });
+
     setIsEditingTotal(false);
     setTotalBudget("");
-    toast.success("Total budget updated");
   };
 
+  // Add a new section
+  const handleAddSection = async (name: string) => {
+    if (!budget) return;
+    const newSection = { name, amount: 0 };
+    const updatedSections = [...budget.sections, newSection];
+
+    await updateBudgetMutation.mutateAsync({
+      id: budget._id,
+      updates: {
+        ...budget,
+        sections: updatedSections,
+      },
+    });
+
+    setIsAddingSection(false);
+  };
+
+  // Remove a section
+  const handleRemoveSection = async (sectionName: string) => {
+    if (!budget) return;
+    const section = budget.sections.find((s) => s.name === sectionName);
+    if (!section) return;
+    const updatedSections = budget.sections.filter(
+      (s) => s.name !== sectionName
+    );
+
+    await updateBudgetMutation.mutateAsync({
+      id: budget._id,
+      updates: {
+        ...budget,
+        sections: updatedSections,
+      },
+    });
+  };
+
+  const handleCreateBudget = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const total = parseFloat(newTotal);
+    if (isNaN(total) || total <= 0) {
+      toast.error("Please enter a valid total budget");
+      return;
+    }
+    if (!userId) {
+      toast.error("You must be signed in to create a budget");
+      return;
+    }
+
+    await createBudgetMutation.mutateAsync({
+      month: months[getMonthNumber(newMonth) - 1],
+      year: newYear,
+      totalBudgeted: 0,
+      userId,
+    });
+  };
+
+  if (!session) return <div>Please sign in to manage your budget.</div>;
+
+  // Debug: log budget value
+  console.log("budget", budget);
+
+  // Show create form if no budget
+  if (!budget) {
+    return (
+      <Card className="glass-card hover-card max-w-md mx-auto mt-10">
+        <CardHeader>
+          <CardTitle>Create Your Budget</CardTitle>
+          <CardDescription>
+            Set your total budget, month, and year to get started.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleCreateBudget} className="space-y-4">
+            <Input
+              type="number"
+              placeholder="Total Budget"
+              value={newTotal}
+              onChange={(e) => setNewTotal(e.target.value)}
+              min={0}
+              step="0.01"
+              required
+            />
+            <div className="flex gap-2">
+              <Select value={newMonth} onValueChange={setNewMonth}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select month" />
+                </SelectTrigger>
+                <SelectContent>
+                  {months.map((month) => (
+                    <SelectItem key={month} value={month}>
+                      {month}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                type="number"
+                placeholder="Year"
+                value={newYear}
+                onChange={(e) => setNewYear(Number(e.target.value))}
+                min={2000}
+                max={2100}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full">
+              Create Budget
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Only render budget UI if budget exists
   return (
     <Card className="glass-card hover-card">
       <CardHeader>
@@ -71,7 +363,7 @@ const BudgetSetupSection: React.FC = () => {
                     onChange={(e) => setTotalBudget(e.target.value)}
                     placeholder="Total budget"
                     className="w-full sm:w-40 pl-9"
-                    min={totalBudgeted}
+                    min={budget?.totalBudgeted}
                     step="0.01"
                   />
                 </div>
@@ -99,7 +391,11 @@ const BudgetSetupSection: React.FC = () => {
                 className="p-3 rounded-lg bg-slate-900/10 dark:bg-white/10 hover:bg-slate-900/20 dark:hover:bg-white/20 transition-all duration-200 cursor-pointer border border-slate-900/20 dark:border-white/20"
               >
                 <div className="text-base sm:text-lg font-medium text-slate-900 dark:text-white">
-                  {formatMoney(totalBudgeted + totalAvailable, currency)}
+                  {formatMoney(
+                    (budget?.totalBudgeted || 0) +
+                      (budget?.totalAvailable || 0),
+                    currency
+                  )}
                 </div>
                 <div className="text-xs sm:text-sm text-slate-600 dark:text-white/60">
                   Total Budget (click to edit)
@@ -115,7 +411,7 @@ const BudgetSetupSection: React.FC = () => {
               Budgeted
             </div>
             <div className="text-base sm:text-lg font-medium mt-1 text-slate-900 dark:text-white">
-              {formatMoney(totalBudgeted, currency)}
+              {formatMoney(budget?.totalBudgeted || 0, currency)}
             </div>
           </div>
           <div className="p-3 sm:p-4 rounded-xl bg-slate-900/10 dark:bg-white/10 backdrop-blur-sm border border-slate-900/20 dark:border-white/20">
@@ -123,7 +419,7 @@ const BudgetSetupSection: React.FC = () => {
               Available to Budget
             </div>
             <div className="text-base sm:text-lg font-medium mt-1 text-slate-900 dark:text-white">
-              {formatMoney(totalAvailable, currency)}
+              {formatMoney(budget?.totalAvailable || 0, currency)}
             </div>
           </div>
         </div>
@@ -131,10 +427,19 @@ const BudgetSetupSection: React.FC = () => {
 
       <CardContent>
         <div className="space-y-4">
-          {sections.length > 0 ? (
+          {budget && budget.sections.length > 0 ? (
             <div className="space-y-4">
-              {sections.map((section) => (
-                <BudgetSectionItem key={section.id} section={section} />
+              {budget.sections.map((section) => (
+                <BudgetSectionItem
+                  key={section._id || section.name}
+                  section={section}
+                  categories={categories}
+                  onRemove={handleRemoveSection}
+                  onAddCategory={handleAddCategory}
+                  onRemoveCategory={handleRemoveCategory}
+                  onUpdateCategory={handleUpdateCategory}
+                  totalAvailable={budget.totalAvailable}
+                />
               ))}
             </div>
           ) : (
@@ -149,7 +454,10 @@ const BudgetSetupSection: React.FC = () => {
           )}
 
           {isAddingSection ? (
-            <NewSectionForm onComplete={() => setIsAddingSection(false)} />
+            <NewSectionForm
+              onComplete={(name: string) => handleAddSection(name)}
+              onCancel={() => setIsAddingSection(false)}
+            />
           ) : (
             <Button
               onClick={() => setIsAddingSection(true)}

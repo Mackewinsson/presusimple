@@ -1,49 +1,76 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useAppSelector } from '@/lib/hooks/useAppSelector';
-import ExpenseItem from './ExpenseItem';
-import { compareDesc, isWithinInterval, startOfDay, endOfDay, parseISO } from 'date-fns';
-import { Input } from '@/components/ui/input';
-import { Search, Calendar } from 'lucide-react';
-import { Label } from '@/components/ui/label';
+import { useState } from "react";
+import ExpenseItem from "./ExpenseItem";
+import {
+  compareDesc,
+  isWithinInterval,
+  startOfDay,
+  endOfDay,
+  parseISO,
+} from "date-fns";
+import { Input } from "@/components/ui/input";
+import { Search, Calendar } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
-const ExpenseList: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  
-  const expenses = useAppSelector(state => state.expenses.expenses);
-  const categories = useAppSelector(state => state.budget.categories);
-  
+interface Category {
+  _id?: string;
+  id?: string;
+  name: string;
+  budgeted: number;
+  spent: number;
+  sectionId: string;
+}
+
+interface Expense {
+  _id: string;
+  categoryId: string;
+  amount: number;
+  description: string;
+  date: string;
+  type: "expense" | "income";
+}
+
+interface ExpenseListProps {
+  categories: Category[];
+  expenses: Expense[];
+}
+
+const ExpenseList: React.FC<ExpenseListProps> = ({ categories, expenses }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   // Sort expenses by date (most recent first)
-  const sortedExpenses = [...expenses].sort((a, b) => 
+  const sortedExpenses = [...expenses].sort((a, b) =>
     compareDesc(new Date(a.date), new Date(b.date))
   );
-  
+
   // Filter expenses based on search term and date range
-  const filteredExpenses = sortedExpenses.filter(expense => {
-    const category = categories.find(cat => cat.id === expense.categoryId);
+  const filteredExpenses = sortedExpenses.filter((expense) => {
+    const category = categories.find(
+      (cat) => cat._id === expense.categoryId || cat.id === expense.categoryId
+    );
     const searchLower = searchTerm.toLowerCase();
-    
+
     // Text search
-    const matchesSearch = 
+    const matchesSearch =
       expense.description.toLowerCase().includes(searchLower) ||
       category?.name.toLowerCase().includes(searchLower);
-    
+
     // Date range filter
     let matchesDateRange = true;
     if (startDate && endDate) {
       const expenseDate = parseISO(expense.date);
       matchesDateRange = isWithinInterval(expenseDate, {
         start: startOfDay(parseISO(startDate)),
-        end: endOfDay(parseISO(endDate))
+        end: endOfDay(parseISO(endDate)),
       });
     }
-    
+
     return matchesSearch && matchesDateRange;
   });
-  
+
   if (expenses.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
@@ -51,7 +78,7 @@ const ExpenseList: React.FC = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="space-y-4">
       <div className="space-y-4">
@@ -65,7 +92,7 @@ const ExpenseList: React.FC = () => {
             className="pl-9"
           />
         </div>
-        
+
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="startDate">Start Date</Label>
@@ -76,7 +103,7 @@ const ExpenseList: React.FC = () => {
               onChange={(e) => setStartDate(e.target.value)}
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="endDate">End Date</Label>
             <Input
@@ -88,16 +115,17 @@ const ExpenseList: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       <div className="space-y-2">
-        {filteredExpenses.map(expense => (
-          <ExpenseItem 
-            key={expense.id} 
+        {filteredExpenses.map((expense) => (
+          <ExpenseItem
+            key={expense._id}
             expense={expense}
+            categories={categories}
           />
         ))}
       </div>
-      
+
       {filteredExpenses.length === 0 && (
         <div className="text-center py-4 text-muted-foreground">
           No transactions found matching your search.

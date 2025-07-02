@@ -1,30 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { useAppDispatch } from "@/lib/hooks/useAppDispatch";
-import { addSection } from "@/lib/store/budgetSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
+import { toast } from "sonner";
 
 interface NewSectionFormProps {
-  onComplete: () => void;
+  onComplete: (name: string) => void;
+  onCancel: () => void;
 }
 
-const NewSectionForm: React.FC<NewSectionFormProps> = ({ onComplete }) => {
-  const dispatch = useAppDispatch();
+const NewSectionForm: React.FC<NewSectionFormProps> = ({
+  onComplete,
+  onCancel,
+}) => {
   const [name, setName] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (name.trim() === "") {
+      toast.error("Please enter a section name");
       return;
     }
 
-    dispatch(addSection({ name: name.trim() }));
-    setName("");
-    onComplete();
+    onComplete(name.trim());
   };
 
   return (
@@ -44,7 +45,7 @@ const NewSectionForm: React.FC<NewSectionFormProps> = ({ onComplete }) => {
         <Button
           type="button"
           variant="outline"
-          onClick={onComplete}
+          onClick={onCancel}
           className="flex items-center justify-center text-sm sm:text-base"
         >
           <X className="h-4 w-4 mr-1" />
