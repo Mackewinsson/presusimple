@@ -62,7 +62,11 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   categories,
 }) => {
   const { data: session } = useSession();
-  const { data: userId } = useUserId();
+  const {
+    data: userId,
+    isLoading: userIdLoading,
+    error: userIdError,
+  } = useUserId();
   const { data: expenses = [] } = useExpenses(userId || "");
 
   // React Query mutations
@@ -218,7 +222,12 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       toast.error("Please enter a valid amount");
       return;
     }
-    if (amount < budget.totalBudgeted) {
+
+    const currentTotal =
+      (budget.totalBudgeted || 0) + (budget.totalAvailable || 0);
+    const currentlyBudgeted = budget.totalBudgeted || 0;
+
+    if (amount < currentlyBudgeted) {
       toast.error("New total cannot be less than currently budgeted amount");
       return;
     }
@@ -227,7 +236,8 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       id: budget._id,
       updates: {
         ...budget,
-        totalAvailable: amount - budget.totalBudgeted,
+        totalBudgeted: currentlyBudgeted, // Keep currently budgeted amount
+        totalAvailable: amount - currentlyBudgeted, // Adjust available amount
       },
     });
 
@@ -288,13 +298,54 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     await createBudgetMutation.mutateAsync({
       month: monthNumber,
       year: newYear,
-      totalBudgeted: total,
-      totalAvailable: total,
+      totalBudgeted: 0, // Start with 0 budgeted to categories
+      totalAvailable: total, // All amount is available to budget
       user: userId,
     });
   };
 
   if (!session) return <div>Please sign in to manage your budget.</div>;
+
+  // Show loading state while fetching userId
+  if (userIdLoading) {
+    return (
+      <Card className="glass-card hover-card max-w-md mx-auto mt-10">
+        <CardHeader>
+          <CardTitle>Loading...</CardTitle>
+          <CardDescription>
+            Please wait while we load your account information.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Show error state if userId fetch failed
+  if (userIdError) {
+    return (
+      <Card className="glass-card hover-card max-w-md mx-auto mt-10">
+        <CardHeader>
+          <CardTitle>Error</CardTitle>
+          <CardDescription>
+            Failed to load your account information. Please try refreshing the
+            page.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-4">
+            <p className="text-sm text-muted-foreground">
+              Error: {userIdError.message}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   // Debug: log budget value
   console.log("budget", budget);
