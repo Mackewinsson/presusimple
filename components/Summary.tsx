@@ -25,12 +25,7 @@ import { Button } from "./ui/button";
 import { Download, FileSpreadsheet } from "lucide-react";
 import { utils, writeFile } from "xlsx";
 import { toast } from "sonner";
-
-interface Budget {
-  _id: string;
-  totalBudgeted: number;
-  totalAvailable: number;
-}
+import type { Budget } from "@/lib/api";
 
 interface Category {
   _id?: string;

@@ -34,6 +34,7 @@ import {
 } from "@/lib/hooks";
 import { LoadingButton } from "@/components/ui/loading-skeleton";
 import { useExpenses } from "@/lib/hooks/useExpenseQueries";
+import type { Budget } from "@/lib/api";
 
 interface Category {
   _id?: string;
@@ -49,13 +50,6 @@ interface Section {
   id?: string;
   name: string;
   amount: number;
-}
-
-interface Budget {
-  _id: string;
-  sections: Section[];
-  totalBudgeted: number;
-  totalAvailable: number;
 }
 
 interface BudgetSetupSectionProps {

@@ -14,12 +14,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import NewExpenseForm from "./NewExpenseForm";
 import ExpenseList from "./ExpenseList";
-
-interface Budget {
-  _id: string;
-  totalBudgeted: number;
-  totalAvailable: number;
-}
+import type { Budget } from "@/lib/api";
 
 interface Category {
   _id?: string;

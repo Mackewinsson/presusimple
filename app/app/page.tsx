@@ -12,39 +12,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { DollarSign, History } from "lucide-react";
 import { useUserId, useBudget, useCategories, useExpenses } from "@/lib/hooks";
 import { AppLoadingSkeleton } from "@/components/ui/loading-skeleton";
-
-// Add interfaces for Budget and Category to type state
-interface Category {
-  _id?: string;
-  id?: string;
-  name: string;
-  budgeted: number;
-  spent: number;
-  sectionId: string;
-}
-
-interface Section {
-  _id?: string;
-  name: string;
-}
-
-interface Budget {
-  _id: string;
-  month: string;
-  year: number;
-  sections: Section[];
-  totalBudgeted: number;
-  totalAvailable: number;
-}
-
-interface Expense {
-  _id: string;
-  categoryId: string;
-  amount: number;
-  description: string;
-  date: string;
-  type: "expense" | "income";
-}
+import { Budget, Category, Expense } from "@/lib/api";
 
 export default function BudgetApp() {
   const { data: session, status } = useSession();

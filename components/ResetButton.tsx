@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { useUserId, useResetBudget, useSaveMonthlyBudget } from "@/lib/hooks";
 import { LoadingButton } from "@/components/ui/loading-skeleton";
+import type { Budget } from "@/lib/api";
 
 interface Category {
   _id?: string;
@@ -37,15 +38,6 @@ interface Expense {
   description: string;
   date: string;
   type: "expense" | "income";
-}
-
-interface Budget {
-  _id: string;
-  month: string;
-  year: number;
-  sections: any[];
-  totalBudgeted: number;
-  totalAvailable: number;
 }
 
 interface ResetButtonProps {
@@ -81,10 +73,27 @@ const ResetButton: React.FC<ResetButtonProps> = ({
         );
       }, 0);
 
+      // Convert month number to month name
+      const monthNames = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+      const monthNameFromNumber = monthNames[budget.month - 1] || "Unknown";
+
       // First, save the current month's data
       await saveMonthlyBudgetMutation.mutateAsync({
         name: monthName,
-        month: budget.month,
+        month: monthNameFromNumber,
         year: budget.year,
         categories: categories.map((cat) => ({
           name: cat.name,
