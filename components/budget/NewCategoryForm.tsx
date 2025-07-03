@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks/useAppSelector";
-import { addCategory } from "@/lib/store/budgetSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
