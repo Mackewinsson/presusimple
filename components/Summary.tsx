@@ -151,7 +151,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
 
       // Convert MongoDB expenses to the format expected by exportToPdf
       const convertedExpenses = expenses.map((expense) => ({
-        id: expense._id,
+        _id: expense._id,
         categoryId: expense.categoryId,
         amount: expense.amount,
         description: expense.description,

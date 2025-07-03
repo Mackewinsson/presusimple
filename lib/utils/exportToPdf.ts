@@ -1,13 +1,18 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { format } from "date-fns";
-import { BudgetCategory, BudgetSection } from "@/lib/store/budgetSlice";
-import { Expense } from "@/lib/store/expenseSlice";
+import { Category, Expense } from "@/lib/api";
 import { formatMoney } from "./formatMoney";
+
+// Define BudgetSection type for section structure
+export interface BudgetSection {
+  id: string;
+  name: string;
+}
 
 export const exportToPdf = (
   sections: BudgetSection[],
-  categories: BudgetCategory[],
+  categories: Category[],
   expenses: Expense[],
   totalBudgeted: number,
   totalSpent: number
@@ -97,7 +102,12 @@ export const exportToPdf = (
       startY: yPos,
       head: [["Date", "Category", "Description", "Amount", "Type"]],
       body: expenses.map((expense) => {
-        const category = categories.find((c) => c.id === expense.categoryId);
+        const category = categories.find(
+          (c) =>
+            c.id === expense.categoryId ||
+            c._id === expense.categoryId ||
+            c.name === expense.categoryId
+        );
         return [
           format(new Date(expense.date), "PP"),
           category?.name || "Unknown",

@@ -1,17 +1,16 @@
-import { Currency } from '@/lib/store/currencySlice';
+import { Currency, currencies } from "@/lib/hooks/useCurrencyQueries";
 
-const DEFAULT_CURRENCY: Currency = {
-  code: 'USD',
-  symbol: '$',
-  name: 'US Dollar'
-};
+const DEFAULT_CURRENCY: Currency = currencies[0];
 
 /**
  * Format a number as a currency string
  */
-export const formatMoney = (amount: number, currency: Currency = DEFAULT_CURRENCY): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
+export const formatMoney = (
+  amount: number,
+  currency: Currency = DEFAULT_CURRENCY
+): string => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
     currency: currency?.code || DEFAULT_CURRENCY.code,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -29,10 +28,13 @@ export const calculatePercentage = (value: number, total: number): number => {
 /**
  * Determine the status of a budget category based on spending
  */
-export const getBudgetStatus = (spent: number, budgeted: number): 'success' | 'warning' | 'danger' => {
+export const getBudgetStatus = (
+  spent: number,
+  budgeted: number
+): "success" | "warning" | "danger" => {
   const percentage = calculatePercentage(spent, budgeted);
-  
-  if (percentage >= 100) return 'danger';
-  if (percentage >= 80) return 'warning';
-  return 'success';
+
+  if (percentage >= 100) return "danger";
+  if (percentage >= 80) return "warning";
+  return "success";
 };
