@@ -28,6 +28,7 @@ import {
   useCategories,
   useUserId,
 } from "@/lib/hooks";
+import { LoadingButton } from "@/components/ui/loading-skeleton";
 
 const SavingsGoalList = () => {
   const [isAddingGoal, setIsAddingGoal] = useState(false);
@@ -153,7 +154,12 @@ const SavingsGoalList = () => {
               >
                 Cancel
               </Button>
-              <Button type="submit">Add Goal</Button>
+              <LoadingButton
+                type="submit"
+                loading={createGoalMutation.isPending}
+              >
+                Add Goal
+              </LoadingButton>
             </div>
           </form>
         ) : (

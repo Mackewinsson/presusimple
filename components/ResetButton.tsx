@@ -19,6 +19,7 @@ import {
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useUserId, useResetBudget, useSaveMonthlyBudget } from "@/lib/hooks";
+import { LoadingButton } from "@/components/ui/loading-skeleton";
 
 interface Category {
   _id?: string;
@@ -146,12 +147,16 @@ const ResetButton: React.FC<ResetButtonProps> = ({
           <AlertDialogCancel className="text-sm sm:text-base">
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction
+          <LoadingButton
             onClick={handleReset}
             className="text-sm sm:text-base"
+            loading={
+              resetBudgetMutation.isPending ||
+              saveMonthlyBudgetMutation.isPending
+            }
           >
             Save and Reset
-          </AlertDialogAction>
+          </LoadingButton>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

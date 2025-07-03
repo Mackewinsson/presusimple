@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { useSession } from "next-auth/react";
 import { useUserId, useCreateExpense } from "@/lib/hooks";
+import { LoadingButton } from "@/components/ui/loading-skeleton";
 
 interface Budget {
   _id: string;
@@ -194,10 +195,14 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
         </div>
       </div>
 
-      <Button type="submit" className="w-full">
+      <LoadingButton
+        type="submit"
+        className="w-full"
+        loading={createExpenseMutation.isPending}
+      >
         <Plus className="h-4 w-4 mr-2" />
         Add Transaction
-      </Button>
+      </LoadingButton>
     </form>
   );
 };

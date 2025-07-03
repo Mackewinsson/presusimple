@@ -32,6 +32,7 @@ import {
   useDeleteCategory,
   useUpdateBudget,
 } from "@/lib/hooks";
+import { LoadingButton } from "@/components/ui/loading-skeleton";
 
 interface Category {
   _id?: string;
@@ -330,9 +331,13 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                 required
               />
             </div>
-            <Button type="submit" className="w-full">
+            <LoadingButton
+              type="submit"
+              className="w-full"
+              loading={createBudgetMutation.isPending}
+            >
               Create Budget
-            </Button>
+            </LoadingButton>
           </form>
         </CardContent>
       </Card>
@@ -368,13 +373,14 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button
+                  <LoadingButton
                     size="sm"
                     onClick={handleSetTotalBudget}
                     className="flex-1 sm:flex-none"
+                    loading={updateBudgetMutation.isPending}
                   >
                     Set
-                  </Button>
+                  </LoadingButton>
                   <Button
                     size="sm"
                     variant="ghost"

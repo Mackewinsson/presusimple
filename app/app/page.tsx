@@ -11,6 +11,7 @@ import Summary from "@/components/Summary";
 import ThemeToggle from "@/components/ThemeToggle";
 import { DollarSign, History } from "lucide-react";
 import { useUserId, useBudget, useCategories, useExpenses } from "@/lib/hooks";
+import { AppLoadingSkeleton } from "@/components/ui/loading-skeleton";
 
 // Add interfaces for Budget and Category to type state
 interface Category {
@@ -73,8 +74,12 @@ export default function BudgetApp() {
     }
   }, [session, status, router]);
 
-  if (status === "loading" || !session || isLoading) {
-    return null;
+  if (status === "loading" || !session) {
+    return <AppLoadingSkeleton />;
+  }
+
+  if (isLoading) {
+    return <AppLoadingSkeleton />;
   }
 
   return (

@@ -31,11 +31,14 @@ import {
   useDeleteMonthlyBudget,
   useUserId,
 } from "@/lib/hooks";
+import { HistoryItemSkeleton } from "@/components/ui/loading-skeleton";
 
 export default function HistoryPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const { data: userId } = useUserId();
-  const { data: budgets = [] } = useMonthlyBudgets(userId || "");
+  const { data: budgets = [], isLoading: budgetsLoading } = useMonthlyBudgets(
+    userId || ""
+  );
   const deleteBudgetMutation = useDeleteMonthlyBudget();
 
   const sortedBudgets = [...budgets].sort(
@@ -89,7 +92,13 @@ export default function HistoryPage() {
             />
           </div>
 
-          {filteredBudgets.length > 0 ? (
+          {budgetsLoading ? (
+            <div className="grid gap-4">
+              {[1, 2, 3].map((i) => (
+                <HistoryItemSkeleton key={i} />
+              ))}
+            </div>
+          ) : filteredBudgets.length > 0 ? (
             <div className="grid gap-4">
               {filteredBudgets.map((budget) => (
                 <Card key={budget._id} className="glass-card hover-card">

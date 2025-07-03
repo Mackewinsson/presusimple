@@ -22,6 +22,7 @@ import {
   useResetBudget,
   useUserId,
 } from "@/lib/hooks";
+import { LoadingButton } from "@/components/ui/loading-skeleton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -104,14 +105,15 @@ const BudgetTemplateSelector = () => {
               onChange={(e) => setTemplateName(e.target.value)}
               placeholder="Template name"
             />
-            <Button
+            <LoadingButton
               onClick={handleSaveTemplate}
               className="shrink-0"
               disabled={!templateName.trim()}
+              loading={createTemplateMutation.isPending}
             >
               <Save className="h-4 w-4 mr-2" />
               Save
-            </Button>
+            </LoadingButton>
           </div>
 
           {/* Template List */}

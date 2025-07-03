@@ -36,10 +36,13 @@ import {
   Cell,
 } from "recharts";
 import { useMonthlyBudgets, useUserId } from "@/lib/hooks";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function InsightsPage() {
   const { data: userId } = useUserId();
-  const { data: budgets = [] } = useMonthlyBudgets(userId || "");
+  const { data: budgets = [], isLoading: budgetsLoading } = useMonthlyBudgets(
+    userId || ""
+  );
   const [selectedBudgetId, setSelectedBudgetId] = useState<string>(
     budgets[0]?._id || ""
   );
@@ -125,7 +128,33 @@ export default function InsightsPage() {
       </header>
 
       <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {selectedBudget ? (
+        {budgetsLoading ? (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
+                <Card key={i}>
+                  <CardHeader>
+                    <Skeleton className="h-6 w-32 mb-2" />
+                    <Skeleton className="h-4 w-24" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-8 w-20 mb-2" />
+                    <Skeleton className="h-4 w-32" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-6 w-40 mb-2" />
+                <Skeleton className="h-4 w-56" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-[400px] w-full" />
+              </CardContent>
+            </Card>
+          </div>
+        ) : selectedBudget ? (
           <div className="space-y-6">
             {/* Overview Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
