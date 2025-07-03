@@ -288,20 +288,34 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       return;
     }
     if (!userId) {
+      console.error("No userId available:", {
+        session,
+        userId,
+        userIdLoading,
+        userIdError,
+      });
       toast.error("You must be signed in to create a budget");
       return;
     }
 
+    console.log("Creating budget with userId:", userId);
+
     // Convert month name to number (1-based)
     const monthNumber = getMonthNumber(newMonth);
 
-    await createBudgetMutation.mutateAsync({
-      month: monthNumber,
-      year: newYear,
-      totalBudgeted: 0, // Start with 0 budgeted to categories
-      totalAvailable: total, // All amount is available to budget
-      user: userId,
-    });
+    try {
+      await createBudgetMutation.mutateAsync({
+        month: monthNumber,
+        year: newYear,
+        totalBudgeted: 0, // Start with 0 budgeted to categories
+        totalAvailable: total, // All amount is available to budget
+        user: userId,
+      });
+      console.log("Budget created successfully");
+    } catch (error) {
+      console.error("Failed to create budget:", error);
+      toast.error("Failed to create budget. Please try again.");
+    }
   };
 
   if (!session) return <div>Please sign in to manage your budget.</div>;
