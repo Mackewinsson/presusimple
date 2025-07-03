@@ -171,12 +171,13 @@ export const expenseApi = {
 
   // Create a new expense
   createExpense: async (expenseData: {
+    user: string;
+    budget: string;
     categoryId: string;
     amount: number;
     description: string;
     date: string;
     type: "expense" | "income";
-    userId: string;
   }): Promise<Expense> => {
     const response = await fetch("/api/expenses", {
       method: "POST",

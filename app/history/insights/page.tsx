@@ -35,7 +35,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import { useMonthlyBudgets, useUserId } from "@/lib/hooks";
+import { useMonthlyBudgets, useUserId, useExpenses } from "@/lib/hooks";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function InsightsPage() {
@@ -49,9 +49,55 @@ export default function InsightsPage() {
 
   const selectedBudget = budgets.find((b) => b._id === selectedBudgetId);
 
+  // Fetch all expenses for the user
+  const { data: allExpenses = [] } = useExpenses(userId || "");
+
+  // Filter expenses for the selected month/year
+  const selectedMonth = selectedBudget?.month;
+  const selectedYear = selectedBudget?.year;
+  const filteredExpenses = allExpenses.filter((exp) => {
+    const expDate = new Date(exp.date);
+    return (
+      expDate.getMonth() + 1 ===
+        (typeof selectedMonth === "string"
+          ? new Date(Date.parse(selectedMonth + " 1, 2000")).getMonth() + 1
+          : selectedMonth) && expDate.getFullYear() === selectedYear
+    );
+  });
+
+  // Calculate spent for each category from filtered expenses
+  const categoriesWithSpent = (selectedBudget?.categories || []).map(
+    (category) => {
+      const normalize = (str: string | undefined) =>
+        (str || "").toString().trim().toLowerCase();
+      const spent = filteredExpenses
+        .filter((exp) => {
+          // Robust match: by id/_id if present, else by normalized name
+          if (
+            "_id" in category &&
+            category._id &&
+            exp.categoryId === category._id
+          )
+            return true;
+          if ("id" in category && category.id && exp.categoryId === category.id)
+            return true;
+          // Try to match by name if id is not available
+          if (normalize(exp.categoryId) === normalize(category.name))
+            return true;
+          return false;
+        })
+        .reduce((sum, exp) => {
+          if (exp.type === "expense") return sum + exp.amount;
+          if (exp.type === "income") return sum - exp.amount;
+          return sum;
+        }, 0);
+      return { ...category, spent };
+    }
+  );
+
   // Prepare data for category comparison chart
   const categoryData =
-    selectedBudget?.categories.map((category) => ({
+    categoriesWithSpent.map((category) => ({
       name: category.name,
       budgeted: category.budgeted,
       spent: category.spent,
@@ -64,7 +110,7 @@ export default function InsightsPage() {
   const expenseTotal = 0;
 
   // Get top spending categories
-  const topCategories = [...(selectedBudget?.categories || [])]
+  const topCategories = [...categoriesWithSpent]
     .sort((a, b) => b.spent - a.spent)
     .slice(0, 5);
 

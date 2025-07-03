@@ -86,12 +86,13 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
 
     try {
       await createExpenseMutation.mutateAsync({
+        user: userId,
+        budget: budget._id,
         categoryId,
         amount: numAmount,
         description: description.trim(),
         date,
         type,
-        userId,
       });
 
       // Reset form
@@ -134,16 +135,26 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="expense">
+              <SelectItem
+                value="expense"
+                className="[&>span]:text-red-600 [&>span]:dark:text-red-400"
+              >
                 <div className="flex items-center gap-2">
-                  <ArrowUpCircle className="h-4 w-4 text-destructive" />
-                  Expense
+                  <ArrowUpCircle className="h-4 w-4 text-red-600 dark:text-red-400 !text-red-600 !dark:text-red-400" />
+                  <span className="text-red-600 dark:text-red-400 !text-red-600 !dark:text-red-400">
+                    Expense
+                  </span>
                 </div>
               </SelectItem>
-              <SelectItem value="income">
+              <SelectItem
+                value="income"
+                className="[&>span]:text-green-600 [&>span]:dark:text-green-400"
+              >
                 <div className="flex items-center gap-2">
-                  <ArrowDownCircle className="h-4 w-4 text-primary" />
-                  Income
+                  <ArrowDownCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  <span className="text-green-600 dark:text-green-400">
+                    Income
+                  </span>
                 </div>
               </SelectItem>
             </SelectContent>

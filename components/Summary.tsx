@@ -64,8 +64,20 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
     );
   }, 0);
 
+  // Calculate spent for each category from expenses
+  const categoriesWithSpent = categories.map((category) => {
+    const spent = expenses
+      .filter((exp) => exp.categoryId === (category._id || category.id))
+      .reduce((sum, exp) => {
+        if (exp.type === "expense") return sum + exp.amount;
+        if (exp.type === "income") return sum - exp.amount;
+        return sum;
+      }, 0);
+    return { ...category, spent };
+  });
+
   // Get the top 5 categories by spent amount
-  const topCategories = [...categories]
+  const topCategories = [...categoriesWithSpent]
     .sort((a, b) => b.spent - a.spent)
     .slice(0, 5);
 
@@ -98,6 +110,29 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
       );
     }
     return null;
+  };
+
+  const CustomBarLabel = (props: any) => {
+    const { x, y, width, value } = props;
+    // Fallbacks for undefined values
+    const labelX = x + (width ? width / 2 : 0);
+    // If the bar is zero, y may be at the bottom of the chart, so lift it up a bit
+    const labelY = (y !== undefined ? y : 0) - 8;
+    // Optionally, skip label for zero values
+    if (!value) return null;
+    return (
+      <text
+        x={labelX}
+        y={labelY}
+        textAnchor="middle"
+        fontSize={12}
+        fill="hsl(var(--muted-foreground))"
+        fontWeight={500}
+        pointerEvents="none"
+      >
+        {formatMoney(value)}
+      </text>
+    );
   };
 
   const handleExportToPdf = () => {
@@ -153,7 +188,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
         ["Category", "Budgeted", "Spent", "Remaining"],
       ];
 
-      categories.forEach((category) => {
+      categoriesWithSpent.forEach((category) => {
         summaryData.push([
           category.name,
           category.budgeted,
@@ -291,10 +326,16 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                   />
                   <XAxis
                     dataKey="name"
+                    angle={-35}
+                    textAnchor="end"
                     tick={{
                       fill: "hsl(var(--muted-foreground))",
-                      fontSize: 10,
+                      fontSize: 12,
+                      dy: 10,
                     }}
+                    tickFormatter={(name) =>
+                      name.length > 12 ? name.slice(0, 12) + "…" : name
+                    }
                     tickLine={false}
                     axisLine={false}
                     interval={0}
@@ -331,15 +372,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                         }
                       />
                     ))}
-                    <LabelList
-                      dataKey="spent"
-                      position="top"
-                      formatter={(value: number) => formatMoney(value)}
-                      style={{
-                        fontSize: "10px",
-                        fill: "hsl(var(--muted-foreground))",
-                      }}
-                    />
+                    <LabelList dataKey="spent" content={CustomBarLabel} />
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>

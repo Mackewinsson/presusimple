@@ -226,13 +226,15 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
           <div className="text-right">
             <div
               className={`font-medium flex items-center gap-1 ${
-                expense.type === "expense" ? "text-destructive" : "text-primary"
+                expense.type === "expense"
+                  ? "text-destructive"
+                  : "text-green-600 dark:text-green-400"
               }`}
             >
               {expense.type === "expense" ? (
-                <ArrowUpCircle className="h-4 w-4" />
+                <ArrowUpCircle className="h-4 w-4 text-destructive" />
               ) : (
-                <ArrowDownCircle className="h-4 w-4" />
+                <ArrowDownCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
               )}
               {formatMoney(expense.amount)}
             </div>

@@ -33,6 +33,7 @@ import {
   useUpdateBudget,
 } from "@/lib/hooks";
 import { LoadingButton } from "@/components/ui/loading-skeleton";
+import { useExpenses } from "@/lib/hooks/useExpenseQueries";
 
 interface Category {
   _id?: string;
@@ -68,6 +69,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
 }) => {
   const { data: session } = useSession();
   const { data: userId } = useUserId();
+  const { data: expenses = [] } = useExpenses(userId || "");
 
   // React Query mutations
   const createBudgetMutation = useCreateBudget();
@@ -104,6 +106,18 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   const getMonthNumber = (monthName: string) => {
     return months.indexOf(monthName) + 1;
   };
+
+  // Calculate spent for each category
+  const categoriesWithSpent = categories.map((category) => {
+    const spent = expenses
+      .filter((exp) => exp.categoryId === (category._id || category.id))
+      .reduce((sum, exp) => {
+        if (exp.type === "expense") return sum + exp.amount;
+        if (exp.type === "income") return sum - exp.amount;
+        return sum;
+      }, 0);
+    return { ...category, spent };
+  });
 
   // Category CRUD handlers
   const handleAddCategory = async (
@@ -439,7 +453,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                 <BudgetSectionItem
                   key={section._id || section.name}
                   section={section}
-                  categories={categories}
+                  categories={categoriesWithSpent}
                   onRemove={handleRemoveSection}
                   onAddCategory={handleAddCategory}
                   onRemoveCategory={handleRemoveCategory}
