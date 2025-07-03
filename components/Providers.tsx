@@ -1,9 +1,6 @@
 "use client";
 
 import React from "react";
-import { Provider } from "react-redux";
-import { PersistGate } from "redux-persist/integration/react";
-import { store, persistor } from "@/lib/store";
 import { Toaster } from "sonner";
 import { SessionProvider } from "next-auth/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -29,13 +26,9 @@ export default function Providers({ children }: ProvidersProps) {
   return (
     <SessionProvider>
       <QueryClientProvider client={queryClient}>
-        <Provider store={store}>
-          <PersistGate loading={null} persistor={persistor}>
-            {children}
-            <Toaster richColors />
-            <ReactQueryDevtools initialIsOpen={false} />
-          </PersistGate>
-        </Provider>
+        {children}
+        <Toaster richColors />
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </SessionProvider>
   );

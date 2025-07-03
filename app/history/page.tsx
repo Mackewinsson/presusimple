@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useAppSelector, useAppDispatch } from "@/lib/hooks/useAppSelector";
-import { deleteBudget } from "@/lib/store/monthlyBudgetSlice";
 import {
   Card,
   CardContent,
@@ -28,14 +26,20 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import {
+  useMonthlyBudgets,
+  useDeleteMonthlyBudget,
+  useUserId,
+} from "@/lib/hooks";
 
 export default function HistoryPage() {
-  const dispatch = useAppDispatch();
   const [searchTerm, setSearchTerm] = useState("");
-  const budgets = useAppSelector((state) => state.monthlyBudgets.budgets);
+  const { data: userId } = useUserId();
+  const { data: budgets = [] } = useMonthlyBudgets(userId || "");
+  const deleteBudgetMutation = useDeleteMonthlyBudget();
 
   const sortedBudgets = [...budgets].sort(
-    (a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime()
+    (a, b) => parseISO(b.createdAt).getTime() - parseISO(a.createdAt).getTime()
   );
 
   const filteredBudgets = sortedBudgets.filter((budget) =>
@@ -43,8 +47,7 @@ export default function HistoryPage() {
   );
 
   const handleDelete = (id: string) => {
-    dispatch(deleteBudget({ id }));
-    toast.success("Budget history deleted");
+    deleteBudgetMutation.mutate(id);
   };
 
   return (
@@ -89,13 +92,13 @@ export default function HistoryPage() {
           {filteredBudgets.length > 0 ? (
             <div className="grid gap-4">
               {filteredBudgets.map((budget) => (
-                <Card key={budget.id} className="glass-card hover-card">
+                <Card key={budget._id} className="glass-card hover-card">
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
                       <div>
                         <CardTitle>{budget.name}</CardTitle>
                         <CardDescription>
-                          {format(parseISO(budget.date), "PPP")}
+                          {format(parseISO(budget.createdAt), "PPP")}
                         </CardDescription>
                       </div>
                       <AlertDialog>
@@ -123,7 +126,7 @@ export default function HistoryPage() {
                               Cancel
                             </AlertDialogCancel>
                             <AlertDialogAction
-                              onClick={() => handleDelete(budget.id)}
+                              onClick={() => handleDelete(budget._id)}
                               className="text-sm sm:text-base"
                             >
                               Delete
@@ -164,7 +167,7 @@ export default function HistoryPage() {
                           Transactions
                         </div>
                         <div className="font-medium">
-                          {budget.expenses.length}
+                          {budget.expensesCount}
                         </div>
                       </div>
                     </div>

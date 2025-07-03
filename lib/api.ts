@@ -242,4 +242,12 @@ export const monthlyBudgetApi = {
     if (!response.ok) throw new Error("Failed to save monthly budget");
     return response.json();
   },
+
+  // Delete monthly budget
+  deleteMonthlyBudget: async (id: string): Promise<void> => {
+    const response = await fetch(`/api/monthly-budgets/${id}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) throw new Error("Failed to delete monthly budget");
+  },
 };

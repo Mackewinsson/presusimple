@@ -1,15 +1,27 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useAppSelector, useAppDispatch } from '@/lib/hooks/useAppSelector';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { saveTemplate, deleteTemplate } from '@/lib/store/budgetTemplateSlice';
-import { resetAll as resetBudget } from '@/lib/store/budgetSlice';
-import { resetAll as resetExpenses } from '@/lib/store/expenseSlice';
-import { BookTemplate, Plus, Save, Trash2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { BookTemplate, Plus, Save, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import {
+  useBudgetTemplates,
+  useCreateBudgetTemplate,
+  useDeleteBudgetTemplate,
+  useBudget,
+  useCategories,
+  useExpenses,
+  useResetBudget,
+  useUserId,
+} from "@/lib/hooks";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,68 +32,59 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 
 const BudgetTemplateSelector = () => {
-  const dispatch = useAppDispatch();
-  const [templateName, setTemplateName] = useState('');
-  
-  const templates = useAppSelector(state => state.budgetTemplates.templates);
-  const currentBudget = useAppSelector(state => ({
-    sections: state.budget.sections,
-    categories: state.budget.categories,
-  }));
-  
+  const [templateName, setTemplateName] = useState("");
+
+  const { data: userId } = useUserId();
+  const { data: templates = [] } = useBudgetTemplates();
+  const { data: budget } = useBudget(userId || "");
+  const { data: categories = [] } = useCategories(userId || "");
+  const { data: expenses = [] } = useExpenses(userId || "");
+
+  const createTemplateMutation = useCreateBudgetTemplate();
+  const deleteTemplateMutation = useDeleteBudgetTemplate();
+  const resetBudgetMutation = useResetBudget();
+
   const handleSaveTemplate = () => {
     if (!templateName.trim()) {
-      toast.error('Please enter a template name');
+      toast.error("Please enter a template name");
       return;
     }
-    
-    dispatch(saveTemplate({
+
+    if (!budget) {
+      toast.error("No budget found to save as template");
+      return;
+    }
+
+    createTemplateMutation.mutate({
       name: templateName.trim(),
-      sections: currentBudget.sections,
-      categories: currentBudget.categories.map(cat => ({
-        ...cat,
-        spent: 0,
+      sections: budget.sections.map((section) => ({
+        id: section._id || section.id || "",
+        name: section.name,
       })),
-    }));
-    
-    setTemplateName('');
-    toast.success('Budget template saved');
-  };
-  
-  const handleLoadTemplate = (template: typeof templates[0]) => {
-    dispatch(resetBudget());
-    dispatch(resetExpenses());
-    
-    // Load the template data into the current budget
-    template.sections.forEach(section => {
-      dispatch({
-        type: 'budget/addSection',
-        payload: { name: section.name },
-      });
+      categories: categories.map((cat) => ({
+        id: cat._id || cat.id || "",
+        name: cat.name,
+        budgeted: cat.budgeted,
+        sectionId: cat.sectionId,
+      })),
     });
-    
-    template.categories.forEach(category => {
-      dispatch({
-        type: 'budget/addCategory',
-        payload: {
-          name: category.name,
-          budgeted: category.budgeted,
-          sectionId: category.sectionId,
-        },
-      });
-    });
-    
-    toast.success(`Template "${template.name}" loaded`);
+
+    setTemplateName("");
   };
-  
+
+  const handleLoadTemplate = (template: any) => {
+    // For now, just show a message since we need to implement the load functionality
+    // This will be implemented when we add template loading to the backend
+    toast.info("Template loading functionality will be implemented soon");
+  };
+
   const handleDeleteTemplate = (id: string) => {
-    dispatch(deleteTemplate({ id }));
-    toast.success('Template deleted');
+    deleteTemplateMutation.mutate(id);
   };
-  
+
   return (
     <Card>
       <CardHeader>
@@ -91,7 +94,7 @@ const BudgetTemplateSelector = () => {
         </CardTitle>
         <CardDescription>Save and load budget templates</CardDescription>
       </CardHeader>
-      
+
       <CardContent>
         <div className="space-y-4">
           {/* Save Current Budget as Template */}
@@ -110,10 +113,10 @@ const BudgetTemplateSelector = () => {
               Save
             </Button>
           </div>
-          
+
           {/* Template List */}
           <div className="space-y-2">
-            {templates.map(template => (
+            {templates.map((template) => (
               <div
                 key={template.id}
                 className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/5 transition-colors"
@@ -121,10 +124,11 @@ const BudgetTemplateSelector = () => {
                 <div>
                   <div className="font-medium">{template.name}</div>
                   <div className="text-sm text-muted-foreground">
-                    {template.categories.length} categories in {template.sections.length} sections
+                    {template.categories.length} categories in{" "}
+                    {template.sections.length} sections
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
@@ -132,31 +136,35 @@ const BudgetTemplateSelector = () => {
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Load Budget Template</AlertDialogTitle>
+                        <AlertDialogTitle>
+                          Load Budget Template
+                        </AlertDialogTitle>
                         <AlertDialogDescription>
-                          This will clear your current budget and load the selected template. 
-                          Are you sure you want to continue?
+                          This will clear your current budget and load the
+                          selected template. Are you sure you want to continue?
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleLoadTemplate(template)}>
+                        <AlertDialogAction
+                          onClick={() => handleLoadTemplate(template)}
+                        >
                           Load Template
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
-                  
-                  {!template.isDefault && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDeleteTemplate(template.id)}
-                      className="text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
+
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() =>
+                      handleDeleteTemplate(template.id || template._id || "")
+                    }
+                    className="text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             ))}

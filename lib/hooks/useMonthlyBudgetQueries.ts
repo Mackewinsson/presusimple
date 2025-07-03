@@ -37,3 +37,23 @@ export const useSaveMonthlyBudget = () => {
     },
   });
 };
+
+// Delete monthly budget mutation
+export const useDeleteMonthlyBudget = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: monthlyBudgetApi.deleteMonthlyBudget,
+    onSuccess: (_, id) => {
+      // Remove from cache
+      queryClient.removeQueries({ queryKey: monthlyBudgetKeys.detail(id) });
+      // Invalidate lists
+      queryClient.invalidateQueries({ queryKey: monthlyBudgetKeys.lists() });
+      toast.success("Monthly budget deleted successfully");
+    },
+    onError: (error) => {
+      console.error("Failed to delete monthly budget:", error);
+      toast.error("Failed to delete monthly budget");
+    },
+  });
+};
