@@ -288,11 +288,15 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       return;
     }
 
+    // Convert month name to number (1-based)
+    const monthNumber = getMonthNumber(newMonth);
+
     await createBudgetMutation.mutateAsync({
-      month: months[getMonthNumber(newMonth) - 1],
+      month: monthNumber,
       year: newYear,
-      totalBudgeted: 0,
-      userId,
+      totalBudgeted: total,
+      totalAvailable: total,
+      user: userId,
     });
   };
 

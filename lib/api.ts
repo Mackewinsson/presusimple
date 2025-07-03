@@ -1,11 +1,12 @@
 // lib/api.ts
 export interface Budget {
   _id: string;
-  month: string;
+  month: number;
   year: number;
   sections: any[];
   totalBudgeted: number;
   totalAvailable: number;
+  user: string;
 }
 
 export interface Category {
@@ -65,10 +66,11 @@ export const budgetApi = {
 
   // Create a new budget
   createBudget: async (budgetData: {
-    month: string;
+    month: number;
     year: number;
     totalBudgeted: number;
-    userId: string;
+    totalAvailable: number;
+    user: string;
   }): Promise<Budget> => {
     const response = await fetch("/api/budgets", {
       method: "POST",
