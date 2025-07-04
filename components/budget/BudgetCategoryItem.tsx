@@ -44,7 +44,7 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
   const handleSaveEdit = () => {
     const budgetAmount = parseFloat(budgeted);
     if (isNaN(budgetAmount) || budgetAmount < 0) {
-      toast.error("Please enter a valid amount");
+      toast.error("Budgeted amount cannot be negative");
       return;
     }
     const budgetDiff = budgetAmount - category.budgeted;

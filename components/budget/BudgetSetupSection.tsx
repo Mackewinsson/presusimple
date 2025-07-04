@@ -117,6 +117,12 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     return { ...category, spent };
   });
 
+  // Calculate total budgeted from categories (this should match database totalBudgeted)
+  const calculatedTotalBudgeted = categories.reduce(
+    (sum, cat) => sum + cat.budgeted,
+    0
+  );
+
   // Category CRUD handlers
   const handleAddCategory = async (
     sectionId: string,
@@ -475,8 +481,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
               >
                 <div className="text-base sm:text-lg font-medium text-slate-900 dark:text-white">
                   {formatMoney(
-                    (budget?.totalBudgeted || 0) +
-                      (budget?.totalAvailable || 0),
+                    calculatedTotalBudgeted + (budget?.totalAvailable || 0),
                     currency
                   )}
                 </div>
@@ -494,7 +499,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
               Budgeted
             </div>
             <div className="text-base sm:text-lg font-medium mt-1 text-slate-900 dark:text-white">
-              {formatMoney(budget?.totalBudgeted || 0, currency)}
+              {formatMoney(calculatedTotalBudgeted, currency)}
             </div>
           </div>
           <div className="p-3 sm:p-4 rounded-xl bg-slate-900/10 dark:bg-white/10 backdrop-blur-sm border border-slate-900/20 dark:border-white/20">

@@ -50,16 +50,27 @@ export async function POST(request: NextRequest) {
       );
     }, 0);
 
-    // Reset all categories (set spent to 0)
+    // Reset all categories (set spent to 0, keep budgeted amounts)
     await Category.updateMany({ user: userId }, { $set: { spent: 0 } });
 
     // Delete all expenses for this user
     await Expense.deleteMany({ user: userId });
 
-    // Update budget total available
+    // Calculate total budgeted from categories (to keep allocations)
+    const totalBudgetedFromCategories = categories.reduce(
+      (sum, cat) => sum + cat.budgeted,
+      0
+    );
+
+    // Update budget totals - keep the total budget amount and category allocations
+    const totalBudgetAmount = budget.totalBudgeted + budget.totalAvailable;
     await Budget.findByIdAndUpdate(budget._id, {
-      totalAvailable: budget.totalBudgeted,
+      totalBudgeted: totalBudgetedFromCategories, // Keep the sum of category budgets
+      totalAvailable: totalBudgetAmount - totalBudgetedFromCategories, // Remaining amount
     });
+
+    // Get the updated budget to return the correct totals
+    const updatedBudget = await Budget.findById(budget._id);
 
     return NextResponse.json({
       message: "Budget reset successfully",
@@ -71,7 +82,8 @@ export async function POST(request: NextRequest) {
           budgeted: cat.budgeted,
           spent: cat.spent,
         })),
-        totalBudgeted: budget.totalBudgeted,
+        totalBudgeted:
+          updatedBudget?.totalBudgeted || totalBudgetedFromCategories,
         totalSpent: totalSpent,
         expensesCount: expenses.length,
       },

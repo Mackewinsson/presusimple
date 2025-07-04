@@ -67,13 +67,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // Clamp category budgets to >= 0
+    const catArray: any[] = categories || [];
+    const safeCategories = catArray.map((cat) => ({
+      ...cat,
+      budgeted: Math.max(0, cat.budgeted),
+    }));
+    // Clamp totalBudgeted to >= 0
+    const safeTotalBudgeted = Math.max(0, totalBudgeted);
+
     const monthlyBudget = new MonthlyBudget({
       user: userId,
       name,
       month,
       year,
-      categories,
-      totalBudgeted,
+      categories: safeCategories,
+      totalBudgeted: safeTotalBudgeted,
       totalSpent,
       expensesCount,
     });

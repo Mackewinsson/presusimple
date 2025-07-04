@@ -59,6 +59,12 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
     );
   }, 0);
 
+  // Calculate total budgeted from categories (this should match database totalBudgeted)
+  const calculatedTotalBudgeted = categories.reduce(
+    (sum, cat) => sum + cat.budgeted,
+    0
+  );
+
   // Calculate spent for each category from expenses
   const categoriesWithSpent = categories.map((category) => {
     const spent = expenses
@@ -270,7 +276,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
               Total Budgeted
             </div>
             <div className="text-lg sm:text-xl md:text-2xl font-semibold">
-              {formatMoney(budget.totalBudgeted)}
+              {formatMoney(calculatedTotalBudgeted)}
             </div>
           </div>
 
@@ -289,10 +295,12 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
             </div>
             <div
               className={`text-lg sm:text-xl md:text-2xl font-semibold ${
-                budget.totalBudgeted - totalSpent < 0 ? "text-destructive" : ""
+                calculatedTotalBudgeted - totalSpent < 0
+                  ? "text-destructive"
+                  : ""
               }`}
             >
-              {formatMoney(budget.totalBudgeted - totalSpent)}
+              {formatMoney(calculatedTotalBudgeted - totalSpent)}
             </div>
           </div>
         </div>

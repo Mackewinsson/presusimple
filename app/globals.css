@@ -301,3 +301,11 @@ select {
   background: rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(0, 0, 0, 0.2);
 }
+
+/* Make select item hover/focus visible in light mode */
+.light .radix-select-item[data-state="focused"],
+.light .radix-select-item:focus,
+.light .radix-select-item:hover {
+  background-color: #e2e8f0 !important; /* Tailwind slate-200 */
+  color: #0f172a !important; /* Tailwind slate-900 */
+}

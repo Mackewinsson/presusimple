@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongoose";
 import Category from "@/models/Category";
+import Expense from "@/models/Expense";
 
 // PUT /api/categories/[id] - Update a category
 export async function PUT(
@@ -59,6 +60,9 @@ export async function DELETE(
         { status: 404 }
       );
     }
+
+    // Also delete all expenses with this categoryId
+    await Expense.deleteMany({ categoryId: params.id });
 
     return NextResponse.json({ message: "Category deleted successfully" });
   } catch (error) {

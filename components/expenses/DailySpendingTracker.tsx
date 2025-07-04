@@ -50,7 +50,9 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
       sum + (expense.type === "expense" ? expense.amount : -expense.amount)
     );
   }, 0);
-  const remaining = budget.totalBudgeted - totalSpent;
+  // Calculate total budgeted from categories
+  const totalBudgeted = categories.reduce((sum, cat) => sum + cat.budgeted, 0);
+  const remaining = totalBudgeted - totalSpent;
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (

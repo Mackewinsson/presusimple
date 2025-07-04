@@ -58,6 +58,7 @@ const ResetButton: React.FC<ResetButtonProps> = ({
   const [monthName, setMonthName] = useState(() =>
     format(new Date(), "MMMM yyyy")
   );
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleReset = async () => {
     if (!budget || !userId) {
@@ -110,6 +111,7 @@ const ResetButton: React.FC<ResetButtonProps> = ({
       await resetBudgetMutation.mutateAsync(userId);
 
       toast.success("Current month saved and reset for a new month");
+      setIsOpen(false); // Close the modal after successful reset
     } catch (error) {
       console.error("Error during reset:", error);
       toast.error("Failed to reset budget. Please try again.");
@@ -117,7 +119,7 @@ const ResetButton: React.FC<ResetButtonProps> = ({
   };
 
   return (
-    <AlertDialog>
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
         <Button
           variant="outline"

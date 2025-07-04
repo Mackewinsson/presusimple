@@ -85,11 +85,15 @@ export const useResetBudget = () => {
 
   return useMutation({
     mutationFn: budgetApi.resetBudget,
-    onSuccess: (_, userId) => {
-      // Invalidate all related queries
+    onSuccess: (data, userId) => {
+      // Invalidate all related queries to ensure fresh data
       queryClient.invalidateQueries({ queryKey: budgetKeys.lists() });
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
+
+      // Force refetch the budget to get updated totals
+      queryClient.refetchQueries({ queryKey: budgetKeys.list(userId) });
+
       toast.success("Budget reset successfully");
     },
     onError: (error) => {

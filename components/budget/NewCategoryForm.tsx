@@ -34,8 +34,12 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
 
     const budgetAmount = parseFloat(budgeted);
 
-    if (isNaN(budgetAmount) || budgetAmount < 0) {
+    if (isNaN(budgetAmount)) {
       toast.error("Please enter a valid amount");
+      return;
+    }
+    if (budgetAmount < 0) {
+      toast.error("Budgeted amount cannot be negative");
       return;
     }
 
