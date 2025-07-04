@@ -1,9 +1,44 @@
 // Export all React Query hooks
-export * from "./useBudgetQueries";
-export * from "./useCategoryQueries";
-export * from "./useExpenseQueries";
-export * from "./useMonthlyBudgetQueries";
-export * from "./useUserId";
-export * from "./useBudgetTemplateQueries";
-export * from "./useSavingsGoalQueries";
-export * from "./useCurrencyQueries";
+export { useUserId, useUserSubscription } from "./useUserId";
+export {
+  useBudget,
+  useCreateBudget,
+  useUpdateBudget,
+  useDeleteBudget,
+  useResetBudget,
+} from "./useBudgetQueries";
+export {
+  useBudgetTemplates,
+  useCreateBudgetTemplate,
+  useDeleteBudgetTemplate,
+} from "./useBudgetTemplateQueries";
+export {
+  useCategories,
+  useCreateCategory,
+  useUpdateCategory,
+  useDeleteCategory,
+} from "./useCategoryQueries";
+export {
+  useExpenses,
+  useCreateExpense,
+  useUpdateExpense,
+  useDeleteExpense,
+} from "./useExpenseQueries";
+export {
+  useMonthlyBudgets,
+  useSaveMonthlyBudget,
+  useDeleteMonthlyBudget,
+} from "./useMonthlyBudgetQueries";
+export {
+  useSavingsGoals,
+  useCreateSavingsGoal,
+  useUpdateSavingsGoalProgress,
+  useDeleteSavingsGoal,
+} from "./useSavingsGoalQueries";
+export {
+  useSelectedCurrency,
+  useSetCurrency,
+  currencies,
+  type Currency,
+} from "./useCurrencyQueries";
+export { useAccessControl } from "./useAccessControl";

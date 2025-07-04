@@ -62,6 +62,7 @@ export async function POST(request: NextRequest) {
     const user = new User({
       email,
       name: name || "Test User",
+      isPaid: false,
     });
 
     const savedUser = await user.save();
@@ -71,6 +72,63 @@ export async function POST(request: NextRequest) {
     console.error("Error creating user:", error);
     return NextResponse.json(
       { error: "Failed to create user" },
+      { status: 500 }
+    );
+  }
+}
+
+// PATCH /api/users - Update user subscription status
+export async function PATCH(request: NextRequest) {
+  try {
+    console.log("PATCH /api/users - Connecting to database...");
+    await dbConnect();
+    console.log("PATCH /api/users - Database connected");
+
+    const body = await request.json();
+    console.log("PATCH /api/users - Request body:", body);
+
+    const {
+      email,
+      stripeCustomerId,
+      stripeSubscriptionId,
+      isPaid,
+      trialStart,
+      trialEnd,
+    } = body;
+
+    if (!email) {
+      console.log("PATCH /api/users - Email is required");
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
+
+    // Update user subscription fields
+    console.log("PATCH /api/users - Updating user subscription:", email);
+    const updatedUser = await User.findOneAndUpdate(
+      { email },
+      {
+        ...(stripeCustomerId && { stripeCustomerId }),
+        ...(stripeSubscriptionId && { stripeSubscriptionId }),
+        ...(typeof isPaid !== "undefined" && { isPaid }),
+        ...(trialStart && { trialStart: new Date(trialStart) }),
+        ...(trialEnd && { trialEnd: new Date(trialEnd) }),
+      },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      console.log("PATCH /api/users - User not found:", email);
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    console.log(
+      "PATCH /api/users - User updated successfully:",
+      updatedUser._id
+    );
+    return NextResponse.json(updatedUser);
+  } catch (error) {
+    console.error("Error updating user:", error);
+    return NextResponse.json(
+      { error: "Failed to update user" },
       { status: 500 }
     );
   }

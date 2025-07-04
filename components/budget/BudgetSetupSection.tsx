@@ -22,7 +22,7 @@ import BudgetSectionItem from "./BudgetSectionItem";
 import NewSectionForm from "./NewSectionForm";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { toast } from "sonner";
-import { currencies, Currency } from "@/lib/hooks";
+import { currencies, type Currency } from "@/lib/hooks";
 import { useSession } from "next-auth/react";
 import {
   useUserId,

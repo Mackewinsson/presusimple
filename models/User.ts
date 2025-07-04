@@ -3,13 +3,23 @@ import mongoose, { Schema, Document, models } from "mongoose";
 export interface IUser extends Document {
   email: string;
   name?: string;
-  // Add other fields as needed
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+  isPaid?: boolean;
+  trialStart?: Date;
+  trialEnd?: Date;
+  subscriptionType?: string; // "stripe", "manual_paid", "manual_trial", etc.
 }
 
 const UserSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },
   name: { type: String },
-  // Add other fields as needed
+  stripeCustomerId: { type: String },
+  stripeSubscriptionId: { type: String },
+  isPaid: { type: Boolean, default: false },
+  trialStart: { type: Date },
+  trialEnd: { type: Date },
+  subscriptionType: { type: String }, // Track subscription source
 });
 
 export default models.User || mongoose.model<IUser>("User", UserSchema);
