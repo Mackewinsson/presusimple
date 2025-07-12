@@ -310,7 +310,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
             <h3 className="text-base sm:text-lg font-medium mb-4 sm:mb-6">
               Top Spending Categories
             </h3>
-            <div className="h-[250px] sm:h-[300px] md:h-[350px]">
+            <div className="h-[250px] sm:h-[300px] md:h-[350px]" data-testid="summary-chart">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={chartData}
