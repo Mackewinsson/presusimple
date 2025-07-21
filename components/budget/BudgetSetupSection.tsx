@@ -38,6 +38,7 @@ import { useAIBudgetCreation } from "@/lib/hooks/useAIBudgetCreation";
 import { LoadingButton } from "@/components/ui/loading-skeleton";
 import { useExpenses } from "@/lib/hooks/useExpenseQueries";
 import type { Budget } from "@/lib/api";
+import { AILoading } from "@/components/ui/ai-loading";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -107,7 +108,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   
   // AI Budget Creation
   const [aiDescription, setAiDescription] = useState("");
-  const { createBudgetFromAI, isProcessing: isAICreating } = useAIBudgetCreation();
+  const { createBudgetFromAI, isProcessing: isAICreating, currentStep } = useAIBudgetCreation();
 
   // Month names array
   const months = [
@@ -435,7 +436,9 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   // Show create form if no budget
   if (!budget) {
     return (
-      <Card className="glass-card hover-card max-w-2xl mx-auto mt-10">
+      <>
+        <AILoading isProcessing={isAICreating} currentStep={currentStep} />
+        <Card className="glass-card hover-card max-w-2xl mx-auto mt-10">
         <CardHeader>
           <CardTitle>Create Your Budget</CardTitle>
           <CardDescription>
@@ -445,9 +448,11 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
         <CardContent>
           <Tabs defaultValue="manual" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="manual">Manual Setup</TabsTrigger>
-              <TabsTrigger value="ai" className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4" />
+              <TabsTrigger value="manual" className="text-sm font-medium">
+                Manual Setup
+              </TabsTrigger>
+              <TabsTrigger value="ai" className="flex items-center gap-2 text-sm font-medium">
+                <Sparkles className="h-4 w-4 flex-shrink-0" />
                 AI Assistant
               </TabsTrigger>
             </TabsList>
@@ -488,7 +493,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                 </div>
                 <LoadingButton
                   type="submit"
-                  className="w-full"
+                  className="w-full btn-primary flex items-center justify-center"
                   loading={createBudgetMutation.isPending}
                 >
                   Create Budget
@@ -499,7 +504,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
             <TabsContent value="ai" className="space-y-4 mt-4">
               <form onSubmit={handleCreateBudgetWithAI} className="space-y-4">
                 <div className="space-y-2">
-                  <label htmlFor="aiDescription" className="text-sm font-medium">
+                  <label htmlFor="aiDescription" className="text-sm font-medium text-white">
                     Describe your budget
                   </label>
                   <Textarea
@@ -512,9 +517,9 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                   />
                 </div>
                 
-                <div className="text-sm text-muted-foreground">
-                  <p>Examples:</p>
-                  <ul className="list-disc list-inside space-y-1 mt-2">
+                <div className="text-sm text-white/70">
+                  <p className="font-medium mb-2">Examples:</p>
+                  <ul className="list-disc list-inside space-y-1 mt-2 text-white/60">
                     <li>"I make 5000. Rent 2000, food 1000, the rest is savings."</li>
                     <li>"My income is 3000. I spend 1200 on rent, 800 on food, 300 on transport, and save the rest."</li>
                     <li>"I earn 6000 monthly. 2500 for rent, 1000 for food, 500 for utilities, and the rest goes to savings."</li>
@@ -547,23 +552,33 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                 
                 <LoadingButton
                   type="submit"
-                  className="w-full"
+                  className="w-full btn-primary flex items-center justify-center"
                   loading={isAICreating}
                   disabled={!aiDescription.trim()}
                 >
-                  {isAICreating ? "Creating budget with AI..." : "Create Budget with AI"}
+                  {isAICreating ? (
+                    "Creating budget with AI..."
+                  ) : (
+                    <>
+                      <Sparkles className="h-5 w-5 mr-2 flex-shrink-0" />
+                      Create Budget with AI
+                    </>
+                  )}
                 </LoadingButton>
               </form>
             </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
+      </>
     );
   }
 
   // Only render budget UI if budget exists
   return (
-    <Card className="glass-card hover-card">
+    <>
+      <AILoading isProcessing={isAICreating} currentStep={currentStep} />
+      <Card className="glass-card hover-card">
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-0">
           <div className="flex items-start justify-between w-full sm:w-auto">
@@ -723,6 +738,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
         </div>
       </CardContent>
     </Card>
+    </>
   );
 };
 

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useUserId } from './useUserId';
 
+type AIStep = "extracting" | "creating" | "saving" | "complete";
+
 interface AICategory {
   name: string;
   amount: number;
@@ -32,6 +34,7 @@ interface CreateCategoryData {
 
 export const useAIBudgetCreation = () => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [currentStep, setCurrentStep] = useState<AIStep>("extracting");
   const userIdQuery = useUserId();
   const queryClient = useQueryClient();
 
@@ -88,12 +91,16 @@ export const useAIBudgetCreation = () => {
 
   const createBudgetFromAI = async (description: string, month: number, year: number) => {
     setIsProcessing(true);
+    setCurrentStep("extracting");
     
     try {
-      // Step 1: Extract data with AI
+      // Step 1: Extract data with AI (add delay to show animation)
+      await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
       const aiData = await extractBudgetData.mutateAsync(description);
+      setCurrentStep("creating");
       
-      // Step 2: Create the budget
+      // Step 2: Create the budget (add delay to show animation)
+      await new Promise(resolve => setTimeout(resolve, 1500)); // 1.5 second delay
       const budgetData: CreateBudgetData = {
         user: userIdQuery.data!,
         month,
@@ -104,8 +111,10 @@ export const useAIBudgetCreation = () => {
       };
 
       const budget = await createBudget.mutateAsync(budgetData);
+      setCurrentStep("saving");
       
-      // Step 3: Create the categories
+      // Step 3: Create the categories (add delay to show animation)
+      await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
       const categoryPromises = aiData.categories.map(async (category) => {
         // Find the corresponding sectionId
         const sectionIndex = aiData.sections.findIndex(s => s.name === category.sectionName);
@@ -122,6 +131,10 @@ export const useAIBudgetCreation = () => {
       });
 
       await Promise.all(categoryPromises);
+      setCurrentStep("complete");
+      
+      // Show completion for a moment before finishing
+      await new Promise(resolve => setTimeout(resolve, 800)); // 0.8 second delay
       
       // Refresh queries
       queryClient.invalidateQueries({ queryKey: ['budgets'] });
@@ -133,12 +146,14 @@ export const useAIBudgetCreation = () => {
       throw error;
     } finally {
       setIsProcessing(false);
+      setCurrentStep("extracting");
     }
   };
 
   return {
     createBudgetFromAI,
     isProcessing,
+    currentStep,
     isExtracting: extractBudgetData.isPending,
     isCreatingBudget: createBudget.isPending,
     isCreatingCategories: createCategory.isPending,

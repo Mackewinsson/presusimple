@@ -1,0 +1,137 @@
+"use client";
+
+import { Sparkles, Brain, Zap, CheckCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+interface AILoadingProps {
+  isProcessing: boolean;
+  currentStep?: "extracting" | "creating" | "saving" | "complete";
+  className?: string;
+}
+
+export const AILoading = ({ isProcessing, currentStep = "extracting", className }: AILoadingProps) => {
+  if (!isProcessing) return null;
+
+  const steps = [
+    { key: "extracting", label: "Analyzing your description...", icon: Brain },
+    { key: "creating", label: "Creating budget structure...", icon: Zap },
+    { key: "saving", label: "Saving to database...", icon: CheckCircle },
+  ];
+
+  const currentStepIndex = steps.findIndex(step => step.key === currentStep);
+
+  return (
+    <div className={cn(
+      "fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center",
+      className
+    )}>
+      <div className="glass-card p-8 max-w-md w-full mx-4 shadow-2xl">
+        {/* Header */}
+        <div className="text-center mb-6">
+          <div className="relative inline-flex items-center justify-center w-16 h-16 mb-4">
+            {/* Animated sparkles background */}
+            <div className="absolute inset-0">
+              <Sparkles className="w-6 h-6 text-white animate-pulse absolute top-0 left-0" />
+              <Sparkles className="w-4 h-4 text-white/80 animate-pulse absolute top-2 right-2" style={{ animationDelay: '0.5s' }} />
+              <Sparkles className="w-5 h-5 text-white/60 animate-pulse absolute bottom-2 left-2" style={{ animationDelay: '1s' }} />
+              <Sparkles className="w-3 h-3 text-white/90 animate-pulse absolute top-1 left-1/2" style={{ animationDelay: '1.5s' }} />
+              <Sparkles className="w-4 h-4 text-white/70 animate-pulse absolute bottom-1 right-1" style={{ animationDelay: '2s' }} />
+            </div>
+            {/* Main AI icon */}
+            <div className="relative z-10 bg-white rounded-full p-3 animate-pulse shadow-lg">
+              <Brain className="w-8 h-8 text-slate-900 animate-pulse" />
+            </div>
+          </div>
+          <h3 className="text-xl font-semibold text-white mb-2">
+            AI Assistant Working
+          </h3>
+          <p className="text-sm text-white/70 animate-pulse">
+            Creating your perfect budget...
+          </p>
+        </div>
+
+        {/* Progress steps */}
+        <div className="space-y-4">
+          {steps.map((step, index) => {
+            const Icon = step.icon;
+            const isActive = index === currentStepIndex;
+            const isCompleted = index < currentStepIndex;
+            
+            return (
+              <div
+                key={step.key}
+                className={cn(
+                  "flex items-center space-x-3 p-3 rounded-lg transition-all duration-300",
+                  isActive && "bg-white/20 border border-white/30",
+                  isCompleted && "bg-emerald-500/20 border border-emerald-500/30",
+                  !isActive && !isCompleted && "bg-white/5 border border-white/10"
+                )}
+              >
+                <div className={cn(
+                  "flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300",
+                  isActive && "bg-white text-slate-900 animate-pulse",
+                  isCompleted && "bg-emerald-500 text-white",
+                  !isActive && !isCompleted && "bg-white/20 text-white/50"
+                )}>
+                  {isCompleted ? (
+                    <CheckCircle className="w-5 h-5" />
+                  ) : (
+                    <Icon className="w-5 h-5" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className={cn(
+                    "text-sm font-medium transition-colors duration-300",
+                    isActive && "text-white",
+                    isCompleted && "text-emerald-300",
+                    !isActive && !isCompleted && "text-white/50"
+                  )}>
+                    {step.label}
+                  </p>
+                </div>
+                {isActive && (
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Animated progress bar */}
+        <div className="mt-6">
+          <div className="w-full bg-white/20 rounded-full h-2">
+            <div 
+              className="bg-white h-2 rounded-full transition-all duration-500 ease-out"
+              style={{ 
+                width: `${((currentStepIndex + 1) / steps.length) * 100}%` 
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Floating particles effect */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {[...Array(12)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full animate-pulse"
+              style={{
+                width: `${Math.random() * 3 + 1}px`,
+                height: `${Math.random() * 3 + 1}px`,
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                backgroundColor: `rgba(255, 255, 255, ${0.3 + Math.random() * 0.4})`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${3 + Math.random() * 2}s`
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}; 
