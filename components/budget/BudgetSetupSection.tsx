@@ -9,8 +9,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, DollarSign, Trash2 } from "lucide-react";
+import { Plus, DollarSign, Trash2, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -33,6 +34,7 @@ import {
   useUpdateBudget,
   useDeleteBudget,
 } from "@/lib/hooks";
+import { useAIBudgetCreation } from "@/lib/hooks/useAIBudgetCreation";
 import { LoadingButton } from "@/components/ui/loading-skeleton";
 import { useExpenses } from "@/lib/hooks/useExpenseQueries";
 import type { Budget } from "@/lib/api";
@@ -47,6 +49,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 
 interface Category {
   _id?: string;
@@ -96,6 +104,10 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   const [newTotal, setNewTotal] = useState("");
   const [newMonth, setNewMonth] = useState("January");
   const [newYear, setNewYear] = useState(new Date().getFullYear());
+  
+  // AI Budget Creation
+  const [aiDescription, setAiDescription] = useState("");
+  const { createBudgetFromAI, isProcessing: isAICreating } = useAIBudgetCreation();
 
   // Month names array
   const months = [
@@ -337,6 +349,31 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     }
   };
 
+  const handleCreateBudgetWithAI = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!aiDescription.trim()) {
+      toast.error("Please enter a budget description");
+      return;
+    }
+
+    if (!userId) {
+      toast.error("You must be signed in to create a budget");
+      return;
+    }
+
+    try {
+      const monthNumber = getMonthNumber(newMonth);
+      await createBudgetFromAI(aiDescription, monthNumber, newYear);
+      
+      toast.success("Budget created successfully with AI!");
+      setAiDescription("");
+    } catch (error) {
+      console.error("Failed to create budget with AI:", error);
+      toast.error("Failed to create budget with AI. Please try again.");
+    }
+  };
+
   const handleDeleteBudget = async () => {
     if (!budget?._id) return;
 
@@ -398,55 +435,127 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   // Show create form if no budget
   if (!budget) {
     return (
-      <Card className="glass-card hover-card max-w-md mx-auto mt-10">
+      <Card className="glass-card hover-card max-w-2xl mx-auto mt-10">
         <CardHeader>
           <CardTitle>Create Your Budget</CardTitle>
           <CardDescription>
-            Set your total budget, month, and year to get started.
+            Choose how you'd like to create your budget - manually or with AI assistance.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleCreateBudget} className="space-y-4">
-            <Input
-              type="number"
-              placeholder="Total Budget"
-              value={newTotal}
-              onChange={(e) => setNewTotal(e.target.value)}
-              min={0}
-              step="0.01"
-              required
-            />
-            <div className="flex gap-2">
-              <Select value={newMonth} onValueChange={setNewMonth}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select month" />
-                </SelectTrigger>
-                <SelectContent>
-                  {months.map((month) => (
-                    <SelectItem key={month} value={month}>
-                      {month}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Input
-                type="number"
-                placeholder="Year"
-                value={newYear}
-                onChange={(e) => setNewYear(Number(e.target.value))}
-                min={2000}
-                max={2100}
-                required
-              />
-            </div>
-            <LoadingButton
-              type="submit"
-              className="w-full"
-              loading={createBudgetMutation.isPending}
-            >
-              Create Budget
-            </LoadingButton>
-          </form>
+          <Tabs defaultValue="manual" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="manual">Manual Setup</TabsTrigger>
+              <TabsTrigger value="ai" className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4" />
+                AI Assistant
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="manual" className="space-y-4 mt-4">
+              <form onSubmit={handleCreateBudget} className="space-y-4">
+                <Input
+                  type="number"
+                  placeholder="Total Budget"
+                  value={newTotal}
+                  onChange={(e) => setNewTotal(e.target.value)}
+                  min={0}
+                  step="0.01"
+                  required
+                />
+                <div className="flex gap-2">
+                  <Select value={newMonth} onValueChange={setNewMonth}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select month" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {months.map((month) => (
+                        <SelectItem key={month} value={month}>
+                          {month}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    type="number"
+                    placeholder="Year"
+                    value={newYear}
+                    onChange={(e) => setNewYear(Number(e.target.value))}
+                    min={2000}
+                    max={2100}
+                    required
+                  />
+                </div>
+                <LoadingButton
+                  type="submit"
+                  className="w-full"
+                  loading={createBudgetMutation.isPending}
+                >
+                  Create Budget
+                </LoadingButton>
+              </form>
+            </TabsContent>
+            
+            <TabsContent value="ai" className="space-y-4 mt-4">
+              <form onSubmit={handleCreateBudgetWithAI} className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="aiDescription" className="text-sm font-medium">
+                    Describe your budget
+                  </label>
+                  <Textarea
+                    id="aiDescription"
+                    placeholder="Example: I make 5000. Rent 2000, food 1000, the rest is savings."
+                    value={aiDescription}
+                    onChange={(e) => setAiDescription(e.target.value)}
+                    rows={4}
+                    disabled={isAICreating}
+                  />
+                </div>
+                
+                <div className="text-sm text-muted-foreground">
+                  <p>Examples:</p>
+                  <ul className="list-disc list-inside space-y-1 mt-2">
+                    <li>"I make 5000. Rent 2000, food 1000, the rest is savings."</li>
+                    <li>"My income is 3000. I spend 1200 on rent, 800 on food, 300 on transport, and save the rest."</li>
+                    <li>"I earn 6000 monthly. 2500 for rent, 1000 for food, 500 for utilities, and the rest goes to savings."</li>
+                  </ul>
+                </div>
+                
+                <div className="flex gap-2">
+                  <Select value={newMonth} onValueChange={setNewMonth}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select month" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {months.map((month) => (
+                        <SelectItem key={month} value={month}>
+                          {month}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    type="number"
+                    placeholder="Year"
+                    value={newYear}
+                    onChange={(e) => setNewYear(Number(e.target.value))}
+                    min={2000}
+                    max={2100}
+                    required
+                  />
+                </div>
+                
+                <LoadingButton
+                  type="submit"
+                  className="w-full"
+                  loading={isAICreating}
+                  disabled={!aiDescription.trim()}
+                >
+                  {isAICreating ? "Creating budget with AI..." : "Create Budget with AI"}
+                </LoadingButton>
+              </form>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     );
