@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import NewExpenseForm from "./NewExpenseForm";
 import ExpenseList from "./ExpenseList";
+import { AITransactionInput } from "./AITransactionInput";
 import type { Budget } from "@/lib/api";
 
 interface Category {
@@ -95,9 +96,12 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="add" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="add" className="text-xs sm:text-sm">
               Add Transaction
+            </TabsTrigger>
+            <TabsTrigger value="ai" className="text-xs sm:text-sm">
+              AI Quick Input
             </TabsTrigger>
             <TabsTrigger value="history" className="text-xs sm:text-sm">
               Transaction History
@@ -110,6 +114,10 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
               categories={categories}
               expenses={expenses}
             />
+          </TabsContent>
+
+          <TabsContent value="ai" className="space-y-4">
+            <AITransactionInput budgetId={budget._id} />
           </TabsContent>
 
           <TabsContent value="history">
