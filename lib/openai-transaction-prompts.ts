@@ -19,15 +19,15 @@ Expected output (using available categories):
 {
   "transactions": [
     { "description": "Rent", "amount": 500, "type": "expense", "category": "Rent" },
-    { "description": "Food", "amount": 30, "type": "expense", "category": "Food" },
-    { "description": "Freelance job", "amount": 100, "type": "income", "category": "Savings" }
+    { "description": "Food", "amount": 30, "type": "expense", "category": "Groceries" },
+    { "description": "Freelance job", "amount": 100, "type": "income", "category": "Income" }
   ]
 }
 
-Examples with available categories:
-- "coffee 5" → expense, "Coffee", use "Food" category
-- "gas 40" → expense, "Gas", use "Transportation" category (if available)
-- "salary 2000" → income, "Salary", use "Savings" category (for income)
-- "lunch 15, dinner 25" → two expenses, "Lunch" and "Dinner", use "Food" category
+Examples of how to categorize:
+- "coffee 5" → expense, "Coffee", choose closest food-related category available
+- "gas 40" → expense, "Gas", choose closest transportation-related category available
+- "salary 2000" → income, "Salary", choose closest income-related category available
+- "lunch 15, dinner 25" → two expenses, "Lunch" and "Dinner", choose closest food-related category available
 
-CRITICAL: You can ONLY use the categories provided in the available categories list.`; 
+CRITICAL: You can ONLY use the categories provided in the available categories list. Do not assume any specific categories exist - only use what's provided.`; 

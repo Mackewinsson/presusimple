@@ -9,10 +9,29 @@ export async function GET(request: NextRequest) {
     await dbConnect();
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("user");
+    const budgetId = searchParams.get("budget");
 
     if (userId) {
       // Get user's budget first
       const budget = await Budget.findOne({ user: userId });
+      if (!budget) {
+        return NextResponse.json([]);
+      }
+
+      // Get section IDs from the budget
+      const sectionIds = budget.sections.map(
+        (section: any) => section._id || section.name
+      );
+
+      // Filter categories by section IDs
+      const categories = await Category.find({
+        sectionId: { $in: sectionIds },
+      }).sort({ createdAt: -1 });
+
+      return NextResponse.json(categories);
+    } else if (budgetId) {
+      // Get categories for a specific budget
+      const budget = await Budget.findById(budgetId);
       if (!budget) {
         return NextResponse.json([]);
       }

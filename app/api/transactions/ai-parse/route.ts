@@ -81,6 +81,7 @@ export async function POST(request: NextRequest) {
     // Debug logging
     console.log('Available categories:', categories);
     console.log('Enhanced prompt:', enhancedPrompt);
+    console.log('User input:', description);
 
     // Call OpenAI with function calling
     let completion;
