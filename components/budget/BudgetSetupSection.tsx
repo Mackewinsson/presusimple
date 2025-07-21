@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, DollarSign } from "lucide-react";
+import { Plus, DollarSign, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -31,10 +31,22 @@ import {
   useUpdateCategory,
   useDeleteCategory,
   useUpdateBudget,
+  useDeleteBudget,
 } from "@/lib/hooks";
 import { LoadingButton } from "@/components/ui/loading-skeleton";
 import { useExpenses } from "@/lib/hooks/useExpenseQueries";
 import type { Budget } from "@/lib/api";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Category {
   _id?: string;
@@ -75,6 +87,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   const updateCategoryMutation = useUpdateCategory();
   const deleteCategoryMutation = useDeleteCategory();
   const updateBudgetMutation = useUpdateBudget();
+  const deleteBudgetMutation = useDeleteBudget();
 
   const [isAddingSection, setIsAddingSection] = useState(false);
   const [isEditingTotal, setIsEditingTotal] = useState(false);
@@ -324,6 +337,18 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     }
   };
 
+  const handleDeleteBudget = async () => {
+    if (!budget?._id) return;
+
+    try {
+      await deleteBudgetMutation.mutateAsync(budget._id);
+      console.log("Budget deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete budget:", error);
+      toast.error("Failed to delete budget. Please try again.");
+    }
+  };
+
   if (!session) return <div>Please sign in to manage your budget.</div>;
 
   // Show loading state while fetching userId
@@ -432,13 +457,43 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     <Card className="glass-card hover-card">
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-0">
-          <div>
-            <CardTitle className="text-xl sm:text-2xl font-semibold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-              Budget Setup
-            </CardTitle>
-            <CardDescription className="text-sm sm:text-base text-slate-700 dark:text-white/70">
-              Create budget sections and categories to track your spending
-            </CardDescription>
+          <div className="flex items-start justify-between w-full sm:w-auto">
+            <div>
+              <CardTitle className="text-xl sm:text-2xl font-semibold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                Budget Setup
+              </CardTitle>
+              <CardDescription className="text-sm sm:text-base text-slate-700 dark:text-white/70">
+                Create budget sections and categories to track your spending
+              </CardDescription>
+            </div>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Budget</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete this budget? This will remove all categories, sections, and expenses. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteBudget}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Delete Budget
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
           <div className="text-right">
             {isEditingTotal ? (
