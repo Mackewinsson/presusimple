@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquare, Plus, CheckCircle, XCircle, Sparkles, Zap } from "lucide-react";
+import { AITransactionLoading } from "@/components/ui/ai-transaction-loading";
 import { useToast } from "@/hooks/use-toast";
 import { useUserId } from "@/lib/hooks/useUserId";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -82,6 +83,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
   const [parsedTransactions, setParsedTransactions] = useState<ParsedTransaction[]>([]);
   const [isParsing, setIsParsing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [currentStep, setCurrentStep] = useState<"analyzing" | "parsing" | "matching" | "complete">("analyzing");
   
   const { toast } = useToast();
   const userId = useUserId();
@@ -241,7 +243,18 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
     }
 
     setIsParsing(true);
+    setCurrentStep("analyzing");
+    
     try {
+      // Step 1: Analyzing (1.5 seconds)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setCurrentStep("parsing");
+      
+      // Step 2: Parsing (2 seconds)
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setCurrentStep("matching");
+      
+      // Step 3: API call and matching (1.5 seconds)
       const result = await parseTransactions.mutateAsync(description);
       
       if (!result.transactions || result.transactions.length === 0) {
@@ -276,6 +289,10 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
         return;
       }
 
+      // Step 4: Complete
+      setCurrentStep("complete");
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       setParsedTransactions(validTransactions);
       setIsOpen(true);
     } catch (error) {
@@ -383,7 +400,9 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
   };
 
   return (
-    <Card className="glass-card hover-card group">
+    <>
+      <AITransactionLoading isProcessing={isParsing} currentStep={currentStep} />
+      <Card className="glass-card hover-card group">
       <CardHeader>
         <CardTitle className="flex items-center gap-3 text-xl">
           <div className="relative">
@@ -482,5 +501,6 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
         </DialogContent>
       </Dialog>
     </Card>
+    </>
   );
 }; 
