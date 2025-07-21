@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -82,6 +82,39 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
   const userId = useUserId();
   const queryClient = useQueryClient();
 
+  // Fetch categories for this budget
+  const [categories, setCategories] = useState<any[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+
+  // Load categories when component mounts
+  const loadCategories = async () => {
+    setIsLoadingCategories(true);
+    try {
+      const response = await fetch(`/api/categories?budget=${budgetId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch categories');
+      }
+      const categoriesData = await response.json();
+      setCategories(categoriesData);
+    } catch (error) {
+      console.error('Failed to load categories:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load budget categories",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingCategories(false);
+    }
+  };
+
+  // Load categories on mount
+  React.useEffect(() => {
+    if (budgetId) {
+      loadCategories();
+    }
+  }, [budgetId]);
+
   const parseTransactions = useMutation({
     mutationFn: async (description: string) => {
       const response = await fetch('/api/transactions/ai-parse', {
@@ -90,7 +123,8 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
         body: JSON.stringify({
           description,
           userId,
-          budgetId
+          budgetId,
+          categories: categories.map(cat => cat.name) // Pass available categories
         }),
       });
 
@@ -105,14 +139,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
 
   const saveExpense = useMutation({
     mutationFn: async (transaction: ParsedTransaction) => {
-      // First, we need to find the category ID by name
-      const categoriesResponse = await fetch(`/api/categories?budget=${budgetId}`);
-      if (!categoriesResponse.ok) {
-        throw new Error('Failed to fetch categories');
-      }
-      const categories = await categoriesResponse.json();
-      
-      // Find matching category
+      // Find matching category from our loaded categories
       const matchingCategory = categories.find((cat: any) => 
         cat.name.toLowerCase() === transaction.category.toLowerCase()
       );

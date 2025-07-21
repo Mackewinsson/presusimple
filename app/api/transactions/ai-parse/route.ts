@@ -29,7 +29,7 @@ function checkRateLimit(userId: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
-    const { description, userId, budgetId } = await request.json();
+    const { description, userId, budgetId, categories } = await request.json();
 
     // Edge case: Validate required fields
     if (!description || !userId || !budgetId) {
@@ -70,13 +70,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Create enhanced system prompt with available categories
+    const availableCategories = categories && categories.length > 0 
+      ? `\n\nAvailable categories in this budget: ${categories.join(', ')}`
+      : '';
+    
+    const enhancedPrompt = transactionSystemPrompt + availableCategories + 
+      '\n\nIMPORTANT: Use only the available categories listed above. If no exact match exists, choose the closest category.';
+
     // Call OpenAI with function calling
     let completion;
     try {
       completion = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [
-          { role: "system", content: transactionSystemPrompt },
+          { role: "system", content: enhancedPrompt },
           { role: "user", content: description }
         ],
         functions: [transactionFunctionSchema],

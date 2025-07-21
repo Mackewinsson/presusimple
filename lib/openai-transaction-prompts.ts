@@ -13,18 +13,18 @@ Expected output:
 }
 
 CRITICAL RULES:
-- Infer category names from context (e.g., "food" → "Groceries", "rent" → "Rent")
+- Use ONLY the available categories provided in the system prompt
+- If no exact match exists, choose the closest available category
 - Normalize category capitalization (title case)
 - Tag with "expense" or "income" type based on context
 - Use descriptive transaction names
 - Handle multiple transactions in one input
 - If amount is mentioned without context, assume it's an expense
-- Common categories: Rent, Groceries, Transportation, Utilities, Entertainment, Healthcare, Income, Savings
 
 Examples:
-- "coffee 5" → expense, "Coffee", "Food"
-- "gas 40" → expense, "Gas", "Transportation" 
-- "salary 2000" → income, "Salary", "Income"
-- "lunch 15, dinner 25" → two expenses, "Lunch" and "Dinner", both "Food"
+- "coffee 5" → expense, "Coffee", use closest food category
+- "gas 40" → expense, "Gas", use closest transportation category
+- "salary 2000" → income, "Salary", use income category
+- "lunch 15, dinner 25" → two expenses, "Lunch" and "Dinner", use food category
 
 Always ensure each transaction has a description, amount, type, and category.`; 
