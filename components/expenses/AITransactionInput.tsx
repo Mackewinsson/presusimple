@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MessageSquare, Plus, CheckCircle, XCircle, Sparkles, Zap, AlertTriangle, DollarSign, AlertCircle } from "lucide-react";
 import { AITransactionLoading } from "@/components/ui/ai-transaction-loading";
 import { useToast } from "@/hooks/use-toast";
@@ -19,12 +20,14 @@ interface ParsedTransaction {
   amount: number;
   type: "expense" | "income";
   category: string;
+  suggestedCategories?: string[]; // New: AI suggestions for better categorization
 }
 
 interface MissingCategory {
   name: string;
   transactions: ParsedTransaction[];
   totalAmount: number;
+  suggestedCategories?: string[]; // New: AI suggestions for this category
 }
 
 interface CategoryBudget {
@@ -36,14 +39,16 @@ interface TransactionPreviewProps {
   transactions: ParsedTransaction[];
   missingCategories: MissingCategory[];
   availableBudget: number;
+  availableCategories: any[]; // New: Available categories for selection
   onConfirm: (transactions: ParsedTransaction[], newCategoriesToCreate: CategoryBudget[]) => void;
   onCancel: () => void;
   isSaving: boolean;
 }
 
-const TransactionPreview = ({ transactions, missingCategories, availableBudget, onConfirm, onCancel, isSaving }: TransactionPreviewProps) => {
+const TransactionPreview = ({ transactions, missingCategories, availableBudget, availableCategories, onConfirm, onCancel, isSaving }: TransactionPreviewProps) => {
   const [newCategoriesToCreate, setNewCategoriesToCreate] = useState<CategoryBudget[]>([]);
   const [budgetInputs, setBudgetInputs] = useState<Record<string, number>>({});
+  const [categoryChanges, setCategoryChanges] = useState<Record<number, string>>({});
 
   const handleCategoryToggle = (categoryName: string) => {
     setNewCategoriesToCreate(prev => {
@@ -69,8 +74,17 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
     });
   };
 
+  const handleCategoryChange = (transactionIndex: number, newCategory: string) => {
+    setCategoryChanges(prev => ({ ...prev, [transactionIndex]: newCategory }));
+  };
+
   const handleConfirm = () => {
-    onConfirm(transactions, newCategoriesToCreate);
+    // Apply category changes to transactions
+    const updatedTransactions = transactions.map((transaction, index) => ({
+      ...transaction,
+      category: categoryChanges[index] || transaction.category
+    }));
+    onConfirm(updatedTransactions, newCategoriesToCreate);
   };
 
   const totalBudgetNeeded = newCategoriesToCreate.reduce((sum, cat) => sum + cat.budgeted, 0);
@@ -190,34 +204,65 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
           const missingCategory = missingCategories.find(mc => 
             mc.transactions.some(t => t === transaction)
           );
+          const currentCategory = categoryChanges[index] || transaction.category;
           
           return (
             <div 
               key={index} 
-              className={`flex items-center justify-between p-3 border rounded-lg hover:shadow-md transition-all duration-300 transform hover:scale-[1.02] animate-in slide-in-from-left-2 ${
+              className={`p-3 border rounded-lg hover:shadow-md transition-all duration-300 transform hover:scale-[1.02] animate-in slide-in-from-left-2 ${
                 isMissingCategory ? 'border-amber-500/50 bg-amber-500/5' : ''
               }`}
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <div className="flex-1">
-                <div className="font-medium">{transaction.description}</div>
-                <div className="text-sm text-muted-foreground flex items-center gap-2">
-                  {transaction.category}
-                  {isMissingCategory && (
-                    <Badge variant="outline" className="text-amber-300 border-amber-300">
-                      New Category
-                    </Badge>
-                  )}
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex-1">
+                  <div className="font-medium">{transaction.description}</div>
+                  <div className="text-sm text-muted-foreground flex items-center gap-2">
+                    <span>Category:</span>
+                    <Select value={currentCategory} onValueChange={(value) => handleCategoryChange(index, value)}>
+                      <SelectTrigger className="w-40 h-8 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableCategories.map((cat) => (
+                          <SelectItem key={cat._id} value={cat.name}>
+                            {cat.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {isMissingCategory && (
+                      <Badge variant="outline" className="text-amber-300 border-amber-300">
+                        New Category
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant={transaction.type === "expense" ? "destructive" : "default"}>
+                    {transaction.type}
+                  </Badge>
+                  <span className="font-mono font-medium">
+                    ${transaction.amount.toFixed(2)}
+                  </span>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge variant={transaction.type === "expense" ? "destructive" : "default"}>
-                  {transaction.type}
-                </Badge>
-                <span className="font-mono font-medium">
-                  ${transaction.amount.toFixed(2)}
-                </span>
-              </div>
+              
+              {/* Category Suggestions */}
+              {transaction.suggestedCategories && transaction.suggestedCategories.length > 0 && (
+                <div className="text-xs text-muted-foreground mt-2">
+                  <span>Suggestions: </span>
+                  {transaction.suggestedCategories.map((suggestion, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleCategoryChange(index, suggestion)}
+                      className="text-blue-300 hover:text-blue-200 underline mr-2"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           );
         })}
@@ -817,6 +862,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
                 transactions={parsedTransactions}
                 missingCategories={missingCategories}
                 availableBudget={availableBudget}
+                availableCategories={categories} // Pass available categories to the preview
                 onConfirm={handleConfirm}
                 onCancel={handleCancel}
                 isSaving={isSaving}

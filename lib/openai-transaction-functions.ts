@@ -12,7 +12,12 @@ export const transactionFunctionSchema = {
             description: { type: "string" },
             amount: { type: "number" },
             type: { type: "string", enum: ["expense", "income"] },
-            category: { type: "string" }
+            category: { type: "string" },
+            suggestedCategories: { 
+              type: "array", 
+              items: { type: "string" },
+              description: "Optional: Suggested better category names if the chosen category is not ideal"
+            }
           },
           required: ["description", "amount", "type", "category"]
         }
@@ -28,5 +33,6 @@ export type ExtractTransactionsResponse = {
     amount: number;
     type: "expense" | "income";
     category: string;
+    suggestedCategories?: string[];
   }>;
 }; 
