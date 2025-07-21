@@ -93,19 +93,35 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
 
   // Load categories when component mounts
   const loadCategories = async () => {
+    if (!budgetId) {
+      console.error('No budgetId provided');
+      return;
+    }
+
     setIsLoadingCategories(true);
     try {
       const response = await fetch(`/api/categories?budget=${budgetId}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch categories');
+        if (response.status === 404) {
+          throw new Error('Budget not found');
+        } else if (response.status === 401) {
+          throw new Error('Authentication required');
+        } else {
+          throw new Error(`Failed to fetch categories: ${response.status}`);
+        }
       }
       const categoriesData = await response.json();
+      
+      if (!Array.isArray(categoriesData)) {
+        throw new Error('Invalid categories data received');
+      }
+      
       setCategories(categoriesData);
     } catch (error) {
       console.error('Failed to load categories:', error);
       toast({
         title: "Error",
-        description: "Failed to load budget categories",
+        description: error instanceof Error ? error.message : "Failed to load budget categories",
         variant: "destructive",
       });
     } finally {
@@ -178,10 +194,20 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
   });
 
   const handleParse = async () => {
+    // Input validation
     if (!description.trim()) {
       toast({
         title: "Error",
         description: "Please enter a transaction description",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (description.length > 500) {
+      toast({
+        title: "Error",
+        description: "Description is too long. Please keep it under 500 characters.",
         variant: "destructive",
       });
       return;
@@ -196,16 +222,83 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       return;
     }
 
+    if (!budgetId) {
+      toast({
+        title: "Error",
+        description: "No budget selected. Please create a budget first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (categories.length === 0) {
+      toast({
+        title: "Error",
+        description: "No categories found. Please set up budget categories first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsParsing(true);
     try {
       const result = await parseTransactions.mutateAsync(description);
-      setParsedTransactions(result.transactions);
+      
+      if (!result.transactions || result.transactions.length === 0) {
+        toast({
+          title: "No transactions found",
+          description: "AI couldn't identify any transactions. Try being more specific.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate parsed transactions
+      const validTransactions = result.transactions.filter((transaction: ParsedTransaction) => {
+        if (!transaction.description || !transaction.amount || !transaction.type || !transaction.category) {
+          return false;
+        }
+        if (transaction.amount <= 0) {
+          return false;
+        }
+        if (!['expense', 'income'].includes(transaction.type)) {
+          return false;
+        }
+        return true;
+      });
+
+      if (validTransactions.length === 0) {
+        toast({
+          title: "Invalid transactions",
+          description: "AI parsed transactions but they were invalid. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setParsedTransactions(validTransactions);
       setIsOpen(true);
     } catch (error) {
       console.error("Failed to parse transactions:", error);
+      
+      let errorMessage = "Failed to parse transactions";
+      if (error instanceof Error) {
+        if (error.message.includes("rate limit")) {
+          errorMessage = "Too many requests. Please wait a moment and try again.";
+        } else if (error.message.includes("network")) {
+          errorMessage = "Network error. Please check your connection and try again.";
+        } else if (error.message.includes("401")) {
+          errorMessage = "Authentication error. Please sign in again.";
+        } else if (error.message.includes("500")) {
+          errorMessage = "Server error. Please try again later.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to parse transactions",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -214,19 +307,38 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
   };
 
   const handleConfirm = async () => {
+    if (parsedTransactions.length === 0) {
+      toast({
+        title: "Error",
+        description: "No transactions to save",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSaving(true);
     try {
-      // Save all transactions
-      const savePromises = parsedTransactions.map(transaction => 
-        saveExpense.mutateAsync(transaction)
+      // Save all transactions with error handling for each
+      const results = await Promise.allSettled(
+        parsedTransactions.map(transaction => saveExpense.mutateAsync(transaction))
       );
       
-      await Promise.all(savePromises);
+      const successful = results.filter(result => result.status === 'fulfilled').length;
+      const failed = results.filter(result => result.status === 'rejected').length;
       
-      toast({
-        title: "Success",
-        description: `Saved ${parsedTransactions.length} transaction(s)`,
-      });
+      if (successful > 0) {
+        toast({
+          title: "Success",
+          description: `Saved ${successful} transaction(s)${failed > 0 ? `, ${failed} failed` : ''}`,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to save any transactions. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
       
       // Reset form
       setDescription("");
@@ -239,9 +351,25 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       
     } catch (error) {
       console.error("Failed to save transactions:", error);
+      
+      let errorMessage = "Failed to save transactions";
+      if (error instanceof Error) {
+        if (error.message.includes("network")) {
+          errorMessage = "Network error. Please check your connection and try again.";
+        } else if (error.message.includes("401")) {
+          errorMessage = "Authentication error. Please sign in again.";
+        } else if (error.message.includes("500")) {
+          errorMessage = "Server error. Please try again later.";
+        } else if (error.message.includes("category")) {
+          errorMessage = "Category not found. Please check your budget categories.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save transactions",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -289,13 +417,23 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
         <div className="flex gap-2">
           <Button
             onClick={handleParse}
-            disabled={!description.trim() || isParsing}
+            disabled={!description.trim() || isParsing || isLoadingCategories || categories.length === 0}
             className="flex-1 btn-primary"
           >
             {isParsing ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
                 <span className="animate-pulse">AI is working...</span>
+              </>
+            ) : isLoadingCategories ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                <span>Loading categories...</span>
+              </>
+            ) : categories.length === 0 ? (
+              <>
+                <XCircle className="h-4 w-4 mr-2" />
+                <span>No categories available</span>
               </>
             ) : (
               <>
@@ -305,6 +443,13 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
             )}
           </Button>
         </div>
+        
+        {categories.length === 0 && !isLoadingCategories && (
+          <div className="text-xs text-muted-foreground bg-white/10 p-3 rounded-lg">
+            <p className="font-medium mb-1">Setup Required</p>
+            <p>You need to create budget categories first. Go to Budget Setup to add categories.</p>
+          </div>
+        )}
 
         <div className="text-xs text-muted-foreground space-y-2">
           <p className="font-medium flex items-center gap-2">
