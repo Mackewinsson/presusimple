@@ -6,10 +6,11 @@ import Expense from "@/models/Expense";
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   await dbConnect();
-  const budget = await Budget.findById(params.id);
+  const budget = await Budget.findById(id);
   if (!budget)
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json(budget);
@@ -17,11 +18,12 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   await dbConnect();
   const data = await req.json();
-  const budget = await Budget.findByIdAndUpdate(params.id, data, { new: true });
+  const budget = await Budget.findByIdAndUpdate(id, data, { new: true });
   if (!budget)
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json(budget);
@@ -29,10 +31,11 @@ export async function PUT(
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   await dbConnect();
-  const budget = await Budget.findByIdAndDelete(params.id);
+  const budget = await Budget.findByIdAndDelete(id);
   if (!budget)
     return NextResponse.json({ error: "Not found" }, { status: 404 });
 

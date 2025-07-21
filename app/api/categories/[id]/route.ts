@@ -6,8 +6,9 @@ import Expense from "@/models/Expense";
 // PUT /api/categories/[id] - Update a category
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     await dbConnect();
     const body = await request.json();
@@ -22,7 +23,7 @@ export async function PUT(
     }
 
     const updatedCategory = await Category.findByIdAndUpdate(
-      params.id,
+      id,
       { name, budgeted },
       { new: true, runValidators: true }
     );
@@ -47,12 +48,13 @@ export async function PUT(
 // DELETE /api/categories/[id] - Delete a category
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     await dbConnect();
 
-    const deletedCategory = await Category.findByIdAndDelete(params.id);
+    const deletedCategory = await Category.findByIdAndDelete(id);
 
     if (!deletedCategory) {
       return NextResponse.json(
@@ -62,7 +64,7 @@ export async function DELETE(
     }
 
     // Also delete all expenses with this categoryId
-    await Expense.deleteMany({ categoryId: params.id });
+    await Expense.deleteMany({ categoryId: id });
 
     return NextResponse.json({ message: "Category deleted successfully" });
   } catch (error) {

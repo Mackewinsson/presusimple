@@ -5,11 +5,12 @@ import Expense from "../../../../models/Expense";
 // GET /api/expenses/[id] - Get a specific expense
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     await dbConnect();
-    const expense = await Expense.findById(params.id);
+    const expense = await Expense.findById(id);
     if (!expense) {
       return NextResponse.json({ error: "Expense not found" }, { status: 404 });
     }
@@ -26,13 +27,14 @@ export async function GET(
 // PUT /api/expenses/[id] - Update an expense
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     await dbConnect();
     const body = await req.json();
 
-    const expense = await Expense.findByIdAndUpdate(params.id, body, {
+    const expense = await Expense.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
     });
@@ -54,11 +56,12 @@ export async function PUT(
 // DELETE /api/expenses/[id] - Delete an expense
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     await dbConnect();
-    const expense = await Expense.findByIdAndDelete(params.id);
+    const expense = await Expense.findByIdAndDelete(id);
 
     if (!expense) {
       return NextResponse.json({ error: "Expense not found" }, { status: 404 });
