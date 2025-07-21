@@ -77,17 +77,27 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
     return { ...category, spent };
   });
 
-  // Get the top 5 categories by spent amount
-  const topCategories = [...categoriesWithSpent]
-    .sort((a, b) => b.spent - a.spent)
+  // Get all categories for chart (show budgeted amounts even if no spending)
+  const chartCategories = [...categoriesWithSpent]
+    .sort((a, b) => b.budgeted - a.budgeted) // Sort by budgeted amount
     .slice(0, 5);
 
-  const chartData = topCategories.map((cat) => ({
+  const chartData = chartCategories.map((cat) => ({
     name: cat.name,
     spent: cat.spent,
     budgeted: cat.budgeted,
     overBudget: cat.spent > cat.budgeted,
   }));
+
+  // Debug logging
+  console.log('Summary Debug:', {
+    categoriesCount: categories.length,
+    categoriesWithSpentCount: categoriesWithSpent.length,
+    chartCategoriesCount: chartCategories.length,
+    chartData,
+    totalSpent,
+    calculatedTotalBudgeted
+  });
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -305,23 +315,24 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
           </div>
         </div>
 
-        {topCategories.length > 0 ? (
+        {categories.length > 0 ? (
           <div className="mt-6 sm:mt-8">
             <h3 className="text-base sm:text-lg font-medium mb-4 sm:mb-6">
               Top Spending Categories
             </h3>
             <div className="h-[250px] sm:h-[300px] md:h-[350px]" data-testid="summary-chart">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={chartData}
-                  margin={{
-                    top: 20,
-                    right: 20,
-                    left: 10,
-                    bottom: 40,
-                  }}
-                  barGap={6}
-                >
+              {chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={chartData}
+                    margin={{
+                      top: 20,
+                      right: 20,
+                      left: 10,
+                      bottom: 40,
+                    }}
+                    barGap={6}
+                  >
                   <CartesianGrid
                     strokeDasharray="3 3"
                     vertical={false}
@@ -387,12 +398,19 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-sm text-muted-foreground">
+                    No chart data available
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         ) : (
           <div className="text-center py-8 sm:py-12 px-4 rounded-lg bg-muted/30">
             <p className="text-sm sm:text-base text-muted-foreground">
-              Add some budget categories and expenses to see a summary
+              Add some budget categories to see a summary
             </p>
           </div>
         )}

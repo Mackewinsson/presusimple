@@ -171,6 +171,19 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
+      
+      // Validate that the category exists in the available categories
+      if (categories && categories.length > 0) {
+        const categoryExists = categories.some((cat: string) => 
+          cat.toLowerCase() === transaction.category.toLowerCase()
+        );
+        if (!categoryExists) {
+          return NextResponse.json(
+            { error: `Category "${transaction.category}" is not available in your budget. Available categories: ${categories.join(', ')}` },
+            { status: 400 }
+          );
+        }
+      }
     }
 
     // Edge case: Check for reasonable amounts

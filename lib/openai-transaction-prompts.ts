@@ -10,22 +10,24 @@ CRITICAL RULES:
 - Handle multiple transactions in one input
 - If amount is mentioned without context, assume it's an expense
 
+IMPORTANT: The available categories will be provided separately. You must use ONLY those categories.
+
 Example input:
 "I paid rent 500, spent 30 on food and got 100 for a freelance job"
 
-Expected output:
+Expected output (using available categories):
 {
   "transactions": [
     { "description": "Rent", "amount": 500, "type": "expense", "category": "Rent" },
-    { "description": "Food", "amount": 30, "type": "expense", "category": "Groceries" },
-    { "description": "Freelance job", "amount": 100, "type": "income", "category": "Income" }
+    { "description": "Food", "amount": 30, "type": "expense", "category": "Food" },
+    { "description": "Freelance job", "amount": 100, "type": "income", "category": "Savings" }
   ]
 }
 
-Examples:
-- "coffee 5" → expense, "Coffee", use closest food category from available list
-- "gas 40" → expense, "Gas", use closest transportation category from available list
-- "salary 2000" → income, "Salary", use income category from available list
-- "lunch 15, dinner 25" → two expenses, "Lunch" and "Dinner", use food category from available list
+Examples with available categories:
+- "coffee 5" → expense, "Coffee", use "Food" category
+- "gas 40" → expense, "Gas", use "Transportation" category (if available)
+- "salary 2000" → income, "Salary", use "Savings" category (for income)
+- "lunch 15, dinner 25" → two expenses, "Lunch" and "Dinner", use "Food" category
 
-IMPORTANT: The available categories will be provided separately. You must use ONLY those categories.`; 
+CRITICAL: You can ONLY use the categories provided in the available categories list.`; 
