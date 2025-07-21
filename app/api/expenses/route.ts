@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongoose";
 import Expense from "../../../models/Expense";
+import mongoose from "mongoose";
 
 // GET /api/expenses - Get all expenses or filter by user
 export async function GET(request: NextRequest) {
@@ -10,8 +11,19 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get("user");
 
     if (userId) {
+      // Convert string user ID to ObjectId if it's a string
+      let userObjectId;
+      try {
+        userObjectId = new mongoose.Types.ObjectId(userId);
+      } catch (error) {
+        return NextResponse.json(
+          { error: "Invalid user ID format" },
+          { status: 400 }
+        );
+      }
+      
       // Filter by user
-      const expenses = await Expense.find({ user: userId }).sort({ date: -1 });
+      const expenses = await Expense.find({ user: userObjectId }).sort({ date: -1 });
       return NextResponse.json(expenses);
     } else {
       // Get all expenses (for admin purposes)
@@ -53,9 +65,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Convert string IDs to ObjectIds if they're strings
+    let userObjectId, budgetObjectId;
+    try {
+      userObjectId = typeof user === 'string' ? new mongoose.Types.ObjectId(user) : user;
+      budgetObjectId = typeof budget === 'string' ? new mongoose.Types.ObjectId(budget) : budget;
+    } catch (error) {
+      return NextResponse.json(
+        { error: "Invalid user or budget ID format" },
+        { status: 400 }
+      );
+    }
+
     const expense = new Expense({
-      user,
-      budget,
+      user: userObjectId,
+      budget: budgetObjectId,
       categoryId,
       amount,
       description,
