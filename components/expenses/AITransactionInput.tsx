@@ -122,7 +122,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           description,
-          userId,
+          userId: userId?.data, // Extract the actual user ID string
           budgetId,
           categories: categories.map(cat => cat.name) // Pass available categories
         }),
@@ -153,7 +153,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user: userId,
+          user: userId?.data, // Extract the actual user ID string
           budget: budgetId,
           categoryId: matchingCategory._id,
           amount: transaction.amount,
@@ -182,7 +182,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       return;
     }
 
-    if (!userId) {
+    if (!userId?.data) {
       toast({
         title: "Error",
         description: "You must be signed in to add transactions",
