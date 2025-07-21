@@ -29,7 +29,7 @@ const TransactionPreview = ({ transactions, onConfirm, onCancel, isSaving }: Tra
   return (
     <div className="space-y-4">
       <div className="text-sm text-muted-foreground flex items-center gap-2">
-        <CheckCircle className="h-4 w-4 text-green-500 animate-pulse" />
+        <CheckCircle className="h-4 w-4 text-white animate-pulse" />
         <span>AI found {transactions.length} transaction{transactions.length !== 1 ? 's' : ''}!</span>
       </div>
       
@@ -259,13 +259,13 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-3 text-xl">
           <div className="relative">
-            <Sparkles className="h-6 w-6 text-purple-500 animate-pulse" />
-            <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-ping" />
+            <Sparkles className="h-6 w-6 text-white animate-pulse" />
+            <div className="absolute -top-1 -right-1 w-2 h-2 bg-white rounded-full animate-ping" />
           </div>
-          <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <span className="text-white">
             AI Magic
           </span>
-          <Zap className="h-5 w-5 text-yellow-500 animate-bounce" />
+          <Zap className="h-5 w-5 text-white animate-bounce" />
         </CardTitle>
         <CardDescription className="text-base">
           ✨ Just describe your day in plain English and watch AI transform it into perfect budget entries
@@ -277,7 +277,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
             placeholder="Example: coffee 5, lunch 15, gas 40, salary 2000"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="min-h-[100px] transition-all duration-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-purple-300"
+            className="min-h-[100px]"
             disabled={isParsing}
           />
           <div className="flex justify-between items-center text-xs text-muted-foreground">
@@ -290,7 +290,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
           <Button
             onClick={handleParse}
             disabled={!description.trim() || isParsing}
-            className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            className="flex-1 btn-primary"
           >
             {isParsing ? (
               <>
@@ -308,13 +308,13 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
 
         <div className="text-xs text-muted-foreground space-y-2">
           <p className="font-medium flex items-center gap-2">
-            <Sparkles className="h-3 w-3 text-purple-500" />
+            <Sparkles className="h-3 w-3 text-white" />
             Try these examples:
           </p>
           <ul className="space-y-1">
-            <li className="hover:text-purple-500 transition-colors cursor-pointer">• "coffee 5, lunch 15" → Two food expenses</li>
-            <li className="hover:text-purple-500 transition-colors cursor-pointer">• "rent 500, gas 40" → Rent and transportation</li>
-            <li className="hover:text-purple-500 transition-colors cursor-pointer">• "salary 2000, freelance 500" → Two income sources</li>
+            <li className="hover:text-white transition-colors cursor-pointer">• "coffee 5, lunch 15" → Two food expenses</li>
+            <li className="hover:text-white transition-colors cursor-pointer">• "rent 500, gas 40" → Rent and transportation</li>
+            <li className="hover:text-white transition-colors cursor-pointer">• "salary 2000, freelance 500" → Two income sources</li>
           </ul>
         </div>
       </CardContent>
