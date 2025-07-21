@@ -268,7 +268,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
           <Zap className="h-5 w-5 text-white animate-bounce" />
         </CardTitle>
         <CardDescription className="text-base">
-          ✨ Just describe your day in plain English and watch AI transform it into perfect budget entries
+          Just describe your day in plain English and watch AI transform it into perfect budget entries
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
