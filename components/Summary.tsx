@@ -326,6 +326,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                     strokeDasharray="3 3"
                     vertical={false}
                     stroke="hsl(var(--muted-foreground)/0.2)"
+                    horizontal={true}
                   />
                   <XAxis
                     dataKey="name"
@@ -343,6 +344,8 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                     axisLine={false}
                     interval={0}
                     height={80}
+                    type="category"
+                    scale="band"
                   />
                   <YAxis
                     tickFormatter={(value) => formatMoney(value)}
@@ -353,18 +356,23 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                     tickLine={false}
                     axisLine={false}
                     width={70}
+                    type="number"
+                    scale="linear"
                   />
                   <Tooltip
                     content={<CustomTooltip />}
                     cursor={{ fill: "hsl(var(--muted)/0.2)" }}
+                    active={true}
+                    isAnimationActive={true}
                   />
                   <Bar
                     dataKey="budgeted"
                     fill="hsl(var(--muted))"
                     radius={[4, 4, 0, 0]}
                     maxBarSize={30}
+                    type="monotone"
                   />
-                  <Bar dataKey="spent" radius={[4, 4, 0, 0]} maxBarSize={30}>
+                  <Bar dataKey="spent" radius={[4, 4, 0, 0]} maxBarSize={30} type="monotone">
                     {chartData.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
