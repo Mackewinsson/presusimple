@@ -75,6 +75,8 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
   };
 
   const handleCategoryChange = (transactionIndex: number, newCategory: string) => {
+    console.log('Changing category for transaction', transactionIndex, 'to', newCategory);
+    console.log('Available categories:', availableCategories.map(cat => cat.name));
     setCategoryChanges(prev => ({ ...prev, [transactionIndex]: newCategory }));
   };
 
@@ -252,15 +254,31 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
               {transaction.suggestedCategories && transaction.suggestedCategories.length > 0 && (
                 <div className="text-xs text-muted-foreground mt-2">
                   <span>Suggestions: </span>
-                  {transaction.suggestedCategories.map((suggestion, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handleCategoryChange(index, suggestion)}
-                      className="text-blue-300 hover:text-blue-200 underline mr-2"
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
+                  {transaction.suggestedCategories
+                    .filter(suggestion => availableCategories.some(cat => cat.name === suggestion))
+                    .map((suggestion, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleCategoryChange(index, suggestion)}
+                        className="text-blue-300 hover:text-blue-200 underline mr-2"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  {transaction.suggestedCategories.filter(suggestion => 
+                    !availableCategories.some(cat => cat.name === suggestion)
+                  ).length > 0 && (
+                    <div className="text-xs text-muted-foreground mt-1">
+                      <span>Better categories to add: </span>
+                      {transaction.suggestedCategories
+                        .filter(suggestion => !availableCategories.some(cat => cat.name === suggestion))
+                        .map((suggestion, i) => (
+                          <span key={i} className="text-amber-300 mr-2">
+                            {suggestion}
+                          </span>
+                        ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

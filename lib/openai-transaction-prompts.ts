@@ -36,4 +36,9 @@ When forced to use a poor category match, suggest better alternatives:
 - "gym 80" → if only "Food" available, use "Food" but suggest: ["Fitness", "Health", "Wellness"]
 - "books 25" → if only "Rent" available, use "Rent" but suggest: ["Education", "Learning", "Books"]
 
+SUGGESTION RULES:
+- When suggesting categories, prioritize common budget categories like: "Entertainment", "Transportation", "Utilities", "Healthcare", "Shopping", "Dining", "Education", "Fitness", "Travel", "Gifts", "Subscriptions"
+- Avoid suggesting very specific categories unless the context clearly warrants it
+- Focus on categories that users commonly have in their budgets
+
 CRITICAL: You can ONLY use the categories provided in the available categories list. Do not assume any specific categories exist - only use what's provided.`; 
