@@ -77,7 +77,12 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
   const handleCategoryChange = (transactionIndex: number, newCategory: string) => {
     console.log('Changing category for transaction', transactionIndex, 'to', newCategory);
     console.log('Available categories:', availableCategories.map(cat => cat.name));
-    setCategoryChanges(prev => ({ ...prev, [transactionIndex]: newCategory }));
+    console.log('Current category changes:', categoryChanges);
+    setCategoryChanges(prev => {
+      const newChanges = { ...prev, [transactionIndex]: newCategory };
+      console.log('New category changes:', newChanges);
+      return newChanges;
+    });
   };
 
   const handleConfirm = () => {
@@ -254,12 +259,16 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
               {transaction.suggestedCategories && transaction.suggestedCategories.length > 0 && (
                 <div className="text-xs text-muted-foreground mt-2">
                   <span>Suggestions: </span>
+                  <span className="text-green-300">(Debug: {transaction.suggestedCategories.length} suggestions)</span>
                   {transaction.suggestedCategories
                     .filter(suggestion => availableCategories.some(cat => cat.name === suggestion))
                     .map((suggestion, i) => (
                       <button
                         key={i}
-                        onClick={() => handleCategoryChange(index, suggestion)}
+                        onClick={() => {
+                          console.log('Clicking suggestion:', suggestion);
+                          handleCategoryChange(index, suggestion);
+                        }}
                         className="text-blue-300 hover:text-blue-200 underline mr-2"
                       >
                         {suggestion}

@@ -131,6 +131,15 @@ export async function POST(request: NextRequest) {
       transactionData = JSON.parse(functionCall.arguments);
       // Debug logging
       console.log('AI response:', transactionData);
+      console.log('AI response transactions:', transactionData.transactions);
+      if (transactionData.transactions && transactionData.transactions.length > 0) {
+        transactionData.transactions.forEach((tx: any, index: number) => {
+          console.log(`Transaction ${index}:`, tx);
+          if (tx.suggestedCategories) {
+            console.log(`Transaction ${index} suggestions:`, tx.suggestedCategories);
+          }
+        });
+      }
     } catch (parseError) {
       return NextResponse.json(
         { error: "Failed to parse AI response. Please try again." },
