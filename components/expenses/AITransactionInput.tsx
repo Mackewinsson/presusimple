@@ -325,6 +325,9 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
 
   const parseTransactions = useMutation({
     mutationFn: async (description: string) => {
+      const categoryNames = categories.map(cat => cat.name);
+      console.log('Sending categories to AI:', categoryNames);
+      
       const response = await fetch('/api/transactions/ai-parse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -332,7 +335,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
           description,
           userId: userId?.data,
           budgetId,
-          categories: categories.map(cat => cat.name) // Pass available categories
+          categories: categoryNames // Pass available categories
         }),
       });
 
@@ -341,7 +344,9 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
         throw new Error(error.error || 'Failed to parse transactions');
       }
 
-      return response.json();
+      const result = await response.json();
+      console.log('AI parsing result:', result);
+      return result;
     },
   });
 
@@ -421,6 +426,18 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       });
       return;
     }
+
+    // Check if categories are loaded
+    if (categories.length === 0) {
+      toast({
+        title: "Error",
+        description: "No categories available. Please set up your budget categories first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log('Starting AI parsing with categories:', categories.map(cat => cat.name));
 
     if (!userId?.data) {
       toast({

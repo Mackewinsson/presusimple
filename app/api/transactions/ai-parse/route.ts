@@ -72,11 +72,15 @@ export async function POST(request: NextRequest) {
 
     // Create enhanced system prompt with available categories
     const availableCategories = categories && categories.length > 0 
-      ? `\n\nAvailable categories in this budget: ${categories.join(', ')}`
+      ? `\n\nAVAILABLE CATEGORIES (you MUST use ONLY these): ${categories.join(', ')}`
       : '';
     
     const enhancedPrompt = transactionSystemPrompt + availableCategories + 
-      '\n\nIMPORTANT: Use only the available categories listed above. If no exact match exists, choose the closest category.';
+      '\n\nCRITICAL: You MUST use ONLY the available categories listed above. NEVER create new categories. If no exact match exists, choose the closest available category from the list provided.';
+
+    // Debug logging
+    console.log('Available categories:', categories);
+    console.log('Enhanced prompt:', enhancedPrompt);
 
     // Call OpenAI with function calling
     let completion;
@@ -124,6 +128,8 @@ export async function POST(request: NextRequest) {
     let transactionData;
     try {
       transactionData = JSON.parse(functionCall.arguments);
+      // Debug logging
+      console.log('AI response:', transactionData);
     } catch (parseError) {
       return NextResponse.json(
         { error: "Failed to parse AI response. Please try again." },
