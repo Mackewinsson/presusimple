@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, DollarSign, Trash2, Sparkles } from "lucide-react";
+import { Plus, DollarSign, Trash2, Sparkles, Zap } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -461,10 +461,19 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     return (
       <>
         <AILoading isProcessing={isAICreating} currentStep={currentStep} />
-        <Card className="glass-card hover-card max-w-2xl mx-auto mt-10">
+        <Card className="glass-card hover-card group bg-gradient-to-br from-slate-900/90 via-purple-900/20 to-slate-900/90 border border-purple-500/20 shadow-2xl">
         <CardHeader>
-          <CardTitle>Create Your Budget</CardTitle>
-          <CardDescription>
+          <CardTitle className="flex items-center gap-3 text-xl">
+            <div className="relative">
+              <Sparkles className="h-6 w-6 text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text animate-pulse" />
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-ping" />
+            </div>
+            <span className="text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 bg-clip-text font-bold">
+              Create Your Budget
+            </span>
+            <Zap className="h-5 w-5 text-transparent bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text animate-bounce" />
+          </CardTitle>
+          <CardDescription className="text-base">
             Choose how you'd like to create your budget - manually or with AI assistance.
           </CardDescription>
         </CardHeader>
@@ -474,54 +483,61 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
               <TabsTrigger value="manual" className="text-sm font-medium">
                 Manual Setup
               </TabsTrigger>
-              <TabsTrigger value="ai" className="flex items-center gap-2 text-sm font-medium">
-                <Sparkles className="h-4 w-4 flex-shrink-0" />
+              <TabsTrigger value="ai" className="flex items-center gap-2 text-sm font-medium bg-gradient-to-r from-purple-600/20 to-pink-600/20 hover:from-purple-600/30 hover:to-pink-600/30 border-purple-500/30 data-[state=active]:from-purple-600/40 data-[state=active]:to-pink-600/40 data-[state=active]:border-purple-500/50 transition-all duration-200">
+                <Sparkles className="h-4 w-4 flex-shrink-0 text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text" />
                 AI Assistant
               </TabsTrigger>
             </TabsList>
             
             <TabsContent value="manual" className="space-y-4 mt-4">
-              <form onSubmit={handleCreateBudget} className="space-y-4">
-                <Input
-                  type="number"
-                  placeholder="Total Budget"
-                  value={newTotal}
-                  onChange={(e) => setNewTotal(e.target.value)}
-                  min={0}
-                  step="0.01"
-                  required
-                />
-                <div className="flex gap-2">
-                  <Select value={newMonth} onValueChange={setNewMonth}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select month" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {months.map((month) => (
-                        <SelectItem key={month} value={month}>
-                          {month}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    type="number"
-                    placeholder="Year"
-                    value={newYear}
-                    onChange={(e) => setNewYear(Number(e.target.value))}
-                    min={2000}
-                    max={2100}
-                    required
-                  />
-                </div>
-                <LoadingButton
-                  type="submit"
-                  className="w-full btn-primary flex items-center justify-center"
-                  loading={createBudgetMutation.isPending}
-                >
-                  Create Budget
-                </LoadingButton>
-              </form>
+          <form onSubmit={handleCreateBudget} className="space-y-4">
+            <Input
+              type="number"
+              placeholder="Total Budget"
+              value={newTotal}
+              onChange={(e) => setNewTotal(e.target.value)}
+              min={0}
+              step="0.01"
+              required
+            />
+            <div className="flex gap-2">
+              <Select value={newMonth} onValueChange={setNewMonth}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select month" />
+                </SelectTrigger>
+                <SelectContent>
+                  {months.map((month) => (
+                    <SelectItem key={month} value={month}>
+                      {month}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                type="number"
+                placeholder="Year"
+                value={newYear}
+                onChange={(e) => setNewYear(Number(e.target.value))}
+                min={2000}
+                max={2100}
+                required
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] border-0"
+              disabled={createBudgetMutation.isPending}
+            >
+              {createBudgetMutation.isPending ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                  <span className="animate-pulse">Creating budget...</span>
+                </>
+              ) : (
+                "Create Budget"
+              )}
+            </Button>
+          </form>
             </TabsContent>
             
             <TabsContent value="ai" className="space-y-4 mt-4">
@@ -581,21 +597,23 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                   />
                 </div>
                 
-                                                 <LoadingButton
-                                   type="submit"
-                                   className="w-full btn-primary flex items-center justify-center"
-                                   loading={isAICreating}
-                                   disabled={!aiDescription.trim() || isAICreating}
-                                 >
+                                                                 <Button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] border-0"
+                  disabled={!aiDescription.trim() || isAICreating}
+                >
                   {isAICreating ? (
-                    "Creating budget with AI..."
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                      <span className="animate-pulse">Creating budget with AI...</span>
+                    </>
                   ) : (
                     <>
-                      <Sparkles className="h-5 w-5 mr-2 flex-shrink-0" />
+                      <Sparkles className="h-5 w-5 mr-2 flex-shrink-0 text-white" />
                       Create Budget with AI
                     </>
                   )}
-                </LoadingButton>
+                </Button>
               </form>
             </TabsContent>
           </Tabs>
@@ -609,7 +627,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   return (
     <>
       <AILoading isProcessing={isAICreating} currentStep={currentStep} />
-      <Card className="glass-card hover-card">
+    <Card className="glass-card hover-card">
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-0">
           <div className="flex items-start justify-between w-full sm:w-auto">
