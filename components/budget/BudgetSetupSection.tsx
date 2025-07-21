@@ -353,8 +353,14 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   const handleCreateBudgetWithAI = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Edge case: Validate description length
     if (!aiDescription.trim()) {
       toast.error("Please enter a budget description");
+      return;
+    }
+
+    if (aiDescription.trim().length < 10) {
+      toast.error("Please provide a more detailed description (at least 10 characters)");
       return;
     }
 
@@ -363,15 +369,32 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       return;
     }
 
+    // Edge case: Validate month and year
+    const monthNumber = getMonthNumber(newMonth);
+    if (monthNumber < 1 || monthNumber > 12) {
+      toast.error("Please select a valid month");
+      return;
+    }
+
+    if (newYear < 2020 || newYear > 2030) {
+      toast.error("Please select a valid year (2020-2030)");
+      return;
+    }
+
     try {
-      const monthNumber = getMonthNumber(newMonth);
       await createBudgetFromAI(aiDescription, monthNumber, newYear);
       
       toast.success("Budget created successfully with AI!");
       setAiDescription("");
     } catch (error) {
       console.error("Failed to create budget with AI:", error);
-      toast.error("Failed to create budget with AI. Please try again.");
+      
+      // Edge case: Show user-friendly error messages
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Failed to create budget with AI. Please try again.");
+      }
     }
   };
 
@@ -507,14 +530,22 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                   <label htmlFor="aiDescription" className="text-sm font-medium text-white">
                     Describe your budget
                   </label>
-                  <Textarea
-                    id="aiDescription"
-                    placeholder="Example: I make 5000. Rent 2000, food 1000, the rest is savings."
-                    value={aiDescription}
-                    onChange={(e) => setAiDescription(e.target.value)}
-                    rows={4}
-                    disabled={isAICreating}
-                  />
+                                                     <Textarea
+                                     id="aiDescription"
+                                     placeholder="Example: I make 5000. Rent 2000, food 1000, the rest is savings."
+                                     value={aiDescription}
+                                     onChange={(e) => setAiDescription(e.target.value)}
+                                     rows={4}
+                                     disabled={isAICreating}
+                                   />
+                                   <div className="flex justify-between items-center text-xs text-white/50">
+                                     <span>
+                                       {aiDescription.length}/1000 characters
+                                     </span>
+                                     <span>
+                                       {aiDescription.length < 10 ? 'Need more detail' : 'Good description'}
+                                     </span>
+                                   </div>
                 </div>
                 
                 <div className="text-sm text-white/70">
@@ -550,12 +581,12 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                   />
                 </div>
                 
-                <LoadingButton
-                  type="submit"
-                  className="w-full btn-primary flex items-center justify-center"
-                  loading={isAICreating}
-                  disabled={!aiDescription.trim()}
-                >
+                                                 <LoadingButton
+                                   type="submit"
+                                   className="w-full btn-primary flex items-center justify-center"
+                                   loading={isAICreating}
+                                   disabled={!aiDescription.trim() || isAICreating}
+                                 >
                   {isAICreating ? (
                     "Creating budget with AI..."
                   ) : (
