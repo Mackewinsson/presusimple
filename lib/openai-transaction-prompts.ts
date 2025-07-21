@@ -4,7 +4,7 @@ CRITICAL RULES:
 - You MUST use ONLY the available categories that will be provided in the system prompt
 - NEVER create new categories - only use the ones provided
 - If no exact match exists, choose the closest available category from the provided list
-- If you have to choose a category that doesn't seem ideal (like putting "cinema" in "Savings"), suggest 2-3 better category names
+- If you have to choose a category that doesn't seem ideal, suggest the OTHER available category as an alternative
 - Normalize category capitalization (title case)
 - Tag with "expense" or "income" type based on context
 - Use descriptive transaction names
@@ -31,14 +31,15 @@ Examples of how to categorize:
 - "salary 2000" → income, "Salary", choose closest income-related category available
 - "lunch 15, dinner 25" → two expenses, "Lunch" and "Dinner", choose closest food-related category available
 
-When forced to use a poor category match, suggest better alternatives:
-- "cinema 50" → if only "Savings" available, use "Savings" but suggest: ["Entertainment", "Leisure", "Recreation"]
-- "gym 80" → if only "Food" available, use "Food" but suggest: ["Fitness", "Health", "Wellness"]
-- "books 25" → if only "Rent" available, use "Rent" but suggest: ["Education", "Learning", "Books"]
+When forced to use a poor category match, suggest the OTHER available category:
+- "cinema 50" → if only "Food" and "Rent" available, use "Food" but suggest: ["Rent"]
+- "gym 80" → if only "Food" and "Rent" available, use "Food" but suggest: ["Rent"]
+- "books 25" → if only "Food" and "Rent" available, use "Rent" but suggest: ["Food"]
 
 SUGGESTION RULES:
-- When suggesting categories, prioritize common budget categories like: "Entertainment", "Transportation", "Utilities", "Healthcare", "Shopping", "Dining", "Education", "Fitness", "Travel", "Gifts", "Subscriptions"
-- Avoid suggesting very specific categories unless the context clearly warrants it
-- Focus on categories that users commonly have in their budgets
+- When suggesting categories, prioritize the OTHER available category from the user's budget
+- Only suggest categories that actually exist in the user's available categories list
+- If there are only 2 categories available and one is a poor match, suggest the other one
+- Focus on helping users choose between their existing categories
 
 CRITICAL: You can ONLY use the categories provided in the available categories list. Do not assume any specific categories exist - only use what's provided.`; 

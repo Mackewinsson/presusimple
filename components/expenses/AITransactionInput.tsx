@@ -290,6 +290,30 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                   )}
                 </div>
               )}
+              
+              {/* Fallback: Show all available categories as suggestions if no AI suggestions match */}
+              {(!transaction.suggestedCategories || 
+                transaction.suggestedCategories.filter(suggestion => 
+                  availableCategories.some(cat => cat.name === suggestion)
+                ).length === 0) && (
+                <div className="text-xs text-muted-foreground mt-2">
+                  <span>Available categories: </span>
+                  {availableCategories
+                    .filter(cat => cat.name !== currentCategory) // Don't suggest current category
+                    .map((cat, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          console.log('Clicking available category:', cat.name);
+                          handleCategoryChange(index, cat.name);
+                        }}
+                        className="text-blue-300 hover:text-blue-200 underline mr-2"
+                      >
+                        {cat.name}
+                      </button>
+                    ))}
+                </div>
+              )}
             </div>
           );
         })}
