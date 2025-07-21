@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Plus, CheckCircle, XCircle } from "lucide-react";
+import { MessageSquare, Plus, CheckCircle, XCircle, Sparkles, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUserId } from "@/lib/hooks/useUserId";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -28,13 +28,18 @@ interface TransactionPreviewProps {
 const TransactionPreview = ({ transactions, onConfirm, onCancel, isSaving }: TransactionPreviewProps) => {
   return (
     <div className="space-y-4">
-      <div className="text-sm text-muted-foreground">
-        Review the transactions before saving:
+      <div className="text-sm text-muted-foreground flex items-center gap-2">
+        <CheckCircle className="h-4 w-4 text-green-500 animate-pulse" />
+        <span>AI found {transactions.length} transaction{transactions.length !== 1 ? 's' : ''}!</span>
       </div>
       
       <div className="space-y-3">
         {transactions.map((transaction, index) => (
-          <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+          <div 
+            key={index} 
+            className="flex items-center justify-between p-3 border rounded-lg hover:shadow-md transition-all duration-300 transform hover:scale-[1.02] animate-in slide-in-from-left-2"
+            style={{ animationDelay: `${index * 100}ms` }}
+          >
             <div className="flex-1">
               <div className="font-medium">{transaction.description}</div>
               <div className="text-sm text-muted-foreground">{transaction.category}</div>
@@ -250,14 +255,20 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
   };
 
   return (
-    <Card className="glass-card hover-card">
+    <Card className="glass-card hover-card group">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MessageSquare className="h-5 w-5" />
-          Quick Transaction Input
+        <CardTitle className="flex items-center gap-3 text-xl">
+          <div className="relative">
+            <Sparkles className="h-6 w-6 text-purple-500 animate-pulse" />
+            <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-ping" />
+          </div>
+          <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            AI Magic
+          </span>
+          <Zap className="h-5 w-5 text-yellow-500 animate-bounce" />
         </CardTitle>
-        <CardDescription>
-          Describe your transactions in natural language and let AI parse them for you
+        <CardDescription className="text-base">
+          ✨ Just describe your day in plain English and watch AI transform it into perfect budget entries
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -266,7 +277,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
             placeholder="Example: coffee 5, lunch 15, gas 40, salary 2000"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="min-h-[100px]"
+            className="min-h-[100px] transition-all duration-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-purple-300"
             disabled={isParsing}
           />
           <div className="flex justify-between items-center text-xs text-muted-foreground">
@@ -279,28 +290,31 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
           <Button
             onClick={handleParse}
             disabled={!description.trim() || isParsing}
-            className="flex-1"
+            className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
             {isParsing ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                Parsing...
+                <span className="animate-pulse">AI is working...</span>
               </>
             ) : (
               <>
-                <MessageSquare className="h-4 w-4 mr-2" />
-                Parse Transactions
+                <Sparkles className="h-4 w-4 mr-2 animate-pulse" />
+                <span>✨ Transform with AI</span>
               </>
             )}
           </Button>
         </div>
 
-        <div className="text-xs text-muted-foreground space-y-1">
-          <p className="font-medium">Examples:</p>
+        <div className="text-xs text-muted-foreground space-y-2">
+          <p className="font-medium flex items-center gap-2">
+            <Sparkles className="h-3 w-3 text-purple-500" />
+            Try these examples:
+          </p>
           <ul className="space-y-1">
-            <li>• "coffee 5, lunch 15" → Two food expenses</li>
-            <li>• "rent 500, gas 40" → Rent and transportation</li>
-            <li>• "salary 2000, freelance 500" → Two income sources</li>
+            <li className="hover:text-purple-500 transition-colors cursor-pointer">• "coffee 5, lunch 15" → Two food expenses</li>
+            <li className="hover:text-purple-500 transition-colors cursor-pointer">• "rent 500, gas 40" → Rent and transportation</li>
+            <li className="hover:text-purple-500 transition-colors cursor-pointer">• "salary 2000, freelance 500" → Two income sources</li>
           </ul>
         </div>
       </CardContent>
