@@ -65,8 +65,10 @@ export default function InsightsPage() {
 
   // Enhanced debug logging
   console.log('=== INSIGHTS DEBUG ===');
+  console.log('User ID:', userId);
   console.log('URL Budget ID:', searchParams.get('budget'));
   console.log('Selected Budget ID:', selectedBudgetId);
+  console.log('Budgets Loading:', budgetsLoading);
   console.log('All Budgets Count:', budgets.length);
   console.log('All Budgets:', budgets);
   console.log('Selected Budget:', selectedBudget);
