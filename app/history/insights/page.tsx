@@ -75,32 +75,38 @@ export default function InsightsPage() {
     );
   });
 
+  // Debug logging
+  console.log('Selected Budget:', selectedBudget);
+  console.log('Filtered Expenses:', filteredExpenses);
+  console.log('All Expenses:', allExpenses);
+
   // Calculate spent for each category from filtered expenses
   const categoriesWithSpent = (selectedBudget?.categories || []).map(
     (category) => {
       const normalize = (str: string | undefined) =>
         (str || "").toString().trim().toLowerCase();
-      const spent = filteredExpenses
-        .filter((exp) => {
-          // Robust match: by id/_id if present, else by normalized name
-          if (
-            "_id" in category &&
-            category._id &&
-            exp.categoryId === category._id
-          )
-            return true;
-          if ("id" in category && category.id && exp.categoryId === category.id)
-            return true;
-          // Try to match by name if id is not available
-          if (normalize(exp.categoryId) === normalize(category.name))
-            return true;
-          return false;
-        })
-        .reduce((sum, exp) => {
-          if (exp.type === "expense") return sum + exp.amount;
-          if (exp.type === "income") return sum - exp.amount;
-          return sum;
-        }, 0);
+      
+      const categoryExpenses = filteredExpenses.filter((exp) => {
+        // For monthly budget categories, we only have name, budgeted, spent
+        // So we match by normalized name
+        const normalizedExpCategory = normalize(exp.categoryId);
+        const normalizedCategoryName = normalize(category.name);
+        return normalizedExpCategory === normalizedCategoryName;
+      });
+
+      const spent = categoryExpenses.reduce((sum, exp) => {
+        if (exp.type === "expense") return sum + exp.amount;
+        if (exp.type === "income") return sum - exp.amount;
+        return sum;
+      }, 0);
+
+      // Debug logging for each category
+      console.log(`Category: ${category.name}`, {
+        categoryName: category.name,
+        categoryExpenses,
+        spent
+      });
+
       return { ...category, spent };
     }
   );
@@ -114,10 +120,14 @@ export default function InsightsPage() {
       overBudget: category.spent > category.budgeted,
     })) || [];
 
-  // For now, we don't have expenses in the monthly budget data
-  // This will be implemented when we add expenses to the monthly budget model
-  const incomeTotal = 0;
-  const expenseTotal = 0;
+  // Calculate income and expense totals from filtered expenses
+  const incomeTotal = filteredExpenses
+    .filter(exp => exp.type === "income")
+    .reduce((sum, exp) => sum + exp.amount, 0);
+  
+  const expenseTotal = filteredExpenses
+    .filter(exp => exp.type === "expense")
+    .reduce((sum, exp) => sum + exp.amount, 0);
 
   // Get top spending categories
   const topCategories = [...categoriesWithSpent]
@@ -274,7 +284,7 @@ export default function InsightsPage() {
                     {formatMoney(incomeTotal)}
                   </div>
                   <div className="text-sm text-muted-foreground mt-2">
-                    Income data will be available soon
+                    Total income for {format(parseISO(selectedBudget.createdAt), "MMMM yyyy")}
                   </div>
                 </CardContent>
               </Card>
@@ -294,7 +304,7 @@ export default function InsightsPage() {
                     {formatMoney(expenseTotal)}
                   </div>
                   <div className="text-sm text-muted-foreground mt-2">
-                    Expense data will be available soon
+                    Total expenses for {format(parseISO(selectedBudget.createdAt), "MMMM yyyy")}
                   </div>
                 </CardContent>
               </Card>
