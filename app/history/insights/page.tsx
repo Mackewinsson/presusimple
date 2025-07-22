@@ -41,9 +41,23 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function InsightsPage() {
   const { data: userId } = useUserId();
-  const { data: budgets = [], isLoading: budgetsLoading } = useMonthlyBudgets(
+  const { data: budgets = [], isLoading: budgetsLoading, refetch: refetchBudgets } = useMonthlyBudgets(
     userId || ""
   );
+
+  // Debug the userId issue
+  console.log('=== USER ID DEBUG ===');
+  console.log('userId:', userId);
+  console.log('userId type:', typeof userId);
+  console.log('userId truthy:', !!userId);
+
+  // Force refetch if budgets is empty but userId is available
+  useEffect(() => {
+    if (userId && budgets.length === 0 && !budgetsLoading) {
+      console.log('Forcing refetch of budgets...');
+      refetchBudgets();
+    }
+  }, [userId, budgets.length, budgetsLoading, refetchBudgets]);
   const searchParams = useSearchParams();
   const [selectedBudgetId, setSelectedBudgetId] = useState<string>("");
 
