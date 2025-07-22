@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -43,9 +44,18 @@ export default function InsightsPage() {
   const { data: budgets = [], isLoading: budgetsLoading } = useMonthlyBudgets(
     userId || ""
   );
-  const [selectedBudgetId, setSelectedBudgetId] = useState<string>(
-    budgets[0]?._id || ""
-  );
+  const searchParams = useSearchParams();
+  const [selectedBudgetId, setSelectedBudgetId] = useState<string>("");
+
+  // Set initial budget from URL parameter or first available budget
+  useEffect(() => {
+    const budgetFromUrl = searchParams.get('budget');
+    if (budgetFromUrl && budgets.length > 0) {
+      setSelectedBudgetId(budgetFromUrl);
+    } else if (budgets.length > 0 && !selectedBudgetId) {
+      setSelectedBudgetId(budgets[0]._id);
+    }
+  }, [budgets, searchParams, selectedBudgetId]);
 
   const selectedBudget = budgets.find((b) => b._id === selectedBudgetId);
 
