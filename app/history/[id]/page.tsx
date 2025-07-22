@@ -257,14 +257,16 @@ export default function BudgetDetailPage() {
       <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="space-y-6">
           {/* Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-primary" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+              <CardHeader className="border-b bg-gradient-to-r from-background to-primary/5">
+                <CardTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <TrendingUp className="h-5 w-5 text-primary" />
+                  </div>
                   Budget Overview
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-base">
                   {selectedBudget.name}
                 </CardDescription>
               </CardHeader>
@@ -305,13 +307,15 @@ export default function BudgetDetailPage() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ArrowDownCircle className="h-5 w-5 text-primary" />
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+              <CardHeader className="border-b bg-gradient-to-r from-background to-secondary/5">
+                <CardTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-secondary/10">
+                    <ArrowDownCircle className="h-5 w-5 text-secondary-foreground" />
+                  </div>
                   Transactions
                 </CardTitle>
-                <CardDescription>Total transactions for the month</CardDescription>
+                <CardDescription className="text-base">Total transactions for the month</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-primary">
@@ -323,13 +327,15 @@ export default function BudgetDetailPage() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ArrowUpCircle className="h-5 w-5 text-destructive" />
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+              <CardHeader className="border-b bg-gradient-to-r from-background to-destructive/5">
+                <CardTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-destructive/10">
+                    <ArrowUpCircle className="h-5 w-5 text-destructive" />
+                  </div>
                   Categories
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-base">
                   Budget categories used
                 </CardDescription>
               </CardHeader>
@@ -345,21 +351,23 @@ export default function BudgetDetailPage() {
           </div>
 
           {/* Category Spending Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <PieChart className="h-5 w-5 text-primary" />
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b bg-gradient-to-r from-background to-muted/20">
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <PieChart className="h-6 w-6 text-primary" />
+                </div>
                 Category Spending
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-base">
                 Comparison of budgeted vs actual spending by category
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="h-[400px] flex flex-col">
+            <CardContent className="p-6">
+              <div className="h-[450px] flex flex-col">
                 {hasSpendingData ? (
-                  <div className="flex-1 overflow-x-auto">
-                    <div className="min-w-full h-full" style={{ minWidth: `${Math.max(chartCategories.length * 120, 400)}px` }}>
+                  <div className="flex-1 overflow-x-auto rounded-lg">
+                    <div className="min-w-full h-full p-4" style={{ minWidth: `${Math.max(chartCategories.length * 140, 500)}px` }}>
                       <Bar
                         data={{
                           labels: chartData.map(item => item.name),
@@ -402,11 +410,13 @@ export default function BudgetDetailPage() {
                               labels: {
                                 color: currentTheme === 'dark' ? '#F9FAFB' : '#374151', // White for dark mode, dark gray for light mode
                                 font: {
-                                  size: 12,
-                                  weight: 'normal',
+                                  size: 14,
+                                  weight: 'bold',
                                 },
                                 usePointStyle: true,
-                                padding: 20,
+                                padding: 25,
+                                boxWidth: 20,
+                                boxHeight: 8,
                               },
                             },
                             tooltip: {
@@ -500,19 +510,24 @@ export default function BudgetDetailPage() {
                   </div>
                 ) : (
                   <div className="flex-1 flex items-center justify-center">
-                    <div className="text-center">
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {selectedBudget?.categories.length === 0 
-                          ? "No categories available" 
-                          : "No spending data available"
-                        }
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {selectedBudget?.categories.length === 0 
-                          ? "No budget categories were tracked" 
-                          : "No expenses were recorded for this period"
-                        }
-                      </p>
+                    <div className="text-center space-y-4">
+                      <div className="w-16 h-16 mx-auto rounded-full bg-muted/50 flex items-center justify-center">
+                        <PieChart className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-lg font-medium text-foreground">
+                          {selectedBudget?.categories.length === 0 
+                            ? "No Categories Available" 
+                            : "No Spending Data Available"
+                          }
+                        </p>
+                        <p className="text-sm text-muted-foreground max-w-md">
+                          {selectedBudget?.categories.length === 0 
+                            ? "No budget categories were tracked for this period. Add categories to see spending breakdown." 
+                            : "No expenses were recorded for this period. Start tracking expenses to see your spending patterns."
+                          }
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -521,52 +536,67 @@ export default function BudgetDetailPage() {
           </Card>
 
           {/* Categories Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Category Details</CardTitle>
-              <CardDescription>
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b bg-gradient-to-r from-background to-muted/20">
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <div className="p-2 rounded-lg bg-secondary/10">
+                  <TrendingUp className="h-6 w-6 text-secondary-foreground" />
+                </div>
+                Category Details
+              </CardTitle>
+              <CardDescription className="text-base">
                 Detailed breakdown of each category
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
+            <CardContent className="p-6">
+              <div className="space-y-6">
                 {selectedBudget.categories.map((category, index) => (
-                  <div key={index} className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium">{category.name}</span>
-                      <span
-                        className={
-                          category.spent > category.budgeted
-                            ? "text-destructive"
-                            : ""
-                        }
-                      >
-                        {formatMoney(category.spent)}
-                      </span>
+                  <div key={index} className="p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getChartColors(index) }}></div>
+                        <span className="font-semibold text-lg">{category.name}</span>
+                      </div>
+                      <div className="text-right">
+                        <div className={`text-lg font-bold ${
+                          category.spent > category.budgeted ? "text-destructive" : "text-primary"
+                        }`}>
+                          {formatMoney(category.spent)}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          of {formatMoney(category.budgeted)} budgeted
+                        </div>
+                      </div>
                     </div>
-                    <div className="h-2 rounded-full bg-secondary overflow-hidden">
-                      <div
-                        className={`h-full transition-all duration-300 ${
-                          category.spent > category.budgeted
-                            ? "bg-destructive"
-                            : "bg-primary"
-                        }`}
-                        style={{
-                          width: `${Math.min(
-                            100,
-                            (category.spent / category.budgeted) * 100
-                          )}%`,
-                        }}
-                      />
-                    </div>
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                      <span>Budgeted: {formatMoney(category.budgeted)}</span>
-                      <span>
-                        {Math.round(
-                          (category.spent / category.budgeted) * 100
-                        )}
-                        % spent
-                      </span>
+                    <div className="space-y-2">
+                      <div className="h-3 rounded-full bg-secondary overflow-hidden">
+                        <div
+                          className={`h-full transition-all duration-500 ease-out ${
+                            category.spent > category.budgeted
+                              ? "bg-destructive"
+                              : "bg-primary"
+                          }`}
+                          style={{
+                            width: `${Math.min(
+                              100,
+                              (category.spent / category.budgeted) * 100
+                            )}%`,
+                          }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">
+                          {Math.round((category.spent / category.budgeted) * 100)}% spent
+                        </span>
+                        <span className={`font-medium ${
+                          category.spent > category.budgeted ? "text-destructive" : "text-primary"
+                        }`}>
+                          {category.spent > category.budgeted 
+                            ? `+${formatMoney(category.spent - category.budgeted)} over`
+                            : `${formatMoney(category.budgeted - category.spent)} remaining`
+                          }
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))}
