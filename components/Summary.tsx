@@ -87,7 +87,13 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
     spent: Number(cat.spent) || 0,
     budgeted: Number(cat.budgeted) || 0,
     overBudget: (Number(cat.spent) || 0) > (Number(cat.budgeted) || 0),
-  })).filter(item => item.budgeted > 0 || item.spent > 0); // Only show items with data
+  })); // Temporarily removed filter to debug
+
+  console.log('Chart data debug:', {
+    chartDataLength: chartData.length,
+    chartData,
+    categoriesWithSpent: categoriesWithSpent.map(cat => ({ name: cat.name, budgeted: cat.budgeted, spent: cat.spent }))
+  });
 
 
 
@@ -313,6 +319,9 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
               Top Spending Categories
             </h3>
             <div className="h-[250px] sm:h-[300px] md:h-[350px]" data-testid="summary-chart">
+              <div style={{ height: '20px', background: 'green', marginBottom: '10px' }}>
+                Chart Container Debug: {chartData.length} items
+              </div>
               {chartData.length > 0 ? (
                 <div>
 
