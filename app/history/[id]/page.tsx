@@ -334,9 +334,9 @@ export default function BudgetDetailPage() {
                             {
                               label: 'Budgeted',
                               data: chartData.map(item => item.budgeted),
-                              backgroundColor: themeColors.muted,
+                              backgroundColor: themeColors.muted + '40', // Add transparency
                               borderColor: themeColors.muted,
-                              borderWidth: 1,
+                              borderWidth: 2,
                               borderRadius: 6,
                               borderSkipped: false,
                             },
@@ -346,12 +346,12 @@ export default function BudgetDetailPage() {
                               backgroundColor: chartData.map((item, index) => 
                                 item.overBudget 
                                   ? themeColors.destructive
-                                  : getChartColor(index)
+                                  : themeColors.primary
                               ),
                               borderColor: chartData.map((item, index) => 
                                 item.overBudget 
                                   ? themeColors.destructive
-                                  : getChartColor(index)
+                                  : themeColors.primary
                               ),
                               borderWidth: 1,
                               borderRadius: 6,
@@ -420,7 +420,7 @@ export default function BudgetDetailPage() {
                                 display: false,
                               },
                               ticks: {
-                                color: themeColors.muted,
+                                color: themeColors.foreground,
                                 font: {
                                   size: chartCategories.length > 6 ? 10 : 12,
                                   weight: 'normal',
@@ -435,11 +435,14 @@ export default function BudgetDetailPage() {
                               },
                             },
                             y: {
+                              border: {
+                                color: themeColors.border,
+                              },
                               grid: {
-                                color: `${themeColors.muted}20`,
+                                color: `${themeColors.border}40`,
                               },
                               ticks: {
-                                color: themeColors.muted,
+                                color: themeColors.foreground,
                                 font: {
                                   size: 11,
                                   weight: 'normal',
@@ -447,9 +450,6 @@ export default function BudgetDetailPage() {
                                 callback: function(value) {
                                   return formatMoney(value as number);
                                 },
-                              },
-                              border: {
-                                color: themeColors.border,
                               },
                             },
                           },
