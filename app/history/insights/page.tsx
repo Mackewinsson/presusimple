@@ -36,7 +36,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import { useMonthlyBudgets, useUserId, useExpenses } from "@/lib/hooks";
+import { useMonthlyBudgets, useUserId, useExpenses, useCategories } from "@/lib/hooks";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function InsightsPage() {
@@ -59,8 +59,9 @@ export default function InsightsPage() {
 
   const selectedBudget = budgets.find((b) => b._id === selectedBudgetId);
 
-  // Fetch all expenses for the user
+  // Fetch all expenses and categories for the user
   const { data: allExpenses = [] } = useExpenses(userId || "");
+  const { data: allCategories = [] } = useCategories(userId || "");
 
   // Filter expenses for the selected month/year
   const selectedMonth = selectedBudget?.month;
@@ -82,17 +83,29 @@ export default function InsightsPage() {
 
   // Calculate spent for each category from filtered expenses
   const categoriesWithSpent = (selectedBudget?.categories || []).map(
-    (category) => {
-      const normalize = (str: string | undefined) =>
-        (str || "").toString().trim().toLowerCase();
-      
-      const categoryExpenses = filteredExpenses.filter((exp) => {
-        // For monthly budget categories, we only have name, budgeted, spent
-        // So we match by normalized name
-        const normalizedExpCategory = normalize(exp.categoryId);
-        const normalizedCategoryName = normalize(category.name);
-        return normalizedExpCategory === normalizedCategoryName;
-      });
+    (monthlyCategory) => {
+      // Find the corresponding category from the actual categories data
+      const actualCategory = allCategories.find((cat) => 
+        cat.name.toLowerCase() === monthlyCategory.name.toLowerCase()
+      );
+
+      // If we found a matching category, use its ID to match expenses
+      let categoryExpenses = [];
+      if (actualCategory) {
+        categoryExpenses = filteredExpenses.filter((exp) => 
+          exp.categoryId === actualCategory._id
+        );
+      } else {
+        // Fallback: try to match by name (less reliable)
+        const normalize = (str: string | undefined) =>
+          (str || "").toString().trim().toLowerCase();
+        
+        categoryExpenses = filteredExpenses.filter((exp) => {
+          const normalizedExpCategory = normalize(exp.categoryId);
+          const normalizedCategoryName = normalize(monthlyCategory.name);
+          return normalizedExpCategory === normalizedCategoryName;
+        });
+      }
 
       const spent = categoryExpenses.reduce((sum, exp) => {
         if (exp.type === "expense") return sum + exp.amount;
@@ -101,13 +114,14 @@ export default function InsightsPage() {
       }, 0);
 
       // Debug logging for each category
-      console.log(`Category: ${category.name}`, {
-        categoryName: category.name,
+      console.log(`Category: ${monthlyCategory.name}`, {
+        categoryName: monthlyCategory.name,
+        actualCategoryId: actualCategory?._id,
         categoryExpenses,
         spent
       });
 
-      return { ...category, spent };
+      return { ...monthlyCategory, spent };
     }
   );
 
