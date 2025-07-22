@@ -30,7 +30,8 @@ import {
   Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
-import { getChartColor, useThemeColors } from "@/lib/theme";
+import { useThemeColors } from "@/lib/theme";
+import { useTheme } from "next-themes";
 import { useMonthlyBudgets, useUserId, useDeleteMonthlyBudget } from "@/lib/hooks";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -69,6 +70,7 @@ export default function BudgetDetailPage() {
 
   const selectedBudget = budgets.find((b) => b._id === budgetId);
   const themeColors = useThemeColors();
+  const { theme: currentTheme } = useTheme();
 
   // Handle delete
   const handleDelete = async () => {
@@ -93,6 +95,37 @@ export default function BudgetDetailPage() {
   }));
 
   const hasSpendingData = selectedBudget && selectedBudget.categories.length > 0;
+
+  // Get high-contrast colors for dark mode
+  const getChartColors = (index: number) => {
+    if (currentTheme === 'dark') {
+      // Bright colors for dark mode
+      const darkModeColors = [
+        '#60A5FA', // Blue
+        '#34D399', // Green
+        '#FBBF24', // Yellow
+        '#F87171', // Red
+        '#A78BFA', // Purple
+        '#F472B6', // Pink
+        '#34D399', // Teal
+        '#F59E0B', // Orange
+      ];
+      return darkModeColors[index % darkModeColors.length];
+    } else {
+      // Standard colors for light mode
+      const lightModeColors = [
+        '#3B82F6', // Blue
+        '#10B981', // Green
+        '#F59E0B', // Yellow
+        '#EF4444', // Red
+        '#8B5CF6', // Purple
+        '#EC4899', // Pink
+        '#06B6D4', // Teal
+        '#F97316', // Orange
+      ];
+      return lightModeColors[index % lightModeColors.length];
+    }
+  };
 
   if (budgetsLoading) {
     return (
@@ -334,8 +367,8 @@ export default function BudgetDetailPage() {
                             {
                               label: 'Budgeted',
                               data: chartData.map(item => item.budgeted),
-                              backgroundColor: themeColors.muted + '40', // Add transparency
-                              borderColor: themeColors.muted,
+                              backgroundColor: currentTheme === 'dark' ? '#374151' : '#E5E7EB', // Dark gray for dark mode, light gray for light mode
+                              borderColor: currentTheme === 'dark' ? '#6B7280' : '#9CA3AF',
                               borderWidth: 2,
                               borderRadius: 6,
                               borderSkipped: false,
@@ -345,13 +378,13 @@ export default function BudgetDetailPage() {
                               data: chartData.map(item => item.spent),
                               backgroundColor: chartData.map((item, index) => 
                                 item.overBudget 
-                                  ? themeColors.destructive
-                                  : themeColors.primary
+                                  ? '#EF4444' // Red for over budget
+                                  : getChartColors(index)
                               ),
                               borderColor: chartData.map((item, index) => 
                                 item.overBudget 
-                                  ? themeColors.destructive
-                                  : themeColors.primary
+                                  ? '#EF4444' // Red for over budget
+                                  : getChartColors(index)
                               ),
                               borderWidth: 1,
                               borderRadius: 6,
@@ -367,7 +400,7 @@ export default function BudgetDetailPage() {
                               display: true, // Show legend for both datasets
                               position: 'top' as const,
                               labels: {
-                                color: themeColors.foreground,
+                                color: currentTheme === 'dark' ? '#F9FAFB' : '#374151', // White for dark mode, dark gray for light mode
                                 font: {
                                   size: 12,
                                   weight: 'normal',
@@ -420,7 +453,7 @@ export default function BudgetDetailPage() {
                                 display: false,
                               },
                               ticks: {
-                                color: themeColors.foreground,
+                                color: currentTheme === 'dark' ? '#F9FAFB' : '#374151', // White for dark mode, dark gray for light mode
                                 font: {
                                   size: chartCategories.length > 6 ? 10 : 12,
                                   weight: 'normal',
@@ -431,18 +464,18 @@ export default function BudgetDetailPage() {
                                 maxTicksLimit: chartCategories.length > 6 ? 6 : 8,
                               },
                               border: {
-                                color: themeColors.border,
+                                color: currentTheme === 'dark' ? '#6B7280' : '#D1D5DB', // Medium gray for dark mode, light gray for light mode
                               },
                             },
                             y: {
                               border: {
-                                color: themeColors.border,
+                                color: currentTheme === 'dark' ? '#6B7280' : '#D1D5DB', // Medium gray for dark mode, light gray for light mode
                               },
                               grid: {
-                                color: `${themeColors.border}40`,
+                                color: currentTheme === 'dark' ? '#374151' : '#E5E7EB', // Dark gray for dark mode, light gray for light mode
                               },
                               ticks: {
-                                color: themeColors.foreground,
+                                color: currentTheme === 'dark' ? '#F9FAFB' : '#374151', // White for dark mode, dark gray for light mode
                                 font: {
                                   size: 11,
                                   weight: 'normal',
