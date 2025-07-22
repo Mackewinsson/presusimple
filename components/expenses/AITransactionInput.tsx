@@ -1,19 +1,23 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
+import { useUserId, useCategories, useBudget } from "@/lib/hooks";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MessageSquare, Plus, CheckCircle, XCircle, Sparkles, Zap, AlertTriangle, DollarSign, AlertCircle } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "@/hooks/use-toast";
+import { Sparkles, Zap, XCircle, CheckCircle, AlertCircle, DollarSign, Plus, Minus, AlertTriangle } from "lucide-react";
+import { formatMoney } from "@/lib/utils/formatMoney";
 import { AITransactionLoading } from "@/components/ui/ai-transaction-loading";
 import { useToast } from "@/hooks/use-toast";
-import { useUserId } from "@/lib/hooks/useUserId";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface ParsedTransaction {
   description: string;
@@ -359,46 +363,11 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
   const queryClient = useQueryClient();
 
   // Fetch categories for this budget
-  const [categories, setCategories] = useState<any[]>([]);
-  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
-
-  // Load categories when component mounts
-  const loadCategories = async () => {
-    if (!budgetId) {
-      console.error('No budgetId provided');
-      return;
-    }
-    setIsLoadingCategories(true);
-    try {
-      const response = await fetch(`/api/categories?budget=${budgetId}`);
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error('Budget not found');
-        } else if (response.status === 401) {
-          throw new Error('Authentication required');
-        } else {
-          throw new Error(`Failed to fetch categories: ${response.status}`);
-        }
-      }
-      const categoriesData = await response.json();
-      if (!Array.isArray(categoriesData)) {
-        throw new Error('Invalid categories data received');
-      }
-      setCategories(categoriesData);
-    } catch (error) {
-      console.error('Failed to load categories:', error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to load budget categories",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoadingCategories(false);
-    }
-  };
+  const { data: categories, isLoading: isLoadingCategories, refetch: refetchCategories } = useCategories(budgetId);
+  const { data: budget, isLoading: isLoadingBudget, refetch: refetchBudget } = useBudget(budgetId);
 
   // Load budget data to get available budget
-  const loadBudget = async () => {
+  const loadBudget = useCallback(async () => {
     if (!budgetId) return;
     
     try {
@@ -410,18 +379,17 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
     } catch (error) {
       console.error('Failed to load budget data:', error);
     }
-  };
+  }, [budgetId]);
 
   React.useEffect(() => {
     if (budgetId) {
-      loadCategories();
       loadBudget();
     }
-  }, [budgetId]);
+  }, [budgetId, loadBudget]);
 
   const parseTransactions = useMutation({
     mutationFn: async (description: string) => {
-      const categoryNames = categories.map(cat => cat.name);
+      const categoryNames = (categories || []).map(cat => cat.name);
       console.log('Sending categories to AI:', categoryNames);
       
       const response = await fetch('/api/transactions/ai-parse', {
@@ -469,11 +437,11 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
   });
 
   const saveExpense = useMutation({
-    mutationFn: async (transaction: ParsedTransaction) => {
-      // Find matching category from our loaded categories
-      const matchingCategory = categories.find((cat: any) => 
-        cat.name.toLowerCase() === transaction.category.toLowerCase()
-      );
+          mutationFn: async (transaction: ParsedTransaction) => {
+        // Find matching category from our loaded categories
+        const matchingCategory = (categories || []).find((cat: any) => 
+          cat.name.toLowerCase() === transaction.category.toLowerCase()
+        );
       
       if (!matchingCategory) {
         throw new Error(`Category "${transaction.category}" not found in budget`);
@@ -524,7 +492,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
     }
 
     // Check if categories are loaded
-    if (categories.length === 0) {
+    if (categories?.length === 0) {
       toast({
         title: "Error",
         description: "No categories available. Please set up your budget categories first.",
@@ -533,7 +501,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       return;
     }
 
-    console.log('Starting AI parsing with categories:', categories.map(cat => cat.name));
+    console.log('Starting AI parsing with categories:', (categories || []).map(cat => cat.name));
 
     if (!userId?.data) {
       toast({
@@ -553,7 +521,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       return;
     }
 
-    if (categories.length === 0) {
+    if (categories?.length === 0) {
       toast({
         title: "Error",
         description: "No categories found. Please set up budget categories first.",
@@ -617,7 +585,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       const missingCategoriesMap = new Map<string, ParsedTransaction[]>();
       
       validTransactions.forEach((transaction: ParsedTransaction) => {
-        const matchingCategory = categories.find((cat: any) => 
+        const matchingCategory = (categories || []).find((cat: any) => 
           cat.name.toLowerCase() === transaction.category.toLowerCase()
         );
         
@@ -709,18 +677,18 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
         }
 
         // Reload categories to include the new ones
-        await loadCategories();
+        await refetchCategories();
         // Reload budget to get updated available amount
-        await loadBudget();
+        await refetchBudget();
       }
 
       // Step 2: Save all transactions
       const results = await Promise.allSettled(
         transactions.map(async (transaction) => {
-          // Find matching category (existing or newly created)
-          let matchingCategory = categories.find((cat: any) => 
-            cat.name.toLowerCase() === transaction.category.toLowerCase()
-          );
+                      // Find matching category (existing or newly created)
+            let matchingCategory = (categories || []).find((cat: any) => 
+              cat.name.toLowerCase() === transaction.category.toLowerCase()
+            );
           
           // If not found in existing categories, check newly created ones
           if (!matchingCategory) {
@@ -854,7 +822,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
           <div className="flex gap-2">
             <Button
               onClick={handleParse}
-              disabled={!description.trim() || isParsing || isLoadingCategories || categories.length === 0}
+              disabled={!description.trim() || isParsing || isLoadingCategories || categories?.length === 0}
               className="flex-1 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] border-0"
             >
               {isParsing ? (
@@ -867,7 +835,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
                   <span>Loading categories...</span>
                 </>
-              ) : categories.length === 0 ? (
+              ) : categories?.length === 0 ? (
                 <>
                   <XCircle className="h-4 w-4 mr-2" />
                   <span>No categories available</span>
@@ -881,7 +849,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
             </Button>
           </div>
 
-          {categories.length === 0 && !isLoadingCategories && (
+          {categories?.length === 0 && !isLoadingCategories && (
             <div className="text-xs text-muted-foreground bg-white/10 p-3 rounded-lg">
               <p className="font-medium mb-1">Setup Required</p>
               <p>You need to create budget categories first. Go to Budget Setup to add categories.</p>
@@ -913,7 +881,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
                 transactions={parsedTransactions}
                 missingCategories={missingCategories}
                 availableBudget={availableBudget}
-                availableCategories={categories} // Pass available categories to the preview
+                availableCategories={categories || []} // Pass available categories to the preview
                 onConfirm={handleConfirm}
                 onCancel={handleCancel}
                 isSaving={isSaving}
