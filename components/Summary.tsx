@@ -87,10 +87,11 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
     return { ...category, spent };
   });
 
-  // Get all categories for chart (show budgeted amounts even if no spending)
+  // Get top spending categories for chart
   const chartCategories = [...categoriesWithSpent]
-    .sort((a, b) => b.budgeted - a.budgeted) // Sort by budgeted amount
-    .slice(0, 5);
+    .filter(cat => cat.spent > 0) // Only show categories with spending
+    .sort((a, b) => b.spent - a.spent) // Sort by spent amount (highest first)
+    .slice(0, 5); // Show top 5 spending categories
 
   const chartData = chartCategories.map((cat) => ({
     name: cat.name,
@@ -275,7 +276,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
         {categories.length > 0 ? (
           <div className="mt-6 sm:mt-8">
             <h3 className="text-base sm:text-lg font-medium mb-4 sm:mb-6">
-              Top Spending Categories
+              Top 5 Spending Categories
             </h3>
             <div className="h-[250px] sm:h-[300px] md:h-[350px]" data-testid="summary-chart">
 
