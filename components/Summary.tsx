@@ -91,7 +91,11 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
   const chartCategories = [...categoriesWithSpent]
     .filter(cat => cat.spent > 0) // Only show categories with spending
     .sort((a, b) => b.spent - a.spent) // Sort by spent amount (highest first)
-    .slice(0, 5); // Show top 5 spending categories
+    .slice(0, 8); // Show top 8 spending categories (increased for better coverage)
+
+  // Handle edge cases
+  const hasSpendingData = chartCategories.length > 0;
+  const hasMultipleCategories = chartCategories.length > 1;
 
   const chartData = chartCategories.map((cat) => ({
     name: cat.name,
@@ -276,12 +280,15 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
         {categories.length > 0 ? (
           <div className="mt-6 sm:mt-8">
             <h3 className="text-base sm:text-lg font-medium mb-4 sm:mb-6">
-              Top Spending Categories
+              {hasSpendingData 
+                ? `Top ${Math.min(chartCategories.length, 8)} Spending Categories`
+                : "Top Spending Categories"
+              }
             </h3>
             <div className="h-[250px] sm:h-[300px] md:h-[350px]" data-testid="summary-chart">
 
               
-                              {chartData.length > 0 ? (
+                              {hasSpendingData ? (
                   <div className="h-80">
                     <Bar
                       data={{
@@ -345,9 +352,13 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                             ticks: {
                               color: 'hsl(var(--muted-foreground))',
                               font: {
-                                size: 12,
+                                size: chartCategories.length > 6 ? 10 : 12,
                                 weight: 'normal',
                               },
+                              maxRotation: 45,
+                              minRotation: 0,
+                              autoSkip: true,
+                              maxTicksLimit: chartCategories.length > 6 ? 6 : 8,
                             },
                             border: {
                               color: 'hsl(var(--border))',
@@ -384,10 +395,21 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                     />
                   </div>
               ) : (
-                <div className="flex items-center justify-center h-full">
-                  <p className="text-sm text-muted-foreground">
-                    No chart data available
-                  </p>
+                <div className="flex items-center justify-center h-80">
+                  <div className="text-center">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {categories.length === 0 
+                        ? "No categories available" 
+                        : "No spending data available"
+                      }
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {categories.length === 0 
+                        ? "Add budget categories to see spending data" 
+                        : "Add expenses to see spending patterns"
+                      }
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
