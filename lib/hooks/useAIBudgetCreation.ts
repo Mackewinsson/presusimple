@@ -32,6 +32,69 @@ interface CreateCategoryData {
   sectionId: string;
 }
 
+interface CategoryGroup {
+  sectionName: string;
+  categories: AICategory[];
+}
+
+// Function to group categories into logical sections
+function groupCategoriesIntoSections(categories: AICategory[]): CategoryGroup[] {
+  const housingKeywords = ['rent', 'mortgage', 'housing', 'home', 'utilities', 'electricity', 'water', 'gas', 'internet', 'wifi'];
+  const foodKeywords = ['food', 'groceries', 'dining', 'restaurant', 'meals', 'lunch', 'dinner', 'breakfast'];
+  const transportKeywords = ['transport', 'gas', 'fuel', 'car', 'uber', 'lyft', 'taxi', 'bus', 'train', 'subway', 'parking'];
+  const entertainmentKeywords = ['entertainment', 'movies', 'games', 'hobbies', 'sports', 'gym', 'fitness', 'netflix', 'spotify'];
+  const savingsKeywords = ['savings', 'emergency', 'investment', 'retirement', '401k', 'ira'];
+  const healthcareKeywords = ['health', 'medical', 'insurance', 'doctor', 'dental', 'pharmacy', 'medicine'];
+  const personalKeywords = ['personal', 'clothing', 'shopping', 'beauty', 'hair', 'cosmetics', 'grooming'];
+  
+  const groups: CategoryGroup[] = [];
+  const processedCategories = new Set<string>();
+  
+  // Helper function to check if category matches keywords
+  function matchesKeywords(categoryName: string, keywords: string[]): boolean {
+    return keywords.some(keyword => 
+      categoryName.toLowerCase().includes(keyword.toLowerCase())
+    );
+  }
+  
+  // Helper function to assign category to group
+  function assignToGroup(category: AICategory, sectionName: string) {
+    let group = groups.find(g => g.sectionName === sectionName);
+    if (!group) {
+      group = { sectionName, categories: [] };
+      groups.push(group);
+    }
+    group.categories.push(category);
+    processedCategories.add(category.name.toLowerCase());
+  }
+  
+  // Process each category
+  categories.forEach(category => {
+    const categoryName = category.name.toLowerCase();
+    
+    if (matchesKeywords(categoryName, housingKeywords)) {
+      assignToGroup(category, 'Housing');
+    } else if (matchesKeywords(categoryName, foodKeywords)) {
+      assignToGroup(category, 'Food & Dining');
+    } else if (matchesKeywords(categoryName, transportKeywords)) {
+      assignToGroup(category, 'Transportation');
+    } else if (matchesKeywords(categoryName, entertainmentKeywords)) {
+      assignToGroup(category, 'Entertainment');
+    } else if (matchesKeywords(categoryName, savingsKeywords)) {
+      assignToGroup(category, 'Savings & Investment');
+    } else if (matchesKeywords(categoryName, healthcareKeywords)) {
+      assignToGroup(category, 'Healthcare');
+    } else if (matchesKeywords(categoryName, personalKeywords)) {
+      assignToGroup(category, 'Personal Care');
+    } else {
+      // Default group for uncategorized items
+      assignToGroup(category, 'Other Expenses');
+    }
+  });
+  
+  return groups;
+}
+
 export const useAIBudgetCreation = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentStep, setCurrentStep] = useState<AIStep>("extracting");
@@ -115,6 +178,13 @@ export const useAIBudgetCreation = () => {
       await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
       const aiData = await extractBudgetData.mutateAsync(description);
       
+      console.log('AI Response Data:', {
+        income: aiData.income,
+        sections: aiData.sections,
+        categories: aiData.categories,
+        categoriesLength: aiData.categories?.length
+      });
+      
       // Edge case: Validate AI response
       if (!aiData || !aiData.income || aiData.income <= 0) {
         throw new Error('Unable to extract income from your description. Please try being more specific about your income.');
@@ -142,10 +212,25 @@ export const useAIBudgetCreation = () => {
       // Step 2: Create the budget (add delay to show animation)
       await new Promise(resolve => setTimeout(resolve, 1500)); // 1.5 second delay
       
-      // Create a completely new budget with unique sections
-      const uniqueSections = aiData.sections.map(section => ({
-        name: `${section.name}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}` // Make section names completely unique
-      }));
+      // Create a completely new budget with intelligent section names
+      // Group categories into logical sections based on their names
+      const sectionGroups = groupCategoriesIntoSections(aiData.categories);
+      
+      // Create sections with clean display names and MongoDB ObjectIds for uniqueness
+      const { ObjectId } = require('mongodb');
+      const uniqueSections = sectionGroups.map((group, index) => {
+        const objectId = new ObjectId();
+        const displayName = group.sectionName;
+        
+        // Use ObjectId for the unique name, but keep displayName clean
+        const uniqueName = `${displayName}_${objectId.toString()}`;
+        
+        return { 
+          name: uniqueName,
+          displayName: displayName,
+          uniqueId: objectId.toString()
+        };
+      });
       
       const budgetData: CreateBudgetData = {
         user: userIdQuery.data!,
@@ -161,7 +246,8 @@ export const useAIBudgetCreation = () => {
       console.log('Created new budget:', {
         budgetId: budget._id,
         sections: budget.sections,
-        totalAvailable: budget.totalAvailable
+        totalAvailable: budget.totalAvailable,
+        sectionsLength: budget.sections?.length
       });
       
       // Edge case: Validate budget creation
@@ -179,32 +265,44 @@ export const useAIBudgetCreation = () => {
         throw new Error('Budget created but no sections found. Please try again.');
       }
 
-      const categoryPromises = aiData.categories.map(async (category, index) => {
-        // Use the corresponding unique section from the budget
-        const sectionName = budget.sections[index]?.name;
-        
-        // Edge case: Handle missing section
-        if (!sectionName) {
-          throw new Error(`Category "${category.name}" references a section that doesn't exist.`);
-        }
-        
-        console.log('Creating category for new budget:', {
-          categoryName: category.name,
-          budgeted: category.amount,
-          sectionName: sectionName,
-          budgetId: budget._id,
-          sectionIndex: index
-        });
-        
-        const categoryData: CreateCategoryData & { budgetId: string } = {
-          name: category.name,
-          budgeted: category.amount,
-          spent: 0,
-          sectionId: sectionName, // Use the exact unique section name
-          budgetId: budget._id, // Pass the specific budget ID
-        };
+      // Create categories for each group
+      const categoryPromises: Promise<any>[] = [];
+      
+      sectionGroups.forEach((group, groupIndex) => {
+        group.categories.forEach((category) => {
+          const section = budget.sections[groupIndex];
+          
+          // Edge case: Handle missing section
+          if (!section) {
+            console.error('Missing section for category:', {
+              categoryName: category.name,
+              budgetSections: budget.sections,
+              groupIndex: groupIndex
+            });
+            throw new Error(`Category "${category.name}" references a section that doesn't exist.`);
+          }
+          
+          console.log('Creating category for new budget:', {
+            categoryName: category.name,
+            budgeted: category.amount,
+            sectionName: section.name,
+            budgetId: budget._id,
+            groupIndex: groupIndex,
+            sectionGroup: group.sectionName,
+            totalSections: budget.sections.length,
+            totalCategories: aiData.categories.length
+          });
+          
+          const categoryData: CreateCategoryData & { budgetId: string } = {
+            name: category.name,
+            budgeted: category.amount,
+            spent: 0,
+            sectionId: section.name, // Use the clean section name for display
+            budgetId: budget._id, // Pass the specific budget ID
+          };
 
-        return createCategory.mutateAsync(categoryData);
+          categoryPromises.push(createCategory.mutateAsync(categoryData));
+        });
       });
 
       const createdCategories = await Promise.all(categoryPromises);

@@ -63,7 +63,7 @@ const BudgetTemplateSelector = () => {
       name: templateName.trim(),
       sections: budget.sections.map((section) => ({
         id: section._id || section.id || "",
-        name: section.name,
+        name: section.displayName || section.name,
       })),
       categories: categories.map((cat) => ({
         id: cat._id || cat.id || "",

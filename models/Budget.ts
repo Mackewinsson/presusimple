@@ -2,6 +2,8 @@ import mongoose, { Schema, Document, Types, models } from "mongoose";
 
 export interface ISection {
   name: string;
+  displayName?: string;
+  uniqueId?: string;
 }
 
 export interface IBudget extends Document {
@@ -17,6 +19,8 @@ export interface IBudget extends Document {
 
 const SectionSchema = new Schema<ISection>({
   name: { type: String, required: true },
+  displayName: { type: String },
+  uniqueId: { type: String },
 });
 
 const BudgetSchema = new Schema<IBudget>({

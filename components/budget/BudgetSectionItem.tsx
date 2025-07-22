@@ -38,6 +38,7 @@ interface Section {
   id?: string;
   _id?: string;
   name: string;
+  displayName?: string;
   amount: number;
 }
 
@@ -84,7 +85,7 @@ const BudgetSectionItem: React.FC<BudgetSectionItemProps> = ({
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <CardTitle className="text-base sm:text-lg font-medium">
-            {section.name}
+            {section.displayName || section.name}
           </CardTitle>
           <div className="flex items-center space-x-1 sm:space-x-2">
             <Button
