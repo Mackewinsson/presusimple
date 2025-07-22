@@ -102,20 +102,20 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
   const hasInsufficientBudget = totalBudgetNeeded > availableBudget;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="text-sm text-muted-foreground flex items-center gap-2">
         <CheckCircle className="h-4 w-4 text-white animate-pulse" />
         <span>AI found {transactions.length} transaction{transactions.length !== 1 ? 's' : ''}!</span>
       </div>
       
       {/* Budget Summary */}
-      <div className="p-3 border border-blue-500/30 rounded-lg bg-blue-500/10">
-        <div className="flex items-center justify-between mb-2">
+      <div className="p-4 border border-blue-500/30 rounded-lg bg-blue-500/10">
+        <div className="flex items-center justify-between mb-3">
           <span className="font-medium text-blue-300">Available Budget</span>
           <span className="font-mono text-blue-300">${availableBudget.toFixed(2)}</span>
         </div>
         {newCategoriesToCreate.length > 0 && (
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-sm mb-2">
             <span className="text-muted-foreground">Budget needed for new categories:</span>
             <span className={`font-mono ${hasInsufficientBudget ? 'text-red-400' : 'text-green-400'}`}>
               ${totalBudgetNeeded.toFixed(2)}
@@ -123,7 +123,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
           </div>
         )}
         {hasInsufficientBudget && (
-          <div className="flex items-center gap-2 mt-2 text-red-400 text-sm">
+          <div className="flex items-center gap-2 mt-3 text-red-400 text-sm">
             <AlertCircle className="h-4 w-4" />
             <span>Insufficient budget. Please adjust category allocations or cancel.</span>
           </div>
@@ -132,12 +132,12 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
       
       {/* Missing Categories Section */}
       {missingCategories.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="flex items-center gap-2 text-amber-300">
             <AlertTriangle className="h-4 w-4" />
             <span className="font-medium">New Categories Found</span>
           </div>
-          <div className="text-sm text-muted-foreground">
+          <div className="text-sm text-muted-foreground mb-4">
             The AI suggested categories that don't exist in your budget. Set budget allocations for each:
           </div>
           {missingCategories.map((missingCategory, index) => {
@@ -206,8 +206,8 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
       )}
       
       {/* Transactions Section */}
-      <div className="space-y-3">
-        <div className="text-sm font-medium text-white">Transactions to Save:</div>
+      <div className="space-y-4">
+        <div className="text-sm font-medium text-white mb-3">Transactions to Save:</div>
         {transactions.map((transaction, index) => {
           const isMissingCategory = missingCategories.some(mc => 
             mc.transactions.some(t => t === transaction)
@@ -220,18 +220,18 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
           return (
             <div 
               key={index} 
-              className={`p-3 border rounded-lg hover:shadow-md transition-all duration-300 transform hover:scale-[1.02] animate-in slide-in-from-left-2 ${
+              className={`p-4 border rounded-lg hover:shadow-md transition-all duration-300 transform hover:scale-[1.02] animate-in slide-in-from-left-2 ${
                 isMissingCategory ? 'border-amber-500/50 bg-amber-500/5' : ''
               }`}
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex-1">
-                  <div className="font-medium">{transaction.description}</div>
-                  <div className="text-sm text-muted-foreground flex items-center gap-2">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium mb-2">{transaction.description}</div>
+                  <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
                     <span>Category:</span>
                     <Select value={currentCategory} onValueChange={(value) => handleCategoryChange(index, value)}>
-                      <SelectTrigger className="w-40 h-8 text-xs">
+                      <SelectTrigger className="w-48 h-8 text-xs">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -243,13 +243,13 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                       </SelectContent>
                     </Select>
                     {isMissingCategory && (
-                      <Badge variant="outline" className="text-amber-300 border-amber-300">
+                      <Badge variant="outline" className="text-amber-300 border-amber-300 ml-2">
                         New Category
                       </Badge>
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 ml-4 flex-shrink-0">
                   <Badge variant={transaction.type === "expense" ? "destructive" : "default"}>
                     {transaction.type}
                   </Badge>
@@ -323,7 +323,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
         })}
       </div>
       
-      <div className="flex gap-2 pt-4">
+      <div className="flex gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
         <Button
           onClick={handleConfirm}
           disabled={isSaving || hasInsufficientBudget}
@@ -886,23 +886,25 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
           </div>
 
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Review Transactions</DialogTitle>
+                <DialogTitle className="text-xl">Review Transactions</DialogTitle>
                 <DialogDescription>
                   Review the parsed transactions and set budget allocations for new categories.
                 </DialogDescription>
               </DialogHeader>
 
-              <TransactionPreview
-                transactions={parsedTransactions}
-                missingCategories={missingCategories}
-                availableBudget={availableBudget}
-                availableCategories={categories || []} // Pass available categories to the preview
-                onConfirm={handleConfirm}
-                onCancel={handleCancel}
-                isSaving={isSaving}
-              />
+              <div className="mt-4">
+                <TransactionPreview
+                  transactions={parsedTransactions}
+                  missingCategories={missingCategories}
+                  availableBudget={availableBudget}
+                  availableCategories={categories || []} // Pass available categories to the preview
+                  onConfirm={handleConfirm}
+                  onCancel={handleCancel}
+                  isSaving={isSaving}
+                />
+              </div>
             </DialogContent>
           </Dialog>
         </CardContent>
