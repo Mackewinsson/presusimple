@@ -1,5 +1,6 @@
 // Export all React Query hooks
 export { useUserId, useUserSubscription } from "./useUserId";
+export { useUserData } from "./useUserData";
 export {
   useBudget,
   useCreateBudget,

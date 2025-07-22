@@ -582,7 +582,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
               {featureFlags.hasFeatureAccess("aiBudgeting") ? (
                 <form onSubmit={handleCreateBudgetWithAI} className="space-y-4">
                 <div className="space-y-2">
-                  <label htmlFor="aiDescription" className="text-sm font-medium text-white">
+                  <label htmlFor="aiDescription" className="text-sm font-medium text-foreground">
                     Describe your budget
                   </label>
                                                      <Textarea
@@ -593,7 +593,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                                      rows={4}
                                      disabled={isAICreating}
                                    />
-                                   <div className="flex justify-between items-center text-xs text-white/50">
+                                   <div className="flex justify-between items-center text-xs text-muted-foreground">
                                      <span>
                                        {aiDescription.length}/1000 characters
                                      </span>
@@ -603,9 +603,9 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                                    </div>
                 </div>
                 
-                <div className="text-sm text-white/70">
-                  <p className="font-medium mb-2">Examples:</p>
-                  <ul className="list-disc list-inside space-y-1 mt-2 text-white/60">
+                <div className="text-sm text-muted-foreground">
+                  <p className="font-medium mb-2 text-foreground">Examples:</p>
+                  <ul className="list-disc list-inside space-y-1 mt-2 text-muted-foreground">
                     <li>"I make 5000. Rent 2000, food 1000, the rest is savings."</li>
                     <li>"My income is 3000. I spend 1200 on rent, 800 on food, 300 on transport, and save the rest."</li>
                     <li>"I earn 6000 monthly. 2500 for rent, 1000 for food, 500 for utilities, and the rest goes to savings."</li>
@@ -648,7 +648,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                     </>
                   ) : (
                     <>
-                      <Sparkles className="h-5 w-5 mr-2 flex-shrink-0 text-white" />
+                      <Sparkles className="h-5 w-5 mr-2 flex-shrink-0" />
                       Create Budget with AI
                     </>
                   )}

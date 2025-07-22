@@ -1,11 +1,10 @@
-import { useSession } from "next-auth/react";
 import { hasAccess, getUserPlan, getAvailableFeatures, getProFeatures } from "@/lib/userAccess";
 import { FeatureKey } from "@/lib/features";
 import { IUser } from "@/models/User";
+import { useUserData } from "./useUserData";
 
 export function useFeatureFlags() {
-  const { data: session } = useSession();
-  const user = session?.user as IUser | undefined;
+  const { data: user, isLoading } = useUserData();
 
   const hasFeatureAccess = (featureKey: FeatureKey): boolean => {
     return hasAccess(user, featureKey);
@@ -29,5 +28,6 @@ export function useFeatureFlags() {
     getAvailableFeaturesForUser,
     getProOnlyFeatures,
     user,
+    isLoading,
   };
 } 
