@@ -101,7 +101,7 @@ export default function HistoryPage() {
           ) : filteredBudgets.length > 0 ? (
             <div className="grid gap-4">
               {filteredBudgets.map((budget) => (
-                <Card key={budget._id} className="glass-card hover-card cursor-pointer transition-all duration-200 hover:scale-[1.02]" onClick={() => window.location.href = `/history/insights?budget=${budget._id}`}>
+                <Card key={budget._id} className="glass-card hover-card cursor-pointer transition-all duration-200 hover:scale-[1.02]" onClick={() => window.location.href = `/history/${budget._id}`}>
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
                       <div>
