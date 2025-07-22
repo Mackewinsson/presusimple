@@ -21,7 +21,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { SpendingChart } from "@/components/ui/SpendingChart";
-import { useMonthlyBudgets, useUserId, useDeleteMonthlyBudget } from "@/lib/hooks";
+import { useMonthlyBudgets, useUserId, useDeleteMonthlyBudget, useExpenses, useCategories } from "@/lib/hooks";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
@@ -47,6 +47,8 @@ export default function BudgetDetailPage() {
   const { data: budgets = [], isLoading: budgetsLoading } = useMonthlyBudgets(
     userId || ""
   );
+  const { data: expenses = [] } = useExpenses(userId || "");
+  const { data: categories = [] } = useCategories(userId || "");
   const deleteBudgetMutation = useDeleteMonthlyBudget();
 
   const selectedBudget = budgets.find((b) => b._id === budgetId);
@@ -61,16 +63,33 @@ export default function BudgetDetailPage() {
     }
   };
 
-  // Prepare data for chart - show all categories with budgeted amounts
-  const chartCategories = selectedBudget?.categories
-    .sort((a, b) => b.budgeted - a.budgeted) // Sort by budgeted amount (highest first)
-    .slice(0, 8) || []; // Show top 8 categories
+  // Calculate spent for each category from expenses (like main app)
+  const categoriesWithSpent = selectedBudget?.categories.map((category) => {
+    const spent = expenses
+      .filter((exp) => {
+        // Find the category by ID and then match by name
+        const categoryObj = categories.find(cat => cat._id === exp.categoryId);
+        return categoryObj?.name === category.name;
+      })
+      .reduce((sum, exp) => {
+        if (exp.type === "expense") return sum + exp.amount;
+        if (exp.type === "income") return sum - exp.amount;
+        return sum;
+      }, 0);
+    return { ...category, spent };
+  }) || [];
 
-  const chartData = chartCategories.map((category, index) => ({
+  // Get top spending categories for chart
+  const chartCategories = [...categoriesWithSpent]
+    .filter(cat => cat.spent > 0) // Only show categories with spending
+    .sort((a, b) => b.spent - a.spent) // Sort by spent amount (highest first)
+    .slice(0, 8); // Show top 8 spending categories
+
+  const chartData = chartCategories.map((category) => ({
     name: category.name,
-    spent: category.spent,
-    budgeted: category.budgeted,
-    overBudget: category.spent > category.budgeted,
+    spent: Number(category.spent) || 0,
+    budgeted: Number(category.budgeted) || 0,
+    overBudget: (Number(category.spent) || 0) > (Number(category.budgeted) || 0),
   }));
 
   const hasSpendingData = selectedBudget && selectedBudget.categories.length > 0;
