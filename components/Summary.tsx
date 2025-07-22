@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { exportToPdf } from "@/lib/utils/exportToPdf";
+import { getChartColor, useThemeColors } from "@/lib/theme";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -62,6 +63,7 @@ interface SummaryProps {
 }
 
 const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
+  const themeColors = useThemeColors();
   // Calculate total spent from expenses
   const totalSpent = expenses.reduce((sum, expense) => {
     return (
@@ -298,15 +300,15 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                           {
                             label: 'Spent',
                             data: chartData.map(item => item.spent),
-                            backgroundColor: chartData.map(item => 
+                            backgroundColor: chartData.map((item, index) => 
                               item.overBudget 
-                                ? 'hsl(var(--destructive))' 
-                                : 'hsl(var(--primary))'
+                                ? themeColors.destructive
+                                : getChartColor(index)
                             ),
-                            borderColor: chartData.map(item => 
+                            borderColor: chartData.map((item, index) => 
                               item.overBudget 
-                                ? 'hsl(var(--destructive))' 
-                                : 'hsl(var(--primary))'
+                                ? themeColors.destructive
+                                : getChartColor(index)
                             ),
                             borderWidth: 1,
                             borderRadius: 6,
@@ -322,10 +324,10 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                             display: false, // Hide legend since we only have one dataset
                           },
                           tooltip: {
-                            backgroundColor: 'hsl(var(--popover))',
-                            titleColor: 'hsl(var(--popover-foreground))',
-                            bodyColor: 'hsl(var(--popover-foreground))',
-                            borderColor: 'hsl(var(--border))',
+                            backgroundColor: themeColors.popover,
+                            titleColor: themeColors.foreground,
+                            bodyColor: themeColors.foreground,
+                            borderColor: themeColors.border,
                             borderWidth: 1,
                             cornerRadius: 8,
                             displayColors: true,
@@ -351,7 +353,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                               display: false,
                             },
                             ticks: {
-                              color: 'hsl(var(--muted-foreground))',
+                              color: themeColors.muted,
                               font: {
                                 size: chartCategories.length > 6 ? 10 : 12,
                                 weight: 'normal',
@@ -362,15 +364,15 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                               maxTicksLimit: chartCategories.length > 6 ? 6 : 8,
                             },
                             border: {
-                              color: 'hsl(var(--border))',
+                              color: themeColors.border,
                             },
                           },
                           y: {
                             grid: {
-                              color: 'hsl(var(--muted-foreground)/0.1)',
+                              color: `${themeColors.muted}20`,
                             },
                             ticks: {
-                              color: 'hsl(var(--muted-foreground))',
+                              color: themeColors.muted,
                               font: {
                                 size: 11,
                                 weight: 'normal',
@@ -380,7 +382,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                               },
                             },
                             border: {
-                              color: 'hsl(var(--border))',
+                              color: themeColors.border,
                             },
                           },
                         },

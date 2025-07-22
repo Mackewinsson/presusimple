@@ -20,70 +20,180 @@
 
 @layer base {
   :root {
+    /* Base colors */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
+    
+    /* Card colors */
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
+    
+    /* Popover colors */
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 0 0% 100%;
+    
+    /* Primary colors */
+    --primary: 210 40% 98%;
     --primary-foreground: 222.2 84% 4.9%;
+    
+    /* Secondary colors */
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
+    
+    /* Muted colors */
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 0 0% 100%;
-    --accent-foreground: 222.2 84% 4.9%;
+    
+    /* Accent colors */
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    
+    /* Destructive colors */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
+    
+    /* Border and input colors */
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 0 0% 100%;
-    --radius: 1rem;
+    --ring: 210 40% 98%;
+    
+    /* Success colors */
+    --success: 142 76% 36%;
+    --success-foreground: 210 40% 98%;
+    
+    /* Warning colors */
+    --warning: 38 92% 50%;
+    --warning-foreground: 222.2 84% 4.9%;
+    
+    /* Info colors */
+    --info: 217 91% 60%;
+    --info-foreground: 210 40% 98%;
+    
+    /* Chart colors */
+    --chart-1: 210 40% 98%;
+    --chart-2: 217 91% 60%;
+    --chart-3: 142 76% 36%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 0 62.8% 30.6%;
+    
+    /* Radius */
+    --radius: 0.75rem;
   }
 
   .dark {
+    /* Base colors */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
+    
+    /* Card colors */
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
+    
+    /* Popover colors */
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 0 0% 100%;
+    
+    /* Primary colors */
+    --primary: 210 40% 98%;
     --primary-foreground: 222.2 84% 4.9%;
+    
+    /* Secondary colors */
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
+    
+    /* Muted colors */
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 0 0% 100%;
-    --accent-foreground: 222.2 84% 4.9%;
+    
+    /* Accent colors */
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    
+    /* Destructive colors */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
+    
+    /* Border and input colors */
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 0 0% 100%;
+    --ring: 210 40% 98%;
+    
+    /* Success colors */
+    --success: 142 76% 36%;
+    --success-foreground: 210 40% 98%;
+    
+    /* Warning colors */
+    --warning: 38 92% 50%;
+    --warning-foreground: 222.2 84% 4.9%;
+    
+    /* Info colors */
+    --info: 217 91% 60%;
+    --info-foreground: 210 40% 98%;
+    
+    /* Chart colors */
+    --chart-1: 210 40% 98%;
+    --chart-2: 217 91% 60%;
+    --chart-3: 142 76% 36%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 0 62.8% 30.6%;
   }
 
   .light {
+    /* Base colors */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
+    
+    /* Card colors */
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
+    
+    /* Popover colors */
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
+    
+    /* Primary colors */
     --primary: 222.2 84% 4.9%;
     --primary-foreground: 210 40% 98%;
+    
+    /* Secondary colors */
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 84% 4.9%;
+    
+    /* Muted colors */
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 222.2 84% 4.9%;
-    --accent-foreground: 210 40% 98%;
+    
+    /* Accent colors */
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 84% 4.9%;
+    
+    /* Destructive colors */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
+    
+    /* Border and input colors */
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
+    
+    /* Success colors */
+    --success: 142 76% 36%;
+    --success-foreground: 210 40% 98%;
+    
+    /* Warning colors */
+    --warning: 38 92% 50%;
+    --warning-foreground: 222.2 84% 4.9%;
+    
+    /* Info colors */
+    --info: 217 91% 60%;
+    --info-foreground: 210 40% 98%;
+    
+    /* Chart colors */
+    --chart-1: 222.2 84% 4.9%;
+    --chart-2: 217 91% 60%;
+    --chart-3: 142 76% 36%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 0 84.2% 60.2%;
   }
 }
 
@@ -107,6 +217,7 @@
   }
 }
 
+/* Glass morphism effects */
 .glass-card {
   @apply bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 transition-all duration-200;
 }
@@ -131,6 +242,7 @@
   @apply hover:bg-white/90 hover:border-gray-300/70;
 }
 
+/* Budget progress bars */
 .budget-progress {
   @apply h-3 rounded-full overflow-hidden backdrop-blur-sm;
 }
@@ -196,6 +308,7 @@
   @apply border border-gray-300 bg-white/50 backdrop-blur-sm text-slate-900 hover:bg-white/80 hover:border-gray-400;
 }
 
+/* Form inputs */
 input,
 .input,
 textarea,
@@ -300,6 +413,44 @@ select {
 .light .glass-dark {
   background: rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* Chart theme colors */
+.chart-color-1 {
+  @apply bg-[hsl(var(--chart-1))] text-[hsl(var(--chart-1-foreground))];
+}
+
+.chart-color-2 {
+  @apply bg-[hsl(var(--chart-2))] text-[hsl(var(--chart-2-foreground))];
+}
+
+.chart-color-3 {
+  @apply bg-[hsl(var(--chart-3))] text-[hsl(var(--chart-3-foreground))];
+}
+
+.chart-color-4 {
+  @apply bg-[hsl(var(--chart-4))] text-[hsl(var(--chart-4-foreground))];
+}
+
+.chart-color-5 {
+  @apply bg-[hsl(var(--chart-5))] text-[hsl(var(--chart-5-foreground))];
+}
+
+/* Status colors */
+.status-success {
+  @apply bg-[hsl(var(--success))] text-[hsl(var(--success-foreground))];
+}
+
+.status-warning {
+  @apply bg-[hsl(var(--warning))] text-[hsl(var(--warning-foreground))];
+}
+
+.status-info {
+  @apply bg-[hsl(var(--info))] text-[hsl(var(--info-foreground))];
+}
+
+.status-destructive {
+  @apply bg-[hsl(var(--destructive))] text-[hsl(var(--destructive-foreground))];
 }
 
 /* Make select item hover/focus visible in light mode */
