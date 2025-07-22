@@ -63,48 +63,45 @@ export default function InsightsPage() {
   const { data: allExpenses = [] } = useExpenses(userId || "");
   const { data: allCategories = [] } = useCategories(userId || "");
 
-  // Filter expenses for the selected month/year
-  const selectedMonth = selectedBudget?.month;
-  const selectedYear = selectedBudget?.year;
-  const filteredExpenses = allExpenses.filter((exp) => {
-    const expDate = new Date(exp.date);
-    return (
-      expDate.getMonth() + 1 ===
-        (typeof selectedMonth === "string"
-          ? new Date(Date.parse(selectedMonth + " 1, 2000")).getMonth() + 1
-          : selectedMonth) && expDate.getFullYear() === selectedYear
-    );
-  });
-
-  // Debug logging
+  // Enhanced debug logging
+  console.log('=== INSIGHTS DEBUG ===');
   console.log('Selected Budget:', selectedBudget);
-  console.log('Filtered Expenses:', filteredExpenses);
-  console.log('All Expenses:', allExpenses);
-  console.log('All Categories:', allCategories);
+  console.log('All Expenses Count:', allExpenses.length);
+  console.log('All Categories Count:', allCategories.length);
+  console.log('Sample Expense:', allExpenses[0]);
+  console.log('Sample Category:', allCategories[0]);
 
-  // Calculate spent for each category from filtered expenses
+  // Simplified expense filtering - just get all expenses for now
+  const filteredExpenses = allExpenses;
+  
+  console.log('Filtered Expenses Count:', filteredExpenses.length);
+  console.log('Sample Filtered Expense:', filteredExpenses[0]);
+
+  // Calculate spent for each category using a more robust approach
   const categoriesWithSpent = (selectedBudget?.categories || []).map(
     (monthlyCategory) => {
-      // Find the corresponding category from the actual categories data
+      console.log(`Processing category: ${monthlyCategory.name}`);
+      
+      // Try multiple matching strategies
+      let categoryExpenses = [];
+      
+      // Strategy 1: Find actual category by name and match by ID
       const actualCategory = allCategories.find((cat) => 
         cat.name.toLowerCase() === monthlyCategory.name.toLowerCase()
       );
-
-      // If we found a matching category, use its ID to match expenses
-      let categoryExpenses = [];
+      
       if (actualCategory) {
+        console.log(`Found actual category for ${monthlyCategory.name}:`, actualCategory._id);
         categoryExpenses = filteredExpenses.filter((exp) => 
           exp.categoryId === actualCategory._id
         );
       } else {
-        // Fallback: try to match by name (less reliable)
-        const normalize = (str: string | undefined) =>
-          (str || "").toString().trim().toLowerCase();
-        
+        console.log(`No actual category found for ${monthlyCategory.name}, trying name matching`);
+        // Strategy 2: Direct name matching (fallback)
         categoryExpenses = filteredExpenses.filter((exp) => {
-          const normalizedExpCategory = normalize(exp.categoryId);
-          const normalizedCategoryName = normalize(monthlyCategory.name);
-          return normalizedExpCategory === normalizedCategoryName;
+          // Find the category name for this expense
+          const expenseCategory = allCategories.find(cat => cat._id === exp.categoryId);
+          return expenseCategory && expenseCategory.name.toLowerCase() === monthlyCategory.name.toLowerCase();
         });
       }
 
@@ -114,11 +111,11 @@ export default function InsightsPage() {
         return sum;
       }, 0);
 
-      // Debug logging for each category
       console.log(`Category: ${monthlyCategory.name}`, {
         categoryName: monthlyCategory.name,
         actualCategoryId: actualCategory?._id,
-        categoryExpenses,
+        categoryExpensesCount: categoryExpenses.length,
+        categoryExpenses: categoryExpenses,
         spent
       });
 
@@ -127,13 +124,12 @@ export default function InsightsPage() {
   );
 
   // Prepare data for category comparison chart
-  const categoryData =
-    categoriesWithSpent.map((category) => ({
-      name: category.name,
-      budgeted: category.budgeted,
-      spent: category.spent,
-      overBudget: category.spent > category.budgeted,
-    })) || [];
+  const categoryData = categoriesWithSpent.map((category) => ({
+    name: category.name,
+    budgeted: category.budgeted,
+    spent: category.spent,
+    overBudget: category.spent > category.budgeted,
+  }));
 
   // Calculate income and expense totals from filtered expenses
   const incomeTotal = filteredExpenses
@@ -237,6 +233,23 @@ export default function InsightsPage() {
           </div>
         ) : selectedBudget ? (
           <div className="space-y-6">
+            {/* Debug Info Card */}
+            <Card className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800">
+              <CardHeader>
+                <CardTitle className="text-yellow-800 dark:text-yellow-200">Debug Information</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm">
+                <div className="space-y-2">
+                  <div>Selected Budget: {selectedBudget.name}</div>
+                  <div>Total Expenses: {filteredExpenses.length}</div>
+                  <div>Total Categories: {allCategories.length}</div>
+                  <div>Monthly Categories: {selectedBudget.categories.length}</div>
+                  <div>Income Total: {formatMoney(incomeTotal)}</div>
+                  <div>Expense Total: {formatMoney(expenseTotal)}</div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Overview Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
