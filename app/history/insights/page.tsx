@@ -65,6 +65,10 @@ export default function InsightsPage() {
 
   // Enhanced debug logging
   console.log('=== INSIGHTS DEBUG ===');
+  console.log('URL Budget ID:', searchParams.get('budget'));
+  console.log('Selected Budget ID:', selectedBudgetId);
+  console.log('All Budgets Count:', budgets.length);
+  console.log('All Budgets:', budgets);
   console.log('Selected Budget:', selectedBudget);
   console.log('All Expenses Count:', allExpenses.length);
   console.log('All Categories Count:', allCategories.length);
@@ -131,18 +135,24 @@ export default function InsightsPage() {
         });
       }
 
-      const spent = categoryExpenses.reduce((sum, exp) => {
+      // Use the monthly budget's own spent data if no expenses found
+      const spentFromExpenses = categoryExpenses.reduce((sum, exp) => {
         if (exp.type === "expense") return sum + exp.amount;
         if (exp.type === "income") return sum - exp.amount;
         return sum;
       }, 0);
+
+      // Fallback to monthly budget's own data if no expenses found
+      const spent = filteredExpenses.length > 0 ? spentFromExpenses : monthlyCategory.spent;
 
       console.log(`Category: ${monthlyCategory.name}`, {
         categoryName: monthlyCategory.name,
         actualCategoryId: actualCategory?._id,
         categoryExpensesCount: categoryExpenses.length,
         categoryExpenses: categoryExpenses,
-        spent
+        spentFromExpenses,
+        monthlyBudgetSpent: monthlyCategory.spent,
+        finalSpent: spent
       });
 
       return { ...monthlyCategory, spent };
@@ -165,6 +175,9 @@ export default function InsightsPage() {
   const expenseTotal = filteredExpenses
     .filter(exp => exp.type === "expense")
     .reduce((sum, exp) => sum + exp.amount, 0);
+
+  // Fallback to monthly budget's total spent if no expenses found
+  const finalExpenseTotal = filteredExpenses.length > 0 ? expenseTotal : selectedBudget?.totalSpent || 0;
 
   // Get top spending categories
   const topCategories = [...categoriesWithSpent]
@@ -272,6 +285,8 @@ export default function InsightsPage() {
                   <div>Monthly Categories: {selectedBudget.categories.length}</div>
                   <div>Income Total: {formatMoney(incomeTotal)}</div>
                   <div>Expense Total: {formatMoney(expenseTotal)}</div>
+                  <div>Final Expense Total: {formatMoney(finalExpenseTotal)}</div>
+                  <div>Monthly Budget Total Spent: {formatMoney(selectedBudget?.totalSpent || 0)}</div>
                 </div>
               </CardContent>
             </Card>
@@ -355,7 +370,7 @@ export default function InsightsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-destructive">
-                    {formatMoney(expenseTotal)}
+                    {formatMoney(finalExpenseTotal)}
                   </div>
                   <div className="text-sm text-muted-foreground mt-2">
                     Total expenses for {format(parseISO(selectedBudget.createdAt), "MMMM yyyy")}
