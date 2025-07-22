@@ -9,17 +9,7 @@ import {
 } from "@/components/ui/card";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { exportToPdf } from "@/lib/utils/exportToPdf";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-  LabelList,
-} from "recharts";
+
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
 import { Download, FileSpreadsheet } from "lucide-react";
@@ -91,52 +81,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
 
 
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-popover/95 backdrop-blur-sm border rounded-lg p-3 shadow-lg">
-          <p className="font-medium mb-1">{label}</p>
-          <p className="text-sm text-muted-foreground">
-            Spent:{" "}
-            <span className="font-medium text-foreground">
-              {formatMoney(data.spent)}
-            </span>
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Budgeted:{" "}
-            <span className="font-medium text-foreground">
-              {formatMoney(data.budgeted)}
-            </span>
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
 
-  const CustomBarLabel = (props: any) => {
-    const { x, y, width, value } = props;
-    // Fallbacks for undefined values
-    const labelX = x + (width ? width / 2 : 0);
-    // If the bar is zero, y may be at the bottom of the chart, so lift it up a bit
-    const labelY = (y !== undefined ? y : 0) - 8;
-    // Optionally, skip label for zero values
-    if (!value) return null;
-    return (
-      <text
-        x={labelX}
-        y={labelY}
-        textAnchor="middle"
-        fontSize={12}
-        fill="hsl(var(--muted-foreground))"
-        fontWeight={500}
-        pointerEvents="none"
-      >
-        {formatMoney(value)}
-      </text>
-    );
-  };
 
   const handleExportToPdf = () => {
     try {
@@ -315,87 +260,83 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
             <div className="h-[250px] sm:h-[300px] md:h-[350px]" data-testid="summary-chart">
 
               
-              {chartData.length > 0 ? (
-                <div>
-
-                  
-                  <ResponsiveContainer width="100%" height="300px">
-                    <BarChart
-                      data={chartData}
-                      margin={{
-                        top: 20,
-                        right: 20,
-                        left: 10,
-                        bottom: 40,
-                      }}
-                      barGap={6}
-                    >
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        vertical={false}
-                        stroke="hsl(var(--muted-foreground)/0.2)"
-                        horizontal={true}
-                      />
-                      <XAxis
-                        dataKey="name"
-                        angle={-35}
-                        textAnchor="end"
-                        tick={{
-                          fill: "hsl(var(--muted-foreground))",
-                          fontSize: 12,
-                          dy: 10,
-                        }}
-                        tickFormatter={(name) =>
-                          name.length > 12 ? name.slice(0, 12) + "…" : name
-                        }
-                        tickLine={false}
-                        axisLine={false}
-                        interval={0}
-                        height={80}
-                        type="category"
-                        scale="band"
-                      />
-                      <YAxis
-                        tickFormatter={(value) => formatMoney(value)}
-                        tick={{
-                          fill: "hsl(var(--muted-foreground))",
-                          fontSize: 10,
-                        }}
-                        tickLine={false}
-                        axisLine={false}
-                        width={70}
-                        type="number"
-                        scale="linear"
-                      />
-                      <Tooltip
-                        content={<CustomTooltip />}
-                        cursor={{ fill: "hsl(var(--muted)/0.2)" }}
-                        active={true}
-                        isAnimationActive={true}
-                      />
-                      <Bar
-                        dataKey="budgeted"
-                        fill="hsl(var(--muted))"
-                        radius={[4, 4, 0, 0]}
-                        maxBarSize={30}
-                        type="monotone"
-                      />
-                      <Bar dataKey="spent" radius={[4, 4, 0, 0]} maxBarSize={30} type="monotone">
-                        {chartData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={
-                              entry.overBudget
-                                ? "hsl(var(--destructive))"
-                                : "hsl(var(--primary))"
-                            }
-                          />
-                        ))}
-                        <LabelList dataKey="spent" content={CustomBarLabel} />
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+                              {chartData.length > 0 ? (
+                  <div className="space-y-4">
+                    {/* Simple HTML/CSS Chart */}
+                    <div className="relative h-64 border border-border rounded-lg p-4">
+                      {/* Y-axis labels */}
+                      <div className="absolute left-0 top-0 bottom-0 w-16 flex flex-col justify-between text-xs text-muted-foreground">
+                        {(() => {
+                          const maxValue = Math.max(...chartData.map(d => Math.max(d.budgeted, d.spent)));
+                          const steps = 5;
+                          return Array.from({ length: steps + 1 }, (_, i) => {
+                            const value = (maxValue / steps) * (steps - i);
+                            return (
+                              <div key={i} className="flex items-center h-0">
+                                <span>{formatMoney(value)}</span>
+                              </div>
+                            );
+                          });
+                        })()}
+                      </div>
+                      
+                      {/* Chart bars */}
+                      <div className="ml-16 h-full flex items-end justify-around gap-2">
+                        {chartData.map((item, index) => {
+                          const maxValue = Math.max(...chartData.map(d => Math.max(d.budgeted, d.spent)));
+                          const budgetedHeight = (item.budgeted / maxValue) * 100;
+                          const spentHeight = (item.spent / maxValue) * 100;
+                          
+                          return (
+                            <div key={index} className="flex flex-col items-center flex-1">
+                              {/* Bars */}
+                              <div className="w-full flex flex-col items-center gap-1 mb-2">
+                                {/* Budgeted bar */}
+                                <div 
+                                  className="w-full bg-muted rounded-sm"
+                                  style={{ height: `${budgetedHeight}%` }}
+                                />
+                                {/* Spent bar */}
+                                <div 
+                                  className={`w-full rounded-sm ${
+                                    item.overBudget ? 'bg-destructive' : 'bg-primary'
+                                  }`}
+                                  style={{ height: `${spentHeight}%` }}
+                                />
+                              </div>
+                              
+                              {/* Category name */}
+                              <div className="text-xs text-center text-muted-foreground">
+                                {item.name.length > 8 ? item.name.slice(0, 8) + '...' : item.name}
+                              </div>
+                              
+                              {/* Values */}
+                              <div className="text-xs text-center mt-1">
+                                <div className="text-muted-foreground">
+                                  {formatMoney(item.spent)}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  / {formatMoney(item.budgeted)}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      
+                      {/* Legend */}
+                      <div className="absolute bottom-0 left-16 right-0 flex justify-center gap-4 text-xs">
+                        <div className="flex items-center gap-1">
+                          <div className="w-3 h-3 bg-muted rounded"></div>
+                          <span className="text-muted-foreground">Budgeted</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <div className="w-3 h-3 bg-primary rounded"></div>
+                          <span className="text-muted-foreground">Spent</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
               ) : (
                 <div className="flex items-center justify-center h-full">
                   <p className="text-sm text-muted-foreground">
