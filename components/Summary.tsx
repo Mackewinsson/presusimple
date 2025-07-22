@@ -285,12 +285,12 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                 : "Top Spending Categories"
               }
             </h3>
-            <div className="h-[250px] sm:h-[300px] md:h-[350px]" data-testid="summary-chart">
+            <div className="h-[250px] sm:h-[300px] md:h-[350px] flex flex-col" data-testid="summary-chart">
 
               
                               {hasSpendingData ? (
-                  <div className="h-80 overflow-x-auto">
-                    <div className="min-w-full" style={{ minWidth: `${Math.max(chartCategories.length * 120, 400)}px` }}>
+                  <div className="flex-1 overflow-x-auto">
+                    <div className="min-w-full h-full" style={{ minWidth: `${Math.max(chartCategories.length * 120, 400)}px` }}>
                       <Bar
                       data={{
                         labels: chartData.map(item => item.name),
@@ -397,7 +397,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                     </div>
                   </div>
               ) : (
-                <div className="flex items-center justify-center h-80">
+                <div className="flex-1 flex items-center justify-center">
                   <div className="text-center">
                     <p className="text-sm text-muted-foreground mb-2">
                       {categories.length === 0 
