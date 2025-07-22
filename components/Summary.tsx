@@ -8,7 +8,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatMoney } from "@/lib/utils/formatMoney";
-import { exportToPdf } from "@/lib/utils/exportToPdf";
 import { getChartColor, useThemeColors } from "@/lib/theme";
 import {
   Chart as ChartJS,
@@ -23,7 +22,7 @@ import { Bar } from 'react-chartjs-2';
 
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
-import { Download, FileSpreadsheet } from "lucide-react";
+import { FileSpreadsheet } from "lucide-react";
 import { utils, writeFile } from "xlsx";
 import { toast } from "sonner";
 import type { Budget } from "@/lib/api";
@@ -110,43 +109,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
 
 
 
-  const handleExportToPdf = () => {
-    try {
-      // Create sections array for PDF export (since we don't have sections in MongoDB)
-      const sections = [{ id: "default", name: "Budget Categories" }];
 
-      // Convert MongoDB categories to the format expected by exportToPdf
-      const convertedCategories = categories.map((cat) => ({
-        id: cat._id || cat.id || "",
-        name: cat.name,
-        budgeted: cat.budgeted,
-        spent: cat.spent,
-        sectionId: cat.sectionId,
-      }));
-
-      // Convert MongoDB expenses to the format expected by exportToPdf
-      const convertedExpenses = expenses.map((expense) => ({
-        _id: expense._id,
-        categoryId: expense.categoryId,
-        amount: expense.amount,
-        description: expense.description,
-        date: expense.date,
-        type: expense.type,
-      }));
-
-      exportToPdf(
-        sections,
-        convertedCategories,
-        convertedExpenses,
-        budget.totalBudgeted,
-        totalSpent
-      );
-      toast.success("PDF report generated successfully");
-    } catch (error) {
-      console.error("PDF export failed:", error);
-      toast.error("Failed to generate PDF report");
-    }
-  };
 
   const handleExportToExcel = () => {
     try {
@@ -231,15 +194,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
               <span className="hidden sm:inline">Excel</span>
               <span className="sm:hidden">XLS</span>
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleExportToPdf}
-              className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm"
-            >
-              <Download className="h-3 w-3 sm:h-4 sm:w-4" />
-              PDF
-            </Button>
+
           </div>
         </div>
       </CardHeader>

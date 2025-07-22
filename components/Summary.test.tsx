@@ -9,9 +9,7 @@ jest.mock('@/lib/utils/formatMoney', () => ({
   },
 }));
 
-jest.mock('@/lib/utils/exportToPdf', () => ({
-  exportToPdf: jest.fn(),
-}));
+
 
 describe('Summary', () => {
   const mockBudget = {
@@ -82,7 +80,7 @@ describe('Summary', () => {
     expect(screen.getByText(/\$420\.00/)).toBeInTheDocument(); // Remaining (500-80)
   });
 
-  it('shows export buttons', () => {
+  it('shows export button', () => {
     render(
       <Summary
         budget={mockBudget}
@@ -91,9 +89,8 @@ describe('Summary', () => {
       />
     );
 
-    // Check for export buttons - look for Excel and PDF
+    // Check for export button - look for Excel only
     expect(screen.getByText('Excel')).toBeInTheDocument();
-    expect(screen.getByText('PDF')).toBeInTheDocument();
   });
 
   it('handles empty data gracefully', () => {
