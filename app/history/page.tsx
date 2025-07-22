@@ -50,7 +50,15 @@ export default function HistoryPage() {
   );
 
   const handleDelete = (id: string) => {
-    deleteBudgetMutation.mutate(id);
+    deleteBudgetMutation.mutate(id, {
+      onSuccess: () => {
+        toast.success("Budget history deleted successfully");
+      },
+      onError: (error) => {
+        console.error("Error deleting budget:", error);
+        toast.error("Failed to delete budget history");
+      },
+    });
   };
 
   return (
@@ -117,8 +125,13 @@ export default function HistoryPage() {
                             size="icon"
                             className="text-destructive"
                             onClick={(e) => e.stopPropagation()}
+                            disabled={deleteBudgetMutation.isPending}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            {deleteBudgetMutation.isPending ? (
+                              <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent className="sm:max-w-md">
@@ -187,11 +200,28 @@ export default function HistoryPage() {
             </div>
           ) : (
             <div className="text-center py-12 px-4 rounded-lg bg-card/95 backdrop-blur shadow-lg">
-              <p className="text-muted-foreground">
-                {searchTerm
-                  ? "No budgets found matching your search."
-                  : "No budget history yet."}
-              </p>
+              <div className="space-y-4">
+                <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center">
+                  <TrendingUp className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">
+                    {searchTerm ? "No matching budgets found" : "No budget history yet"}
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    {searchTerm
+                      ? "Try adjusting your search terms."
+                      : "Start by resetting your current month to save your first budget snapshot."}
+                  </p>
+                  {!searchTerm && (
+                    <Link href="/app">
+                      <Button>
+                        Go to Budget
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </div>
