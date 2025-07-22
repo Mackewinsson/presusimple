@@ -35,6 +35,10 @@ export async function POST(request: NextRequest) {
         ? new Date(subscription.trial_end * 1000)
         : undefined;
       const isPaid = status === "active" || status === "trialing";
+      
+      // Set plan to "pro" for active subscriptions, "free" for inactive
+      const plan = isPaid ? "pro" : "free";
+      
       // Update user by stripeCustomerId
       await User.findOneAndUpdate(
         { stripeCustomerId: customerId },
@@ -43,6 +47,7 @@ export async function POST(request: NextRequest) {
           isPaid,
           trialStart,
           trialEnd,
+          plan,
         }
       );
       break;
@@ -50,36 +55,43 @@ export async function POST(request: NextRequest) {
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
       const customerId = subscription.customer as string;
-      // Set isPaid to false
+      // Set isPaid to false and plan to free
       await User.findOneAndUpdate(
         { stripeCustomerId: customerId },
         {
           isPaid: false,
           stripeSubscriptionId: undefined,
+          plan: "free",
         }
       );
       break;
     }
     case "checkout.session.completed": {
-      // Attach stripeCustomerId to user by email
+      // Attach stripeCustomerId to user by email and set plan to pro
       const session = event.data.object as Stripe.Checkout.Session;
       const customerId = session.customer as string;
       const email = session.customer_email;
       if (email && customerId) {
         await User.findOneAndUpdate(
           { email },
-          { stripeCustomerId: customerId }
+          { 
+            stripeCustomerId: customerId,
+            plan: "pro" // New customers get pro plan
+          }
         );
       }
       break;
     }
     case "invoice.payment_succeeded": {
-      // Optionally, update isPaid to true
+      // Update isPaid to true and plan to pro
       const invoice = event.data.object as Stripe.Invoice;
       const customerId = invoice.customer as string;
       await User.findOneAndUpdate(
         { stripeCustomerId: customerId },
-        { isPaid: true }
+        { 
+          isPaid: true,
+          plan: "pro"
+        }
       );
       break;
     }
