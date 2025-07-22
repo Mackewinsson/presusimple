@@ -89,19 +89,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
     overBudget: (Number(cat.spent) || 0) > (Number(cat.budgeted) || 0),
   })).filter(item => item.budgeted > 0 || item.spent > 0); // Only show items with data
 
-  console.log('Chart rendering check:', { chartDataLength: chartData.length, chartData });
 
-  // Debug logging
-  console.log('Summary Debug:', {
-    categoriesCount: categories.length,
-    categoriesWithSpentCount: categoriesWithSpent.length,
-    chartCategoriesCount: chartCategories.length,
-    chartData,
-    totalSpent,
-    calculatedTotalBudgeted,
-    budget: budget,
-    expenses: expenses
-  });
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -327,18 +315,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
             <div className="h-[250px] sm:h-[300px] md:h-[350px]" data-testid="summary-chart">
               {chartData.length > 0 ? (
                 <div>
-                  <div style={{ height: '20px', background: 'red', marginBottom: '10px' }}>
-                    Chart Debug: {chartData.length} items
-                  </div>
-                  
-                  {/* Test simple chart first */}
-                  <div style={{ height: '100px', border: '1px solid blue', marginBottom: '10px' }}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={[{ name: 'Test', value: 10 }]}>
-                        <Bar dataKey="value" fill="blue" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
+
                   
                   <ResponsiveContainer width="100%" height="300px">
                     {(() => {
