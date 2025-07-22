@@ -84,10 +84,10 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
 
   const chartData = chartCategories.map((cat) => ({
     name: cat.name,
-    spent: cat.spent,
-    budgeted: cat.budgeted,
-    overBudget: cat.spent > cat.budgeted,
-  }));
+    spent: Number(cat.spent) || 0,
+    budgeted: Number(cat.budgeted) || 0,
+    overBudget: (Number(cat.spent) || 0) > (Number(cat.budgeted) || 0),
+  })).filter(item => item.budgeted > 0 || item.spent > 0); // Only show items with data
 
   console.log('Chart rendering check:', { chartDataLength: chartData.length, chartData });
 
@@ -330,82 +330,112 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                   <div style={{ height: '20px', background: 'red', marginBottom: '10px' }}>
                     Chart Debug: {chartData.length} items
                   </div>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={chartData}
-                      margin={{
-                        top: 20,
-                        right: 20,
-                        left: 10,
-                        bottom: 40,
-                      }}
-                      barGap={6}
-                    >
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      vertical={false}
-                      stroke="hsl(var(--muted-foreground)/0.2)"
-                      horizontal={true}
-                    />
-                    <XAxis
-                      dataKey="name"
-                      angle={-35}
-                      textAnchor="end"
-                      tick={{
-                        fill: "hsl(var(--muted-foreground))",
-                        fontSize: 12,
-                        dy: 10,
-                      }}
-                      tickFormatter={(name) =>
-                        name.length > 12 ? name.slice(0, 12) + "…" : name
+                  
+                  {/* Test simple chart first */}
+                  <div style={{ height: '100px', border: '1px solid blue', marginBottom: '10px' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={[{ name: 'Test', value: 10 }]}>
+                        <Bar dataKey="value" fill="blue" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  
+                  <ResponsiveContainer width="100%" height="300px">
+                    {(() => {
+                      try {
+                        return (
+                          <BarChart
+                            data={chartData}
+                            margin={{
+                              top: 20,
+                              right: 20,
+                              left: 10,
+                              bottom: 40,
+                            }}
+                            barGap={6}
+                          >
+                          <CartesianGrid
+                            strokeDasharray="3 3"
+                            vertical={false}
+                            stroke="hsl(var(--muted-foreground)/0.2)"
+                            horizontal={true}
+                          />
+                          <XAxis
+                            dataKey="name"
+                            angle={-35}
+                            textAnchor="end"
+                            tick={{
+                              fill: "hsl(var(--muted-foreground))",
+                              fontSize: 12,
+                              dy: 10,
+                            }}
+                            tickFormatter={(name) =>
+                              name.length > 12 ? name.slice(0, 12) + "…" : name
+                            }
+                            tickLine={false}
+                            axisLine={false}
+                            interval={0}
+                            height={80}
+                            type="category"
+                            scale="band"
+                          />
+                          <YAxis
+                            tickFormatter={(value) => formatMoney(value)}
+                            tick={{
+                              fill: "hsl(var(--muted-foreground))",
+                              fontSize: 10,
+                            }}
+                            tickLine={false}
+                            axisLine={false}
+                            width={70}
+                            type="number"
+                            scale="linear"
+                          />
+                          <Tooltip
+                            content={<CustomTooltip />}
+                            cursor={{ fill: "hsl(var(--muted)/0.2)" }}
+                            active={true}
+                            isAnimationActive={true}
+                          />
+                          <Bar
+                            dataKey="budgeted"
+                            fill="hsl(var(--muted))"
+                            radius={[4, 4, 0, 0]}
+                            maxBarSize={30}
+                            type="monotone"
+                          />
+                          <Bar dataKey="spent" radius={[4, 4, 0, 0]} maxBarSize={30} type="monotone">
+                            {chartData.map((entry, index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={
+                                  entry.overBudget
+                                    ? "hsl(var(--destructive))"
+                                    : "hsl(var(--primary))"
+                                }
+                              />
+                            ))}
+                            <LabelList dataKey="spent" content={CustomBarLabel} />
+                          </Bar>
+                        </BarChart>
+                        );
+                      } catch (error) {
+                        console.error('Chart rendering error:', error);
+                        return (
+                          <div style={{ 
+                            height: '100%', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center',
+                            border: '1px solid red',
+                            background: 'rgba(255,0,0,0.1)'
+                          }}>
+                            <p>Chart Error: {error instanceof Error ? error.message : 'Unknown error'}</p>
+                          </div>
+                        );
                       }
-                      tickLine={false}
-                      axisLine={false}
-                      interval={0}
-                      height={80}
-                      type="category"
-                      scale="band"
-                    />
-                    <YAxis
-                      tickFormatter={(value) => formatMoney(value)}
-                      tick={{
-                        fill: "hsl(var(--muted-foreground))",
-                        fontSize: 10,
-                      }}
-                      tickLine={false}
-                      axisLine={false}
-                      width={70}
-                      type="number"
-                      scale="linear"
-                    />
-                    <Tooltip
-                      content={<CustomTooltip />}
-                      cursor={{ fill: "hsl(var(--muted)/0.2)" }}
-                      active={true}
-                      isAnimationActive={true}
-                    />
-                    <Bar
-                      dataKey="budgeted"
-                      fill="hsl(var(--muted))"
-                      radius={[4, 4, 0, 0]}
-                      maxBarSize={30}
-                      type="monotone"
-                    />
-                    <Bar dataKey="spent" radius={[4, 4, 0, 0]} maxBarSize={30} type="monotone">
-                      {chartData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={
-                            entry.overBudget
-                              ? "hsl(var(--destructive))"
-                              : "hsl(var(--primary))"
-                          }
-                        />
-                      ))}
-                      <LabelList dataKey="spent" content={CustomBarLabel} />
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                    })()}
+                  </ResponsiveContainer>
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-full">
