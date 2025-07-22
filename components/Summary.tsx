@@ -292,7 +292,8 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                             backgroundColor: 'hsl(var(--muted))',
                             borderColor: 'hsl(var(--muted))',
                             borderWidth: 1,
-                            borderRadius: 4,
+                            borderRadius: 6,
+                            borderSkipped: false,
                           },
                           {
                             label: 'Spent',
@@ -308,7 +309,8 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                                 : 'hsl(var(--primary))'
                             ),
                             borderWidth: 1,
-                            borderRadius: 4,
+                            borderRadius: 6,
+                            borderSkipped: false,
                           },
                         ],
                       }}
@@ -322,6 +324,10 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                               usePointStyle: true,
                               padding: 20,
                               color: 'hsl(var(--muted-foreground))',
+                              font: {
+                                size: 12,
+                                weight: 'normal',
+                              },
                             },
                           },
                           tooltip: {
@@ -332,6 +338,13 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                             borderWidth: 1,
                             cornerRadius: 8,
                             displayColors: true,
+                            titleFont: {
+                              size: 14,
+                              weight: 'bold',
+                            },
+                            bodyFont: {
+                              size: 12,
+                            },
                             callbacks: {
                               label: function(context) {
                                 const label = context.dataset.label || '';
@@ -350,27 +363,39 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                               color: 'hsl(var(--muted-foreground))',
                               font: {
                                 size: 12,
+                                weight: 'normal',
                               },
+                            },
+                            border: {
+                              color: 'hsl(var(--border))',
                             },
                           },
                           y: {
                             grid: {
-                              color: 'hsl(var(--muted-foreground)/0.2)',
+                              color: 'hsl(var(--muted-foreground)/0.1)',
                             },
                             ticks: {
                               color: 'hsl(var(--muted-foreground))',
                               font: {
-                                size: 10,
+                                size: 11,
+                                weight: 'normal',
                               },
                               callback: function(value) {
                                 return formatMoney(value as number);
                               },
+                            },
+                            border: {
+                              color: 'hsl(var(--border))',
                             },
                           },
                         },
                         interaction: {
                           intersect: false,
                           mode: 'index' as const,
+                        },
+                        animation: {
+                          duration: 750,
+                          easing: 'easeInOutQuart',
                         },
                       }}
                     />
