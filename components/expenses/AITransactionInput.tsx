@@ -820,7 +820,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
   return (
     <>
       <AITransactionLoading isProcessing={isParsing} currentStep={currentStep} />
-      <Card className="glass-card hover-card group bg-gradient-to-br from-slate-900/90 via-purple-900/20 to-slate-900/90 border border-purple-500/20 shadow-2xl">
+      <Card className="glass-card hover-card group bg-white border border-gray-200 shadow-2xl">
         <CardHeader>
                   <CardTitle className="flex items-center gap-3 text-xl">
           <div className="relative">
@@ -832,7 +832,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
           </span>
           <Zap className="h-5 w-5 text-transparent bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text animate-bounce" />
         </CardTitle>
-          <CardDescription className="text-base">
+          <CardDescription className="text-base text-gray-600">
             Just describe your day in plain English and watch AI transform it into perfect budget entries
           </CardDescription>
         </CardHeader>
@@ -845,7 +845,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
               className="min-h-[100px]"
               disabled={isParsing}
             />
-            <div className="flex justify-between items-center text-xs text-muted-foreground">
+            <div className="flex justify-between items-center text-xs text-gray-500">
               <span>{description.length}/500 characters</span>
               <span>{description.length < 3 ? 'Need more detail' : 'Ready to parse'}</span>
             </div>
