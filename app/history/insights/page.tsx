@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   Card,
@@ -39,7 +39,7 @@ import {
 import { useMonthlyBudgets, useUserId, useExpenses, useCategories } from "@/lib/hooks";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function InsightsPage() {
+function InsightsContent() {
   const { data: userId } = useUserId();
   const { data: budgets = [], isLoading: budgetsLoading, refetch: refetchBudgets } = useMonthlyBudgets(
     userId || ""
@@ -515,5 +515,43 @@ export default function InsightsPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function InsightsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
+        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
+                <Card key={i}>
+                  <CardHeader>
+                    <Skeleton className="h-6 w-32 mb-2" />
+                    <Skeleton className="h-4 w-24" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-8 w-20 mb-2" />
+                    <Skeleton className="h-4 w-32" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-6 w-40 mb-2" />
+                <Skeleton className="h-4 w-56" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-[400px] w-full" />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    }>
+      <InsightsContent />
+    </Suspense>
   );
 }
