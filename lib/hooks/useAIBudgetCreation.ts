@@ -216,19 +216,22 @@ export const useAIBudgetCreation = () => {
       // Group categories into logical sections based on their names
       const sectionGroups = groupCategoriesIntoSections(aiData.categories);
       
-      // Create sections with clean display names and MongoDB ObjectIds for uniqueness
-      const { ObjectId } = require('mongodb');
+      // Create sections with clean display names and unique identifiers
       const uniqueSections = sectionGroups.map((group, index) => {
-        const objectId = new ObjectId();
         const displayName = group.sectionName;
         
-        // Use ObjectId for the unique name, but keep displayName clean
-        const uniqueName = `${displayName}_${objectId.toString()}`;
+        // Generate a unique identifier using timestamp and random string
+        const timestamp = Date.now();
+        const randomString = Math.random().toString(36).substring(2, 15);
+        const uniqueId = `${timestamp}_${randomString}`;
+        
+        // Use unique identifier in the name for internal uniqueness
+        const uniqueName = `${displayName}_${uniqueId}`;
         
         return { 
           name: uniqueName,
           displayName: displayName,
-          uniqueId: objectId.toString()
+          uniqueId: uniqueId
         };
       });
       
