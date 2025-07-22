@@ -276,7 +276,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
         {categories.length > 0 ? (
           <div className="mt-6 sm:mt-8">
             <h3 className="text-base sm:text-lg font-medium mb-4 sm:mb-6">
-              Top 5 Spending Categories
+              Top Spending Categories
             </h3>
             <div className="h-[250px] sm:h-[300px] md:h-[350px]" data-testid="summary-chart">
 
@@ -287,15 +287,6 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                       data={{
                         labels: chartData.map(item => item.name),
                         datasets: [
-                          {
-                            label: 'Budgeted',
-                            data: chartData.map(item => item.budgeted),
-                            backgroundColor: 'hsl(var(--muted))',
-                            borderColor: 'hsl(var(--muted))',
-                            borderWidth: 1,
-                            borderRadius: 6,
-                            borderSkipped: false,
-                          },
                           {
                             label: 'Spent',
                             data: chartData.map(item => item.spent),
@@ -320,16 +311,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                         maintainAspectRatio: false,
                         plugins: {
                           legend: {
-                            position: 'top' as const,
-                            labels: {
-                              usePointStyle: true,
-                              padding: 20,
-                              color: 'hsl(var(--muted-foreground))',
-                              font: {
-                                size: 12,
-                                weight: 'normal',
-                              },
-                            },
+                            display: false, // Hide legend since we only have one dataset
                           },
                           tooltip: {
                             backgroundColor: 'hsl(var(--popover))',
