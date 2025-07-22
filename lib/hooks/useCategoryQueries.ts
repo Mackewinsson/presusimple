@@ -7,6 +7,7 @@ export const categoryKeys = {
   all: ["categories"] as const,
   lists: () => [...categoryKeys.all, "list"] as const,
   list: (userId: string) => [...categoryKeys.lists(), userId] as const,
+  listByBudget: (budgetId: string) => [...categoryKeys.lists(), "budget", budgetId] as const,
   details: () => [...categoryKeys.all, "detail"] as const,
   detail: (id: string) => [...categoryKeys.details(), id] as const,
 };
@@ -17,6 +18,15 @@ export const useCategories = (userId: string) => {
     queryKey: categoryKeys.list(userId),
     queryFn: () => categoryApi.getCategories(userId),
     enabled: !!userId,
+  });
+};
+
+// Get categories for a budget
+export const useCategoriesByBudget = (budgetId: string) => {
+  return useQuery({
+    queryKey: categoryKeys.listByBudget(budgetId),
+    queryFn: () => categoryApi.getCategoriesByBudget(budgetId),
+    enabled: !!budgetId,
   });
 };
 

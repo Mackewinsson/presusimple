@@ -14,6 +14,7 @@ export {
 } from "./useBudgetTemplateQueries";
 export {
   useCategories,
+  useCategoriesByBudget,
   useCreateCategory,
   useUpdateCategory,
   useDeleteCategory,

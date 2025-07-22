@@ -123,6 +123,13 @@ export const categoryApi = {
     return response.json();
   },
 
+  // Get categories for a budget
+  getCategoriesByBudget: async (budgetId: string): Promise<Category[]> => {
+    const response = await fetch(`/api/categories?budget=${budgetId}`);
+    if (!response.ok) throw new Error("Failed to fetch categories");
+    return response.json();
+  },
+
   // Create a new category
   createCategory: async (categoryData: {
     name: string;

@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-import { useUserId, useCategories, useBudget } from "@/lib/hooks";
+import { useUserId, useCategoriesByBudget, useBudget } from "@/lib/hooks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -363,7 +363,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
   const queryClient = useQueryClient();
 
   // Fetch categories for this budget
-  const { data: categories, isLoading: isLoadingCategories, refetch: refetchCategories } = useCategories(budgetId);
+  const { data: categories, isLoading: isLoadingCategories, refetch: refetchCategories } = useCategoriesByBudget(budgetId);
   const { data: budget, isLoading: isLoadingBudget, refetch: refetchBudget } = useBudget(budgetId);
 
   // Load budget data to get available budget
@@ -389,7 +389,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
 
   const parseTransactions = useMutation({
     mutationFn: async (description: string) => {
-      const categoryNames = (categories || []).map(cat => cat.name);
+      const categoryNames = (categories || []).map((cat: any) => cat.name);
       console.log('Sending categories to AI:', categoryNames);
       
       const response = await fetch('/api/transactions/ai-parse', {
@@ -501,7 +501,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       return;
     }
 
-    console.log('Starting AI parsing with categories:', (categories || []).map(cat => cat.name));
+    console.log('Starting AI parsing with categories:', (categories || []).map((cat: any) => cat.name));
 
     if (!userId?.data) {
       toast({
