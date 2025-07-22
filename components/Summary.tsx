@@ -8,17 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatMoney } from "@/lib/utils/formatMoney";
-import { getChartColor, useThemeColors } from "@/lib/theme";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-import { Bar } from 'react-chartjs-2';
+import { SpendingChart } from "@/components/ui/SpendingChart";
 
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
@@ -26,16 +16,6 @@ import { FileSpreadsheet } from "lucide-react";
 import { utils, writeFile } from "xlsx";
 import { toast } from "sonner";
 import type { Budget } from "@/lib/api";
-
-// Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
 
 interface Category {
   _id?: string;
@@ -62,7 +42,6 @@ interface SummaryProps {
 }
 
 const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
-  const themeColors = useThemeColors();
   // Calculate total spent from expenses
   const totalSpent = expenses.reduce((sum, expense) => {
     return (
@@ -243,116 +222,22 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
               }
             </h3>
             <div className="h-[250px] sm:h-[300px] md:h-[350px] flex flex-col" data-testid="summary-chart">
-
-              
-                              {hasSpendingData ? (
-                  <div className="flex-1 overflow-x-auto">
-                    <div className="min-w-full h-full" style={{ minWidth: `${Math.max(chartCategories.length * 120, 400)}px` }}>
-                      <Bar
-                      data={{
-                        labels: chartData.map(item => item.name),
-                        datasets: [
-                          {
-                            label: 'Spent',
-                            data: chartData.map(item => item.spent),
-                            backgroundColor: chartData.map((item, index) => 
-                              item.overBudget 
-                                ? themeColors.destructive
-                                : getChartColor(index)
-                            ),
-                            borderColor: chartData.map((item, index) => 
-                              item.overBudget 
-                                ? themeColors.destructive
-                                : getChartColor(index)
-                            ),
-                            borderWidth: 1,
-                            borderRadius: 6,
-                            borderSkipped: false,
-                          },
-                        ],
-                      }}
-                      options={{
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                          legend: {
-                            display: false, // Hide legend since we only have one dataset
-                          },
-                          tooltip: {
-                            backgroundColor: themeColors.popover,
-                            titleColor: themeColors.foreground,
-                            bodyColor: themeColors.foreground,
-                            borderColor: themeColors.border,
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            displayColors: true,
-                            titleFont: {
-                              size: 14,
-                              weight: 'bold',
-                            },
-                            bodyFont: {
-                              size: 12,
-                            },
-                            callbacks: {
-                              label: function(context) {
-                                const label = context.dataset.label || '';
-                                const value = context.parsed.y;
-                                return `${label}: ${formatMoney(value)}`;
-                              },
-                            },
-                          },
-                        },
-                        scales: {
-                          x: {
-                            grid: {
-                              display: false,
-                            },
-                            ticks: {
-                              color: themeColors.muted,
-                              font: {
-                                size: chartCategories.length > 6 ? 10 : 12,
-                                weight: 'normal',
-                              },
-                              maxRotation: 45,
-                              minRotation: 0,
-                              autoSkip: true,
-                              maxTicksLimit: chartCategories.length > 6 ? 6 : 8,
-                            },
-                            border: {
-                              color: themeColors.border,
-                            },
-                          },
-                          y: {
-                            grid: {
-                              color: `${themeColors.muted}20`,
-                            },
-                            ticks: {
-                              color: themeColors.muted,
-                              font: {
-                                size: 11,
-                                weight: 'normal',
-                              },
-                              callback: function(value) {
-                                return formatMoney(value as number);
-                              },
-                            },
-                            border: {
-                              color: themeColors.border,
-                            },
-                          },
-                        },
-                        interaction: {
-                          intersect: false,
-                          mode: 'index' as const,
-                        },
-                        animation: {
-                          duration: 750,
-                          easing: 'easeInOutQuart',
-                        },
-                                              }}
-                      />
-                    </div>
+              {hasSpendingData ? (
+                <div className="flex-1 overflow-x-auto">
+                  <div className="min-w-full h-full" style={{ minWidth: `${Math.max(chartCategories.length * 120, 400)}px` }}>
+                    <SpendingChart 
+                      data={chartCategories.map(cat => ({
+                        name: cat.name,
+                        spent: cat.spent,
+                        budgeted: cat.budgeted,
+                        overBudget: cat.spent > cat.budgeted,
+                      }))}
+                      showBudgeted={false}
+                      showLegend={false}
+                      height="100%"
+                    />
                   </div>
+                </div>
               ) : (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="text-center">

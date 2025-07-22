@@ -20,31 +20,12 @@ import {
   ArrowDownCircle,
   Trash2,
 } from "lucide-react";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-import { Bar } from 'react-chartjs-2';
-import { useThemeColors } from "@/lib/theme";
-import { useTheme } from "next-themes";
+import { SpendingChart } from "@/components/ui/SpendingChart";
 import { useMonthlyBudgets, useUserId, useDeleteMonthlyBudget } from "@/lib/hooks";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
-// Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -69,8 +50,6 @@ export default function BudgetDetailPage() {
   const deleteBudgetMutation = useDeleteMonthlyBudget();
 
   const selectedBudget = budgets.find((b) => b._id === budgetId);
-  const themeColors = useThemeColors();
-  const { theme: currentTheme } = useTheme();
 
   // Handle delete
   const handleDelete = async () => {
@@ -96,36 +75,7 @@ export default function BudgetDetailPage() {
 
   const hasSpendingData = selectedBudget && selectedBudget.categories.length > 0;
 
-  // Get high-contrast colors for dark mode
-  const getChartColors = (index: number) => {
-    if (currentTheme === 'dark') {
-      // Bright colors for dark mode
-      const darkModeColors = [
-        '#60A5FA', // Blue
-        '#34D399', // Green
-        '#FBBF24', // Yellow
-        '#F87171', // Red
-        '#A78BFA', // Purple
-        '#F472B6', // Pink
-        '#34D399', // Teal
-        '#F59E0B', // Orange
-      ];
-      return darkModeColors[index % darkModeColors.length];
-    } else {
-      // Standard colors for light mode
-      const lightModeColors = [
-        '#3B82F6', // Blue
-        '#10B981', // Green
-        '#F59E0B', // Yellow
-        '#EF4444', // Red
-        '#8B5CF6', // Purple
-        '#EC4899', // Pink
-        '#06B6D4', // Teal
-        '#F97316', // Orange
-      ];
-      return lightModeColors[index % lightModeColors.length];
-    }
-  };
+
 
   if (budgetsLoading) {
     return (
@@ -368,131 +318,11 @@ export default function BudgetDetailPage() {
                 {hasSpendingData ? (
                   <div className="flex-1 overflow-x-auto rounded-lg">
                     <div className="min-w-full h-full p-4" style={{ minWidth: `${Math.max(chartCategories.length * 140, 500)}px` }}>
-                      <Bar
-                        data={{
-                          labels: chartData.map(item => item.name),
-                          datasets: [
-                            {
-                              label: 'Budgeted',
-                              data: chartData.map(item => item.budgeted),
-                              backgroundColor: currentTheme === 'dark' ? '#374151' : '#E5E7EB', // Dark gray for dark mode, light gray for light mode
-                              borderColor: currentTheme === 'dark' ? '#6B7280' : '#9CA3AF',
-                              borderWidth: 2,
-                              borderRadius: 6,
-                              borderSkipped: false,
-                            },
-                            {
-                              label: 'Spent',
-                              data: chartData.map(item => item.spent),
-                              backgroundColor: chartData.map((item, index) => 
-                                item.overBudget 
-                                  ? '#EF4444' // Red for over budget
-                                  : getChartColors(index)
-                              ),
-                              borderColor: chartData.map((item, index) => 
-                                item.overBudget 
-                                  ? '#EF4444' // Red for over budget
-                                  : getChartColors(index)
-                              ),
-                              borderWidth: 1,
-                              borderRadius: 6,
-                              borderSkipped: false,
-                            },
-                          ],
-                        }}
-                        options={{
-                          responsive: true,
-                          maintainAspectRatio: false,
-                          plugins: {
-                            legend: {
-                              display: false, // Hide legend to match main page
-                            },
-                            tooltip: {
-                              backgroundColor: themeColors.popover,
-                              titleColor: themeColors.foreground,
-                              bodyColor: themeColors.foreground,
-                              borderColor: themeColors.border,
-                              borderWidth: 1,
-                              cornerRadius: 8,
-                              displayColors: true,
-                              titleFont: {
-                                size: 14,
-                                weight: 'bold',
-                              },
-                              bodyFont: {
-                                size: 12,
-                              },
-                              callbacks: {
-                                label: function(context) {
-                                  const label = context.dataset.label || '';
-                                  const value = context.parsed.y;
-                                  return `${label}: ${formatMoney(value)}`;
-                                },
-                                afterBody: function(context) {
-                                  const dataIndex = context[0].dataIndex;
-                                  const budgeted = chartData[dataIndex]?.budgeted || 0;
-                                  const spent = chartData[dataIndex]?.spent || 0;
-                                  const difference = spent - budgeted;
-                                  
-                                  if (context[0].dataset.label === 'Budgeted') {
-                                    return [
-                                      `Spent: ${formatMoney(spent)}`,
-                                      `Difference: ${formatMoney(difference)}`
-                                    ];
-                                  }
-                                  return [];
-                                },
-                              },
-                            },
-                          },
-                          scales: {
-                            x: {
-                              grid: {
-                                display: false,
-                              },
-                              ticks: {
-                                color: currentTheme === 'dark' ? '#F9FAFB' : '#374151', // White for dark mode, dark gray for light mode
-                                font: {
-                                  size: chartCategories.length > 6 ? 10 : 12,
-                                  weight: 'normal',
-                                },
-                                maxRotation: 45,
-                                minRotation: 0,
-                                autoSkip: true,
-                                maxTicksLimit: chartCategories.length > 6 ? 6 : 8,
-                              },
-                              border: {
-                                color: currentTheme === 'dark' ? '#6B7280' : '#D1D5DB', // Medium gray for dark mode, light gray for light mode
-                              },
-                            },
-                            y: {
-                              border: {
-                                color: currentTheme === 'dark' ? '#6B7280' : '#D1D5DB', // Medium gray for dark mode, light gray for light mode
-                              },
-                              grid: {
-                                color: currentTheme === 'dark' ? '#374151' : '#E5E7EB', // Dark gray for dark mode, light gray for light mode
-                              },
-                              ticks: {
-                                color: currentTheme === 'dark' ? '#F9FAFB' : '#374151', // White for dark mode, dark gray for light mode
-                                font: {
-                                  size: 11,
-                                  weight: 'normal',
-                                },
-                                callback: function(value) {
-                                  return formatMoney(value as number);
-                                },
-                              },
-                            },
-                          },
-                          interaction: {
-                            intersect: false,
-                            mode: 'index' as const,
-                          },
-                          animation: {
-                            duration: 750,
-                            easing: 'easeInOutQuart',
-                          },
-                        }}
+                      <SpendingChart 
+                        data={chartData}
+                        showBudgeted={true}
+                        showLegend={false}
+                        height="100%"
                       />
                     </div>
                   </div>
