@@ -198,6 +198,14 @@ export default function ManualSubscriptionPage() {
                       : "None"}
                   </div>
                   <div>
+                    <span className="font-medium">Plan:</span>{" "}
+                    <span className={`font-bold ${
+                      userData.plan === "pro" ? "text-green-600" : "text-blue-600"
+                    }`}>
+                      {userData.plan === "pro" ? "Pro" : "Free"}
+                    </span>
+                  </div>
+                  <div>
                     <span className="font-medium">Subscription Type:</span>{" "}
                     {userData.subscriptionType || "None"}
                   </div>
@@ -223,16 +231,22 @@ export default function ManualSubscriptionPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="activate_paid">
-                      Activate Paid Subscription
+                      Activate Paid Subscription (Pro Plan)
                     </SelectItem>
                     <SelectItem value="activate_trial">
-                      Activate 30-Day Trial
+                      Activate 30-Day Trial (Pro Plan)
                     </SelectItem>
                     <SelectItem value="deactivate">
-                      Deactivate Subscription
+                      Deactivate Subscription (Free Plan)
                     </SelectItem>
                     <SelectItem value="extend_trial">
-                      Extend Trial (30 days)
+                      Extend Trial (30 days, Pro Plan)
+                    </SelectItem>
+                    <SelectItem value="set_pro_plan">
+                      Set Pro Plan Only
+                    </SelectItem>
+                    <SelectItem value="set_free_plan">
+                      Set Free Plan Only
                     </SelectItem>
                   </SelectContent>
                 </Select>

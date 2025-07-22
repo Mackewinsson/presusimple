@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
           { email },
           {
             isPaid: true,
+            plan: "pro", // Set plan to pro for paid users
             trialStart: new Date(),
             trialEnd: null, // No trial end for paid users
             subscriptionType: subscriptionType || "manual_paid",
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
         );
         return NextResponse.json({
           success: true,
-          message: "User subscription activated",
+          message: "User subscription activated (Pro plan)",
         });
 
       case "activate_trial":
@@ -75,6 +76,7 @@ export async function POST(request: NextRequest) {
           { email },
           {
             isPaid: false,
+            plan: "pro", // Trial users get pro features
             trialStart: new Date(),
             trialEnd: trialEnd,
             subscriptionType: "manual_trial",
@@ -82,7 +84,7 @@ export async function POST(request: NextRequest) {
         );
         return NextResponse.json({
           success: true,
-          message: "User trial activated",
+          message: "User trial activated (Pro plan)",
         });
 
       case "deactivate":
@@ -91,6 +93,7 @@ export async function POST(request: NextRequest) {
           { email },
           {
             isPaid: false,
+            plan: "free", // Set plan to free when deactivated
             trialStart: null,
             trialEnd: null,
             subscriptionType: null,
@@ -98,7 +101,7 @@ export async function POST(request: NextRequest) {
         );
         return NextResponse.json({
           success: true,
-          message: "User subscription deactivated",
+          message: "User subscription deactivated (Free plan)",
         });
 
       case "extend_trial":
@@ -111,13 +114,45 @@ export async function POST(request: NextRequest) {
           { email },
           {
             isPaid: false,
+            plan: "pro", // Keep pro plan for extended trial
             trialEnd: newTrialEnd,
             subscriptionType: "manual_trial_extended",
           }
         );
         return NextResponse.json({
           success: true,
-          message: `Trial extended by ${days} days`,
+          message: `Trial extended by ${days} days (Pro plan)`,
+        });
+
+      case "set_pro_plan":
+        // Set user to pro plan only
+        await User.findOneAndUpdate(
+          { email },
+          {
+            plan: "pro",
+            subscriptionType: "manual_pro_only",
+          }
+        );
+        return NextResponse.json({
+          success: true,
+          message: "User set to Pro plan",
+        });
+
+      case "set_free_plan":
+        // Set user to free plan only
+        await User.findOneAndUpdate(
+          { email },
+          {
+            plan: "free",
+            isPaid: false,
+            trialStart: null,
+            trialEnd: null,
+            subscriptionType: "manual_free_only",
+          }
+        );
+        return NextResponse.json({
+          success: true,
+          message: "User set to Free plan",
         });
 
       default:
@@ -165,6 +200,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       email: user.email,
       isPaid: user.isPaid || false,
+      plan: user.plan || "free",
       trialStart: user.trialStart,
       trialEnd: user.trialEnd,
       subscriptionType: user.subscriptionType,
