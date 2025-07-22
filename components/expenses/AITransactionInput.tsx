@@ -225,13 +225,13 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
               }`}
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <div className="flex items-start justify-between mb-3">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
                 <div className="flex-1 min-w-0">
                   <div className="font-medium mb-2">{transaction.description}</div>
-                  <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
+                  <div className="text-sm text-muted-foreground flex flex-col sm:flex-row sm:items-center gap-2">
                     <span>Category:</span>
                     <Select value={currentCategory} onValueChange={(value) => handleCategoryChange(index, value)}>
-                      <SelectTrigger className="w-48 h-8 text-xs">
+                      <SelectTrigger className="w-full sm:w-48 h-8 text-xs">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -243,13 +243,13 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                       </SelectContent>
                     </Select>
                     {isMissingCategory && (
-                      <Badge variant="outline" className="text-amber-300 border-amber-300 ml-2">
+                      <Badge variant="outline" className="text-amber-300 border-amber-300 w-fit">
                         New Category
                       </Badge>
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+                <div className="flex items-center gap-2 flex-shrink-0">
                   <Badge variant={transaction.type === "expense" ? "destructive" : "default"}>
                     {transaction.type}
                   </Badge>
@@ -323,7 +323,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
         })}
       </div>
       
-      <div className="flex gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+      <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
         <Button
           onClick={handleConfirm}
           disabled={isSaving || hasInsufficientBudget}
@@ -807,17 +807,17 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       <AITransactionLoading isProcessing={isParsing} currentStep={currentStep} />
       <Card className="glass-card hover-card group bg-white border border-gray-200 shadow-2xl">
         <CardHeader>
-                  <CardTitle className="flex items-center gap-3 text-xl">
+                  <CardTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl">
           <div className="relative">
-            <Sparkles className="h-6 w-6 text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text animate-pulse" />
+            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text animate-pulse" />
             <div className="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-ping" />
           </div>
           <span className="text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 bg-clip-text font-bold">
             AI Magic
           </span>
-          <Zap className="h-5 w-5 text-transparent bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text animate-bounce" />
+          <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-transparent bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text animate-bounce" />
         </CardTitle>
-          <CardDescription className="text-base text-gray-600">
+          <CardDescription className="text-sm sm:text-base text-gray-600">
             Just describe your day in plain English and watch AI transform it into perfect budget entries
           </CardDescription>
         </CardHeader>
@@ -886,10 +886,10 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
           </div>
 
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle className="text-xl">Review Transactions</DialogTitle>
-                <DialogDescription>
+                <DialogTitle className="text-lg sm:text-xl">Review Transactions</DialogTitle>
+                <DialogDescription className="text-sm sm:text-base">
                   Review the parsed transactions and set budget allocations for new categories.
                 </DialogDescription>
               </DialogHeader>

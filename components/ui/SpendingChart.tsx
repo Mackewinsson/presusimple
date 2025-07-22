@@ -42,7 +42,7 @@ export function SpendingChart({
   data, 
   showBudgeted = false, 
   showLegend = false, 
-  height = "400px",
+  height = "300px",
   className = ""
 }: SpendingChartProps) {
   const { theme: currentTheme } = useTheme();
@@ -136,13 +136,13 @@ export function SpendingChart({
               labels: {
                 color: currentTheme === 'dark' ? '#F9FAFB' : '#374151',
                 font: {
-                  size: 14,
+                  size: 12,
                   weight: 'bold',
                 },
                 usePointStyle: true,
-                padding: 25,
-                boxWidth: 20,
-                boxHeight: 8,
+                padding: 20,
+                boxWidth: 16,
+                boxHeight: 6,
               },
             },
             tooltip: {
@@ -154,11 +154,11 @@ export function SpendingChart({
               cornerRadius: 8,
               displayColors: true,
               titleFont: {
-                size: 14,
+                size: 12,
                 weight: 'bold',
               },
               bodyFont: {
-                size: 12,
+                size: 10,
               },
               callbacks: {
                 label: function(context) {
@@ -200,13 +200,13 @@ export function SpendingChart({
               ticks: {
                 color: currentTheme === 'dark' ? '#F9FAFB' : '#374151',
                 font: {
-                  size: data.length > 6 ? 10 : 12,
+                  size: data.length > 6 ? 8 : 10,
                   weight: 'normal',
                 },
                 maxRotation: 45,
                 minRotation: 0,
                 autoSkip: true,
-                maxTicksLimit: data.length > 6 ? 6 : 8,
+                maxTicksLimit: data.length > 6 ? 4 : 6,
               },
               border: {
                 color: currentTheme === 'dark' ? '#6B7280' : '#D1D5DB',
@@ -222,7 +222,7 @@ export function SpendingChart({
               ticks: {
                 color: currentTheme === 'dark' ? '#F9FAFB' : '#374151',
                 font: {
-                  size: 11,
+                  size: 9,
                   weight: 'normal',
                 },
                 callback: function(value) {
