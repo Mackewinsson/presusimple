@@ -21,18 +21,29 @@ import {
   Trash2,
 } from "lucide-react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
   Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
+  Legend,
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+import { getChartColor, useThemeColors } from "@/lib/theme";
 import { useMonthlyBudgets, useUserId, useDeleteMonthlyBudget } from "@/lib/hooks";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 import {
   AlertDialog,
   AlertDialogAction,
@@ -57,6 +68,7 @@ export default function BudgetDetailPage() {
   const deleteBudgetMutation = useDeleteMonthlyBudget();
 
   const selectedBudget = budgets.find((b) => b._id === budgetId);
+  const themeColors = useThemeColors();
 
   // Handle delete
   const handleDelete = async () => {
@@ -68,37 +80,20 @@ export default function BudgetDetailPage() {
     }
   };
 
-  // Prepare data for category comparison chart
-  const categoryData = selectedBudget?.categories.map((category) => ({
-    name: category.name,
-    budgeted: category.budgeted,
-    spent: category.spent,
-    overBudget: category.spent > category.budgeted,
-  })) || [];
+  // Prepare data for chart (same as Summary component)
+  const chartCategories = selectedBudget?.categories
+    .filter(cat => cat.spent > 0) // Only show categories with spending
+    .sort((a, b) => b.spent - a.spent) // Sort by spent amount (highest first)
+    .slice(0, 8) || []; // Show top 8 spending categories
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-popover/95 backdrop-blur-sm border rounded-lg p-3 shadow-lg">
-          <p className="font-medium mb-1">{label}</p>
-          <p className="text-sm text-muted-foreground">
-            Spent:{" "}
-            <span className="font-medium text-foreground">
-              {formatMoney(data.spent)}
-            </span>
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Budgeted:{" "}
-            <span className="font-medium text-foreground">
-              {formatMoney(data.budgeted)}
-            </span>
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
+  const chartData = chartCategories.map((category, index) => ({
+    name: category.name,
+    spent: category.spent,
+    budgeted: category.budgeted,
+    overBudget: category.spent > category.budgeted,
+  }));
+
+  const hasSpendingData = chartCategories.length > 0;
 
   if (budgetsLoading) {
     return (
@@ -329,73 +324,133 @@ export default function BudgetDetailPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={categoryData}
-                    margin={{
-                      top: 20,
-                      right: 30,
-                      left: 20,
-                      bottom: 30,
-                    }}
-                    barGap={8}
-                  >
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      vertical={false}
-                      stroke="hsl(var(--muted-foreground)/0.2)"
-                    />
-                    <XAxis
-                      dataKey="name"
-                      tick={{
-                        fill: "hsl(var(--muted-foreground))",
-                        fontSize: 12,
-                      }}
-                      tickLine={false}
-                      axisLine={false}
-                      interval={0}
-                      height={60}
-                      textAnchor="middle"
-                    />
-                    <YAxis
-                      tickFormatter={(value) => formatMoney(value)}
-                      tick={{
-                        fill: "hsl(var(--muted-foreground))",
-                        fontSize: 12,
-                      }}
-                      tickLine={false}
-                      axisLine={false}
-                      width={80}
-                    />
-                    <Tooltip
-                      content={<CustomTooltip />}
-                      cursor={{ fill: "hsl(var(--muted)/0.2)" }}
-                    />
-                    <Bar
-                      dataKey="budgeted"
-                      fill="hsl(var(--muted))"
-                      radius={[4, 4, 0, 0]}
-                      maxBarSize={40}
-                    />
-                    <Bar
-                      dataKey="spent"
-                      radius={[4, 4, 0, 0]}
-                      maxBarSize={40}
-                    >
-                      {categoryData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={
-                            entry.overBudget
-                              ? "hsl(var(--destructive))"
-                              : "hsl(var(--primary))"
-                          }
-                        />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+              <div className="h-[400px] flex flex-col">
+                {hasSpendingData ? (
+                  <div className="flex-1 overflow-x-auto">
+                    <div className="min-w-full h-full" style={{ minWidth: `${Math.max(chartCategories.length * 120, 400)}px` }}>
+                      <Bar
+                        data={{
+                          labels: chartData.map(item => item.name),
+                          datasets: [
+                            {
+                              label: 'Spent',
+                              data: chartData.map(item => item.spent),
+                              backgroundColor: chartData.map((item, index) => 
+                                item.overBudget 
+                                  ? themeColors.destructive
+                                  : getChartColor(index)
+                              ),
+                              borderColor: chartData.map((item, index) => 
+                                item.overBudget 
+                                  ? themeColors.destructive
+                                  : getChartColor(index)
+                              ),
+                              borderWidth: 1,
+                              borderRadius: 6,
+                              borderSkipped: false,
+                            },
+                          ],
+                        }}
+                        options={{
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: {
+                            legend: {
+                              display: false, // Hide legend since we only have one dataset
+                            },
+                            tooltip: {
+                              backgroundColor: themeColors.popover,
+                              titleColor: themeColors.foreground,
+                              bodyColor: themeColors.foreground,
+                              borderColor: themeColors.border,
+                              borderWidth: 1,
+                              cornerRadius: 8,
+                              displayColors: true,
+                              titleFont: {
+                                size: 14,
+                                weight: 'bold',
+                              },
+                              bodyFont: {
+                                size: 12,
+                              },
+                              callbacks: {
+                                label: function(context) {
+                                  const label = context.dataset.label || '';
+                                  const value = context.parsed.y;
+                                  return `${label}: ${formatMoney(value)}`;
+                                },
+                              },
+                            },
+                          },
+                          scales: {
+                            x: {
+                              grid: {
+                                display: false,
+                              },
+                              ticks: {
+                                color: themeColors.muted,
+                                font: {
+                                  size: chartCategories.length > 6 ? 10 : 12,
+                                  weight: 'normal',
+                                },
+                                maxRotation: 45,
+                                minRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: chartCategories.length > 6 ? 6 : 8,
+                              },
+                              border: {
+                                color: themeColors.border,
+                              },
+                            },
+                            y: {
+                              grid: {
+                                color: `${themeColors.muted}20`,
+                              },
+                              ticks: {
+                                color: themeColors.muted,
+                                font: {
+                                  size: 11,
+                                  weight: 'normal',
+                                },
+                                callback: function(value) {
+                                  return formatMoney(value as number);
+                                },
+                              },
+                              border: {
+                                color: themeColors.border,
+                              },
+                            },
+                          },
+                          interaction: {
+                            intersect: false,
+                            mode: 'index' as const,
+                          },
+                          animation: {
+                            duration: 750,
+                            easing: 'easeInOutQuart',
+                          },
+                        }}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {selectedBudget?.categories.length === 0 
+                          ? "No categories available" 
+                          : "No spending data available"
+                        }
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {selectedBudget?.categories.length === 0 
+                          ? "No budget categories were tracked" 
+                          : "No expenses were recorded for this period"
+                        }
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
