@@ -9,6 +9,7 @@ export interface IUser extends Document {
   trialStart?: Date;
   trialEnd?: Date;
   subscriptionType?: string; // "stripe", "manual_paid", "manual_trial", etc.
+  plan?: "free" | "pro";
 }
 
 const UserSchema = new Schema<IUser>({
@@ -20,6 +21,11 @@ const UserSchema = new Schema<IUser>({
   trialStart: { type: Date },
   trialEnd: { type: Date },
   subscriptionType: { type: String }, // Track subscription source
+  plan: {
+    type: String,
+    enum: ["free", "pro"],
+    default: "free"
+  }
 });
 
 export default models.User || mongoose.model<IUser>("User", UserSchema);

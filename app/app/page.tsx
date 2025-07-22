@@ -21,10 +21,12 @@ import {
   useUserSubscription,
 } from "@/lib/hooks";
 import { useAccessControl } from "@/lib/hooks/useAccessControl";
+import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
 import { AppLoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getSubscriptionStatus } from "@/lib/utils";
 import { Budget, Category, Expense } from "@/lib/api";
+import { UpgradeToProCTA } from "@/components/UpgradeToProCTA";
 
 export default function BudgetApp() {
   const { data: session, status } = useSession();
@@ -43,6 +45,7 @@ export default function BudgetApp() {
   );
   const { data: subscription } = useUserSubscription();
   const accessControl = useAccessControl();
+  const featureFlags = useFeatureFlags();
 
   // Check if any data is loading
   const isLoading =
@@ -187,9 +190,13 @@ export default function BudgetApp() {
             )}
           </div>
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
-            {/* AI Quick Input - Now in grid layout */}
+            {/* AI Quick Input - Now with feature flags */}
             {budget && accessControl.canAccessExpenses && (
-              <AITransactionInput budgetId={budget._id} />
+              featureFlags.hasFeatureAccess("transactionTextInput") ? (
+                <AITransactionInput budgetId={budget._id} />
+              ) : (
+                <UpgradeToProCTA feature="transactionTextInput" />
+              )
             )}
             {budget && accessControl.canAccessExpenses && (
               <DailySpendingTracker
