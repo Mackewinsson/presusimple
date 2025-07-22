@@ -372,7 +372,15 @@ export default function BudgetDetailPage() {
                   <div key={index} className="p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
                     <div className="flex justify-between items-center mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getChartColors(index) }}></div>
+                        <div className="w-3 h-3 rounded-full" style={{ 
+                          backgroundColor: index === 0 ? '#60A5FA' : 
+                                        index === 1 ? '#34D399' : 
+                                        index === 2 ? '#FBBF24' : 
+                                        index === 3 ? '#F87171' : 
+                                        index === 4 ? '#A78BFA' : 
+                                        index === 5 ? '#F472B6' : 
+                                        index === 6 ? '#34D399' : '#F59E0B'
+                        }}></div>
                         <span className="font-semibold text-lg">{category.name}</span>
                       </div>
                       <div className="text-right">
