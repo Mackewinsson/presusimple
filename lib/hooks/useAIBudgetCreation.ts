@@ -168,7 +168,7 @@ export const useAIBudgetCreation = () => {
       }
 
       const categoryPromises = aiData.categories.map(async (category) => {
-        // Find the corresponding sectionId
+        // Find the corresponding section name
         const sectionIndex = aiData.sections.findIndex(s => s.name === category.sectionName);
         
         // Edge case: Handle missing section
@@ -176,18 +176,18 @@ export const useAIBudgetCreation = () => {
           throw new Error(`Category "${category.name}" references a section that doesn't exist.`);
         }
         
-        const sectionId = budget.sections[sectionIndex]._id;
+        const sectionName = budget.sections[sectionIndex].name;
         
-        // Edge case: Validate sectionId
-        if (!sectionId) {
-          throw new Error(`Invalid section ID for category "${category.name}".`);
+        // Edge case: Validate section name
+        if (!sectionName) {
+          throw new Error(`Invalid section name for category "${category.name}".`);
         }
         
         const categoryData: CreateCategoryData = {
           name: category.name,
           budgeted: category.amount,
           spent: 0,
-          sectionId,
+          sectionId: sectionName, // Use section name instead of _id
         };
 
         return createCategory.mutateAsync(categoryData);

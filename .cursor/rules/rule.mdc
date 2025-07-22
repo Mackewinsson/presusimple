@@ -1,0 +1,72 @@
+---
+description: global
+globs:
+alwaysApply: true
+---
+# 🔐 Cursor Code Quality Rules (Strict Mode)
+
+## 🧠 Primary Objectives
+You are assisting in maintaining a professional-grade web application. Every change must:
+- Follow DRY (Don't Repeat Yourself) principles
+- Follow SOLID design principles (especially Single Responsibility and Dependency Inversion)
+- Avoid breaking changes to shared logic or components unless explicitly required and approved
+
+---
+
+## 🛑 RULE 1: NEVER modify shared files blindly
+- Before editing any shared utility, hook, model, or state context:
+  - Identify its dependencies
+  - Explain to the user what else might be impacted
+  - Ask for confirmation before proceeding
+
+---
+
+## 📐 RULE 2: Structure code cleanly
+- Use modular, testable components
+- Keep files short and focused on a single purpose
+- Extract shared logic into helpers if reused more than once
+- No inline magic strings or hardcoded constants — extract them
+
+---
+
+## ♻️ RULE 3: Always apply DRY
+- If a block of logic or code repeats more than once, extract it
+- If a form, modal, or handler is duplicated, refactor it into a reusable component
+- Avoid repeating similar fetch/data logic in multiple components
+
+---
+
+## 🔁 RULE 4: Maintain SOLID principles
+- Each function/component/class should do ONE thing well
+- High-level components shouldn’t depend on implementation details of others
+- Avoid tight coupling — use interfaces, props, or context when necessary
+
+---
+
+## ⚠️ RULE 5: Never break other features
+- If you're modifying a shared function or utility:
+  - Ensure other components using it still work
+  - Test or simulate usage across contexts
+  - Leave existing public methods untouched unless absolutely necessary
+
+---
+
+## ✅ RULE 6: Test each change incrementally
+- After implementing a new feature or update:
+  - Run a local test with real or mocked data
+  - Pause and ask the user if everything works
+  - Only then move to the next step
+
+---
+
+## 📣 Final Behavior
+
+Whenever implementing anything:
+- Follow these rules strictly
+- Explain changes clearly
+- Ask for confirmation before making critical edits
+- Minimize risk by isolating changes
+
+YOU ARE OPERATING IN STRICT MODE.
+
+Only proceed when confident the change will not break other parts of the app.
