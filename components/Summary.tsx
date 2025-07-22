@@ -9,6 +9,16 @@ import {
 } from "@/components/ui/card";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { exportToPdf } from "@/lib/utils/exportToPdf";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
 
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
@@ -16,6 +26,16 @@ import { Download, FileSpreadsheet } from "lucide-react";
 import { utils, writeFile } from "xlsx";
 import { toast } from "sonner";
 import type { Budget } from "@/lib/api";
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 interface Category {
   _id?: string;
@@ -261,81 +281,99 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
 
               
                               {chartData.length > 0 ? (
-                  <div className="space-y-4">
-                    {/* Simple HTML/CSS Chart */}
-                    <div className="relative h-64 border border-border rounded-lg p-4">
-                      {/* Y-axis labels */}
-                      <div className="absolute left-0 top-0 bottom-0 w-16 flex flex-col justify-between text-xs text-muted-foreground">
-                        {(() => {
-                          const maxValue = Math.max(...chartData.map(d => Math.max(d.budgeted, d.spent)));
-                          const steps = 5;
-                          return Array.from({ length: steps + 1 }, (_, i) => {
-                            const value = (maxValue / steps) * (steps - i);
-                            return (
-                              <div key={i} className="flex items-center h-0">
-                                <span>{formatMoney(value)}</span>
-                              </div>
-                            );
-                          });
-                        })()}
-                      </div>
-                      
-                      {/* Chart bars */}
-                      <div className="ml-16 h-full flex items-end justify-around gap-2">
-                        {chartData.map((item, index) => {
-                          const maxValue = Math.max(...chartData.map(d => Math.max(d.budgeted, d.spent)));
-                          const budgetedHeight = (item.budgeted / maxValue) * 100;
-                          const spentHeight = (item.spent / maxValue) * 100;
-                          
-                          return (
-                            <div key={index} className="flex flex-col items-center flex-1">
-                              {/* Bars */}
-                              <div className="w-full flex flex-col items-center gap-1 mb-2">
-                                {/* Budgeted bar */}
-                                <div 
-                                  className="w-full bg-muted rounded-sm"
-                                  style={{ height: `${budgetedHeight}%` }}
-                                />
-                                {/* Spent bar */}
-                                <div 
-                                  className={`w-full rounded-sm ${
-                                    item.overBudget ? 'bg-destructive' : 'bg-primary'
-                                  }`}
-                                  style={{ height: `${spentHeight}%` }}
-                                />
-                              </div>
-                              
-                              {/* Category name */}
-                              <div className="text-xs text-center text-muted-foreground">
-                                {item.name.length > 8 ? item.name.slice(0, 8) + '...' : item.name}
-                              </div>
-                              
-                              {/* Values */}
-                              <div className="text-xs text-center mt-1">
-                                <div className="text-muted-foreground">
-                                  {formatMoney(item.spent)}
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                  / {formatMoney(item.budgeted)}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      
-                      {/* Legend */}
-                      <div className="absolute bottom-0 left-16 right-0 flex justify-center gap-4 text-xs">
-                        <div className="flex items-center gap-1">
-                          <div className="w-3 h-3 bg-muted rounded"></div>
-                          <span className="text-muted-foreground">Budgeted</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div className="w-3 h-3 bg-primary rounded"></div>
-                          <span className="text-muted-foreground">Spent</span>
-                        </div>
-                      </div>
-                    </div>
+                  <div className="h-80">
+                    <Bar
+                      data={{
+                        labels: chartData.map(item => item.name),
+                        datasets: [
+                          {
+                            label: 'Budgeted',
+                            data: chartData.map(item => item.budgeted),
+                            backgroundColor: 'hsl(var(--muted))',
+                            borderColor: 'hsl(var(--muted))',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                          },
+                          {
+                            label: 'Spent',
+                            data: chartData.map(item => item.spent),
+                            backgroundColor: chartData.map(item => 
+                              item.overBudget 
+                                ? 'hsl(var(--destructive))' 
+                                : 'hsl(var(--primary))'
+                            ),
+                            borderColor: chartData.map(item => 
+                              item.overBudget 
+                                ? 'hsl(var(--destructive))' 
+                                : 'hsl(var(--primary))'
+                            ),
+                            borderWidth: 1,
+                            borderRadius: 4,
+                          },
+                        ],
+                      }}
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                          legend: {
+                            position: 'top' as const,
+                            labels: {
+                              usePointStyle: true,
+                              padding: 20,
+                              color: 'hsl(var(--muted-foreground))',
+                            },
+                          },
+                          tooltip: {
+                            backgroundColor: 'hsl(var(--popover))',
+                            titleColor: 'hsl(var(--popover-foreground))',
+                            bodyColor: 'hsl(var(--popover-foreground))',
+                            borderColor: 'hsl(var(--border))',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            callbacks: {
+                              label: function(context) {
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.y;
+                                return `${label}: ${formatMoney(value)}`;
+                              },
+                            },
+                          },
+                        },
+                        scales: {
+                          x: {
+                            grid: {
+                              display: false,
+                            },
+                            ticks: {
+                              color: 'hsl(var(--muted-foreground))',
+                              font: {
+                                size: 12,
+                              },
+                            },
+                          },
+                          y: {
+                            grid: {
+                              color: 'hsl(var(--muted-foreground)/0.2)',
+                            },
+                            ticks: {
+                              color: 'hsl(var(--muted-foreground))',
+                              font: {
+                                size: 10,
+                              },
+                              callback: function(value) {
+                                return formatMoney(value as number);
+                              },
+                            },
+                          },
+                        },
+                        interaction: {
+                          intersect: false,
+                          mode: 'index' as const,
+                        },
+                      }}
+                    />
                   </div>
               ) : (
                 <div className="flex items-center justify-center h-full">
