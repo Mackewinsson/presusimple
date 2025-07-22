@@ -80,11 +80,10 @@ export default function BudgetDetailPage() {
     }
   };
 
-  // Prepare data for chart (same as Summary component)
+  // Prepare data for chart - show all categories with budgeted amounts
   const chartCategories = selectedBudget?.categories
-    .filter(cat => cat.spent > 0) // Only show categories with spending
-    .sort((a, b) => b.spent - a.spent) // Sort by spent amount (highest first)
-    .slice(0, 8) || []; // Show top 8 spending categories
+    .sort((a, b) => b.budgeted - a.budgeted) // Sort by budgeted amount (highest first)
+    .slice(0, 8) || []; // Show top 8 categories
 
   const chartData = chartCategories.map((category, index) => ({
     name: category.name,
@@ -93,7 +92,7 @@ export default function BudgetDetailPage() {
     overBudget: category.spent > category.budgeted,
   }));
 
-  const hasSpendingData = chartCategories.length > 0;
+  const hasSpendingData = selectedBudget && selectedBudget.categories.length > 0;
 
   if (budgetsLoading) {
     return (
@@ -333,6 +332,15 @@ export default function BudgetDetailPage() {
                           labels: chartData.map(item => item.name),
                           datasets: [
                             {
+                              label: 'Budgeted',
+                              data: chartData.map(item => item.budgeted),
+                              backgroundColor: themeColors.muted,
+                              borderColor: themeColors.muted,
+                              borderWidth: 1,
+                              borderRadius: 6,
+                              borderSkipped: false,
+                            },
+                            {
                               label: 'Spent',
                               data: chartData.map(item => item.spent),
                               backgroundColor: chartData.map((item, index) => 
@@ -356,7 +364,17 @@ export default function BudgetDetailPage() {
                           maintainAspectRatio: false,
                           plugins: {
                             legend: {
-                              display: false, // Hide legend since we only have one dataset
+                              display: true, // Show legend for both datasets
+                              position: 'top' as const,
+                              labels: {
+                                color: themeColors.foreground,
+                                font: {
+                                  size: 12,
+                                  weight: 'normal',
+                                },
+                                usePointStyle: true,
+                                padding: 20,
+                              },
                             },
                             tooltip: {
                               backgroundColor: themeColors.popover,
@@ -378,6 +396,20 @@ export default function BudgetDetailPage() {
                                   const label = context.dataset.label || '';
                                   const value = context.parsed.y;
                                   return `${label}: ${formatMoney(value)}`;
+                                },
+                                afterBody: function(context) {
+                                  const dataIndex = context[0].dataIndex;
+                                  const budgeted = chartData[dataIndex]?.budgeted || 0;
+                                  const spent = chartData[dataIndex]?.spent || 0;
+                                  const difference = spent - budgeted;
+                                  
+                                  if (context[0].dataset.label === 'Budgeted') {
+                                    return [
+                                      `Spent: ${formatMoney(spent)}`,
+                                      `Difference: ${formatMoney(difference)}`
+                                    ];
+                                  }
+                                  return [];
                                 },
                               },
                             },
