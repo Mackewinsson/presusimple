@@ -90,7 +90,14 @@ export async function POST(request: NextRequest) {
     console.log("Category saved:", savedCategory);
 
     // Update the budget's totalBudgeted to reflect the new category
-    const budget = await Budget.findOne({ "sections.name": sectionId });
+    // First try to find budget by section name
+    let budget = await Budget.findOne({ "sections.name": sectionId });
+    
+    // If not found, try to find budget by section ID (ObjectId)
+    if (!budget) {
+      budget = await Budget.findOne({ "sections._id": sectionId });
+    }
+    
     if (budget) {
       console.log("Found budget:", {
         _id: budget._id,

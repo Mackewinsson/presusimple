@@ -68,7 +68,7 @@ const BudgetSectionItem: React.FC<BudgetSectionItemProps> = ({
   const [isAddingCategory, setIsAddingCategory] = useState(false);
 
   const sectionCategories = categories.filter(
-    (category) => category.sectionId === (section.id || section._id)
+    (category) => category.sectionId === section.name
   );
   const totalBudgeted = sectionCategories.reduce(
     (sum, category) => sum + category.budgeted,
@@ -168,10 +168,10 @@ const BudgetSectionItem: React.FC<BudgetSectionItemProps> = ({
           <CardFooter className="flex justify-center pt-0 pb-4">
             {isAddingCategory ? (
               <NewCategoryForm
-                sectionId={section.id || section._id || ""}
+                sectionId={section.name}
                 onComplete={(name: string, budgeted: number) => {
                   onAddCategory(
-                    section.id || section._id || "",
+                    section.name,
                     name,
                     budgeted
                   );
