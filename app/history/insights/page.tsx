@@ -45,16 +45,9 @@ export default function InsightsPage() {
     userId || ""
   );
 
-  // Debug the userId issue
-  console.log('=== USER ID DEBUG ===');
-  console.log('userId:', userId);
-  console.log('userId type:', typeof userId);
-  console.log('userId truthy:', !!userId);
-
   // Force refetch if budgets is empty but userId is available
   useEffect(() => {
     if (userId && budgets.length === 0 && !budgetsLoading) {
-      console.log('Forcing refetch of budgets...');
       refetchBudgets();
     }
   }, [userId, budgets.length, budgetsLoading, refetchBudgets]);
@@ -287,27 +280,8 @@ export default function InsightsPage() {
             </Card>
           </div>
         ) : selectedBudget ? (
-          <div className="space-y-6">
-            {/* Debug Info Card */}
-            <Card className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800">
-              <CardHeader>
-                <CardTitle className="text-yellow-800 dark:text-yellow-200">Debug Information</CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm">
-                <div className="space-y-2">
-                  <div>Selected Budget: {selectedBudget.name}</div>
-                  <div>Total Expenses: {filteredExpenses.length}</div>
-                  <div>Total Categories: {allCategories.length}</div>
-                  <div>Monthly Categories: {selectedBudget.categories.length}</div>
-                  <div>Income Total: {formatMoney(incomeTotal)}</div>
-                  <div>Expense Total: {formatMoney(expenseTotal)}</div>
-                  <div>Final Expense Total: {formatMoney(finalExpenseTotal)}</div>
-                  <div>Monthly Budget Total Spent: {formatMoney(selectedBudget?.totalSpent || 0)}</div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Overview Cards */}
+                      <div className="space-y-6">
+              {/* Overview Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
                 <CardHeader>
