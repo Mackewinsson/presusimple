@@ -80,6 +80,7 @@ export default function InsightsPage() {
   console.log('Selected Budget:', selectedBudget);
   console.log('Filtered Expenses:', filteredExpenses);
   console.log('All Expenses:', allExpenses);
+  console.log('All Categories:', allCategories);
 
   // Calculate spent for each category from filtered expenses
   const categoriesWithSpent = (selectedBudget?.categories || []).map(
