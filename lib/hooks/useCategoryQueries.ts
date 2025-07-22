@@ -37,8 +37,8 @@ export const useCreateCategory = () => {
   return useMutation({
     mutationFn: categoryApi.createCategory,
     onSuccess: (data, variables) => {
-      // Invalidate and refetch category queries
-      queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
+      // Invalidate and refetch all category queries (including budget-specific ones)
+      queryClient.invalidateQueries({ queryKey: categoryKeys.all });
       // Also invalidate budget queries since categories affect budget totals
       queryClient.invalidateQueries({ queryKey: ["budgets"] });
       toast.success("Category created successfully");
@@ -60,8 +60,8 @@ export const useUpdateCategory = () => {
     onSuccess: (data, variables) => {
       // Update the cache directly
       queryClient.setQueryData(categoryKeys.detail(variables.id), data);
-      // Invalidate lists to refresh any list views
-      queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
+      // Invalidate all category queries to refresh any list views
+      queryClient.invalidateQueries({ queryKey: categoryKeys.all });
       // Also invalidate budget queries since categories affect budget totals
       queryClient.invalidateQueries({ queryKey: ["budgets"] });
       toast.success("Category updated successfully");
@@ -82,8 +82,8 @@ export const useDeleteCategory = () => {
     onSuccess: (_, id) => {
       // Remove from cache
       queryClient.removeQueries({ queryKey: categoryKeys.detail(id) });
-      // Invalidate lists
-      queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
+      // Invalidate all category queries
+      queryClient.invalidateQueries({ queryKey: categoryKeys.all });
       // Also invalidate budget queries since categories affect budget totals
       queryClient.invalidateQueries({ queryKey: ["budgets"] });
       toast.success("Category deleted successfully");

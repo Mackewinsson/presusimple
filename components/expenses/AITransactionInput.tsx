@@ -375,6 +375,14 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
     budget: budget || null
   });
 
+  // Force refetch categories when component mounts or budgetId changes
+  React.useEffect(() => {
+    if (budgetId && refetchCategories) {
+      console.log('Refetching categories for budget:', budgetId);
+      refetchCategories();
+    }
+  }, [budgetId, refetchCategories]);
+
   // Load budget data to get available budget
   const loadBudget = useCallback(async () => {
     if (!budgetId) return;
