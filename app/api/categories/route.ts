@@ -18,14 +18,14 @@ export async function GET(request: NextRequest) {
         return NextResponse.json([]);
       }
 
-      // Get section IDs from the budget
-      const sectionIds = budget.sections.map(
-        (section: any) => section._id || section.name
+      // Get section names from the budget
+      const sectionNames = budget.sections.map(
+        (section: any) => section.name
       );
 
-      // Filter categories by section IDs
+      // Filter categories by section names
       const categories = await Category.find({
-        sectionId: { $in: sectionIds },
+        sectionId: { $in: sectionNames },
       }).sort({ createdAt: -1 });
 
       return NextResponse.json(categories);
@@ -36,14 +36,14 @@ export async function GET(request: NextRequest) {
         return NextResponse.json([]);
       }
 
-      // Get section IDs from the budget
-      const sectionIds = budget.sections.map(
-        (section: any) => section._id || section.name
+      // Get section names from the budget
+      const sectionNames = budget.sections.map(
+        (section: any) => section.name
       );
 
-      // Filter categories by section IDs
+      // Filter categories by section names
       const categories = await Category.find({
-        sectionId: { $in: sectionIds },
+        sectionId: { $in: sectionNames },
       }).sort({ createdAt: -1 });
 
       return NextResponse.json(categories);
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     console.log("Category saved:", savedCategory);
 
     // Update the budget's totalBudgeted to reflect the new category
-    const budget = await Budget.findOne({ "sections._id": sectionId });
+    const budget = await Budget.findOne({ "sections.name": sectionId });
     if (budget) {
       console.log("Found budget:", {
         _id: budget._id,
@@ -99,11 +99,11 @@ export async function POST(request: NextRequest) {
       });
 
       // Get all categories for this budget
-      const sectionIds = budget.sections.map(
-        (section: any) => section._id || section.name
+      const sectionNames = budget.sections.map(
+        (section: any) => section.name
       );
       const allCategories = await Category.find({
-        sectionId: { $in: sectionIds },
+        sectionId: { $in: sectionNames },
       });
       
       console.log("All categories for budget:", allCategories.map(c => ({
