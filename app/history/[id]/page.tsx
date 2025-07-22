@@ -373,6 +373,15 @@ export default function BudgetDetailPage() {
                           labels: chartData.map(item => item.name),
                           datasets: [
                             {
+                              label: 'Budgeted',
+                              data: chartData.map(item => item.budgeted),
+                              backgroundColor: currentTheme === 'dark' ? '#374151' : '#E5E7EB', // Dark gray for dark mode, light gray for light mode
+                              borderColor: currentTheme === 'dark' ? '#6B7280' : '#9CA3AF',
+                              borderWidth: 2,
+                              borderRadius: 6,
+                              borderSkipped: false,
+                            },
+                            {
                               label: 'Spent',
                               data: chartData.map(item => item.spent),
                               backgroundColor: chartData.map((item, index) => 
@@ -418,6 +427,20 @@ export default function BudgetDetailPage() {
                                   const label = context.dataset.label || '';
                                   const value = context.parsed.y;
                                   return `${label}: ${formatMoney(value)}`;
+                                },
+                                afterBody: function(context) {
+                                  const dataIndex = context[0].dataIndex;
+                                  const budgeted = chartData[dataIndex]?.budgeted || 0;
+                                  const spent = chartData[dataIndex]?.spent || 0;
+                                  const difference = spent - budgeted;
+                                  
+                                  if (context[0].dataset.label === 'Budgeted') {
+                                    return [
+                                      `Spent: ${formatMoney(spent)}`,
+                                      `Difference: ${formatMoney(difference)}`
+                                    ];
+                                  }
+                                  return [];
                                 },
                               },
                             },
