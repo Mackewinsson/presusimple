@@ -289,8 +289,9 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
 
               
                               {hasSpendingData ? (
-                  <div className="h-80">
-                    <Bar
+                  <div className="h-80 overflow-x-auto">
+                    <div className="min-w-full" style={{ minWidth: `${Math.max(chartCategories.length * 120, 400)}px` }}>
+                      <Bar
                       data={{
                         labels: chartData.map(item => item.name),
                         datasets: [
@@ -391,8 +392,9 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                           duration: 750,
                           easing: 'easeInOutQuart',
                         },
-                      }}
-                    />
+                                              }}
+                      />
+                    </div>
                   </div>
               ) : (
                 <div className="flex items-center justify-center h-80">
