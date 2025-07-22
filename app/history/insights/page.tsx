@@ -71,8 +71,34 @@ export default function InsightsPage() {
   console.log('Sample Expense:', allExpenses[0]);
   console.log('Sample Category:', allCategories[0]);
 
-  // Simplified expense filtering - just get all expenses for now
-  const filteredExpenses = allExpenses;
+  // Filter expenses for the selected month/year
+  const selectedMonth = selectedBudget?.month;
+  const selectedYear = selectedBudget?.year;
+  
+  console.log('Selected Month:', selectedMonth);
+  console.log('Selected Year:', selectedYear);
+  
+  const filteredExpenses = allExpenses.filter((exp) => {
+    const expDate = new Date(exp.date);
+    const expMonth = expDate.getMonth() + 1; // 1-based month
+    const expYear = expDate.getFullYear();
+    
+    // Convert month name to number
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    const selectedMonthNumber = selectedMonth ? monthNames.indexOf(selectedMonth) + 1 : 0;
+    
+    const matchesMonth = expMonth === selectedMonthNumber;
+    const matchesYear = expYear === selectedYear;
+    
+    console.log(`Expense date: ${exp.date}, month: ${expMonth}, year: ${expYear}`);
+    console.log(`Selected month: ${selectedMonthNumber}, year: ${selectedYear}`);
+    console.log(`Matches: month=${matchesMonth}, year=${matchesYear}`);
+    
+    return matchesMonth && matchesYear;
+  });
   
   console.log('Filtered Expenses Count:', filteredExpenses.length);
   console.log('Sample Filtered Expense:', filteredExpenses[0]);
