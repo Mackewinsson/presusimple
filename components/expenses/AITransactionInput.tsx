@@ -875,7 +875,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
               ) : (
                 <>
                   <Sparkles className="h-4 w-4 mr-2 animate-pulse" />
-                  <span>✨ Transform with AI</span>
+                  <span>Transform with AI</span>
                 </>
               )}
             </Button>
