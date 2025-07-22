@@ -174,10 +174,17 @@ export function SpendingChart({
                     const difference = spent - budgeted;
                     
                     if (context[0].dataset.label === 'Budgeted') {
-                      return [
-                        `Spent: ${formatMoney(spent)}`,
-                        `Difference: ${formatMoney(difference)}`
-                      ];
+                      // Only show spent info if there's actual spent data
+                      if (spent > 0) {
+                        return [
+                          `Spent: ${formatMoney(spent)}`,
+                          `Difference: ${formatMoney(difference)}`
+                        ];
+                      } else {
+                        return [
+                          `No spending recorded yet`
+                        ];
+                      }
                     }
                     return [];
                   },
