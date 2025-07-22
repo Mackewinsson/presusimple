@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongoose";
 import Category from "@/models/Category";
 import Expense from "@/models/Expense";
+import Budget from "@/models/Budget";
 
 // PUT /api/categories/[id] - Update a category
 export async function PUT(
@@ -35,6 +36,28 @@ export async function PUT(
       );
     }
 
+    // Update the budget's totalBudgeted to reflect the updated category
+    const budget = await Budget.findOne({ "sections._id": updatedCategory.sectionId });
+    if (budget) {
+      // Get all categories for this budget
+      const sectionIds = budget.sections.map(
+        (section: any) => section._id || section.name
+      );
+      const allCategories = await Category.find({
+        sectionId: { $in: sectionIds },
+      });
+      
+      // Calculate total budgeted from all categories
+      const totalBudgeted = allCategories.reduce((sum, cat) => sum + cat.budgeted, 0);
+      
+      // Update budget totals
+      const totalBudgetAmount = budget.totalBudgeted + budget.totalAvailable;
+      await Budget.findByIdAndUpdate(budget._id, {
+        totalBudgeted: totalBudgeted,
+        totalAvailable: totalBudgetAmount - totalBudgeted,
+      });
+    }
+
     return NextResponse.json(updatedCategory);
   } catch (error) {
     console.error("Error updating category:", error);
@@ -54,6 +77,15 @@ export async function DELETE(
   try {
     await dbConnect();
 
+    // Get the category before deleting to know its sectionId
+    const categoryToDelete = await Category.findById(id);
+    if (!categoryToDelete) {
+      return NextResponse.json(
+        { error: "Category not found" },
+        { status: 404 }
+      );
+    }
+
     const deletedCategory = await Category.findByIdAndDelete(id);
 
     if (!deletedCategory) {
@@ -65,6 +97,28 @@ export async function DELETE(
 
     // Also delete all expenses with this categoryId
     await Expense.deleteMany({ categoryId: id });
+
+    // Update the budget's totalBudgeted to reflect the deleted category
+    const budget = await Budget.findOne({ "sections._id": categoryToDelete.sectionId });
+    if (budget) {
+      // Get all remaining categories for this budget
+      const sectionIds = budget.sections.map(
+        (section: any) => section._id || section.name
+      );
+      const allCategories = await Category.find({
+        sectionId: { $in: sectionIds },
+      });
+      
+      // Calculate total budgeted from remaining categories
+      const totalBudgeted = allCategories.reduce((sum, cat) => sum + cat.budgeted, 0);
+      
+      // Update budget totals
+      const totalBudgetAmount = budget.totalBudgeted + budget.totalAvailable;
+      await Budget.findByIdAndUpdate(budget._id, {
+        totalBudgeted: totalBudgeted,
+        totalAvailable: totalBudgetAmount - totalBudgeted,
+      });
+    }
 
     return NextResponse.json({ message: "Category deleted successfully" });
   } catch (error) {

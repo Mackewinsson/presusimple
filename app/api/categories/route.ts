@@ -76,6 +76,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log("=== CATEGORY CREATION DEBUG ===");
+    console.log("Creating category:", { name, budgeted, sectionId });
+
     const category = new Category({
       name,
       budgeted,
@@ -84,6 +87,60 @@ export async function POST(request: NextRequest) {
     });
 
     const savedCategory = await category.save();
+    console.log("Category saved:", savedCategory);
+
+    // Update the budget's totalBudgeted to reflect the new category
+    const budget = await Budget.findOne({ "sections._id": sectionId });
+    if (budget) {
+      console.log("Found budget:", {
+        _id: budget._id,
+        totalBudgeted: budget.totalBudgeted,
+        totalAvailable: budget.totalAvailable
+      });
+
+      // Get all categories for this budget
+      const sectionIds = budget.sections.map(
+        (section: any) => section._id || section.name
+      );
+      const allCategories = await Category.find({
+        sectionId: { $in: sectionIds },
+      });
+      
+      console.log("All categories for budget:", allCategories.map(c => ({
+        name: c.name,
+        budgeted: c.budgeted
+      })));
+      
+      // Calculate total budgeted from all categories
+      const totalBudgeted = allCategories.reduce((sum, cat) => sum + cat.budgeted, 0);
+      console.log("Total budgeted calculated:", totalBudgeted);
+      
+      // Update budget totals
+      const totalBudgetAmount = budget.totalBudgeted + budget.totalAvailable;
+      console.log("Total budget amount:", totalBudgetAmount);
+      
+      const newTotalAvailable = totalBudgetAmount - totalBudgeted;
+      console.log("New values to set:", {
+        totalBudgeted: totalBudgeted,
+        totalAvailable: newTotalAvailable
+      });
+
+      const updateResult = await Budget.findByIdAndUpdate(budget._id, {
+        totalBudgeted: totalBudgeted,
+        totalAvailable: newTotalAvailable,
+      }, { new: true });
+
+      console.log("Budget updated:", {
+        _id: updateResult._id,
+        totalBudgeted: updateResult.totalBudgeted,
+        totalAvailable: updateResult.totalAvailable
+      });
+    } else {
+      console.log("No budget found for sectionId:", sectionId);
+    }
+
+    console.log("=== CATEGORY CREATION DEBUG END ===");
+
     return NextResponse.json(savedCategory, { status: 201 });
   } catch (error) {
     console.error("Error creating category:", error);
