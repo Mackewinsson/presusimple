@@ -11,6 +11,8 @@ export interface IBudget extends Document {
   sections: ISection[];
   totalBudgeted: number;
   totalAvailable: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const SectionSchema = new Schema<ISection>({
@@ -24,6 +26,8 @@ const BudgetSchema = new Schema<IBudget>({
   sections: [SectionSchema],
   totalBudgeted: { type: Number, required: true },
   totalAvailable: { type: Number, required: true },
+}, {
+  timestamps: true // This adds createdAt and updatedAt fields
 });
 
 export default models.Budget || mongoose.model<IBudget>("Budget", BudgetSchema);

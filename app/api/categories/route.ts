@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     await dbConnect();
     const body = await request.json();
 
-    const { name, budgeted, sectionId } = body;
+    const { name, budgeted, sectionId, budgetId } = body;
 
     if (!name || budgeted === undefined || !sectionId) {
       return NextResponse.json(
@@ -75,6 +75,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    console.log("Category creation with budgetId:", budgetId);
 
     console.log("=== CATEGORY CREATION DEBUG ===");
     console.log("Creating category:", { name, budgeted, sectionId });
@@ -90,12 +92,23 @@ export async function POST(request: NextRequest) {
     console.log("Category saved:", savedCategory);
 
     // Update the budget's totalBudgeted to reflect the new category
-    // First try to find budget by section name
-    let budget = await Budget.findOne({ "sections.name": sectionId });
+    let budget;
     
-    // If not found, try to find budget by section ID (ObjectId)
-    if (!budget) {
-      budget = await Budget.findOne({ "sections._id": sectionId });
+    // If budgetId is provided, use that specific budget
+    if (budgetId) {
+      console.log("Looking for specific budget:", budgetId);
+      budget = await Budget.findById(budgetId);
+      console.log("Found budget by ID:", budget ? budget._id : "Not found");
+    } else {
+      // Fallback: try to find budget by section name
+      console.log("Looking for budget by section name:", sectionId);
+      budget = await Budget.findOne({ "sections.name": sectionId });
+      
+      // If not found, try to find budget by section ID (ObjectId)
+      if (!budget) {
+        budget = await Budget.findOne({ "sections._id": sectionId });
+      }
+      console.log("Found budget by section:", budget ? budget._id : "Not found");
     }
     
     if (budget) {

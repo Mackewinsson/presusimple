@@ -61,6 +61,7 @@ export const budgetApi = {
       throw new Error("Failed to fetch budget");
     }
     const budgets = await response.json();
+    // Return the most recent budget (first in the sorted list)
     return budgets[0] || null;
   },
 

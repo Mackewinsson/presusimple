@@ -20,8 +20,8 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // Filter by user
-    const budgets = await Budget.find({ user: userObjectId });
+    // Filter by user and sort by creation date (newest first)
+    const budgets = await Budget.find({ user: userObjectId }).sort({ createdAt: -1 });
     return NextResponse.json(budgets);
   } else {
     // Get all budgets (for admin purposes)

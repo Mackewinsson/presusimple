@@ -188,22 +188,20 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // If the sum doesn't match income, add the difference as "Savings"
-    if (Math.abs(totalCategories - budgetData.income) > 0.01) {
-      const difference = budgetData.income - totalCategories;
-      if (difference > 0) {
-        budgetData.categories.push({
-          name: "Savings",
-          amount: difference
-        });
-      }
-    }
+    // Don't automatically add savings - let the user decide
+    // The budget will have the remaining amount as available
 
     // Add sectionName to each category
     const categoriesWithSection = budgetData.categories.map((cat: any) => ({
       ...cat,
       sectionName: "General"
     }));
+
+    console.log('AI Budget Creation Response:', {
+      income: budgetData.income,
+      categories: categoriesWithSection,
+      totalCategories: categoriesWithSection.length
+    });
 
     return NextResponse.json({
       income: budgetData.income,

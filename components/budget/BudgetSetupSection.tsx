@@ -34,6 +34,7 @@ import {
   useUpdateBudget,
   useDeleteBudget,
 } from "@/lib/hooks";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAIBudgetCreation } from "@/lib/hooks/useAIBudgetCreation";
 import { LoadingButton } from "@/components/ui/loading-skeleton";
 import { useExpenses } from "@/lib/hooks/useExpenseQueries";
@@ -90,6 +91,8 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   } = useUserId();
   const { data: expenses = [] } = useExpenses(userId || "");
 
+  const queryClient = useQueryClient();
+  
   // React Query mutations
   const createBudgetMutation = useCreateBudget();
   const createCategoryMutation = useCreateCategory();
@@ -361,6 +364,15 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
         user: userId,
       });
       console.log("Budget created successfully");
+      
+      // Reset form after successful creation
+      setNewTotal("");
+      setNewMonth("January");
+      setNewYear(new Date().getFullYear());
+      
+      // Force refetch budget data to show the new budget
+      queryClient.invalidateQueries({ queryKey: ["budgets"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
     } catch (error) {
       console.error("Failed to create budget:", error);
       toast.error("Failed to create budget. Please try again.");
@@ -403,6 +415,10 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       
       toast.success("Budget created successfully with AI!");
       setAiDescription("");
+      
+      // Force refetch budget data to show the new budget
+      queryClient.invalidateQueries({ queryKey: ["budgets"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
     } catch (error) {
       console.error("Failed to create budget with AI:", error);
       
@@ -478,7 +494,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     return (
       <>
         <AILoading isProcessing={isAICreating} currentStep={currentStep} />
-        <Card className="glass-card hover-card group bg-gradient-to-br from-slate-900/90 via-purple-900/20 to-slate-900/90 border border-purple-500/20 shadow-2xl">
+        <Card className="glass-card hover-card group bg-gradient-to-br from-white via-purple-50/50 to-white dark:from-slate-900/90 dark:via-purple-900/20 dark:to-slate-900/90 border border-purple-500/20 shadow-2xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-xl">
             <div className="relative">

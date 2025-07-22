@@ -73,7 +73,7 @@ export const useAIBudgetCreation = () => {
   });
 
   const createCategory = useMutation({
-    mutationFn: async (data: CreateCategoryData) => {
+    mutationFn: async (data: CreateCategoryData & { budgetId?: string }) => {
       const response = await fetch('/api/categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -141,16 +141,28 @@ export const useAIBudgetCreation = () => {
       
       // Step 2: Create the budget (add delay to show animation)
       await new Promise(resolve => setTimeout(resolve, 1500)); // 1.5 second delay
+      
+      // Create a completely new budget with unique sections
+      const uniqueSections = aiData.sections.map(section => ({
+        name: `${section.name}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}` // Make section names completely unique
+      }));
+      
       const budgetData: CreateBudgetData = {
         user: userIdQuery.data!,
         month,
         year,
-        sections: aiData.sections,
-        totalBudgeted: aiData.income, // All income is budgeted to categories
-        totalAvailable: 0, // No money left to budget since all is allocated
+        sections: uniqueSections,
+        totalBudgeted: 0, // Start with 0 budgeted, will be updated after categories are created
+        totalAvailable: aiData.income, // All income is available to budget
       };
 
       const budget = await createBudget.mutateAsync(budgetData);
+      
+      console.log('Created new budget:', {
+        budgetId: budget._id,
+        sections: budget.sections,
+        totalAvailable: budget.totalAvailable
+      });
       
       // Edge case: Validate budget creation
       if (!budget || !budget._id) {
@@ -167,27 +179,29 @@ export const useAIBudgetCreation = () => {
         throw new Error('Budget created but no sections found. Please try again.');
       }
 
-      const categoryPromises = aiData.categories.map(async (category) => {
-        // Find the corresponding section name
-        const sectionIndex = aiData.sections.findIndex(s => s.name === category.sectionName);
+      const categoryPromises = aiData.categories.map(async (category, index) => {
+        // Use the corresponding unique section from the budget
+        const sectionName = budget.sections[index]?.name;
         
         // Edge case: Handle missing section
-        if (sectionIndex === -1) {
+        if (!sectionName) {
           throw new Error(`Category "${category.name}" references a section that doesn't exist.`);
         }
         
-        const sectionName = budget.sections[sectionIndex].name;
+        console.log('Creating category for new budget:', {
+          categoryName: category.name,
+          budgeted: category.amount,
+          sectionName: sectionName,
+          budgetId: budget._id,
+          sectionIndex: index
+        });
         
-        // Edge case: Validate section name
-        if (!sectionName) {
-          throw new Error(`Invalid section name for category "${category.name}".`);
-        }
-        
-        const categoryData: CreateCategoryData = {
+        const categoryData: CreateCategoryData & { budgetId: string } = {
           name: category.name,
           budgeted: category.amount,
           spent: 0,
-          sectionId: sectionName, // Use section name instead of _id
+          sectionId: sectionName, // Use the exact unique section name
+          budgetId: budget._id, // Pass the specific budget ID
         };
 
         return createCategory.mutateAsync(categoryData);
@@ -199,6 +213,27 @@ export const useAIBudgetCreation = () => {
       if (createdCategories.length !== aiData.categories.length) {
         throw new Error('Some categories failed to create. Please try again.');
       }
+
+      // Update budget totals after categories are created
+      const totalBudgeted = createdCategories.reduce((sum, cat) => sum + cat.budgeted, 0);
+      const totalAvailable = aiData.income - totalBudgeted;
+      
+      // Update the budget with the new totals
+      await fetch(`/api/budgets/${budget._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          totalBudgeted: totalBudgeted,
+          totalAvailable: totalAvailable,
+        }),
+      });
+      
+      console.log('AI Budget Creation Complete:', {
+        budgetId: budget._id,
+        totalBudgeted,
+        totalAvailable,
+        categoriesCreated: createdCategories.length
+      });
 
       setCurrentStep("complete");
       
