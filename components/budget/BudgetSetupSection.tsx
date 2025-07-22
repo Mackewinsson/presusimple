@@ -249,14 +249,19 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   // Update total budget
   const handleSetTotalBudget = async () => {
     if (!budget) return;
+    
+    console.log("Setting total budget:", {
+      inputValue: totalBudget,
+      currentBudget: budget,
+      currentlyBudgeted: budget.totalBudgeted || 0
+    });
+    
     const amount = parseFloat(totalBudget);
     if (isNaN(amount) || amount < 0) {
       toast.error("Please enter a valid amount");
       return;
     }
 
-    const currentTotal =
-      (budget.totalBudgeted || 0) + (budget.totalAvailable || 0);
     const currentlyBudgeted = budget.totalBudgeted || 0;
 
     if (amount < currentlyBudgeted) {
@@ -264,17 +269,29 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       return;
     }
 
-    await updateBudgetMutation.mutateAsync({
+    console.log("Updating budget with:", {
       id: budget._id,
-      updates: {
-        ...budget,
-        totalBudgeted: currentlyBudgeted, // Keep currently budgeted amount
-        totalAvailable: amount - currentlyBudgeted, // Adjust available amount
-      },
+      totalBudgeted: currentlyBudgeted,
+      totalAvailable: amount - currentlyBudgeted
     });
 
-    setIsEditingTotal(false);
-    setTotalBudget("");
+    try {
+      await updateBudgetMutation.mutateAsync({
+        id: budget._id,
+        updates: {
+          ...budget,
+          totalBudgeted: currentlyBudgeted, // Keep currently budgeted amount
+          totalAvailable: amount - currentlyBudgeted, // Adjust available amount
+        },
+      });
+
+      console.log("Budget updated successfully");
+      setIsEditingTotal(false);
+      setTotalBudget("");
+    } catch (error) {
+      console.error("Failed to update budget:", error);
+      toast.error("Failed to update budget. Please try again.");
+    }
   };
 
   // Add a new section
@@ -704,7 +721,10 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
               </div>
             ) : (
               <div
-                onClick={() => setIsEditingTotal(true)}
+                onClick={() => {
+                  setIsEditingTotal(true);
+                  setTotalBudget((calculatedTotalBudgeted + (budget?.totalAvailable || 0)).toString());
+                }}
                 className="p-3 rounded-lg bg-slate-900/10 dark:bg-white/10 hover:bg-slate-900/20 dark:hover:bg-white/20 transition-all duration-200 cursor-pointer border border-slate-900/20 dark:border-white/20"
               >
                 <div className="text-base sm:text-lg font-medium text-slate-900 dark:text-white">
