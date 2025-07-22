@@ -63,20 +63,13 @@ export default function BudgetDetailPage() {
     }
   };
 
-  // Calculate spent for each category from expenses (like main app)
+  // Use the saved spent data from the monthly budget instead of recalculating from current expenses
   const categoriesWithSpent = selectedBudget?.categories.map((category) => {
-    const spent = expenses
-      .filter((exp) => {
-        // Find the category by ID and then match by name
-        const categoryObj = categories.find(cat => cat._id === exp.categoryId);
-        return categoryObj?.name === category.name;
-      })
-      .reduce((sum, exp) => {
-        if (exp.type === "expense") return sum + exp.amount;
-        if (exp.type === "income") return sum - exp.amount;
-        return sum;
-      }, 0);
-    return { ...category, spent };
+    // Use the saved spent amount from the monthly budget
+    return { 
+      ...category, 
+      spent: category.spent || 0 
+    };
   }) || [];
 
   // Get top spending categories for chart

@@ -74,6 +74,18 @@ const ResetButton: React.FC<ResetButtonProps> = ({
         );
       }, 0);
 
+      // Calculate spent for each category from expenses
+      const categoriesWithSpent = categories.map((category) => {
+        const spent = expenses
+          .filter((exp) => exp.categoryId === (category._id || category.id))
+          .reduce((sum, exp) => {
+            if (exp.type === "expense") return sum + exp.amount;
+            if (exp.type === "income") return sum - exp.amount;
+            return sum;
+          }, 0);
+        return { ...category, spent };
+      });
+
       // Convert month number to month name
       const monthNames = [
         "January",
@@ -91,12 +103,12 @@ const ResetButton: React.FC<ResetButtonProps> = ({
       ];
       const monthNameFromNumber = monthNames[budget.month - 1] || "Unknown";
 
-      // First, save the current month's data
+      // First, save the current month's data with calculated spent amounts
       await saveMonthlyBudgetMutation.mutateAsync({
         name: monthName,
         month: monthNameFromNumber,
         year: budget.year,
-        categories: categories.map((cat) => ({
+        categories: categoriesWithSpent.map((cat) => ({
           name: cat.name,
           budgeted: cat.budgeted,
           spent: cat.spent,
