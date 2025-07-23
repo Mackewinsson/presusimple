@@ -25,6 +25,7 @@ export default function WelcomePage() {
   const { data: user, isLoading } = useUserData();
   const [currentStep, setCurrentStep] = useState(0);
   const [showWelcome, setShowWelcome] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     if (!session) {
@@ -32,15 +33,21 @@ export default function WelcomePage() {
       return;
     }
 
-    // Auto-advance steps
+    // Auto-advance steps with different timing for the last step
+    const delay = currentStep === 3 ? 5000 : 3000; // 5 seconds for last step
+    
     const timer = setTimeout(() => {
       if (currentStep < 3) {
         setCurrentStep(currentStep + 1);
       } else {
-        setShowWelcome(false);
-        router.push("/app");
+        // Add smooth transition for the last step
+        setIsTransitioning(true);
+        setTimeout(() => {
+          setShowWelcome(false);
+          router.push("/app");
+        }, 500); // 500ms transition delay
       }
-    }, 3000);
+    }, delay);
 
     return () => clearTimeout(timer);
   }, [currentStep, session]);
@@ -77,7 +84,9 @@ export default function WelcomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4 pt-20">
+    <div className={`min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4 pt-20 transition-opacity duration-500 ${
+      isTransitioning ? 'opacity-0' : 'opacity-100'
+    }`}>
       <div className="w-full max-w-2xl space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
@@ -172,9 +181,10 @@ export default function WelcomePage() {
             onClick={() => router.push("/app")}
             className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold px-8 py-3"
             size="lg"
+            disabled={currentStep === 3 && isTransitioning}
           >
             <Sparkles className="h-4 w-4 mr-2" />
-            Start Budgeting Now
+            {currentStep === 3 && isTransitioning ? "Redirecting..." : "Start Budgeting Now"}
             <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
         </div>
