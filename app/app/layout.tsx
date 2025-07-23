@@ -1,7 +1,6 @@
 import { Settings } from "lucide-react";
 import Link from "next/link";
 import CurrencySelector from "@/components/CurrencySelector";
-import GlobalHeader from "@/components/GlobalHeader";
 
 export default function BudgetLayout({
   children,
@@ -10,7 +9,6 @@ export default function BudgetLayout({
 }) {
   return (
     <>
-      <GlobalHeader />
       <div className="fixed bottom-3 sm:bottom-4 right-3 sm:right-4 z-50 flex items-center gap-2">
         <CurrencySelector />
         <Link

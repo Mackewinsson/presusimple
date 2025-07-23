@@ -39,7 +39,11 @@ const SubscriptionButton = () => {
 
   // Don't render anything while loading to prevent flashing
   if (isLoading) {
-    return null;
+    return (
+      <div className="w-full">
+        <div className="h-20 bg-muted animate-pulse rounded-lg" />
+      </div>
+    );
   }
 
   const trialDaysLeft = calculateTrialDaysLeft(subscription?.trialEnd || null);
@@ -55,14 +59,6 @@ const SubscriptionButton = () => {
       return () => clearTimeout(timer);
     }
   }, [subscriptionStatus, showThankYou]);
-
-  if (isLoading) {
-    return (
-      <div className="w-full">
-        <div className="h-20 bg-muted animate-pulse rounded-lg" />
-      </div>
-    );
-  }
 
   // User is paid - show brief thank you message then hide
   if (subscriptionStatus === "paid") {

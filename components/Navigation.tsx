@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import SignOutButton from "@/components/SignOutButton";
 
 export default function Navigation() {
   const { data: session, status } = useSession();
@@ -25,12 +26,12 @@ export default function Navigation() {
                 >
                   Dashboard
                 </Link>
-                <button
-                  onClick={() => signOut({ callbackUrl: "/" })}
+                <SignOutButton
+                  variant="default"
+                  size="sm"
+                  showText={true}
                   className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500"
-                >
-                  Sign Out
-                </button>
+                />
               </>
             ) : (
               <Link

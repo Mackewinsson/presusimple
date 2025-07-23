@@ -14,6 +14,7 @@ import SubscriptionButton from "@/components/SubscriptionButton";
 import AccessRestricted from "@/components/AccessRestricted";
 import { TrialStatus } from "@/components/TrialStatus";
 import { DollarSign, History, AlertTriangle } from "lucide-react";
+import SignOutButton from "@/components/SignOutButton";
 import {
   useUserId,
   useBudget,
@@ -120,6 +121,13 @@ export default function BudgetApp() {
               </span>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
+              <ThemeToggle />
+              <SignOutButton
+                variant="outline"
+                size="sm"
+                showText={true}
+                className="flex items-center gap-1.5 sm:gap-2 text-slate-700 dark:text-white/70 hover:text-slate-900 dark:hover:text-white border-slate-300/50 dark:border-white/20 bg-white/50 dark:bg-white/10 backdrop-blur-sm"
+              />
               <Link
                 href="/history"
                 className="flex items-center gap-1.5 sm:gap-2 text-slate-700 dark:text-white/70 hover:text-slate-900 dark:hover:text-white transition-colors"
