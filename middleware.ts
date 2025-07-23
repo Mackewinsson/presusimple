@@ -4,11 +4,17 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Debug logging
+  console.log('Middleware - Pathname:', pathname);
+
   // Define protected routes
   const protectedRoutes = ["/app", "/dashboard", "/history", "/admin"];
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route)
   );
+
+  // Special handling for welcome page - allow access for authenticated users
+  const isWelcomePage = pathname === "/app/welcome";
 
   // Define auth routes
   const authRoutes = ["/auth"];
@@ -19,6 +25,8 @@ export async function middleware(request: NextRequest) {
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
   });
+
+  console.log('Middleware - Token:', !!token, 'IsWelcomePage:', isWelcomePage);
 
   // Redirect to login if accessing protected route without token
   if (isProtectedRoute && !token) {
@@ -32,8 +40,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/app", request.url));
   }
 
-  // Redirect to app if accessing home page with valid token
-  if (pathname === "/" && token) {
+  // Redirect to app if accessing home page with valid token (but not welcome page)
+  if (pathname === "/" && token && !isWelcomePage) {
     return NextResponse.redirect(new URL("/app", request.url));
   }
 
