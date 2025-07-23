@@ -381,7 +381,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       console.log('Refetching categories for budget:', budgetId);
       refetchCategories();
     }
-  }, [budgetId, refetchCategories]);
+  }, [budgetId]);
 
   // Load budget data to get available budget
   const loadBudget = useCallback(async () => {

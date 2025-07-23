@@ -118,7 +118,7 @@ const Carousel = React.forwardRef<
       return () => {
         api?.off('select', onSelect);
       };
-    }, [api, onSelect]);
+    }, [api]);
 
     return (
       <CarouselContext.Provider

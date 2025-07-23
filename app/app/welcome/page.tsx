@@ -28,7 +28,7 @@ export default function WelcomePage() {
 
   useEffect(() => {
     if (!session) {
-              router.replace("/auth/login");
+      router.replace("/auth/login");
       return;
     }
 
@@ -43,7 +43,7 @@ export default function WelcomePage() {
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [currentStep, session, router]);
+  }, [currentStep, session]);
 
   const steps = [
     {
