@@ -28,10 +28,7 @@ export default function WelcomePage() {
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
-    console.log('Welcome useEffect - Session:', !!session, 'CurrentStep:', currentStep);
-    
     if (!session) {
-      console.log('Welcome - No session, redirecting to login');
       router.replace("/auth/login");
       return;
     }
@@ -41,11 +38,9 @@ export default function WelcomePage() {
     
     const timer = setTimeout(() => {
       if (currentStep < 3) {
-        console.log('Welcome - Advancing to step:', currentStep + 1);
         setCurrentStep(currentStep + 1);
       } else {
         // Add smooth transition for the last step
-        console.log('Welcome - Last step reached, transitioning to /app');
         setIsTransitioning(true);
         setTimeout(() => {
           setShowWelcome(false);

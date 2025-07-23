@@ -4,9 +4,6 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Debug logging
-  console.log('Middleware - Pathname:', pathname);
-
   // Define protected routes
   const protectedRoutes = ["/app", "/dashboard", "/history", "/admin"];
   const isProtectedRoute = protectedRoutes.some((route) =>
@@ -25,8 +22,6 @@ export async function middleware(request: NextRequest) {
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
   });
-
-  console.log('Middleware - Token:', !!token, 'IsWelcomePage:', isWelcomePage);
 
   // Redirect to login if accessing protected route without token
   if (isProtectedRoute && !token) {
