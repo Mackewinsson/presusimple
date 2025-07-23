@@ -32,6 +32,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/app", request.url));
   }
 
+  // Redirect to app if accessing home page with valid token
+  if (pathname === "/" && token) {
+    return NextResponse.redirect(new URL("/app", request.url));
+  }
+
   // Add security headers
   const response = NextResponse.next();
   
