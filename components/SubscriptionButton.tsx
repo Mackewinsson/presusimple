@@ -58,7 +58,7 @@ const SubscriptionButton = () => {
       }, 5000); // Show for 5 seconds
       return () => clearTimeout(timer);
     }
-  }, [subscriptionStatus, showThankYou]);
+  }, [subscriptionStatus]);
 
   // User is paid - show brief thank you message then hide
   if (subscriptionStatus === "paid") {
