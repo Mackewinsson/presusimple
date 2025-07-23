@@ -44,12 +44,21 @@ export default function ResetPasswordPage() {
       </CardContent>
       <CardFooter>
         <Link 
-          href="/auth/login"
+          href="/auth/login" 
           className="text-sm text-muted-foreground hover:text-foreground flex items-center"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to login
         </Link>
+        <div className="text-center text-sm">
+          <span className="mr-1">Remember your password?</span>
+          <Link 
+            href="/auth/login" 
+            className="text-primary hover:underline"
+          >
+            Sign in
+          </Link>
+        </div>
       </CardFooter>
     </Card>
   );

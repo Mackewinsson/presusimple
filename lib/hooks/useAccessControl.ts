@@ -14,6 +14,7 @@ export interface AccessControl {
   isPaid: boolean;
   isInTrial: boolean;
   hasNoSubscription: boolean;
+  isLoading: boolean;
 }
 
 export function useAccessControl(): AccessControl {
@@ -32,7 +33,8 @@ export function useAccessControl(): AccessControl {
       isTrialExpired: false,
       isPaid: false,
       isInTrial: false,
-      hasNoSubscription: true,
+      hasNoSubscription: false,
+      isLoading: true,
     };
   }
 
@@ -61,5 +63,6 @@ export function useAccessControl(): AccessControl {
     isPaid,
     isInTrial,
     hasNoSubscription,
+    isLoading: false,
   };
 }

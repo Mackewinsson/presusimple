@@ -1,5 +1,7 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import { dbConnect } from "@/lib/mongoose";
+import User from "@/models/User";
 
 const handler = NextAuth({
   providers: [
@@ -9,21 +11,67 @@ const handler = NextAuth({
     }),
   ],
   pages: {
-    signIn: "/auth/signin",
+    signIn: "/auth/login",
   },
   session: {
     strategy: "jwt",
   },
   callbacks: {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === "google") {
+        try {
+          await dbConnect();
+          
+          // Check if user already exists
+          const existingUser = await User.findOne({ email: user.email });
+          
+          if (!existingUser) {
+            // Create new user with trial activation
+            const trialEnd = new Date();
+            trialEnd.setDate(trialEnd.getDate() + 30); // 30-day trial
+            
+            const newUser = new User({
+              email: user.email,
+              name: user.name,
+              isPaid: false,
+              plan: "pro", // Trial users get pro features
+              trialStart: new Date(),
+              trialEnd: trialEnd,
+              subscriptionType: "trial_signup",
+            });
+            
+            await newUser.save();
+            console.log("New user created with trial:", user.email);
+            
+            // Add a flag to indicate this is a new user
+            user.isNewUser = true;
+          }
+          
+          return true;
+        } catch (error) {
+          console.error("Error during sign in:", error);
+          return false;
+        }
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.user = user;
+        // Preserve the isNewUser flag
+        if (user.isNewUser) {
+          token.isNewUser = true;
+        }
       }
       return token;
     },
     async session({ session, token }) {
       if (token.user) {
         session.user = token.user;
+      }
+      // Add isNewUser to session
+      if (token.isNewUser) {
+        session.isNewUser = true;
       }
       return session;
     },

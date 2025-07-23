@@ -37,6 +37,11 @@ const SubscriptionButton = () => {
     }
   };
 
+  // Don't render anything while loading to prevent flashing
+  if (isLoading) {
+    return null;
+  }
+
   const trialDaysLeft = calculateTrialDaysLeft(subscription?.trialEnd || null);
   const subscriptionStatus = getSubscriptionStatus(subscription || {});
 

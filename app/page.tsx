@@ -43,7 +43,7 @@ export default function LandingPage() {
                 </button>
               ) : (
                 <Link
-                  href="/auth/signin"
+                  href="/auth/login"
                   className="inline-flex items-center gap-1.5 bg-white/10 dark:bg-white/10 backdrop-blur-sm text-slate-900 dark:text-white border border-gray-300/50 dark:border-white/20 px-2 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-white/20 dark:hover:bg-white/20 transition-all duration-200 text-xs sm:text-sm"
                 >
                   <span className="hidden sm:inline">Sign In</span>
@@ -55,7 +55,7 @@ export default function LandingPage() {
                   if (session) {
                     window.location.href = "/app";
                   } else {
-                    window.location.href = "/auth/signin";
+                    window.location.href = "/auth/login";
                   }
                 }}
                 className="inline-flex items-center gap-1.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-2 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-slate-800 dark:hover:bg-gray-100 transition-all duration-200 text-xs sm:text-sm shadow-lg font-medium"
@@ -85,7 +85,7 @@ export default function LandingPage() {
                 if (session) {
                   window.location.href = "/app";
                 } else {
-                  window.location.href = "/auth/signin";
+                  window.location.href = "/auth/login";
                 }
               }}
               className="inline-flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2.5 sm:px-5 md:px-6 sm:py-3 rounded-lg text-sm sm:text-base md:text-lg font-medium hover:bg-slate-800 dark:hover:bg-gray-100 transition-all duration-200 shadow-lg transform hover:scale-105"

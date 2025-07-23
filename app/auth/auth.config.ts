@@ -9,7 +9,7 @@ export const authConfig = {
     }),
   ],
   pages: {
-    signIn: "/auth/signin",
+    signIn: "/auth/login",
   },
   callbacks: {
     authorized({ auth, request: { nextUrl } }: any) {

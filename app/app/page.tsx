@@ -12,6 +12,7 @@ import Summary from "@/components/Summary";
 import ThemeToggle from "@/components/ThemeToggle";
 import SubscriptionButton from "@/components/SubscriptionButton";
 import AccessRestricted from "@/components/AccessRestricted";
+import { TrialStatus } from "@/components/TrialStatus";
 import { DollarSign, History, AlertTriangle } from "lucide-react";
 import {
   useUserId,
@@ -22,6 +23,7 @@ import {
 } from "@/lib/hooks";
 import { useAccessControl } from "@/lib/hooks/useAccessControl";
 import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
+import { useUserData } from "@/lib/hooks/useUserData";
 import { AppLoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getSubscriptionStatus } from "@/lib/utils";
@@ -34,6 +36,9 @@ export default function BudgetApp() {
 
   // Get user ID using React Query
   const { data: userId, isLoading: userIdLoading } = useUserId();
+
+  // Get user data for trial/subscription status
+  const { data: user, isLoading: userLoading } = useUserData();
 
   // Get data using React Query
   const { data: budget, isLoading: budgetLoading } = useBudget(userId || "");
@@ -49,82 +54,47 @@ export default function BudgetApp() {
 
   // Check if any data is loading
   const isLoading =
-    userIdLoading || budgetLoading || categoriesLoading || expensesLoading;
+    userIdLoading || 
+    userLoading || 
+    budgetLoading || 
+    categoriesLoading || 
+    expensesLoading;
 
   React.useEffect(() => {
     if (status === "loading") return;
     if (!session) {
-      router.replace("/auth/signin");
+              router.replace("/auth/login");
       return;
     }
-  }, [session, status, router]);
+
+    // Check if user is new and redirect to welcome page
+    if (session.isNewUser && !userLoading) {
+      router.replace("/app/welcome");
+      return;
+    }
+  }, [session, status, router, userLoading]);
 
   if (status === "loading" || !session) {
     return <AppLoadingSkeleton />;
   }
 
+  // Show loading skeleton while user data is being fetched
   if (isLoading) {
     return <AppLoadingSkeleton />;
   }
 
+  // Only check subscription status after user data has loaded
   const subscriptionStatus = getSubscriptionStatus(subscription || {});
   const trialExpired = subscriptionStatus === "expired";
   const hasNoSubscription = subscriptionStatus === "none";
 
-  // Show access restricted if user has no access
-  if (accessControl.isTrialExpired) {
+  // Show access restricted for trial expired or no subscription
+  // But only after we've confirmed the user data has loaded and access control is not loading
+  if (!userLoading && !accessControl.isLoading && (trialExpired || hasNoSubscription)) {
     return (
-      <div className="min-h-screen gradient-bg-dark">
-        <header className="border-b border-slate-300/50 dark:border-white/10 bg-white/5 dark:bg-white/5 backdrop-blur-xl sticky top-0 z-50">
-          <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
-            <div className="flex items-center justify-between">
-              <Link
-                href="/"
-                className="flex items-center gap-2 sm:gap-3 w-fit hover:opacity-90 transition-opacity"
-              >
-                <div className="bg-white dark:bg-white text-slate-900 p-1.5 sm:p-2 rounded-xl shadow-lg">
-                  <DollarSign className="h-4 w-4 sm:h-6 sm:w-6" />
-                </div>
-                <h1 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                  Simple Budget
-                </h1>
-              </Link>
-              <ThemeToggle />
-            </div>
-          </div>
-        </header>
-        <main className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8">
-          <AccessRestricted reason="trial_expired" />
-        </main>
-      </div>
-    );
-  }
-
-  if (accessControl.hasNoSubscription) {
-    return (
-      <div className="min-h-screen gradient-bg-dark">
-        <header className="border-b border-slate-300/50 dark:border-white/10 bg-white/5 dark:bg-white/5 backdrop-blur-xl sticky top-0 z-50">
-          <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
-            <div className="flex items-center justify-between">
-              <Link
-                href="/"
-                className="flex items-center gap-2 sm:gap-3 w-fit hover:opacity-90 transition-opacity"
-              >
-                <div className="bg-white dark:bg-white text-slate-900 p-1.5 sm:p-2 rounded-xl shadow-lg">
-                  <DollarSign className="h-4 w-4 sm:h-6 sm:w-6" />
-                </div>
-                <h1 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                  Simple Budget
-                </h1>
-              </Link>
-              <ThemeToggle />
-            </div>
-          </div>
-        </header>
-        <main className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8">
-          <AccessRestricted reason="no_subscription" />
-        </main>
-      </div>
+      <AccessRestricted
+        reason={trialExpired ? "trial_expired" : "no_subscription"}
+      />
     );
   }
 
@@ -133,19 +103,23 @@ export default function BudgetApp() {
       <header className="border-b border-slate-300/50 dark:border-white/10 bg-white/5 dark:bg-white/5 backdrop-blur-xl sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <Link
-              href="/"
-              className="flex items-center gap-2 sm:gap-3 w-fit hover:opacity-90 transition-opacity"
-            >
-              <div className="bg-white dark:bg-white text-slate-900 p-1.5 sm:p-2 rounded-xl shadow-lg">
-                <DollarSign className="h-4 w-4 sm:h-6 sm:w-6" />
-              </div>
-              <h1 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                Simple Budget
-              </h1>
-            </Link>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Link
+                href="/"
+                className="flex items-center gap-2 sm:gap-3 w-fit hover:opacity-90 transition-opacity"
+              >
+                <div className="bg-white dark:bg-white text-slate-900 p-1.5 sm:p-2 rounded-xl shadow-lg">
+                  <DollarSign className="h-4 w-4 sm:h-6 sm:w-6" />
+                </div>
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                  Simple Budget
+                </h1>
+              </Link>
+              <span className="text-sm sm:text-base text-slate-600 dark:text-white/70">
+                Welcome back, {session?.user?.name}!
+              </span>
+            </div>
             <div className="flex items-center gap-2 sm:gap-4">
-              <ThemeToggle />
               <Link
                 href="/history"
                 className="flex items-center gap-1.5 sm:gap-2 text-slate-700 dark:text-white/70 hover:text-slate-900 dark:hover:text-white transition-colors"
@@ -161,16 +135,8 @@ export default function BudgetApp() {
       </header>
 
       <main className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8">
-        {/* Trial Expiration Warning */}
-        {trialExpired && (
-          <Alert className="mb-6 border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20">
-            <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
-            <AlertDescription className="text-red-800 dark:text-red-200">
-              Your free trial has expired. Upgrade to continue using all
-              features!
-            </AlertDescription>
-          </Alert>
-        )}
+        {/* Trial Status */}
+        <TrialStatus />
 
         <div className="grid gap-4 sm:gap-6 md:gap-8 grid-cols-1 xl:grid-cols-2">
           <div className="space-y-4 sm:space-y-6 md:space-y-8">

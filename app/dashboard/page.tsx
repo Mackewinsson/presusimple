@@ -15,7 +15,7 @@ export default function Dashboard() {
   }
 
   if (status === "unauthenticated") {
-    redirect("/auth/signin");
+    redirect("/auth/login");
   }
 
   return (

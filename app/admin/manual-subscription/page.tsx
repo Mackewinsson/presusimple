@@ -37,7 +37,7 @@ export default function ManualSubscriptionPage() {
     if (status === "loading") return;
 
     if (!session) {
-      router.replace("/auth/signin");
+              router.replace("/auth/login");
       return;
     }
 

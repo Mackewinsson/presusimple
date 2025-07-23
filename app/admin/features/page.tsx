@@ -15,7 +15,7 @@ export default function FeaturesAdminPage() {
   React.useEffect(() => {
     if (status === "loading") return;
     if (!session) {
-      router.replace("/auth/signin");
+              router.replace("/auth/login");
       return;
     }
   }, [session, status, router]);

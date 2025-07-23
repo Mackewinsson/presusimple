@@ -34,7 +34,7 @@ export default function Navigation() {
               </>
             ) : (
               <Link
-                href="/auth/signin"
+                href="/auth/login"
                 className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500"
               >
                 Sign In
