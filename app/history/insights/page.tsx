@@ -50,7 +50,7 @@ function InsightsContent() {
     if (userId && budgets.length === 0 && !budgetsLoading) {
       refetchBudgets();
     }
-  }, [userId, budgets.length, budgetsLoading, refetchBudgets]);
+  }, [userId, budgets.length, budgetsLoading]);
   const searchParams = useSearchParams();
   const [selectedBudgetId, setSelectedBudgetId] = useState<string>("");
 
@@ -62,7 +62,7 @@ function InsightsContent() {
     } else if (budgets.length > 0 && !selectedBudgetId) {
       setSelectedBudgetId(budgets[0]._id);
     }
-  }, [budgets, searchParams, selectedBudgetId]);
+  }, [budgets, searchParams]);
 
   const selectedBudget = budgets.find((b) => b._id === selectedBudgetId);
 

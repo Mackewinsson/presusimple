@@ -402,7 +402,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
     if (budgetId) {
       loadBudget();
     }
-  }, [budgetId, loadBudget]);
+  }, [budgetId]);
 
   const parseTransactions = useMutation({
     mutationFn: async (description: string) => {
