@@ -24,27 +24,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="light">
+    <html lang="en">
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var theme = localStorage.getItem('theme');
-                  if (theme === 'light' || theme === 'dark') {
-                    document.documentElement.classList.remove('light', 'dark');
-                    document.documentElement.classList.add(theme);
-                  } else {
-                    var systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                    document.documentElement.classList.remove('light', 'dark');
-                    document.documentElement.classList.add(systemTheme);
-                  }
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
+        {/* Theme will be handled by ThemeProvider to prevent hydration mismatches */}
       </head>
       <body className={inter.className}>
         <ThemeProvider>
