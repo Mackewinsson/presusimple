@@ -45,6 +45,24 @@ const handler = NextAuth({
             
             // Add a flag to indicate this is a new user
             user.isNewUser = true;
+          } else {
+            // Handle existing users who don't have trial data
+            if (!existingUser.trialEnd && !existingUser.isPaid) {
+              // Give existing users a trial if they don't have one
+              const trialEnd = new Date();
+              trialEnd.setDate(trialEnd.getDate() + 30); // 30-day trial
+              
+              existingUser.plan = "pro";
+              existingUser.trialStart = new Date();
+              existingUser.trialEnd = trialEnd;
+              existingUser.subscriptionType = "trial_signup";
+              
+              await existingUser.save();
+              console.log("Existing user given trial:", user.email);
+              
+              // Add a flag to indicate this is a returning user getting trial
+              user.isNewUser = true;
+            }
           }
           
           return true;
@@ -77,9 +95,8 @@ const handler = NextAuth({
     },
     async redirect({ url, baseUrl }) {
       // For new users, redirect to welcome page
-      if (url.includes("isNewUser=true") || url.includes("callbackUrl=/app/welcome")) {
-        return `${baseUrl}/app/welcome`;
-      }
+      // We'll let the app handle the redirect logic since we can't access session here
+      // The app will check session.isNewUser and redirect to /app/welcome if needed
       
       // Allow the callbackUrl to work, but default to /app
       if (url.startsWith(baseUrl)) return url;

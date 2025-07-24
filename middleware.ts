@@ -31,7 +31,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirect to app if accessing auth routes with valid token
-  if (isAuthRoute && token) {
+  // But don't redirect if they're in the middle of the auth flow
+  if (isAuthRoute && token && !pathname.includes("callback")) {
     return NextResponse.redirect(new URL("/app", request.url));
   }
 

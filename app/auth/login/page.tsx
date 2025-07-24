@@ -13,7 +13,6 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await signIn("google", { 
-        callbackUrl: "/app",
         redirect: true 
       });
     } catch (error) {

@@ -80,7 +80,13 @@ function BudgetAppContent() {
     }
 
     // Check if user is new and redirect to welcome page
-    if (session.isNewUser && !userLoading) {
+    // Only redirect if user is new AND hasn't completed onboarding
+    const onboardingComplete = localStorage.getItem("onboardingComplete");
+    console.log("Debug - session.isNewUser:", session.isNewUser);
+    console.log("Debug - userLoading:", userLoading);
+    console.log("Debug - onboardingComplete:", onboardingComplete);
+    
+    if (session.isNewUser && !userLoading && !onboardingComplete) {
       console.log("New user detected, redirecting to welcome page");
       router.replace("/app/welcome");
       return;
@@ -100,21 +106,13 @@ function BudgetAppContent() {
   console.log("App page - Access control:", accessControl);
   console.log("App page - Can create budget:", accessControl.canCreateBudget);
 
-  // Show onboarding for new users
-  if (isNewUser && !userLoading && !accessControl.isLoading) {
-    return (
-      <NewUserOnboarding 
-        onComplete={() => {
-          // Remove the newUser parameter from URL
-          router.replace("/app");
-        }} 
-      />
-    );
-  }
-
   // Show access restricted for trial expired or no subscription
   // But only after we've confirmed the user data has loaded and access control is not loading
-  if (!userLoading && !accessControl.isLoading && (trialExpired || hasNoSubscription)) {
+  // Don't show for users who are in the onboarding process (no trial data yet)
+  const onboardingComplete = typeof window !== 'undefined' ? localStorage.getItem("onboardingComplete") : null;
+  const hasNoTrialData = !user?.trialEnd && !user?.isPaid;
+  
+  if (!userLoading && !accessControl.isLoading && (trialExpired || hasNoSubscription) && !hasNoTrialData) {
     return (
       <AccessRestricted
         reason={trialExpired ? "trial_expired" : "no_subscription"}

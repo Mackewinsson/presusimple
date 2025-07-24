@@ -133,3 +133,40 @@ export async function PATCH(request: NextRequest) {
     );
   }
 }
+
+// DELETE /api/users - Delete user by email
+export async function DELETE(request: NextRequest) {
+  try {
+    console.log("DELETE /api/users - Connecting to database...");
+    await dbConnect();
+    console.log("DELETE /api/users - Database connected");
+
+    const { searchParams } = new URL(request.url);
+    const email = searchParams.get("email");
+    
+    console.log("DELETE /api/users - Email:", email);
+
+    if (!email) {
+      console.log("DELETE /api/users - Email is required");
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
+
+    // Delete user by email
+    console.log("DELETE /api/users - Deleting user:", email);
+    const deletedUser = await User.findOneAndDelete({ email });
+
+    if (!deletedUser) {
+      console.log("DELETE /api/users - User not found:", email);
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    console.log("DELETE /api/users - User deleted successfully:", deletedUser._id);
+    return NextResponse.json({ message: "User deleted successfully", user: deletedUser });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return NextResponse.json(
+      { error: "Failed to delete user" },
+      { status: 500 }
+    );
+  }
+}

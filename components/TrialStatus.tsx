@@ -21,6 +21,19 @@ export function TrialStatus() {
     return null;
   }
 
+  // Don't show for new users who just completed onboarding
+  const onboardingComplete = typeof window !== 'undefined' ? localStorage.getItem("onboardingComplete") : null;
+  
+  // Don't show for users with active trial (new users)
+  const hasActiveTrial = user?.trialEnd && calculateTrialDaysLeft(user.trialEnd) > 0;
+  
+  // Don't show for users without trial data who haven't completed onboarding
+  // This prevents showing upgrade prompts during the onboarding process
+  const hasNoTrialData = !user?.trialEnd && !user?.isPaid;
+  if (onboardingComplete || hasActiveTrial || hasNoTrialData) {
+    return null;
+  }
+
   const trialDaysLeft = calculateTrialDaysLeft(user?.trialEnd || null);
   const isTrialActive = user?.trialEnd && trialDaysLeft > 0;
   const isTrialExpired = user?.trialEnd && trialDaysLeft <= 0;

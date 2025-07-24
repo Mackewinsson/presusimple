@@ -9,11 +9,25 @@ import { Clock, Crown, CreditCard } from "lucide-react";
 import { calculateTrialDaysLeft, getSubscriptionStatus } from "@/lib/utils";
 
 const SubscriptionButton = () => {
+  // TODOS LOS HOOKS VAN AL INICIO
   const { data: session } = useSession();
   const { data: subscription, isLoading } = useUserSubscription();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showThankYou, setShowThankYou] = useState(false);
+
+  const trialDaysLeft = calculateTrialDaysLeft(subscription?.trialEnd || null);
+  const subscriptionStatus = getSubscriptionStatus(subscription || {});
+
+  useEffect(() => {
+    if (subscriptionStatus === "paid" && !showThankYou) {
+      setShowThankYou(true);
+      const timer = setTimeout(() => {
+        setShowThankYou(false);
+      }, 5000); // Show for 5 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [subscriptionStatus]);
 
   const handleSubscribe = async () => {
     setLoading(true);
@@ -37,7 +51,7 @@ const SubscriptionButton = () => {
     }
   };
 
-  // Don't render anything while loading to prevent flashing
+  // AHORA LOS RETURNS CONDICIONALES
   if (isLoading) {
     return (
       <div className="w-full">
@@ -45,20 +59,6 @@ const SubscriptionButton = () => {
       </div>
     );
   }
-
-  const trialDaysLeft = calculateTrialDaysLeft(subscription?.trialEnd || null);
-  const subscriptionStatus = getSubscriptionStatus(subscription || {});
-
-  // Show thank you message briefly when user becomes paid
-  useEffect(() => {
-    if (subscriptionStatus === "paid" && !showThankYou) {
-      setShowThankYou(true);
-      const timer = setTimeout(() => {
-        setShowThankYou(false);
-      }, 5000); // Show for 5 seconds
-      return () => clearTimeout(timer);
-    }
-  }, [subscriptionStatus]);
 
   // User is paid - show brief thank you message then hide
   if (subscriptionStatus === "paid") {
@@ -100,25 +100,9 @@ const SubscriptionButton = () => {
     );
   }
 
-  // User has no subscription - show start trial button
-  return (
-    <div className="space-y-3">
-      <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950/20">
-        <CreditCard className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-        <AlertDescription className="text-orange-800 dark:text-orange-200">
-          Start your 30-day free trial to unlock all features!
-        </AlertDescription>
-      </Alert>
-      <Button
-        onClick={handleSubscribe}
-        disabled={loading || !session?.user?.email}
-        className="w-full"
-      >
-        {loading ? "Redirecting..." : "Start Free Trial"}
-      </Button>
-      {error && <div className="text-red-500 text-sm">{error}</div>}
-    </div>
-  );
+  // User has no subscription - don't show anything during onboarding
+  // This prevents showing upgrade prompts for users without trial data
+  return null;
 };
 
 export default SubscriptionButton;
