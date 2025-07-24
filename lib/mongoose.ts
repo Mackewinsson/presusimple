@@ -19,16 +19,37 @@ export async function dbConnect() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
-      maxPoolSize: 10, // Maintain up to 10 socket connections
-      serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+      maxPoolSize: 20, // Increased for better connection handling
+      serverSelectionTimeoutMS: 10000, // Increased timeout for international connections
+      socketTimeoutMS: 60000, // Increased socket timeout for slower connections
+      connectTimeoutMS: 10000, // Connection timeout
       family: 4, // Use IPv4, skip trying IPv6
+      retryWrites: true, // Enable retry for write operations
+      retryReads: true, // Enable retry for read operations
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts);
+    try {
+      cached.promise = mongoose.connect(MONGODB_URI, opts);
+      cached.conn = await cached.promise;
+      console.log('MongoDB connected successfully');
+      return cached.conn;
+    } catch (error) {
+      console.error('MongoDB connection error:', error);
+      // Reset cached promise on error to allow retry
+      cached.promise = null;
+      throw error;
+    }
   }
-  cached.conn = await cached.promise;
-  return cached.conn;
+  
+  try {
+    cached.conn = await cached.promise;
+    return cached.conn;
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    // Reset cached promise on error to allow retry
+    cached.promise = null;
+    throw error;
+  }
 }
 
 // Graceful shutdown

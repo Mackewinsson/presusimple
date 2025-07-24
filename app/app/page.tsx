@@ -30,6 +30,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getSubscriptionStatus } from "@/lib/utils";
 import { Budget, Category, Expense } from "@/lib/api";
 import { UpgradeToProCTA } from "@/components/UpgradeToProCTA";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 export default function BudgetApp() {
   const { data: session, status } = useSession();
@@ -105,7 +106,8 @@ export default function BudgetApp() {
   }
 
   return (
-    <div className="min-h-screen gradient-bg-dark">
+    <ErrorBoundary>
+      <div className="min-h-screen gradient-bg-dark">
       <header className="border-b border-slate-300/50 dark:border-white/10 bg-white/5 dark:bg-white/5 backdrop-blur-xl sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
@@ -170,12 +172,11 @@ export default function BudgetApp() {
           </div>
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
             {/* AI Quick Input - Now with feature flags */}
-            {budget && accessControl.canAccessExpenses && (
-              featureFlags.hasFeatureAccess("transactionTextInput") ? (
-                <AITransactionInput budgetId={budget._id} />
-              ) : (
-                <UpgradeToProCTA feature="transactionTextInput" />
-              )
+            {budget && accessControl.canAccessExpenses && featureFlags.hasFeatureAccess("transactionTextInput") && (
+              <AITransactionInput budgetId={budget._id} />
+            )}
+            {budget && accessControl.canAccessExpenses && !featureFlags.hasFeatureAccess("transactionTextInput") && (
+              <UpgradeToProCTA feature="transactionTextInput" />
             )}
             {budget && accessControl.canAccessExpenses && (
               <DailySpendingTracker
@@ -203,6 +204,7 @@ export default function BudgetApp() {
           </p>
         </div>
       </footer>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }

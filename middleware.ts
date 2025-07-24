@@ -51,6 +51,10 @@ export async function middleware(request: NextRequest) {
     "Content-Security-Policy",
     "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:;"
   );
+  
+  // Performance headers for international users
+  response.headers.set("Cache-Control", "public, max-age=300, s-maxage=300"); // 5 minutes cache
+  response.headers.set("Vary", "Accept-Encoding, User-Agent");
 
   return response;
 }
