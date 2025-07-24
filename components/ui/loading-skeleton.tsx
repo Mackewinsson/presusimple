@@ -180,7 +180,7 @@ export const HistoryItemSkeleton = () => (
 
 // Main app loading skeleton
 export const AppLoadingSkeleton = () => (
-  <div className="min-h-screen gradient-bg-dark">
+  <div className="min-h-screen gradient-bg-dark flex flex-col">
     <header className="border-b border-slate-300/50 dark:border-white/10 bg-white/5 dark:bg-white/5 backdrop-blur-xl sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
         <div className="flex items-center justify-between">
@@ -196,7 +196,7 @@ export const AppLoadingSkeleton = () => (
       </div>
     </header>
 
-    <main className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8">
+    <main className="flex-1 container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8">
       <div className="grid gap-4 sm:gap-6 md:gap-8 grid-cols-1 xl:grid-cols-2">
         <div className="space-y-4 sm:space-y-6 md:space-y-8">
           <BudgetSetupSkeleton />
@@ -217,7 +217,7 @@ export const AppLoadingSkeleton = () => (
       </div>
     </main>
 
-    <footer className="border-t border-slate-300/50 dark:border-white/10 py-3 sm:py-4 md:py-6 mt-4 sm:mt-6 md:mt-8 bg-white/5 dark:bg-white/5 backdrop-blur-sm">
+    <footer className="mt-auto border-t border-slate-300/50 dark:border-white/10 py-3 sm:py-4 md:py-6 bg-white/5 dark:bg-white/5 backdrop-blur-sm sticky bottom-0 sm:static">
       <div className="container mx-auto px-4 sm:px-6">
         <Skeleton className="h-4 w-48 mx-auto" />
       </div>

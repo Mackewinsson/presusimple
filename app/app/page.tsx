@@ -122,7 +122,7 @@ function BudgetAppContent() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen gradient-bg-dark">
+      <div className="min-h-screen gradient-bg-dark flex flex-col">
       <header className="border-b border-slate-300/50 dark:border-white/10 bg-white/5 dark:bg-white/5 backdrop-blur-xl sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
@@ -164,7 +164,7 @@ function BudgetAppContent() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8">
+      <main className="flex-1 container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8">
         {/* Trial Status */}
         <TrialStatus />
 
@@ -211,7 +211,7 @@ function BudgetAppContent() {
         </div>
       </main>
 
-      <footer className="border-t border-slate-300/50 dark:border-white/10 py-3 sm:py-4 md:py-6 mt-4 sm:mt-6 md:mt-8 bg-white/5 dark:bg-white/5 backdrop-blur-sm">
+      <footer className="mt-auto border-t border-slate-300/50 dark:border-white/10 py-3 sm:py-4 md:py-6 bg-white/5 dark:bg-white/5 backdrop-blur-sm sticky bottom-0 sm:static">
         <div className="container mx-auto px-4 sm:px-6">
           <p className="text-center text-xs sm:text-sm text-slate-600 dark:text-white/60">
             &copy; {new Date().getFullYear()} Simple Budget. All rights
