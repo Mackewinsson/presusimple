@@ -31,10 +31,15 @@ import { getSubscriptionStatus } from "@/lib/utils";
 import { Budget, Category, Expense } from "@/lib/api";
 import { UpgradeToProCTA } from "@/components/UpgradeToProCTA";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { useSearchParams } from "next/navigation";
+import { NewUserOnboarding } from "@/components/NewUserOnboarding";
+import { Suspense } from "react";
 
-export default function BudgetApp() {
+function BudgetAppContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isNewUser = searchParams.get("newUser") === "true" || session?.isNewUser;
 
   // Get user ID using React Query
   const { data: userId, isLoading: userIdLoading } = useUserId();
@@ -95,6 +100,18 @@ export default function BudgetApp() {
   console.log("App page - Access control:", accessControl);
   console.log("App page - Can create budget:", accessControl.canCreateBudget);
 
+  // Show onboarding for new users
+  if (isNewUser && !userLoading && !accessControl.isLoading) {
+    return (
+      <NewUserOnboarding 
+        onComplete={() => {
+          // Remove the newUser parameter from URL
+          router.replace("/app");
+        }} 
+      />
+    );
+  }
+
   // Show access restricted for trial expired or no subscription
   // But only after we've confirmed the user data has loaded and access control is not loading
   if (!userLoading && !accessControl.isLoading && (trialExpired || hasNoSubscription)) {
@@ -124,7 +141,7 @@ export default function BudgetApp() {
                 </h1>
               </Link>
               <span className="text-sm sm:text-base text-slate-600 dark:text-white/70">
-                Welcome back, {session?.user?.name}!
+                {isNewUser ? `Welcome, ${session?.user?.name}!` : `Welcome back, ${session?.user?.name}!`}
               </span>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
@@ -206,5 +223,13 @@ export default function BudgetApp() {
       </footer>
       </div>
     </ErrorBoundary>
+  );
+}
+
+export default function BudgetApp() {
+  return (
+    <Suspense fallback={<AppLoadingSkeleton />}>
+      <BudgetAppContent />
+    </Suspense>
   );
 }

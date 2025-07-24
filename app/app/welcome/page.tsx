@@ -47,10 +47,9 @@ export default function WelcomePage() {
         setIsTransitioning(true);
         setTimeout(() => {
           setShowWelcome(false);
-          // For new users, they should see the budget creation section
-          // The main app page will handle showing the budget setup
+          // For new users, redirect to budget creation
           console.log("Welcome complete, redirecting to /app");
-          router.push("/app");
+          router.push("/app?newUser=true");
         }, 500); // 500ms transition delay
       }
     }, delay);

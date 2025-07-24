@@ -76,6 +76,11 @@ const handler = NextAuth({
       return session;
     },
     async redirect({ url, baseUrl }) {
+      // For new users, redirect to welcome page
+      if (url.includes("isNewUser=true") || url.includes("callbackUrl=/app/welcome")) {
+        return `${baseUrl}/app/welcome`;
+      }
+      
       // Allow the callbackUrl to work, but default to /app
       if (url.startsWith(baseUrl)) return url;
       if (url.startsWith("/")) return `${baseUrl}${url}`;
