@@ -67,6 +67,11 @@ function BudgetAppContent() {
     categoriesLoading || 
     expensesLoading;
 
+  // Only check subscription status after user data has loaded
+  const subscriptionStatus = getSubscriptionStatus(subscription || {});
+  const trialExpired = subscriptionStatus === "expired";
+  const hasNoSubscription = subscriptionStatus === "none";
+
   React.useEffect(() => {
     if (status === "loading") return;
     if (!session) {
@@ -90,11 +95,6 @@ function BudgetAppContent() {
   if (isLoading) {
     return <AppLoadingSkeleton />;
   }
-
-  // Only check subscription status after user data has loaded
-  const subscriptionStatus = getSubscriptionStatus(subscription || {});
-  const trialExpired = subscriptionStatus === "expired";
-  const hasNoSubscription = subscriptionStatus === "none";
 
   console.log("App page - Subscription status:", subscriptionStatus);
   console.log("App page - Access control:", accessControl);
