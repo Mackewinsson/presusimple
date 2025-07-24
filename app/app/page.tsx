@@ -64,12 +64,13 @@ export default function BudgetApp() {
   React.useEffect(() => {
     if (status === "loading") return;
     if (!session) {
-              router.replace("/auth/login");
+      router.replace("/auth/login");
       return;
     }
 
     // Check if user is new and redirect to welcome page
     if (session.isNewUser && !userLoading) {
+      console.log("New user detected, redirecting to welcome page");
       router.replace("/app/welcome");
       return;
     }
@@ -88,6 +89,10 @@ export default function BudgetApp() {
   const subscriptionStatus = getSubscriptionStatus(subscription || {});
   const trialExpired = subscriptionStatus === "expired";
   const hasNoSubscription = subscriptionStatus === "none";
+
+  console.log("App page - Subscription status:", subscriptionStatus);
+  console.log("App page - Access control:", accessControl);
+  console.log("App page - Can create budget:", accessControl.canCreateBudget);
 
   // Show access restricted for trial expired or no subscription
   // But only after we've confirmed the user data has loaded and access control is not loading

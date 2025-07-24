@@ -33,6 +33,9 @@ export default function WelcomePage() {
       return;
     }
 
+    console.log("Welcome page - Session:", session);
+    console.log("Welcome page - isNewUser:", session.isNewUser);
+
     // Auto-advance steps with different timing for the last step
     const delay = currentStep === 3 ? 5000 : 3000; // 5 seconds for last step
     
@@ -44,6 +47,9 @@ export default function WelcomePage() {
         setIsTransitioning(true);
         setTimeout(() => {
           setShowWelcome(false);
+          // For new users, they should see the budget creation section
+          // The main app page will handle showing the budget setup
+          console.log("Welcome complete, redirecting to /app");
           router.push("/app");
         }, 500); // 500ms transition delay
       }
