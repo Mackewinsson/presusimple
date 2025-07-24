@@ -28,8 +28,8 @@ export default function WelcomePage() {
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
+    // Only auto-advance if user is authenticated
     if (!session) {
-      router.replace("/auth/login");
       return;
     }
 
@@ -78,6 +78,45 @@ export default function WelcomePage() {
       progress: 100
     }
   ];
+
+  // Show login page if no session
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+        <div className="w-full max-w-md space-y-8">
+          <div className="text-center space-y-4">
+            <div className="flex justify-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
+                <Crown className="h-8 w-8 text-white" />
+              </div>
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2">
+                Welcome to Simple Budget
+              </h1>
+              <p className="text-lg text-slate-300">
+                Sign in to start managing your finances
+              </p>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <Button
+              onClick={() => router.push("/auth/login")}
+              className="w-full bg-white text-slate-900 hover:bg-gray-100 font-semibold py-3"
+              size="lg"
+            >
+              Continue with Google
+            </Button>
+            
+            <p className="text-center text-sm text-slate-400">
+              By continuing, you agree to our Terms of Service and Privacy Policy
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!showWelcome) {
     return null;
