@@ -50,3 +50,9 @@ export const useSetCurrency = () => {
     },
   });
 };
+
+// Hook to get the current selected currency for use in formatMoney
+export const useCurrentCurrency = () => {
+  const { data: selectedCurrency } = useSelectedCurrency();
+  return selectedCurrency || currencies[0]; // Fallback to USD
+};

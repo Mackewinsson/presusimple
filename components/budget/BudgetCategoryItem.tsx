@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 import { formatMoney } from "@/lib/utils/formatMoney";
+import { useCurrentCurrency } from "@/lib/hooks";
 import { Input } from "@/components/ui/input";
 import InlineEdit from "@/components/ui/inline-edit";
 
@@ -23,6 +24,7 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
   onUpdate,
   totalAvailable,
 }) => {
+  const currentCurrency = useCurrentCurrency();
   const [budgeted, setBudgeted] = useState(category.budgeted.toString());
 
   const handleRemoveCategory = () => {
@@ -40,7 +42,8 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
     if (budgetDiff > totalAvailable) {
       toast.error(
         `Cannot increase budget by more than available amount (${formatMoney(
-          totalAvailable
+          totalAvailable,
+          currentCurrency
         )})`
       );
       return;
@@ -74,8 +77,8 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
           </div>
           <div className="flex justify-between text-sm mb-1">
             <span className="text-muted-foreground">
-              {formatMoney(category.spent)} of{" "}
-              {formatMoney(category.budgeted)}
+              {formatMoney(category.spent, currentCurrency)} of{" "}
+              {formatMoney(category.budgeted, currentCurrency)}
             </span>
             <span
               className={

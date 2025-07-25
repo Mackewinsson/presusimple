@@ -40,6 +40,7 @@ export {
 export {
   useSelectedCurrency,
   useSetCurrency,
+  useCurrentCurrency,
   currencies,
   type Currency,
 } from "./useCurrencyQueries";

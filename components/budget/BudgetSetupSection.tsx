@@ -23,7 +23,7 @@ import BudgetSectionItem from "./BudgetSectionItem";
 import NewSectionForm from "./NewSectionForm";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { toast } from "sonner";
-import { currencies, type Currency } from "@/lib/hooks";
+import { currencies, type Currency, useCurrentCurrency } from "@/lib/hooks";
 import { useSession } from "next-auth/react";
 import {
   useUserId,
@@ -88,6 +88,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   categories,
 }) => {
   const { data: session } = useSession();
+  const currentCurrency = useCurrentCurrency();
   const {
     data: userId,
     isLoading: userIdLoading,
@@ -109,7 +110,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   const [isAddingSection, setIsAddingSection] = useState(false);
   const [isEditingTotal, setIsEditingTotal] = useState(false);
   const [totalBudget, setTotalBudget] = useState("");
-  const currency: Currency = currencies[0]; // Default to USD, or fetch from user/session if needed
+  const currency: Currency = currentCurrency; // Use selected currency
   const [newTotal, setNewTotal] = useState("");
   const [newMonth, setNewMonth] = useState("January");
   const [newYear, setNewYear] = useState(new Date().getFullYear());

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { formatMoney } from "@/lib/utils/formatMoney";
+import { useCurrentCurrency } from "@/lib/hooks";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,6 +61,7 @@ interface ExpenseItemProps {
 }
 
 const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
+  const currentCurrency = useCurrentCurrency();
   const updateExpenseMutation = useUpdateExpense();
   const deleteExpenseMutation = useDeleteExpense();
 
@@ -236,7 +238,7 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
               ) : (
                 <ArrowDownCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
               )}
-              {formatMoney(expense.amount)}
+                                {formatMoney(expense.amount, currentCurrency)}
             </div>
           </div>
           <div className="flex items-center gap-1">

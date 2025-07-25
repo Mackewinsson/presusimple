@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { SpendingChart } from "@/components/ui/SpendingChart";
+import { useCurrentCurrency } from "@/lib/hooks";
 
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
@@ -42,6 +43,7 @@ interface SummaryProps {
 }
 
 const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
+  const currentCurrency = useCurrentCurrency();
   // Calculate total spent from expenses
   const totalSpent = expenses.reduce((sum, expense) => {
     return (
@@ -184,7 +186,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
               Total Budgeted
             </div>
             <div className="text-lg sm:text-xl md:text-2xl font-semibold">
-              {formatMoney(calculatedTotalBudgeted)}
+                              {formatMoney(calculatedTotalBudgeted, currentCurrency)}
             </div>
           </div>
 
@@ -193,7 +195,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
               Total Spent
             </div>
             <div className="text-lg sm:text-xl md:text-2xl font-semibold">
-              {formatMoney(totalSpent)}
+                              {formatMoney(totalSpent, currentCurrency)}
             </div>
           </div>
 
@@ -208,7 +210,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                   : ""
               }`}
             >
-              {formatMoney(calculatedTotalBudgeted - totalSpent)}
+                              {formatMoney(calculatedTotalBudgeted - totalSpent, currentCurrency)}
             </div>
           </div>
         </div>
