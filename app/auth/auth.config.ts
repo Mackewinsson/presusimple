@@ -14,12 +14,12 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }: any) {
       const isLoggedIn = !!auth?.user;
-      const isOnApp = nextUrl.pathname.startsWith("/app");
-      if (isOnApp) {
+      const isOnBudget = nextUrl.pathname.startsWith("/budget");
+      if (isOnBudget) {
         if (isLoggedIn) return true;
         return false; // Redirect unauthenticated users to login page
       } else if (isLoggedIn) {
-        return Response.redirect(new URL("/app", nextUrl));
+        return Response.redirect(new URL("/budget", nextUrl));
       }
       return true;
     },

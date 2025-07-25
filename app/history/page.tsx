@@ -68,7 +68,7 @@ export default function HistoryPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link
-                href="/app"
+                href="/budget"
                 className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ArrowLeft className="h-5 w-5" />
@@ -214,7 +214,7 @@ export default function HistoryPage() {
                       : "Start by resetting your current month to save your first budget snapshot."}
                   </p>
                   {!searchTerm && (
-                    <Link href="/app">
+                    <Link href="/budget">
                       <Button>
                         Go to Budget
                       </Button>

@@ -5,13 +5,13 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Define protected routes
-  const protectedRoutes = ["/app", "/dashboard", "/history", "/admin"];
+  const protectedRoutes = ["/budget", "/dashboard", "/history", "/admin"];
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route)
   );
 
   // Special handling for welcome page - allow access for authenticated users
-  const isWelcomePage = pathname === "/app/welcome";
+  const isWelcomePage = pathname === "/budget/welcome";
 
   // Define auth routes
   const authRoutes = ["/auth"];
@@ -30,15 +30,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Redirect to app if accessing auth routes with valid token
+  // Redirect to budget if accessing auth routes with valid token
   // But don't redirect if they're in the middle of the auth flow
   if (isAuthRoute && token && !pathname.includes("callback")) {
-    return NextResponse.redirect(new URL("/app", request.url));
+    return NextResponse.redirect(new URL("/budget", request.url));
   }
 
-  // Redirect to app if accessing home page with valid token (but not welcome page)
+  // Redirect to budget if accessing home page with valid token (but not welcome page)
   if (pathname === "/" && token && !isWelcomePage) {
-    return NextResponse.redirect(new URL("/app", request.url));
+    return NextResponse.redirect(new URL("/budget", request.url));
   }
 
   // Add security headers

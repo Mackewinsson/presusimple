@@ -56,7 +56,7 @@ export default function LandingPage() {
               <button
                 onClick={() => {
                   if (session) {
-                    window.location.href = "/app";
+                    window.location.href = "/budget";
                   } else {
                     window.location.href = "/auth/login";
                   }
@@ -86,7 +86,7 @@ export default function LandingPage() {
             <button
               onClick={() => {
                 if (session) {
-                  window.location.href = "/app";
+                  window.location.href = "/budget";
                 } else {
                   window.location.href = "/auth/login";
                 }
@@ -198,7 +198,7 @@ export default function LandingPage() {
                   </li>
                 </ul>
                 <Link
-                  href="/app"
+                  href="/budget"
                   className="block w-full text-center py-2 px-4 rounded-lg bg-slate-900/10 dark:bg-white/20 text-slate-900 dark:text-white hover:bg-slate-900/20 dark:hover:bg-white/30 transition-all duration-200 text-sm sm:text-base border border-slate-900/20 dark:border-white/30"
                 >
                   Get Started
@@ -240,7 +240,7 @@ export default function LandingPage() {
                   </li>
                 </ul>
                 <Link
-                  href="/app"
+                  href="/budget"
                   className="block w-full text-center py-2 px-4 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-gray-100 transition-all duration-200 text-sm sm:text-base shadow-lg font-medium"
                 >
                   Get Pro
@@ -279,7 +279,7 @@ export default function LandingPage() {
                   </li>
                 </ul>
                 <Link
-                  href="/app"
+                  href="/budget"
                   className="block w-full text-center py-2 px-4 rounded-lg bg-slate-900/10 dark:bg-white/20 text-slate-900 dark:text-white hover:bg-slate-900/20 dark:hover:bg-white/30 transition-all duration-200 text-sm sm:text-base border border-slate-900/20 dark:border-white/30"
                 >
                   Contact Sales

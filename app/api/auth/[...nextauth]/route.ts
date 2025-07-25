@@ -99,10 +99,10 @@ const handler = NextAuth({
       // We'll let the app handle the redirect logic since we can't access session here
       // The app will check session.isNewUser and redirect to /app/welcome if needed
       
-      // Allow the callbackUrl to work, but default to /app
+      // Allow the callbackUrl to work, but default to /budget
       if (url.startsWith(baseUrl)) return url;
       if (url.startsWith("/")) return `${baseUrl}${url}`;
-      return baseUrl + "/app";
+      return baseUrl + "/budget";
     },
   },
   debug: process.env.NODE_ENV === "development",

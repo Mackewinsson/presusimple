@@ -15,7 +15,7 @@ export default function WelcomePage() {
     
     // Go directly to main app without any parameters
     // User will have immediate access to trial features
-    router.replace("/app");
+    router.replace("/budget");
   };
 
   // Show login page if no session

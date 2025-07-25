@@ -44,7 +44,7 @@ export default function ManualSubscriptionPage() {
     const userEmail = session.user?.email;
     if (!userEmail || !AUTHORIZED_ADMINS.includes(userEmail)) {
       toast.error("Access denied. You are not authorized to view this page.");
-      router.replace("/app");
+      router.replace("/budget");
       return;
     }
   }, [session, status, router]);

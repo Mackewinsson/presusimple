@@ -77,7 +77,7 @@
       "name": "View Budget",
       "short_name": "Budget",
       "description": "View your current budget",
-      "url": "/app",
+      "url": "/budget",
       "icons": [
         {
           "src": "/icons/icon-96x96.png",
