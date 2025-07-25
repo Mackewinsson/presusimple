@@ -12,10 +12,10 @@ export default function TranslationDemo() {
         <CardTitle>{t('welcome')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
-        <p><strong>{t('budget')}:</strong> {t('createBudget')}</p>
-        <p><strong>{t('expenses')}:</strong> {t('addTransaction')}</p>
-        <p><strong>{t('settings')}:</strong> {t('settings')}</p>
-        <p><strong>{t('history')}:</strong> {t('transactionHistory')}</p>
+        {/* <p><strong>{t('budget')}:</strong> {t('createBudget')}</p> */}
+        {/* <p><strong>{t('expenses')}:</strong> {t('addTransaction')}</p> */}
+        {/* <p><strong>{t('settings')}:</strong> {t('settings')}</p> */}
+        {/* <p><strong>{t('history')}:</strong> {t('transactionHistory')}</p> */}
       </CardContent>
     </Card>
   );
