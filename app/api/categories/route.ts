@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 
       console.log("Categories API: Found categories", {
         categoriesCount: categories.length,
-        categories: categories.map(cat => ({ name: cat.name, sectionId: cat.sectionId, budgetId: cat.budgetId }))
+        categories: categories.map(cat => ({ name: cat.name, budgetId: cat.budgetId }))
       });
 
       return NextResponse.json(categories);

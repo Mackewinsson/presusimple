@@ -29,7 +29,7 @@ interface CreateCategoryData {
   name: string;
   budgeted: number;
   spent: number;
-  sectionId: string;
+  budgetId: string;
 }
 
 interface CategoryGroup {
@@ -277,11 +277,10 @@ export const useAIBudgetCreation = () => {
           
 
           
-          const categoryData: CreateCategoryData & { budgetId: string } = {
+          const categoryData: CreateCategoryData = {
             name: category.name,
             budgeted: category.amount,
             spent: 0,
-            sectionId: section.name, // Use the clean section name for display
             budgetId: budget._id, // Pass the specific budget ID
           };
 

@@ -45,11 +45,8 @@ export async function DELETE(
   if (!budget)
     return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  // Cascade delete: delete all categories for this budget's sections
-  const sectionIds = budget.sections.map(
-    (section: any) => section._id || section.name
-  );
-  await Category.deleteMany({ sectionId: { $in: sectionIds } });
+  // Cascade delete: delete all categories for this budget
+  await Category.deleteMany({ budgetId: budget._id });
   // Delete all expenses for this budget
   await Expense.deleteMany({ budget: budget._id });
 
