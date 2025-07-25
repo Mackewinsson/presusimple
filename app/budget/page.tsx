@@ -14,7 +14,7 @@ import SubscriptionButton from "@/components/SubscriptionButton";
 import AccessRestricted from "@/components/AccessRestricted";
 import { TrialStatus } from "@/components/TrialStatus";
 import { History, AlertTriangle } from "lucide-react";
-
+import { Icon } from "@/components/ui/icon";
 import SignOutButton from "@/components/SignOutButton";
 import {
   useUserId,
@@ -133,7 +133,7 @@ function BudgetAppContent() {
                 className="flex items-center gap-2 sm:gap-3 w-fit hover:opacity-90 transition-opacity"
               >
                 <div className="bg-white dark:bg-white text-slate-900 p-1.5 sm:p-2 rounded-xl shadow-lg">
-                  <div className="h-4 w-4 sm:h-6 sm:w-6 bg-slate-900 rounded" />
+                  <Icon size={24} className="h-4 w-4 sm:h-6 sm:w-6" />
                 </div>
                 <h1 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                   Simple Budget
