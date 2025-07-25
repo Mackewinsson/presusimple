@@ -36,11 +36,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Get all categories for this budget
-    const sectionIds = budget.sections.map(
-      (section: any) => section._id || section.name
-    );
     const categories = await Category.find({
-      sectionId: { $in: sectionIds },
+      budgetId: budget._id,
     });
 
     // Calculate total budgeted from categories

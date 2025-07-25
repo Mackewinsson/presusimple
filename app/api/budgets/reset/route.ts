@@ -45,15 +45,11 @@ export async function POST(request: NextRequest) {
       _id: budget._id,
       totalBudgeted: budget.totalBudgeted,
       totalAvailable: budget.totalAvailable,
-      sections: budget.sections
     });
 
-    // Get all categories for this budget (using sectionIds)
-    const sectionIds = budget.sections.map(
-      (section: any) => section._id || section.name
-    );
+    // Get all categories for this budget
     const categories = await Category.find({
-      sectionId: { $in: sectionIds },
+      budgetId: budget._id,
     });
     console.log("Categories before reset:", categories.map(c => ({
       name: c.name,
@@ -76,7 +72,7 @@ export async function POST(request: NextRequest) {
 
     // Reset all categories (set spent to 0, keep budgeted amounts)
     await Category.updateMany(
-      { sectionId: { $in: sectionIds } },
+      { budgetId: budget._id },
       { $set: { spent: 0 } }
     );
     console.log("Categories reset (spent set to 0)");
@@ -136,7 +132,7 @@ export async function POST(request: NextRequest) {
 
     // Verify categories are still correct
     const categoriesAfter = await Category.find({
-      sectionId: { $in: sectionIds },
+      budgetId: budget._id,
     });
     console.log("Categories after reset:", categoriesAfter.map(c => ({
       name: c.name,
