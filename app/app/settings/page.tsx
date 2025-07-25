@@ -22,6 +22,8 @@ export default function SettingsPage() {
   const subscriptionStatus = getSubscriptionStatus(subscription || {});
   const trialDaysLeft = calculateTrialDaysLeft(subscription?.trialEnd || null);
 
+
+
   const handleUpgrade = async () => {
     try {
       const res = await fetch("/api/stripe/checkout", {

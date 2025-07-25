@@ -46,9 +46,10 @@ const handler = NextAuth({
             // Add a flag to indicate this is a new user
             user.isNewUser = true;
           } else {
-            // Handle existing users who don't have trial data
-            if (!existingUser.trialEnd && !existingUser.isPaid) {
-              // Give existing users a trial if they don't have one
+            // Only give trials to truly new users who have never had a trial
+            // Don't reset trials for existing users
+            if (!existingUser.trialEnd && !existingUser.isPaid && !existingUser.subscriptionType) {
+              // Give existing users a trial only if they have no trial history
               const trialEnd = new Date();
               trialEnd.setDate(trialEnd.getDate() + 30); // 30-day trial
               
