@@ -201,7 +201,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       income: budgetData.income,
-      sections: [{ name: "General" }],
       categories: categoriesWithSection
     });
 

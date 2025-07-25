@@ -12,7 +12,6 @@ interface AICategory {
 
 interface AIBudgetResponse {
   income: number;
-  sections: Array<{ name: string }>;
   categories: AICategory[];
 }
 
@@ -20,7 +19,6 @@ interface CreateBudgetData {
   user: string;
   month: number;
   year: number;
-  sections: Array<{ name: string }>;
   totalBudgeted: number;
   totalAvailable: number;
 }
@@ -234,7 +232,6 @@ export const useAIBudgetCreation = () => {
         user: userIdQuery.data!,
         month,
         year,
-        sections: uniqueSections,
         totalBudgeted: 0, // Start with 0 budgeted, will be updated after categories are created
         totalAvailable: aiData.income, // All income is available to budget
       };
@@ -253,39 +250,20 @@ export const useAIBudgetCreation = () => {
       // Step 3: Create the categories (add delay to show animation)
       await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
       
-      // Edge case: Validate sections exist
-      if (!budget.sections || budget.sections.length === 0) {
-        throw new Error('Budget created but no sections found. Please try again.');
-      }
 
-      // Create categories for each group
+
+      // Create categories directly (no sections)
       const categoryPromises: Promise<any>[] = [];
       
-      sectionGroups.forEach((group, groupIndex) => {
-        group.categories.forEach((category) => {
-          const section = budget.sections[groupIndex];
-          
-          // Edge case: Handle missing section
-          if (!section) {
-            console.error('Missing section for category:', {
-              categoryName: category.name,
-              budgetSections: budget.sections,
-              groupIndex: groupIndex
-            });
-            throw new Error(`Category "${category.name}" references a section that doesn't exist.`);
-          }
-          
+      aiData.categories.forEach((category) => {
+        const categoryData: CreateCategoryData = {
+          name: category.name,
+          budgeted: category.amount,
+          spent: 0,
+          budgetId: budget._id, // Pass the specific budget ID
+        };
 
-          
-          const categoryData: CreateCategoryData = {
-            name: category.name,
-            budgeted: category.amount,
-            spent: 0,
-            budgetId: budget._id, // Pass the specific budget ID
-          };
-
-          categoryPromises.push(createCategory.mutateAsync(categoryData));
-        });
+        categoryPromises.push(createCategory.mutateAsync(categoryData));
       });
 
       const createdCategories = await Promise.all(categoryPromises);

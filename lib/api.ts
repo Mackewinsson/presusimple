@@ -3,7 +3,6 @@ export interface Budget {
   _id: string;
   month: number;
   year: number;
-  sections: any[];
   totalBudgeted: number;
   totalAvailable: number;
   user: string;
