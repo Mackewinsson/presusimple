@@ -46,10 +46,13 @@ export const useUpdateBudget = () => {
     mutationFn: ({ id, updates }: { id: string; updates: Partial<Budget> }) =>
       budgetApi.updateBudget(id, updates),
     onSuccess: (data, variables) => {
-      // Update the cache directly
-      queryClient.setQueryData(budgetKeys.detail(variables.id), data);
-      // Invalidate lists to refresh any list views
-      queryClient.invalidateQueries({ queryKey: budgetKeys.lists() });
+      // Force refetch all budget queries to ensure fresh data
+      queryClient.invalidateQueries({ queryKey: budgetKeys.all });
+      
+      // Also refetch any specific budget queries
+      queryClient.refetchQueries({ queryKey: budgetKeys.detail(variables.id) });
+      queryClient.refetchQueries({ queryKey: budgetKeys.lists() });
+      
       toast.success("Budget updated successfully");
     },
     onError: (error) => {

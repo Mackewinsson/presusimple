@@ -23,9 +23,19 @@ export async function PUT(
   const { id } = await params;
   await dbConnect();
   const data = await req.json();
+  
+  console.log("Budget API PUT - Updating budget:", { id, data });
+  
   const budget = await Budget.findByIdAndUpdate(id, data, { new: true });
   if (!budget)
     return NextResponse.json({ error: "Not found" }, { status: 404 });
+  
+  console.log("Budget API PUT - Updated budget:", {
+    _id: budget._id,
+    totalBudgeted: budget.totalBudgeted,
+    totalAvailable: budget.totalAvailable
+  });
+  
   return NextResponse.json(budget);
 }
 

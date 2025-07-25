@@ -88,6 +88,13 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   budget,
   categories,
 }) => {
+  // Debug: Log budget changes
+  console.log("BudgetSetupSection render - budget:", {
+    _id: budget?._id,
+    totalBudgeted: budget?.totalBudgeted,
+    totalAvailable: budget?.totalAvailable,
+    sections: budget?.sections?.length || 0
+  });
   const { t } = useTranslation();
   const { data: session } = useSession();
   const currentCurrency = useCurrentCurrency();
@@ -252,12 +259,6 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   const handleSetTotalBudget = async () => {
     if (!budget) return;
     
-    console.log("Setting total budget:", {
-      inputValue: totalBudget,
-      currentBudget: budget,
-      currentlyBudgeted: budget.totalBudgeted || 0
-    });
-    
     const amount = parseFloat(totalBudget);
     if (isNaN(amount) || amount < 0) {
       toast.error("Please enter a valid amount");
@@ -273,12 +274,6 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
 
     const newTotalAvailable = amount - currentlyBudgeted;
 
-    console.log("Updating budget with:", {
-      id: budget._id,
-      totalBudgeted: currentlyBudgeted,
-      totalAvailable: newTotalAvailable
-    });
-
     try {
       await updateBudgetMutation.mutateAsync({
         id: budget._id,
@@ -288,7 +283,6 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
         },
       });
 
-      console.log("Budget updated successfully");
       setIsEditingTotal(false);
       setTotalBudget("");
     } catch (error) {
