@@ -9,7 +9,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, DollarSign, Trash2, Sparkles, Zap } from "lucide-react";
+import { Plus, Trash2, Sparkles, Zap } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -631,7 +632,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
             {isEditingTotal ? (
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                 <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Icon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="number"
                     value={totalBudget}
@@ -720,7 +721,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
           ) : (
             <div className="text-center py-8 sm:py-12 px-4 rounded-lg bg-slate-900/5 dark:bg-white/5 backdrop-blur-sm border border-slate-900/10 dark:border-white/10">
               <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900/20 dark:bg-white/20 mb-3 sm:mb-4">
-                <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-slate-900 dark:text-white" />
+                <Icon size={24} className="h-5 w-5 sm:h-6 sm:w-6 text-slate-900 dark:text-white" />
               </div>
               <p className="text-sm sm:text-base text-slate-700 dark:text-white/70">
                 No categories yet. Add your first category below.

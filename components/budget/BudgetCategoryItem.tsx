@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { useCurrentCurrency } from "@/lib/hooks";
-import { DollarSign, Edit2, Trash2, Check, X } from "lucide-react";
+import { Edit2, Trash2, Check, X } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -120,7 +121,7 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Icon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="number"
                       value={editBudgeted}

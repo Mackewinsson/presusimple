@@ -14,7 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { Sparkles, Zap, XCircle, CheckCircle, AlertCircle, DollarSign, Plus, Minus, AlertTriangle } from "lucide-react";
+import { Sparkles, Zap, XCircle, CheckCircle, AlertCircle, Plus, Minus, AlertTriangle } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { AITransactionLoading } from "@/components/ui/ai-transaction-loading";
 import { useToast } from "@/hooks/use-toast";
@@ -180,7 +181,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                         Budget Allocation:
                       </Label>
                       <div className="relative">
-                        <DollarSign className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Icon size={16} className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                           id={`budget-${index}`}
                           type="number"
