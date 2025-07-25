@@ -188,34 +188,20 @@ function BudgetAppContent() {
             )}
           </div>
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
-            {/* Input Mode Toggle */}
-            <div className="flex gap-2 mb-2">
-              <button
-                className={`px-3 py-1 rounded ${inputMode === 'manual' ? 'bg-primary text-white' : 'bg-white border'}`}
-                onClick={() => setInputMode('manual')}
-              >
-                Manual
-              </button>
-              {featureFlags.hasFeatureAccess("transactionTextInput") && (
-                <button
-                  className={`px-3 py-1 rounded ${inputMode === 'ai' ? 'bg-primary text-white' : 'bg-white border'}`}
-                  onClick={() => setInputMode('ai')}
-                >
-                  AI
-                </button>
-              )}
-            </div>
-            {/* Conditionally render input components */}
-            {budget && accessControl.canAccessExpenses && inputMode === 'ai' && featureFlags.hasFeatureAccess("transactionTextInput") && (
+            {/* AI Magic - Always visible when budget exists */}
+            {budget && accessControl.canAccessExpenses && featureFlags.hasFeatureAccess("transactionTextInput") && (
               <AITransactionInput budgetId={budget._id} />
             )}
-            {budget && accessControl.canAccessExpenses && inputMode === 'manual' && (
+            
+            {/* Manual Input Mode */}
+            {budget && accessControl.canAccessExpenses && (
               <DailySpendingTracker
                 budget={budget}
                 categories={categories}
                 expenses={expenses}
               />
             )}
+            
             {budget && accessControl.canAccessBudget && (
               <Summary
                 budget={budget}
