@@ -21,6 +21,7 @@ import { format } from "date-fns";
 import { useUserId, useResetBudget, useSaveMonthlyBudget } from "@/lib/hooks";
 import { LoadingButton } from "@/components/ui/loading-skeleton";
 import type { Budget } from "@/lib/api";
+import { useTranslation } from "@/lib/i18n";
 
 interface Category {
   _id?: string;
@@ -51,6 +52,7 @@ const ResetButton: React.FC<ResetButtonProps> = ({
   categories,
   expenses,
 }) => {
+  const { t } = useTranslation();
   const { data: userId } = useUserId();
   const resetBudgetMutation = useResetBudget();
   const saveMonthlyBudgetMutation = useSaveMonthlyBudget();
@@ -139,7 +141,7 @@ const ResetButton: React.FC<ResetButtonProps> = ({
           disabled={!budget}
         >
           <Trash2 className="h-4 w-4 mr-2" />
-          Reset Month
+          {t('resetMonth')}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="sm:max-w-md">

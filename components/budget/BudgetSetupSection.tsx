@@ -25,6 +25,7 @@ import { formatMoney } from "@/lib/utils/formatMoney";
 import { toast } from "sonner";
 import { currencies, type Currency, useCurrentCurrency } from "@/lib/hooks";
 import { useSession } from "next-auth/react";
+import { useTranslation } from "@/lib/i18n";
 import {
   useUserId,
   useCreateBudget,
@@ -87,6 +88,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   budget,
   categories,
 }) => {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const currentCurrency = useCurrentCurrency();
   const {
@@ -176,15 +178,12 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
 
       // Update budget totals
       if (budget) {
-        const updatedBudget = {
-          ...budget,
-          totalBudgeted: budget.totalBudgeted + budgeted,
-          totalAvailable: budget.totalAvailable - budgeted,
-        };
-
         await updateBudgetMutation.mutateAsync({
           id: budget._id,
-          updates: updatedBudget,
+          updates: {
+            totalBudgeted: budget.totalBudgeted + budgeted,
+            totalAvailable: budget.totalAvailable - budgeted,
+          },
         });
       }
     } catch (error) {
@@ -203,15 +202,12 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
 
       // Update budget totals
       if (budget) {
-        const updatedBudget = {
-          ...budget,
-          totalBudgeted: budget.totalBudgeted - category.budgeted,
-          totalAvailable: budget.totalAvailable + category.budgeted,
-        };
-
         await updateBudgetMutation.mutateAsync({
           id: budget._id,
-          updates: updatedBudget,
+          updates: {
+            totalBudgeted: budget.totalBudgeted - category.budgeted,
+            totalAvailable: budget.totalAvailable + category.budgeted,
+          },
         });
       }
     } catch (error) {
@@ -239,15 +235,12 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
 
       // Update budget totals if budgeted amount changed
       if (budget && budgetDiff !== 0) {
-        const updatedBudget = {
-          ...budget,
-          totalBudgeted: budget.totalBudgeted + budgetDiff,
-          totalAvailable: budget.totalAvailable - budgetDiff,
-        };
-
         await updateBudgetMutation.mutateAsync({
           id: budget._id,
-          updates: updatedBudget,
+          updates: {
+            totalBudgeted: budget.totalBudgeted + budgetDiff,
+            totalAvailable: budget.totalAvailable - budgetDiff,
+          },
         });
       }
     } catch (error) {
@@ -278,19 +271,20 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       return;
     }
 
+    const newTotalAvailable = amount - currentlyBudgeted;
+
     console.log("Updating budget with:", {
       id: budget._id,
       totalBudgeted: currentlyBudgeted,
-      totalAvailable: amount - currentlyBudgeted
+      totalAvailable: newTotalAvailable
     });
 
     try {
       await updateBudgetMutation.mutateAsync({
         id: budget._id,
         updates: {
-          ...budget,
           totalBudgeted: currentlyBudgeted, // Keep currently budgeted amount
-          totalAvailable: amount - currentlyBudgeted, // Adjust available amount
+          totalAvailable: newTotalAvailable, // Adjust available amount
         },
       });
 
@@ -711,10 +705,10 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
           <div className="flex items-start justify-between w-full sm:w-auto">
             <div>
               <CardTitle className="text-xl sm:text-2xl font-semibold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                Budget Setup
+                {t('budgetSetup')}
               </CardTitle>
               <CardDescription className="text-sm sm:text-base text-slate-700 dark:text-white/70">
-                Create budget sections and categories to track your spending
+                {t('createBudgetSections')}
               </CardDescription>
             </div>
             <AlertDialog>
@@ -846,7 +840,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                 <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-slate-900 dark:text-white" />
               </div>
               <p className="text-sm sm:text-base text-slate-700 dark:text-white/70">
-                No budget sections yet. Add one to get started.
+                {t('noBudgetSections')}
               </p>
             </div>
           )}
@@ -863,7 +857,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
               variant="outline"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Budget Section
+              {t('addBudgetSection')}
             </Button>
           )}
         </div>

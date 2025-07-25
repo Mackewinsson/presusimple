@@ -7,9 +7,11 @@ import { useSession } from "next-auth/react";
 import { useUserSubscription } from "@/lib/hooks";
 import { Clock, Crown, CreditCard } from "lucide-react";
 import { calculateTrialDaysLeft, getSubscriptionStatus } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n";
 
 const SubscriptionButton = () => {
   // TODOS LOS HOOKS VAN AL INICIO
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const { data: subscription, isLoading } = useUserSubscription();
   const [loading, setLoading] = useState(false);
@@ -84,8 +86,8 @@ const SubscriptionButton = () => {
           <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           <AlertDescription className="text-blue-800 dark:text-blue-200">
             {trialDaysLeft === 1
-              ? "Your free trial ends tomorrow!"
-              : `Your free trial ends in ${trialDaysLeft} days.`}
+              ? `${t('yourFreeTrialEnds')} 1 ${t('days')}!`
+              : `${t('yourFreeTrialEnds')} ${trialDaysLeft} ${t('days')}.`}
           </AlertDescription>
         </Alert>
         <Button
@@ -93,7 +95,7 @@ const SubscriptionButton = () => {
           disabled={loading || !session?.user?.email}
           className="w-full"
         >
-          {loading ? "Redirecting..." : "Upgrade Now"}
+          {loading ? "Redirecting..." : t('upgradeNow')}
         </Button>
         {error && <div className="text-red-500 text-sm">{error}</div>}
       </div>

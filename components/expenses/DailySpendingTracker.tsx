@@ -16,6 +16,7 @@ import NewExpenseForm from "./NewExpenseForm";
 import ExpenseList from "./ExpenseList";
 import { AITransactionInput } from "./AITransactionInput";
 import type { Budget } from "@/lib/api";
+import { useTranslation } from "@/lib/i18n";
 
 interface Category {
   _id?: string;
@@ -46,6 +47,7 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
   categories,
   expenses,
 }) => {
+  const { t } = useTranslation();
   const totalSpent = expenses.reduce((sum, expense) => {
     return (
       sum + (expense.type === "expense" ? expense.amount : -expense.amount)
@@ -62,10 +64,10 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-0">
           <div>
             <CardTitle className="text-xl sm:text-2xl font-semibold">
-              Transactions
+              {t('transactionHistory')}
             </CardTitle>
             <CardDescription className="text-sm sm:text-base">
-              Track your daily income and expenses
+              {t('trackDailyExpenses')}
             </CardDescription>
           </div>
           <div className="text-right">
@@ -77,7 +79,7 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
               {formatMoney(remaining)}
             </div>
             <div className="text-xs sm:text-sm text-muted-foreground">
-              Available to Spend
+              {t('availableToSpend')}
             </div>
           </div>
         </div>
@@ -98,13 +100,13 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
         <Tabs defaultValue="add" className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="add" className="text-xs sm:text-sm">
-              Add Transaction
+              {t('addTransaction')}
             </TabsTrigger>
             <TabsTrigger value="ai" className="text-xs sm:text-sm">
-              AI Quick Input
+              {t('aiQuickInput')}
             </TabsTrigger>
             <TabsTrigger value="history" className="text-xs sm:text-sm">
-              Transaction History
+              {t('transactionHistory')}
             </TabsTrigger>
           </TabsList>
 

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Lock, AlertTriangle, Crown } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { useTranslation } from "@/lib/i18n";
 
 interface AccessRestrictedProps {
   reason: "trial_expired" | "no_subscription";
@@ -15,6 +16,7 @@ export default function AccessRestricted({
   reason,
   onUpgrade,
 }: AccessRestrictedProps) {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
 
@@ -65,7 +67,7 @@ export default function AccessRestricted({
             className="w-full"
             size="lg"
           >
-            {loading ? "Redirecting..." : "Upgrade Now"}
+            {loading ? "Redirecting..." : t('upgradeNow')}
           </Button>
         </div>
       </div>

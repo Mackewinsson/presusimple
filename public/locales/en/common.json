@@ -1,0 +1,23 @@
+{
+  "createBudget": "Create Budget",
+  "submit": "Submit",
+  "welcome": "Welcome",
+  "budget": "Budget",
+  "expenses": "Expenses",
+  "categories": "Categories",
+  "amount": "Amount",
+  "description": "Description",
+  "date": "Date",
+  "type": "Type",
+  "expense": "Expense",
+  "income": "Income",
+  "addTransaction": "Add Transaction",
+  "transactionHistory": "Transaction History",
+  "availableToSpend": "Available to Spend",
+  "totalBudgeted": "Total Budgeted",
+  "totalSpent": "Total Spent",
+  "remaining": "Remaining",
+  "settings": "Settings",
+  "signOut": "Sign Out",
+  "history": "History"
+} 

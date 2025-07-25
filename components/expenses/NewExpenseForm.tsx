@@ -17,6 +17,7 @@ import { format } from "date-fns";
 import { useSession } from "next-auth/react";
 import { useUserId, useCreateExpense } from "@/lib/hooks";
 import { LoadingButton } from "@/components/ui/loading-skeleton";
+import { useTranslation } from "@/lib/i18n";
 
 interface Budget {
   _id: string;
@@ -55,6 +56,7 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
   categories,
   expenses,
 }) => {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const { data: userId } = useUserId();
   const createExpenseMutation = useCreateExpense();
@@ -110,7 +112,7 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
     <form onSubmit={handleSubmit} className="space-y-4" data-testid="expense-form">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="amount">Amount</Label>
+          <Label htmlFor="amount">{t('amount')}</Label>
           <div className="relative">
             <Input
               id="amount"
@@ -126,7 +128,7 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="type">Type</Label>
+          <Label htmlFor="type">{t('type')}</Label>
           <Select
             value={type}
             onValueChange={(value: TransactionType) => setType(value)}
@@ -142,7 +144,7 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
                 <div className="flex items-center gap-2">
                   <ArrowUpCircle className="h-4 w-4 text-red-600 dark:text-red-400 !text-red-600 !dark:text-red-400" />
                   <span className="text-red-600 dark:text-red-400 !text-red-600 !dark:text-red-400">
-                    Expense
+                    {t('expense')}
                   </span>
                 </div>
               </SelectItem>
@@ -153,7 +155,7 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
                 <div className="flex items-center gap-2">
                   <ArrowDownCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
                   <span className="text-green-600 dark:text-green-400">
-                    Income
+                    {t('income')}
                   </span>
                 </div>
               </SelectItem>
@@ -163,11 +165,11 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">{t('description')}</Label>
         <Input
           id="description"
           type="text"
-          placeholder="What was this transaction for?"
+          placeholder={t('whatWasThisFor')}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
@@ -179,7 +181,7 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
           <Label htmlFor="category">Category</Label>
           <Select value={categoryId} onValueChange={setCategoryId}>
             <SelectTrigger>
-              <SelectValue placeholder="Select a category" />
+              <SelectValue placeholder={t('selectACategory')} />
             </SelectTrigger>
             <SelectContent>
               {categories.map((category) => (
@@ -195,7 +197,7 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="date">Date</Label>
+          <Label htmlFor="date">{t('date')}</Label>
           <Input
             id="date"
             type="date"
@@ -212,7 +214,7 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
         loading={createExpenseMutation.isPending}
       >
         <Plus className="h-4 w-4 mr-2" />
-        Add Transaction
+        {t('addTransaction')}
       </LoadingButton>
     </form>
   );

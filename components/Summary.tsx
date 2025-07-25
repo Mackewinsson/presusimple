@@ -10,6 +10,7 @@ import {
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { SpendingChart } from "@/components/ui/SpendingChart";
 import { useCurrentCurrency } from "@/lib/hooks";
+import { useTranslation } from "@/lib/i18n";
 
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
@@ -43,6 +44,7 @@ interface SummaryProps {
 }
 
 const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
+  const { t } = useTranslation();
   const currentCurrency = useCurrentCurrency();
   // Calculate total spent from expenses
   const totalSpent = expenses.reduce((sum, expense) => {
@@ -158,10 +160,10 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-0">
           <div>
             <CardTitle className="text-xl sm:text-2xl font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              Budget Summary
+              {t('budgetSummary')}
             </CardTitle>
             <CardDescription className="text-sm sm:text-base">
-              Overview of your budget and top spending categories
+              {t('overviewBudgetCategories')}
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">
@@ -172,7 +174,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
               className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm"
             >
               <FileSpreadsheet className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="hidden sm:inline">Excel</span>
+              <span className="hidden sm:inline">{t('excel')}</span>
               <span className="sm:hidden">XLS</span>
             </Button>
 
@@ -183,7 +185,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
           <div className="p-3 sm:p-4 rounded-xl bg-secondary/50 backdrop-blur text-center">
             <div className="text-xs sm:text-sm text-muted-foreground mb-1">
-              Total Budgeted
+              {t('totalBudgeted')}
             </div>
             <div className="text-lg sm:text-xl md:text-2xl font-semibold">
                               {formatMoney(calculatedTotalBudgeted, currentCurrency)}
@@ -192,7 +194,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
 
           <div className="p-3 sm:p-4 rounded-xl bg-primary/5 backdrop-blur text-center">
             <div className="text-xs sm:text-sm text-muted-foreground mb-1">
-              Total Spent
+              {t('totalSpent')}
             </div>
             <div className="text-lg sm:text-xl md:text-2xl font-semibold">
                               {formatMoney(totalSpent, currentCurrency)}
@@ -201,7 +203,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
 
           <div className="p-3 sm:p-4 rounded-xl bg-secondary/50 backdrop-blur text-center sm:col-span-2 lg:col-span-1">
             <div className="text-xs sm:text-sm text-muted-foreground mb-1">
-              Remaining
+              {t('remaining')}
             </div>
             <div
               className={`text-lg sm:text-xl md:text-2xl font-semibold ${
@@ -263,7 +265,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
         ) : (
           <div className="text-center py-8 sm:py-12 px-4 rounded-lg bg-muted/30">
             <p className="text-sm sm:text-base text-muted-foreground">
-              Add some budget categories to see a summary
+              {t('addBudgetCategoriesToSee')}
             </p>
           </div>
         )}

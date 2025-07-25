@@ -34,8 +34,11 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import { useSearchParams } from "next/navigation";
 import { NewUserOnboarding } from "@/components/NewUserOnboarding";
 import { Suspense } from "react";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useTranslation } from "@/lib/i18n";
 
 function BudgetAppContent() {
+  const { t } = useTranslation();
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -139,10 +142,11 @@ function BudgetAppContent() {
                 </h1>
               </Link>
               <span className="text-sm sm:text-base text-slate-600 dark:text-white/70">
-                {isNewUser ? `Welcome, ${session?.user?.name}!` : `Welcome back, ${session?.user?.name}!`}
+                {isNewUser ? `${t('welcomeNew')}, ${session?.user?.name}!` : `${t('welcomeBack')}, ${session?.user?.name}!`}
               </span>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
+              <LanguageSwitcher />
               <ThemeToggle />
               <SignOutButton
                 variant="outline"
@@ -156,7 +160,7 @@ function BudgetAppContent() {
               >
                 <History className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span className="hidden sm:inline text-sm sm:text-base">
-                  History
+                  {t('history')}
                 </span>
               </Link>
             </div>

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Providers from "@/components/Providers";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import LocaleProvider from "@/components/LocaleProvider";
 
 // Load Inter font locally instead of from Google Fonts
 const inter = Inter({
@@ -30,9 +31,11 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <ThemeProvider>
-          <Providers>
-            <main>{children}</main>
-          </Providers>
+          <LocaleProvider initialLocale="en">
+            <Providers>
+              <main>{children}</main>
+            </Providers>
+          </LocaleProvider>
         </ThemeProvider>
       </body>
     </html>

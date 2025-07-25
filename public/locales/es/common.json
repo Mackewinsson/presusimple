@@ -1,0 +1,23 @@
+{
+  "createBudget": "Crear Presupuesto",
+  "submit": "Enviar",
+  "welcome": "Bienvenido",
+  "budget": "Presupuesto",
+  "expenses": "Gastos",
+  "categories": "Categorías",
+  "amount": "Cantidad",
+  "description": "Descripción",
+  "date": "Fecha",
+  "type": "Tipo",
+  "expense": "Gasto",
+  "income": "Ingreso",
+  "addTransaction": "Agregar Transacción",
+  "transactionHistory": "Historial de Transacciones",
+  "availableToSpend": "Disponible para Gastar",
+  "totalBudgeted": "Total Presupuestado",
+  "totalSpent": "Total Gastado",
+  "remaining": "Restante",
+  "settings": "Configuración",
+  "signOut": "Cerrar Sesión",
+  "history": "Historial"
+} 

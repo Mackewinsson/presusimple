@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Search, Calendar } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/lib/i18n";
 
 interface Category {
   _id?: string;
@@ -37,6 +38,7 @@ interface ExpenseListProps {
 }
 
 const ExpenseList: React.FC<ExpenseListProps> = ({ categories, expenses }) => {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -74,7 +76,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ categories, expenses }) => {
   if (expenses.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        No transactions yet. Add one to get started.
+        {t('noTransactionsYet')}
       </div>
     );
   }

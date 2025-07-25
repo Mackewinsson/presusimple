@@ -9,8 +9,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Crown, Clock, AlertTriangle, Sparkles } from "lucide-react";
 import { useUserData } from "@/lib/hooks/useUserData";
 import { calculateTrialDaysLeft } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n";
 
 export function TrialStatus() {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const { data: user, isLoading } = useUserData();
   const [loading, setLoading] = useState(false);
@@ -77,7 +79,7 @@ export function TrialStatus() {
           className="mt-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white"
           size="sm"
         >
-          {loading ? "Redirecting..." : "Upgrade Now"}
+          {loading ? "Redirecting..." : t('upgradeNow')}
         </Button>
       </Alert>
     );
@@ -118,7 +120,7 @@ export function TrialStatus() {
               className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white"
               size="sm"
             >
-              {loading ? "Redirecting..." : "Upgrade Now"}
+              {loading ? "Redirecting..." : t('upgradeNow')}
             </Button>
           </div>
         </CardContent>

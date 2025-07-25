@@ -18,6 +18,7 @@ import { Sparkles, Zap, XCircle, CheckCircle, AlertCircle, DollarSign, Plus, Min
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { AITransactionLoading } from "@/components/ui/ai-transaction-loading";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/lib/i18n";
 
 interface ParsedTransaction {
   description: string;
@@ -349,6 +350,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
 };
 
 export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [parsedTransactions, setParsedTransactions] = useState<ParsedTransaction[]>([]);
@@ -813,25 +815,25 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
             <div className="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-ping" />
           </div>
           <span className="text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 bg-clip-text font-bold">
-            AI Magic
+            {t('aiMagic')}
           </span>
           <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-transparent bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text animate-bounce" />
         </CardTitle>
           <CardDescription className="text-sm sm:text-base text-gray-600">
-            Just describe your day in plain English and watch AI transform it into perfect budget entries
+            {t('aiDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Textarea
-              placeholder="Example: coffee 5, lunch 15, gas 40, salary 2000"
+              placeholder={t('aiExample')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="min-h-[100px]"
               disabled={isParsing}
             />
             <div className="flex justify-between items-center text-xs text-gray-500">
-              <span>{description.length}/500 characters</span>
+              <span>{description.length}/500 {t('charactersRemaining')}</span>
               <span>{description.length < 3 ? 'Need more detail' : 'Ready to parse'}</span>
             </div>
           </div>
@@ -855,7 +857,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
               ) : categories?.length === 0 ? (
                 <>
                   <XCircle className="h-4 w-4 mr-2" />
-                  <span>No categories available</span>
+                  <span>{t('noCategoriesAvailable')}</span>
                 </>
               ) : (
                 <>
@@ -868,20 +870,20 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
 
           {categories?.length === 0 && !isLoadingCategories && (
             <div className="text-xs text-muted-foreground bg-white/10 p-3 rounded-lg">
-              <p className="font-medium mb-1">Setup Required</p>
-              <p>You need to create budget categories first. Go to Budget Setup to add categories.</p>
+              <p className="font-medium mb-1">{t('setupRequired')}</p>
+              <p>{t('setupRequiredMessage')}</p>
             </div>
           )}
 
           <div className="text-xs text-muted-foreground space-y-2">
             <p className="font-medium flex items-center gap-2">
               <Sparkles className="h-3 w-3 text-white" />
-              Try these examples:
+              {t('tryExamples')}
             </p>
             <ul className="space-y-1">
-              <li className="hover:text-white transition-colors cursor-pointer">• "coffee 5, lunch 15" → Two food expenses</li>
-              <li className="hover:text-white transition-colors cursor-pointer">• "rent 500, gas 40" → Rent and transportation</li>
-              <li className="hover:text-white transition-colors cursor-pointer">• "salary 2000, freelance 500" → Two income sources</li>
+              <li className="hover:text-white transition-colors cursor-pointer">• "{t('coffeeExample')}" → Two food expenses</li>
+              <li className="hover:text-white transition-colors cursor-pointer">• "{t('rentExample')}" → Rent and transportation</li>
+              <li className="hover:text-white transition-colors cursor-pointer">• "{t('salaryExample')}" → Two income sources</li>
             </ul>
           </div>
 

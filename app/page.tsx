@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import ThemeToggle from "@/components/ThemeToggle";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import TranslationDemo from "@/components/TranslationDemo";
 
 export default function LandingPage() {
   const { data: session } = useSession();
@@ -32,6 +34,7 @@ export default function LandingPage() {
               </h1>
             </Link>
             <div className="flex items-center gap-2 sm:gap-4">
+              <LanguageSwitcher />
               <ThemeToggle />
               {session ? (
                 <button
@@ -93,6 +96,19 @@ export default function LandingPage() {
               Start Budgeting Now
               <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
+          </div>
+        </section>
+
+        {/* Translation Demo Section */}
+        <section className="py-8 sm:py-12 px-4 bg-white/5 dark:bg-white/5">
+          <div className="container mx-auto text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-slate-900 dark:text-white">
+              Multi-language Support
+            </h2>
+            <p className="text-slate-700 dark:text-white/80 mb-8">
+              Switch between English and Spanish using the language selector above.
+            </p>
+            <TranslationDemo />
           </div>
         </section>
 

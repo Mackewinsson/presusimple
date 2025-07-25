@@ -3,9 +3,12 @@
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import SignOutButton from "@/components/SignOutButton";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useTranslation } from "@/lib/i18n";
 
 export default function Navigation() {
   const { data: session, status } = useSession();
+  const { t } = useTranslation();
 
   return (
     <nav className="bg-white shadow-lg">
@@ -13,11 +16,12 @@ export default function Navigation() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
             <Link href="/" className="text-xl font-bold text-gray-800">
-              Budget App
+              {t('budget')} App
             </Link>
           </div>
 
           <div className="flex items-center space-x-4">
+            <LanguageSwitcher />
             {status === "authenticated" ? (
               <>
                 <Link
