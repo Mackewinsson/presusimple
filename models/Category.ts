@@ -4,7 +4,8 @@ export interface ICategory extends Document {
   name: string;
   budgeted: number;
   spent: number;
-  sectionId: string;
+  sectionId: string; // Keep for UI compatibility
+  budgetId: string; // Add for backend logic
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,6 +28,10 @@ const CategorySchema: Schema = new Schema(
       min: 0,
     },
     sectionId: {
+      type: String,
+      required: true,
+    },
+    budgetId: {
       type: String,
       required: true,
     },

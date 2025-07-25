@@ -167,13 +167,14 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     name: string,
     budgeted: number
   ) => {
-    if (!userId) return;
+    if (!userId || !budget) return;
 
     try {
       await createCategoryMutation.mutateAsync({
         name,
         budgeted,
         sectionId,
+        budgetId: budget._id,
         userId,
       });
       // Budget totals are automatically updated by the API

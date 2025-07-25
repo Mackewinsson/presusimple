@@ -151,15 +151,18 @@ export const categoryApi = {
     name: string;
     budgeted: number;
     sectionId: string;
+    budgetId: string;
     userId: string;
-    budgetId?: string;
   }): Promise<Category> => {
     const response = await fetch("/api/categories", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(categoryData),
     });
-    if (!response.ok) throw new Error("Failed to create category");
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || "Failed to create category");
+    }
     return response.json();
   },
 

@@ -18,14 +18,9 @@ export async function GET(request: NextRequest) {
         return NextResponse.json([]);
       }
 
-      // Get section names from the budget
-      const sectionNames = budget.sections.map(
-        (section: any) => section.name
-      );
-
-      // Filter categories by section names
+      // Get categories for this budget (using budgetId for backend logic)
       const categories = await Category.find({
-        sectionId: { $in: sectionNames },
+        budgetId: budget._id,
       }).sort({ createdAt: -1 });
 
       return NextResponse.json(categories);
@@ -36,25 +31,19 @@ export async function GET(request: NextRequest) {
         return NextResponse.json([]);
       }
 
-      // Get section names from the budget
-      const sectionNames = budget.sections.map(
-        (section: any) => section.name
-      );
-
       console.log("Categories API: Filtering by budget", {
         budgetId,
-        sectionNames,
-        budgetSections: budget.sections
+        budgetObjectId: budget._id
       });
 
-      // Filter categories by section names
+      // Get categories for this budget (using budgetId for backend logic)
       const categories = await Category.find({
-        sectionId: { $in: sectionNames },
+        budgetId: budget._id,
       }).sort({ createdAt: -1 });
 
       console.log("Categories API: Found categories", {
         categoriesCount: categories.length,
-        categories: categories.map(cat => ({ name: cat.name, sectionId: cat.sectionId }))
+        categories: categories.map(cat => ({ name: cat.name, sectionId: cat.sectionId, budgetId: cat.budgetId }))
       });
 
       return NextResponse.json(categories);
@@ -80,9 +69,9 @@ export async function POST(request: NextRequest) {
 
     const { name, budgeted, sectionId, budgetId } = body;
 
-    if (!name || budgeted === undefined || !sectionId) {
+    if (!name || budgeted === undefined || !sectionId || !budgetId) {
       return NextResponse.json(
-        { error: "Missing required fields: name, budgeted, sectionId" },
+        { error: "Missing required fields: name, budgeted, sectionId, budgetId" },
         { status: 400 }
       );
     }
@@ -94,66 +83,66 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Temporarily disabled validation to debug
     // Check if category with same name already exists in this section
-    const existingCategory = await Category.findOne({
-      name: name.trim(),
-      sectionId: sectionId
-    });
+    // const existingCategory = await Category.findOne({
+    //   name: name.trim(),
+    //   sectionId: sectionId
+    // });
 
-    if (existingCategory) {
-      return NextResponse.json(
-        { error: `Category "${name}" already exists in this section` },
-        { status: 400 }
-      );
-    }
+    // if (existingCategory) {
+    //   return NextResponse.json(
+    //     { error: `Category "${name}" already exists in this section` },
+    //     { status: 400 }
+    //   );
+    // }
 
 
 
+    console.log("Creating category with data:", { name, budgeted, sectionId, budgetId });
+    
     const category = new Category({
       name,
       budgeted,
       spent: 0,
       sectionId,
+      budgetId,
     });
 
     const savedCategory = await category.save();
+    console.log("Category saved successfully:", savedCategory);
 
     // Update the budget's totalBudgeted to reflect the new category
-    let budget;
-    
-    // If budgetId is provided, use that specific budget
-    if (budgetId) {
-      budget = await Budget.findById(budgetId);
-    } else {
-      // Fallback: try to find budget by section name
-      budget = await Budget.findOne({ "sections.name": sectionId });
-      
-      // If not found, try to find budget by section ID (ObjectId)
-      if (!budget) {
-        budget = await Budget.findOne({ "sections._id": sectionId });
-      }
-    }
+    const budget = await Budget.findById(budgetId);
     
     if (budget) {
+      console.log("Found budget for update:", budget._id);
+      
       // Get all categories for this budget (including the newly created one)
-      const sectionNames = budget.sections.map(
-        (section: any) => section.name
-      );
       const allCategories = await Category.find({
-        sectionId: { $in: sectionNames },
+        budgetId: budget._id,
       });
+      console.log("All categories found:", allCategories.length);
       
       // Calculate total budgeted from all categories
       const totalBudgeted = allCategories.reduce((sum, cat) => sum + cat.budgeted, 0);
+      console.log("Total budgeted calculated:", totalBudgeted);
       
       // Update budget totals atomically
       const totalBudgetAmount = budget.totalBudgeted + budget.totalAvailable;
       const newTotalAvailable = Math.max(0, totalBudgetAmount - totalBudgeted);
 
-      await Budget.findByIdAndUpdate(budget._id, {
+      const updatedBudget = await Budget.findByIdAndUpdate(budget._id, {
         totalBudgeted: totalBudgeted,
         totalAvailable: newTotalAvailable,
       }, { new: true });
+      
+      console.log("Budget updated successfully:", {
+        totalBudgeted: updatedBudget.totalBudgeted,
+        totalAvailable: updatedBudget.totalAvailable
+      });
+    } else {
+      console.log("No budget found for budgetId:", budgetId);
     }
 
     return NextResponse.json(savedCategory, { status: 201 });
