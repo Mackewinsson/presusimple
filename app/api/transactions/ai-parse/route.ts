@@ -79,9 +79,7 @@ export async function POST(request: NextRequest) {
       '\n\nCRITICAL: You MUST use ONLY the available categories listed above. NEVER create new categories. If no exact match exists, choose the closest available category from the list provided.';
 
     // Debug logging
-    console.log('Available categories:', categories);
-    console.log('Enhanced prompt:', enhancedPrompt);
-    console.log('User input:', description);
+
 
     // Call OpenAI with function calling
     let completion;
@@ -130,14 +128,10 @@ export async function POST(request: NextRequest) {
     try {
       transactionData = JSON.parse(functionCall.arguments);
       // Debug logging
-      console.log('AI response:', transactionData);
-      console.log('AI response transactions:', transactionData.transactions);
+      
       if (transactionData.transactions && transactionData.transactions.length > 0) {
         transactionData.transactions.forEach((tx: any, index: number) => {
-          console.log(`Transaction ${index}:`, tx);
-          if (tx.suggestedCategories) {
-            console.log(`Transaction ${index} suggestions:`, tx.suggestedCategories);
-          }
+          // Transaction processing
         });
       }
     } catch (parseError) {

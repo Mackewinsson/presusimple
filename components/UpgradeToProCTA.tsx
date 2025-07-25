@@ -43,7 +43,7 @@ export function UpgradeToProCTA({ feature, className = "" }: UpgradeToProCTAProp
           className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold"
           onClick={() => {
             // TODO: Implement upgrade flow
-            console.log("Upgrade to Pro clicked");
+        
           }}
         >
           <Sparkles className="h-4 w-4 mr-2" />

@@ -197,11 +197,7 @@ export async function POST(request: NextRequest) {
       sectionName: "General"
     }));
 
-    console.log('AI Budget Creation Response:', {
-      income: budgetData.income,
-      categories: categoriesWithSection,
-      totalCategories: categoriesWithSection.length
-    });
+
 
     return NextResponse.json({
       income: budgetData.income,

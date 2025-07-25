@@ -71,25 +71,13 @@ function InsightsContent() {
   const { data: allCategories = [] } = useCategories(userId || "");
 
   // Enhanced debug logging
-  console.log('=== INSIGHTS DEBUG ===');
-  console.log('User ID:', userId);
-  console.log('URL Budget ID:', searchParams.get('budget'));
-  console.log('Selected Budget ID:', selectedBudgetId);
-  console.log('Budgets Loading:', budgetsLoading);
-  console.log('All Budgets Count:', budgets.length);
-  console.log('All Budgets:', budgets);
-  console.log('Selected Budget:', selectedBudget);
-  console.log('All Expenses Count:', allExpenses.length);
-  console.log('All Categories Count:', allCategories.length);
-  console.log('Sample Expense:', allExpenses[0]);
-  console.log('Sample Category:', allCategories[0]);
+
 
   // Filter expenses for the selected month/year
   const selectedMonth = selectedBudget?.month;
   const selectedYear = selectedBudget?.year;
   
-  console.log('Selected Month:', selectedMonth);
-  console.log('Selected Year:', selectedYear);
+
   
   const filteredExpenses = allExpenses.filter((exp) => {
     const expDate = new Date(exp.date);
@@ -106,20 +94,17 @@ function InsightsContent() {
     const matchesMonth = expMonth === selectedMonthNumber;
     const matchesYear = expYear === selectedYear;
     
-    console.log(`Expense date: ${exp.date}, month: ${expMonth}, year: ${expYear}`);
-    console.log(`Selected month: ${selectedMonthNumber}, year: ${selectedYear}`);
-    console.log(`Matches: month=${matchesMonth}, year=${matchesYear}`);
+    
     
     return matchesMonth && matchesYear;
   });
   
-  console.log('Filtered Expenses Count:', filteredExpenses.length);
-  console.log('Sample Filtered Expense:', filteredExpenses[0]);
+
 
   // Calculate spent for each category using a more robust approach
   const categoriesWithSpent = (selectedBudget?.categories || []).map(
     (monthlyCategory) => {
-      console.log(`Processing category: ${monthlyCategory.name}`);
+
       
       // Try multiple matching strategies
       let categoryExpenses = [];
@@ -130,12 +115,12 @@ function InsightsContent() {
       );
       
       if (actualCategory) {
-        console.log(`Found actual category for ${monthlyCategory.name}:`, actualCategory._id);
+        
         categoryExpenses = filteredExpenses.filter((exp) => 
           exp.categoryId === actualCategory._id
         );
       } else {
-        console.log(`No actual category found for ${monthlyCategory.name}, trying name matching`);
+        
         // Strategy 2: Direct name matching (fallback)
         categoryExpenses = filteredExpenses.filter((exp) => {
           // Find the category name for this expense
@@ -154,15 +139,7 @@ function InsightsContent() {
       // Fallback to monthly budget's own data if no expenses found
       const spent = filteredExpenses.length > 0 ? spentFromExpenses : monthlyCategory.spent;
 
-      console.log(`Category: ${monthlyCategory.name}`, {
-        categoryName: monthlyCategory.name,
-        actualCategoryId: actualCategory?._id,
-        categoryExpensesCount: categoryExpenses.length,
-        categoryExpenses: categoryExpenses,
-        spentFromExpenses,
-        monthlyBudgetSpent: monthlyCategory.spent,
-        finalSpent: spent
-      });
+
 
       return { ...monthlyCategory, spent };
     }

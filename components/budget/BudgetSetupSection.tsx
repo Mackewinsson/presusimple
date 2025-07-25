@@ -19,8 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import BudgetSectionItem from "./BudgetSectionItem";
-import NewSectionForm from "./NewSectionForm";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { toast } from "sonner";
 import { currencies, type Currency, useCurrentCurrency } from "@/lib/hooks";
@@ -42,6 +40,8 @@ import { useExpenses } from "@/lib/hooks/useExpenseQueries";
 import type { Budget } from "@/lib/api";
 import { budgetApi } from "@/lib/api";
 import { budgetKeys } from "@/lib/hooks/useBudgetQueries";
+import BudgetSectionItem from "./BudgetSectionItem";
+import NewSectionForm from "./NewSectionForm";
 import { AILoading } from "@/components/ui/ai-loading";
 import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
 import { UpgradeToProCTA } from "@/components/UpgradeToProCTA";
@@ -88,13 +88,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   budget,
   categories,
 }) => {
-  // Debug: Log budget changes
-  console.log("BudgetSetupSection render - budget:", {
-    _id: budget?._id,
-    totalBudgeted: budget?.totalBudgeted,
-    totalAvailable: budget?.totalAvailable,
-    sections: budget?.sections?.length || 0
-  });
+
   const { t } = useTranslation();
   const { data: session } = useSession();
   const currentCurrency = useCurrentCurrency();
@@ -255,42 +249,6 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     }
   };
 
-  // Update total budget
-  const handleSetTotalBudget = async () => {
-    if (!budget) return;
-    
-    const amount = parseFloat(totalBudget);
-    if (isNaN(amount) || amount < 0) {
-      toast.error("Please enter a valid amount");
-      return;
-    }
-
-    const currentlyBudgeted = budget.totalBudgeted || 0;
-
-    if (amount < currentlyBudgeted) {
-      toast.error("New total cannot be less than currently budgeted amount");
-      return;
-    }
-
-    const newTotalAvailable = amount - currentlyBudgeted;
-
-    try {
-      await updateBudgetMutation.mutateAsync({
-        id: budget._id,
-        updates: {
-          totalBudgeted: currentlyBudgeted, // Keep currently budgeted amount
-          totalAvailable: newTotalAvailable, // Adjust available amount
-        },
-      });
-
-      setIsEditingTotal(false);
-      setTotalBudget("");
-    } catch (error) {
-      console.error("Failed to update budget:", error);
-      toast.error("Failed to update budget. Please try again.");
-    }
-  };
-
   // Add a new section
   const handleAddSection = async (name: string) => {
     if (!budget) return;
@@ -330,8 +288,6 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   const handleUpdateSection = async (oldSectionName: string, newSectionName: string) => {
     if (!budget) return;
     
-    console.log("Starting section update:", { oldSectionName, newSectionName, budgetId: budget._id });
-    
     try {
       // Use the atomic section update API
       const result = await budgetApi.updateSectionName(
@@ -339,11 +295,6 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
         oldSectionName,
         newSectionName
       );
-      
-      console.log("Section updated successfully:", {
-        updatedCategories: result.updatedCategories,
-        newBudget: result.budget
-      });
 
       // Update the cache with the new budget data
       queryClient.setQueryData(budgetKeys.detail(budget._id), result.budget);
@@ -358,6 +309,44 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       toast.error("Failed to update section name. Please try again.");
     }
   };
+
+  // Update total budget
+  const handleSetTotalBudget = async () => {
+    if (!budget) return;
+    
+    const amount = parseFloat(totalBudget);
+    if (isNaN(amount) || amount < 0) {
+      toast.error("Please enter a valid amount");
+      return;
+    }
+
+    const currentlyBudgeted = budget.totalBudgeted || 0;
+
+    if (amount < currentlyBudgeted) {
+      toast.error("New total cannot be less than currently budgeted amount");
+      return;
+    }
+
+    const newTotalAvailable = amount - currentlyBudgeted;
+
+    try {
+      await updateBudgetMutation.mutateAsync({
+        id: budget._id,
+        updates: {
+          totalBudgeted: currentlyBudgeted, // Keep currently budgeted amount
+          totalAvailable: newTotalAvailable, // Adjust available amount
+        },
+      });
+
+      setIsEditingTotal(false);
+      setTotalBudget("");
+    } catch (error) {
+      console.error("Failed to update budget:", error);
+      toast.error("Failed to update budget. Please try again.");
+    }
+  };
+
+
 
   const handleCreateBudget = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -377,7 +366,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       return;
     }
 
-    console.log("Creating budget with userId:", userId);
+
 
     // Convert month name to number (1-based)
     const monthNumber = getMonthNumber(newMonth);
@@ -390,7 +379,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
         totalAvailable: total, // All amount is available to budget
         user: userId,
       });
-      console.log("Budget created successfully");
+
       
       // Reset form after successful creation
       setNewTotal("");
@@ -463,7 +452,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
 
     try {
       await deleteBudgetMutation.mutateAsync(budget._id);
-      console.log("Budget deleted successfully");
+
     } catch (error) {
       console.error("Failed to delete budget:", error);
       toast.error("Failed to delete budget. Please try again.");
@@ -514,7 +503,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   }
 
   // Debug: log budget value
-  console.log("budget", budget);
+  
 
   // Show create form if no budget
   if (!budget) {

@@ -37,6 +37,7 @@ import { Suspense } from "react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useTranslation } from "@/lib/i18n";
 import PWAInstaller from "@/components/PWAInstaller";
+import { useState } from "react";
 
 function BudgetAppContent() {
   const { t } = useTranslation();
@@ -62,6 +63,7 @@ function BudgetAppContent() {
   const { data: subscription } = useUserSubscription();
   const accessControl = useAccessControl();
   const featureFlags = useFeatureFlags();
+  const [inputMode, setInputMode] = useState<'manual' | 'ai'>('manual');
 
   // Check if any data is loading
   const isLoading =
@@ -86,12 +88,8 @@ function BudgetAppContent() {
     // Check if user is new and redirect to welcome page
     // Only redirect if user is new AND hasn't completed onboarding
     const onboardingComplete = localStorage.getItem("onboardingComplete");
-    console.log("Debug - session.isNewUser:", session.isNewUser);
-    console.log("Debug - userLoading:", userLoading);
-    console.log("Debug - onboardingComplete:", onboardingComplete);
     
     if (session.isNewUser && !userLoading && !onboardingComplete) {
-      console.log("New user detected, redirecting to welcome page");
       router.replace("/app/welcome");
       return;
     }
@@ -106,9 +104,7 @@ function BudgetAppContent() {
     return <AppLoadingSkeleton />;
   }
 
-  console.log("App page - Subscription status:", subscriptionStatus);
-  console.log("App page - Access control:", accessControl);
-  console.log("App page - Can create budget:", accessControl.canCreateBudget);
+
 
   // Show access restricted for trial expired or no subscription
   // But only after we've confirmed the user data has loaded and access control is not loading
@@ -182,6 +178,7 @@ function BudgetAppContent() {
                 categories={categories}
               />
             )}
+
             {accessControl.canResetBudget && (
               <ResetButton
                 budget={budget || null}
@@ -191,14 +188,28 @@ function BudgetAppContent() {
             )}
           </div>
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
-            {/* AI Quick Input - Now with feature flags */}
-            {budget && accessControl.canAccessExpenses && featureFlags.hasFeatureAccess("transactionTextInput") && (
+            {/* Input Mode Toggle */}
+            <div className="flex gap-2 mb-2">
+              <button
+                className={`px-3 py-1 rounded ${inputMode === 'manual' ? 'bg-primary text-white' : 'bg-white border'}`}
+                onClick={() => setInputMode('manual')}
+              >
+                Manual
+              </button>
+              {featureFlags.hasFeatureAccess("transactionTextInput") && (
+                <button
+                  className={`px-3 py-1 rounded ${inputMode === 'ai' ? 'bg-primary text-white' : 'bg-white border'}`}
+                  onClick={() => setInputMode('ai')}
+                >
+                  AI
+                </button>
+              )}
+            </div>
+            {/* Conditionally render input components */}
+            {budget && accessControl.canAccessExpenses && inputMode === 'ai' && featureFlags.hasFeatureAccess("transactionTextInput") && (
               <AITransactionInput budgetId={budget._id} />
             )}
-            {budget && accessControl.canAccessExpenses && !featureFlags.hasFeatureAccess("transactionTextInput") && (
-              <UpgradeToProCTA feature="transactionTextInput" />
-            )}
-            {budget && accessControl.canAccessExpenses && (
+            {budget && accessControl.canAccessExpenses && inputMode === 'manual' && (
               <DailySpendingTracker
                 budget={budget}
                 categories={categories}

@@ -87,10 +87,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("Category creation with budgetId:", budgetId);
 
-    console.log("=== CATEGORY CREATION DEBUG ===");
-    console.log("Creating category:", { name, budgeted, sectionId });
 
     const category = new Category({
       name,
@@ -100,35 +97,24 @@ export async function POST(request: NextRequest) {
     });
 
     const savedCategory = await category.save();
-    console.log("Category saved:", savedCategory);
 
     // Update the budget's totalBudgeted to reflect the new category
     let budget;
     
     // If budgetId is provided, use that specific budget
     if (budgetId) {
-      console.log("Looking for specific budget:", budgetId);
       budget = await Budget.findById(budgetId);
-      console.log("Found budget by ID:", budget ? budget._id : "Not found");
     } else {
       // Fallback: try to find budget by section name
-      console.log("Looking for budget by section name:", sectionId);
       budget = await Budget.findOne({ "sections.name": sectionId });
       
       // If not found, try to find budget by section ID (ObjectId)
       if (!budget) {
         budget = await Budget.findOne({ "sections._id": sectionId });
       }
-      console.log("Found budget by section:", budget ? budget._id : "Not found");
     }
     
     if (budget) {
-      console.log("Found budget:", {
-        _id: budget._id,
-        totalBudgeted: budget.totalBudgeted,
-        totalAvailable: budget.totalAvailable
-      });
-
       // Get all categories for this budget
       const sectionNames = budget.sections.map(
         (section: any) => section.name
@@ -137,40 +123,18 @@ export async function POST(request: NextRequest) {
         sectionId: { $in: sectionNames },
       });
       
-      console.log("All categories for budget:", allCategories.map(c => ({
-        name: c.name,
-        budgeted: c.budgeted
-      })));
-      
       // Calculate total budgeted from all categories
       const totalBudgeted = allCategories.reduce((sum, cat) => sum + cat.budgeted, 0);
-      console.log("Total budgeted calculated:", totalBudgeted);
       
       // Update budget totals
       const totalBudgetAmount = budget.totalBudgeted + budget.totalAvailable;
-      console.log("Total budget amount:", totalBudgetAmount);
-      
       const newTotalAvailable = totalBudgetAmount - totalBudgeted;
-      console.log("New values to set:", {
-        totalBudgeted: totalBudgeted,
-        totalAvailable: newTotalAvailable
-      });
 
-      const updateResult = await Budget.findByIdAndUpdate(budget._id, {
+      await Budget.findByIdAndUpdate(budget._id, {
         totalBudgeted: totalBudgeted,
         totalAvailable: newTotalAvailable,
       }, { new: true });
-
-      console.log("Budget updated:", {
-        _id: updateResult._id,
-        totalBudgeted: updateResult.totalBudgeted,
-        totalAvailable: updateResult.totalAvailable
-      });
-    } else {
-      console.log("No budget found for sectionId:", sectionId);
     }
-
-    console.log("=== CATEGORY CREATION DEBUG END ===");
 
     return NextResponse.json(savedCategory, { status: 201 });
   } catch (error) {

@@ -80,12 +80,10 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
   };
 
   const handleCategoryChange = (transactionIndex: number, newCategory: string) => {
-    console.log('Changing category for transaction', transactionIndex, 'to', newCategory);
-    console.log('Available categories:', availableCategories.map(cat => cat.name));
-    console.log('Current category changes:', categoryChanges);
+
     setCategoryChanges(prev => {
       const newChanges = { ...prev, [transactionIndex]: newCategory };
-      console.log('New category changes:', newChanges);
+      
       return newChanges;
     });
   };
@@ -271,7 +269,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                       <button
                         key={i}
                         onClick={() => {
-                          console.log('Clicking suggestion:', suggestion);
+                      
                           handleCategoryChange(index, suggestion);
                         }}
                         className="text-blue-300 hover:text-blue-200 underline mr-2"
@@ -309,7 +307,6 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                       <button
                         key={i}
                         onClick={() => {
-                          console.log('Clicking available category:', cat.name);
                           handleCategoryChange(index, cat.name);
                         }}
                         className="text-blue-300 hover:text-blue-200 underline mr-2"
@@ -368,19 +365,11 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
   const { data: categories, isLoading: isLoadingCategories, refetch: refetchCategories } = useCategoriesByBudget(budgetId);
   const { data: budget, isLoading: isLoadingBudget, refetch: refetchBudget } = useBudget(budgetId);
 
-  // Debug logging
-  console.log('AITransactionInput Debug:', {
-    budgetId,
-    categories: categories || [],
-    categoriesLength: categories?.length || 0,
-    isLoadingCategories,
-    budget: budget || null
-  });
+
 
   // Force refetch categories when component mounts or budgetId changes
   React.useEffect(() => {
     if (budgetId && refetchCategories) {
-      console.log('Refetching categories for budget:', budgetId);
       refetchCategories();
     }
   }, [budgetId]);
@@ -409,7 +398,6 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
   const parseTransactions = useMutation({
     mutationFn: async (description: string) => {
       const categoryNames = (categories || []).map((cat: any) => cat.name);
-      console.log('Sending categories to AI:', categoryNames);
       
       const response = await fetch('/api/transactions/ai-parse', {
         method: 'POST',
@@ -428,7 +416,6 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       }
 
       const result = await response.json();
-      console.log('AI parsing result:', result);
       return result;
     },
   });

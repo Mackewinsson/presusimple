@@ -65,12 +65,7 @@ const BudgetSectionItem: React.FC<BudgetSectionItemProps> = ({
     (category) => category.sectionId === section.name
   );
   
-  console.log("BudgetSectionItem filtering:", {
-    sectionName: section.name,
-    totalCategories: categories.length,
-    filteredCategories: sectionCategories.length,
-    allCategorySectionIds: categories.map(cat => ({ name: cat.name, sectionId: cat.sectionId }))
-  });
+
   const totalBudgeted = sectionCategories.reduce(
     (sum, category) => sum + category.budgeted,
     0

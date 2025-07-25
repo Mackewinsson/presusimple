@@ -178,12 +178,7 @@ export const useAIBudgetCreation = () => {
       await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
       const aiData = await extractBudgetData.mutateAsync(description);
       
-      console.log('AI Response Data:', {
-        income: aiData.income,
-        sections: aiData.sections,
-        categories: aiData.categories,
-        categoriesLength: aiData.categories?.length
-      });
+
       
       // Edge case: Validate AI response
       if (!aiData || !aiData.income || aiData.income <= 0) {
@@ -246,12 +241,7 @@ export const useAIBudgetCreation = () => {
 
       const budget = await createBudget.mutateAsync(budgetData);
       
-      console.log('Created new budget:', {
-        budgetId: budget._id,
-        sections: budget.sections,
-        totalAvailable: budget.totalAvailable,
-        sectionsLength: budget.sections?.length
-      });
+
       
       // Edge case: Validate budget creation
       if (!budget || !budget._id) {
@@ -285,16 +275,7 @@ export const useAIBudgetCreation = () => {
             throw new Error(`Category "${category.name}" references a section that doesn't exist.`);
           }
           
-          console.log('Creating category for new budget:', {
-            categoryName: category.name,
-            budgeted: category.amount,
-            sectionName: section.name,
-            budgetId: budget._id,
-            groupIndex: groupIndex,
-            sectionGroup: group.sectionName,
-            totalSections: budget.sections.length,
-            totalCategories: aiData.categories.length
-          });
+
           
           const categoryData: CreateCategoryData & { budgetId: string } = {
             name: category.name,
@@ -329,12 +310,7 @@ export const useAIBudgetCreation = () => {
         }),
       });
       
-      console.log('AI Budget Creation Complete:', {
-        budgetId: budget._id,
-        totalBudgeted,
-        totalAvailable,
-        categoriesCreated: createdCategories.length
-      });
+
 
       setCurrentStep("complete");
       

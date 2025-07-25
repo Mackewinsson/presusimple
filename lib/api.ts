@@ -152,6 +152,7 @@ export const categoryApi = {
     budgeted: number;
     sectionId: string;
     userId: string;
+    budgetId?: string;
   }): Promise<Category> => {
     const response = await fetch("/api/categories", {
       method: "POST",
