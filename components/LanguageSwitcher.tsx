@@ -38,7 +38,7 @@ export default function LanguageSwitcher() {
         variant="ghost"
         size="sm"
         onClick={switchToEnglish}
-        className={`text-xs ${currentLocale === 'en' ? 'bg-accent' : ''}`}
+        className={`text-xs ${currentLocale === 'en' ? 'bg-white text-slate-900 dark:bg-white dark:text-slate-900' : 'text-slate-700 dark:text-white/70'}`}
       >
         EN
       </Button>
@@ -46,7 +46,7 @@ export default function LanguageSwitcher() {
         variant="ghost"
         size="sm"
         onClick={switchToSpanish}
-        className={`text-xs ${currentLocale === 'es' ? 'bg-accent' : ''}`}
+        className={`text-xs ${currentLocale === 'es' ? 'bg-white text-slate-900 dark:bg-white dark:text-slate-900' : 'text-slate-700 dark:text-white/70'}`}
       >
         ES
       </Button>
