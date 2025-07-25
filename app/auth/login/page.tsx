@@ -4,7 +4,8 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Crown, ArrowRight, DollarSign } from "lucide-react";
+import { Crown, ArrowRight } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -34,7 +35,7 @@ export default function LoginPage() {
           <div className="space-y-2">
             <div className="flex items-center justify-center gap-3 mb-2">
               <div className="bg-white text-slate-900 p-2 rounded-lg shadow-lg">
-                <DollarSign className="h-6 w-6" />
+                <Icon size={24} />
               </div>
               <CardTitle className="text-2xl font-bold text-white">
                 Welcome to Simple Budget
