@@ -7,7 +7,6 @@ type AIStep = "extracting" | "creating" | "saving" | "complete";
 interface AICategory {
   name: string;
   amount: number;
-  sectionName: string;
 }
 
 interface AIBudgetResponse {
@@ -30,68 +29,7 @@ interface CreateCategoryData {
   budgetId: string;
 }
 
-interface CategoryGroup {
-  sectionName: string;
-  categories: AICategory[];
-}
 
-// Function to group categories into logical sections
-function groupCategoriesIntoSections(categories: AICategory[]): CategoryGroup[] {
-  const housingKeywords = ['rent', 'mortgage', 'housing', 'home', 'utilities', 'electricity', 'water', 'gas', 'internet', 'wifi'];
-  const foodKeywords = ['food', 'groceries', 'dining', 'restaurant', 'meals', 'lunch', 'dinner', 'breakfast'];
-  const transportKeywords = ['transport', 'gas', 'fuel', 'car', 'uber', 'lyft', 'taxi', 'bus', 'train', 'subway', 'parking'];
-  const entertainmentKeywords = ['entertainment', 'movies', 'games', 'hobbies', 'sports', 'gym', 'fitness', 'netflix', 'spotify'];
-  const savingsKeywords = ['savings', 'emergency', 'investment', 'retirement', '401k', 'ira'];
-  const healthcareKeywords = ['health', 'medical', 'insurance', 'doctor', 'dental', 'pharmacy', 'medicine'];
-  const personalKeywords = ['personal', 'clothing', 'shopping', 'beauty', 'hair', 'cosmetics', 'grooming'];
-  
-  const groups: CategoryGroup[] = [];
-  const processedCategories = new Set<string>();
-  
-  // Helper function to check if category matches keywords
-  function matchesKeywords(categoryName: string, keywords: string[]): boolean {
-    return keywords.some(keyword => 
-      categoryName.toLowerCase().includes(keyword.toLowerCase())
-    );
-  }
-  
-  // Helper function to assign category to group
-  function assignToGroup(category: AICategory, sectionName: string) {
-    let group = groups.find(g => g.sectionName === sectionName);
-    if (!group) {
-      group = { sectionName, categories: [] };
-      groups.push(group);
-    }
-    group.categories.push(category);
-    processedCategories.add(category.name.toLowerCase());
-  }
-  
-  // Process each category
-  categories.forEach(category => {
-    const categoryName = category.name.toLowerCase();
-    
-    if (matchesKeywords(categoryName, housingKeywords)) {
-      assignToGroup(category, 'Housing');
-    } else if (matchesKeywords(categoryName, foodKeywords)) {
-      assignToGroup(category, 'Food & Dining');
-    } else if (matchesKeywords(categoryName, transportKeywords)) {
-      assignToGroup(category, 'Transportation');
-    } else if (matchesKeywords(categoryName, entertainmentKeywords)) {
-      assignToGroup(category, 'Entertainment');
-    } else if (matchesKeywords(categoryName, savingsKeywords)) {
-      assignToGroup(category, 'Savings & Investment');
-    } else if (matchesKeywords(categoryName, healthcareKeywords)) {
-      assignToGroup(category, 'Healthcare');
-    } else if (matchesKeywords(categoryName, personalKeywords)) {
-      assignToGroup(category, 'Personal Care');
-    } else {
-      // Default group for uncategorized items
-      assignToGroup(category, 'Other Expenses');
-    }
-  });
-  
-  return groups;
-}
 
 export const useAIBudgetCreation = () => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -205,28 +143,7 @@ export const useAIBudgetCreation = () => {
       // Step 2: Create the budget (add delay to show animation)
       await new Promise(resolve => setTimeout(resolve, 1500)); // 1.5 second delay
       
-      // Create a completely new budget with intelligent section names
-      // Group categories into logical sections based on their names
-      const sectionGroups = groupCategoriesIntoSections(aiData.categories);
-      
-      // Create sections with clean display names and unique identifiers
-      const uniqueSections = sectionGroups.map((group, index) => {
-        const displayName = group.sectionName;
-        
-        // Generate a unique identifier using timestamp and random string
-        const timestamp = Date.now();
-        const randomString = Math.random().toString(36).substring(2, 15);
-        const uniqueId = `${timestamp}_${randomString}`;
-        
-        // Use unique identifier in the name for internal uniqueness
-        const uniqueName = `${displayName}_${uniqueId}`;
-        
-        return { 
-          name: uniqueName,
-          displayName: displayName,
-          uniqueId: uniqueId
-        };
-      });
+      // Create a completely new budget (no sections needed)
       
       const budgetData: CreateBudgetData = {
         user: userIdQuery.data!,
