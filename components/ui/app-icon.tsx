@@ -12,7 +12,7 @@ export const AppIcon: React.FC<AppIconProps> = ({ className = "", size = 24 }) =
       alt="Simple Budget"
       width={size}
       height={size}
-      className={className}
+      className={`rounded ${className}`}
     />
   );
 }; 

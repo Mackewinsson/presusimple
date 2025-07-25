@@ -93,9 +93,7 @@ export default function SignIn() {
           
           <div className="space-y-4">
             <div className="flex items-center justify-center gap-4">
-              <div className="bg-white text-slate-900 p-3 rounded-xl shadow-lg">
-                <AppIcon size={32} />
-              </div>
+              <AppIcon size={32} />
               <h1 className="text-5xl font-bold text-white leading-tight">
                 Simple Budget
               </h1>

@@ -30,9 +30,7 @@ export default function WelcomePage() {
             </span>
           </div>
           <div className="flex items-center justify-center gap-3 mb-2">
-            <div className="bg-white text-slate-900 p-2 rounded-lg shadow-lg">
-              <AppIcon size={24} />
-            </div>
+            <AppIcon size={24} />
             <h1 className="text-3xl font-bold text-white">Welcome to Simple Budget!</h1>
           </div>
           <p className="text-lg text-slate-300 mb-6">
@@ -60,9 +58,7 @@ export default function WelcomePage() {
           </span>
         </div>
         <div className="flex items-center justify-center gap-3 mb-2">
-          <div className="bg-white text-slate-900 p-2 rounded-lg shadow-lg">
-            <AppIcon size={24} />
-          </div>
+          <AppIcon size={24} />
           <h1 className="text-3xl font-bold text-white">Welcome to Simple Budget!</h1>
         </div>
         <p className="text-lg text-slate-300 mb-6">
