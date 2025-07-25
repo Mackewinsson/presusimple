@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Crown } from "lucide-react";
+import { Crown, DollarSign } from "lucide-react";
 
 export default function WelcomePage() {
   const { data: session } = useSession();
@@ -28,7 +28,12 @@ export default function WelcomePage() {
               <Crown className="h-8 w-8 text-white" />
             </span>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Welcome to Simple Budget!</h1>
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <div className="bg-white text-slate-900 p-2 rounded-lg shadow-lg">
+              <DollarSign className="h-6 w-6" />
+            </div>
+            <h1 className="text-3xl font-bold text-white">Welcome to Simple Budget!</h1>
+          </div>
           <p className="text-lg text-slate-300 mb-6">
             Sign in to start managing your finances
           </p>
@@ -53,7 +58,12 @@ export default function WelcomePage() {
             <Crown className="h-8 w-8 text-white" />
           </span>
         </div>
-        <h1 className="text-3xl font-bold text-white mb-2">Welcome to Simple Budget!</h1>
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <div className="bg-white text-slate-900 p-2 rounded-lg shadow-lg">
+            <DollarSign className="h-6 w-6" />
+          </div>
+          <h1 className="text-3xl font-bold text-white">Welcome to Simple Budget!</h1>
+        </div>
         <p className="text-lg text-slate-300 mb-6">
           You're all set up with your 30-day free trial. Start budgeting and take control of your finances!
         </p>

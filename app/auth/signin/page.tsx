@@ -16,7 +16,8 @@ import {
   Target,
   Zap,
   Shield,
-  BarChart3
+  BarChart3,
+  DollarSign
 } from "lucide-react";
 
 export default function SignIn() {
@@ -91,9 +92,14 @@ export default function SignIn() {
           </div>
           
           <div className="space-y-4">
-            <h1 className="text-5xl font-bold text-white leading-tight">
-              Simple Budget
-            </h1>
+            <div className="flex items-center justify-center gap-4">
+              <div className="bg-white text-slate-900 p-3 rounded-xl shadow-lg">
+                <DollarSign className="h-8 w-8" />
+              </div>
+              <h1 className="text-5xl font-bold text-white leading-tight">
+                Simple Budget
+              </h1>
+            </div>
             <p className="text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
               The professional budgeting platform that transforms your financial life with AI-powered insights and enterprise-grade tools.
             </p>
