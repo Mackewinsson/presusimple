@@ -3,13 +3,22 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
+import { Input } from "@/components/ui/input";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { useCurrentCurrency } from "@/lib/hooks";
-import { Input } from "@/components/ui/input";
-import InlineEdit from "@/components/ui/inline-edit";
-
+import { DollarSign, Edit2, Trash2, Check, X } from "lucide-react";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface BudgetCategoryItemProps {
   category: any;
@@ -25,19 +34,35 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
   totalAvailable,
 }) => {
   const currentCurrency = useCurrentCurrency();
-  const [budgeted, setBudgeted] = useState(category.budgeted.toString());
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(category.name);
+  const [editBudgeted, setEditBudgeted] = useState(category.budgeted.toString());
 
   const handleRemoveCategory = () => {
     onRemove(category._id || category.id);
     toast.success("Category removed");
   };
 
-  const handleSaveBudgetEdit = () => {
-    const budgetAmount = parseFloat(budgeted);
+  const handleStartEdit = () => {
+    setEditName(category.name);
+    setEditBudgeted(category.budgeted.toString());
+    setIsEditing(true);
+  };
+
+  const handleSave = () => {
+    const trimmedName = editName.trim();
+    const budgetAmount = parseFloat(editBudgeted);
+    
+    if (trimmedName === "") {
+      toast.error("Please enter a category name");
+      return;
+    }
+
     if (isNaN(budgetAmount) || budgetAmount < 0) {
       toast.error("Budgeted amount cannot be negative");
       return;
     }
+
     const budgetDiff = budgetAmount - category.budgeted;
     if (budgetDiff > totalAvailable) {
       toast.error(
@@ -48,8 +73,24 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
       );
       return;
     }
-    onUpdate(category._id || category.id, category.name, budgetAmount);
+
+    onUpdate(category._id || category.id, trimmedName, budgetAmount);
+    setIsEditing(false);
     toast.success("Category updated");
+  };
+
+  const handleCancel = () => {
+    setEditName(category.name);
+    setEditBudgeted(category.budgeted.toString());
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSave();
+    } else if (e.key === "Escape") {
+      handleCancel();
+    }
   };
 
   const getProgressColor = () => {
@@ -64,16 +105,98 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
       <CardContent className="p-4">
         <div className="space-y-3">
           <div className="flex justify-between items-center">
-            <InlineEdit
-              value={category.name}
-              onSave={(newName: string) => {
-                onUpdate(category._id || category.id, newName, category.budgeted);
-              }}
-              onDelete={handleRemoveCategory}
-              className="flex-1"
-              buttonClassName="h-8 w-8 p-0"
-              showDelete={true}
-            />
+            {isEditing ? (
+              <div className="flex-1 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="flex-1 text-sm"
+                    placeholder="Category name"
+                    autoFocus
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="number"
+                      value={editBudgeted}
+                      onChange={(e) => setEditBudgeted(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      className="pl-9 text-sm"
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={handleSave}
+                    className="h-8 w-8 p-0 text-green-600 hover:text-green-700"
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={handleCancel}
+                    className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 flex-1">
+                <span className="font-medium">{category.name}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleStartEdit}
+                  className="h-8 w-8 p-0"
+                >
+                  <Edit2 className="h-4 w-4" />
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="sm:max-w-md">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="text-lg sm:text-xl">
+                        Delete Category
+                      </AlertDialogTitle>
+                      <AlertDialogDescription className="text-sm sm:text-base">
+                        Are you sure you want to delete this category? This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="text-sm sm:text-base">
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleRemoveCategory}
+                        className="text-sm sm:text-base"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            )}
           </div>
           <div className="flex justify-between text-sm mb-1">
             <span className="text-muted-foreground">
