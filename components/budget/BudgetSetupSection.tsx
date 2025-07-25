@@ -108,6 +108,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
 
   const [isEditingTotal, setIsEditingTotal] = useState(false);
   const [totalBudget, setTotalBudget] = useState("");
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
   const currency: Currency = currentCurrency; // Use selected currency
   const [newTotal, setNewTotal] = useState("");
   const [newMonth, setNewMonth] = useState("January");
@@ -727,13 +728,25 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
             </div>
           )}
 
-          <NewCategoryForm
-            onComplete={(name: string, budgeted: number) => {
-              handleAddCategory(name, budgeted);
-            }}
-            onCancel={() => {}}
-            totalAvailable={budget?.totalAvailable || 0}
-          />
+          {showCategoryForm ? (
+            <NewCategoryForm
+              onComplete={(name: string, budgeted: number) => {
+                handleAddCategory(name, budgeted);
+                setShowCategoryForm(false); // Hide form after adding category
+              }}
+              onCancel={() => setShowCategoryForm(false)}
+              totalAvailable={budget?.totalAvailable || 0}
+            />
+          ) : (
+            <Button
+              onClick={() => setShowCategoryForm(true)}
+              className="w-full mt-4"
+              variant="outline"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Category
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
