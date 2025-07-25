@@ -29,7 +29,7 @@ interface Category {
   name: string;
   budgeted: number;
   spent: number;
-  sectionId: string;
+  budgetId: string;
 }
 
 interface Expense {
