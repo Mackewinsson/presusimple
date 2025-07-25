@@ -41,10 +41,21 @@ export async function GET(request: NextRequest) {
         (section: any) => section.name
       );
 
+      console.log("Categories API: Filtering by budget", {
+        budgetId,
+        sectionNames,
+        budgetSections: budget.sections
+      });
+
       // Filter categories by section names
       const categories = await Category.find({
         sectionId: { $in: sectionNames },
       }).sort({ createdAt: -1 });
+
+      console.log("Categories API: Found categories", {
+        categoriesCount: categories.length,
+        categories: categories.map(cat => ({ name: cat.name, sectionId: cat.sectionId }))
+      });
 
       return NextResponse.json(categories);
     } else {

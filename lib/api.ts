@@ -96,6 +96,21 @@ export const budgetApi = {
     return response.json();
   },
 
+  // Update section name (atomic operation)
+  updateSectionName: async (
+    budgetId: string,
+    oldSectionName: string,
+    newSectionName: string
+  ): Promise<{ budget: Budget; updatedCategories: number }> => {
+    const response = await fetch(`/api/budgets/${budgetId}/update-section`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ oldSectionName, newSectionName }),
+    });
+    if (!response.ok) throw new Error("Failed to update section name");
+    return response.json();
+  },
+
   // Delete budget
   deleteBudget: async (id: string): Promise<void> => {
     const response = await fetch(`/api/budgets/${id}`, {

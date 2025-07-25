@@ -39,6 +39,8 @@ import { useAIBudgetCreation } from "@/lib/hooks/useAIBudgetCreation";
 import { LoadingButton } from "@/components/ui/loading-skeleton";
 import { useExpenses } from "@/lib/hooks/useExpenseQueries";
 import type { Budget } from "@/lib/api";
+import { budgetApi } from "@/lib/api";
+import { budgetKeys } from "@/lib/hooks/useBudgetQueries";
 import { AILoading } from "@/components/ui/ai-loading";
 import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
 import { UpgradeToProCTA } from "@/components/UpgradeToProCTA";
@@ -333,6 +335,39 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
         sections: updatedSections,
       },
     });
+  };
+
+  // Update a section name
+  const handleUpdateSection = async (oldSectionName: string, newSectionName: string) => {
+    if (!budget) return;
+    
+    console.log("Starting section update:", { oldSectionName, newSectionName, budgetId: budget._id });
+    
+    try {
+      // Use the atomic section update API
+      const result = await budgetApi.updateSectionName(
+        budget._id,
+        oldSectionName,
+        newSectionName
+      );
+      
+      console.log("Section updated successfully:", {
+        updatedCategories: result.updatedCategories,
+        newBudget: result.budget
+      });
+
+      // Update the cache with the new budget data
+      queryClient.setQueryData(budgetKeys.detail(budget._id), result.budget);
+      
+      // Invalidate queries to refresh the UI
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["budgets"] });
+
+      toast.success("Section name updated successfully");
+    } catch (error) {
+      console.error("Failed to update section name:", error);
+      toast.error("Failed to update section name. Please try again.");
+    }
   };
 
   const handleCreateBudget = async (e: React.FormEvent) => {
@@ -796,6 +831,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                   section={section}
                   categories={categoriesWithSpent}
                   onRemove={handleRemoveSection}
+                  onUpdateSection={handleUpdateSection}
                   onAddCategory={handleAddCategory}
                   onRemoveCategory={handleRemoveCategory}
                   onUpdateCategory={handleUpdateCategory}

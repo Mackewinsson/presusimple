@@ -37,14 +37,14 @@ export async function PUT(
     }
 
     // Update the budget's totalBudgeted to reflect the updated category
-    const budget = await Budget.findOne({ "sections._id": updatedCategory.sectionId });
+    const budget = await Budget.findOne({ "sections.name": updatedCategory.sectionId });
     if (budget) {
       // Get all categories for this budget
-      const sectionIds = budget.sections.map(
-        (section: any) => section._id || section.name
+      const sectionNames = budget.sections.map(
+        (section: any) => section.name
       );
       const allCategories = await Category.find({
-        sectionId: { $in: sectionIds },
+        sectionId: { $in: sectionNames },
       });
       
       // Calculate total budgeted from all categories
@@ -99,14 +99,14 @@ export async function DELETE(
     await Expense.deleteMany({ categoryId: id });
 
     // Update the budget's totalBudgeted to reflect the deleted category
-    const budget = await Budget.findOne({ "sections._id": categoryToDelete.sectionId });
+    const budget = await Budget.findOne({ "sections.name": categoryToDelete.sectionId });
     if (budget) {
       // Get all remaining categories for this budget
-      const sectionIds = budget.sections.map(
-        (section: any) => section._id || section.name
+      const sectionNames = budget.sections.map(
+        (section: any) => section.name
       );
       const allCategories = await Category.find({
-        sectionId: { $in: sectionIds },
+        sectionId: { $in: sectionNames },
       });
       
       // Calculate total budgeted from remaining categories

@@ -9,21 +9,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BudgetCategoryItem from "./BudgetCategoryItem";
 import NewCategoryForm from "./NewCategoryForm";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import InlineEdit from "@/components/ui/inline-edit";
+
 
 interface Category {
   _id?: string;
@@ -46,6 +37,7 @@ interface BudgetSectionItemProps {
   section: Section;
   categories: Category[];
   onRemove: (sectionName: string) => void;
+  onUpdateSection: (oldSectionName: string, newSectionName: string) => void;
   onAddCategory: (sectionId: string, name: string, budgeted: number) => void;
   onRemoveCategory: (categoryId: string) => void;
   onUpdateCategory: (
@@ -60,6 +52,7 @@ const BudgetSectionItem: React.FC<BudgetSectionItemProps> = ({
   section,
   categories,
   onRemove,
+  onUpdateSection,
   onAddCategory,
   onRemoveCategory,
   onUpdateCategory,
@@ -71,6 +64,13 @@ const BudgetSectionItem: React.FC<BudgetSectionItemProps> = ({
   const sectionCategories = categories.filter(
     (category) => category.sectionId === section.name
   );
+  
+  console.log("BudgetSectionItem filtering:", {
+    sectionName: section.name,
+    totalCategories: categories.length,
+    filteredCategories: sectionCategories.length,
+    allCategorySectionIds: categories.map(cat => ({ name: cat.name, sectionId: cat.sectionId }))
+  });
   const totalBudgeted = sectionCategories.reduce(
     (sum, category) => sum + category.budgeted,
     0
@@ -84,56 +84,32 @@ const BudgetSectionItem: React.FC<BudgetSectionItemProps> = ({
     <Card className="w-full mb-4 shadow-sm overflow-hidden">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-base sm:text-lg font-medium">
-            {section.displayName || section.name}
-          </CardTitle>
-          <div className="flex items-center space-x-1 sm:space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="h-7 w-7 sm:h-8 sm:w-8 p-0"
-            >
-              {isExpanded ? (
-                <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
-              ) : (
-                <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
-              )}
-            </Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 sm:h-8 sm:w-8 p-0 text-destructive"
-                >
-                  <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent className="sm:max-w-md">
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="text-lg sm:text-xl">
-                    Delete Budget Section
-                  </AlertDialogTitle>
-                  <AlertDialogDescription className="text-sm sm:text-base">
-                    Are you sure you want to delete this section? This will
-                    remove all categories and their budgeted amounts.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel className="text-sm sm:text-base">
-                    Cancel
-                  </AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => onRemove(section.name)}
-                    className="text-sm sm:text-base"
-                  >
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
+          <InlineEdit
+            value={section.displayName || section.name}
+            onSave={(newName: string) => onUpdateSection(section.name, newName)}
+            onDelete={() => onRemove(section.name)}
+            className="flex-1"
+            buttonClassName="h-8 w-8 p-0"
+            showDelete={true}
+            validation={(value: string) => {
+              // Check if section name already exists (excluding current section)
+              // We need to check against other sections, not categories
+              // This validation should be handled at the parent level
+              return null;
+            }}
+          />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="h-7 w-7 sm:h-8 sm:w-8 p-0"
+          >
+            {isExpanded ? (
+              <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
+            ) : (
+              <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
+            )}
+          </Button>
         </div>
         <CardDescription className="flex flex-col sm:flex-row sm:justify-between mt-1 text-xs sm:text-sm gap-1 sm:gap-0">
           <span>Total: {sectionCategories.length} categories</span>
