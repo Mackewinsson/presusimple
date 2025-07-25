@@ -176,17 +176,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
         sectionId,
         userId,
       });
-
-      // Update budget totals
-      if (budget) {
-        await updateBudgetMutation.mutateAsync({
-          id: budget._id,
-          updates: {
-            totalBudgeted: budget.totalBudgeted + budgeted,
-            totalAvailable: budget.totalAvailable - budgeted,
-          },
-        });
-      }
+      // Budget totals are automatically updated by the API
     } catch (error) {
       console.error("Error adding category:", error);
     }
@@ -200,17 +190,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       if (!category) return;
 
       await deleteCategoryMutation.mutateAsync(categoryId);
-
-      // Update budget totals
-      if (budget) {
-        await updateBudgetMutation.mutateAsync({
-          id: budget._id,
-          updates: {
-            totalBudgeted: budget.totalBudgeted - category.budgeted,
-            totalAvailable: budget.totalAvailable + category.budgeted,
-          },
-        });
-      }
+      // Budget totals are automatically updated by the API
     } catch (error) {
       console.error("Error removing category:", error);
     }
@@ -227,23 +207,11 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       );
       if (!category) return;
 
-      const budgetDiff = budgeted - category.budgeted;
-
       await updateCategoryMutation.mutateAsync({
         id: categoryId,
         updates: { name, budgeted },
       });
-
-      // Update budget totals if budgeted amount changed
-      if (budget && budgetDiff !== 0) {
-        await updateBudgetMutation.mutateAsync({
-          id: budget._id,
-          updates: {
-            totalBudgeted: budget.totalBudgeted + budgetDiff,
-            totalAvailable: budget.totalAvailable - budgetDiff,
-          },
-        });
-      }
+      // Budget totals are automatically updated by the API
     } catch (error) {
       console.error("Error updating category:", error);
     }

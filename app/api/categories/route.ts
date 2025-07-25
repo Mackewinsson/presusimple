@@ -87,6 +87,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (budgeted < 0) {
+      return NextResponse.json(
+        { error: "Budgeted amount cannot be negative" },
+        { status: 400 }
+      );
+    }
+
+    // Check if category with same name already exists in this section
+    const existingCategory = await Category.findOne({
+      name: name.trim(),
+      sectionId: sectionId
+    });
+
+    if (existingCategory) {
+      return NextResponse.json(
+        { error: `Category "${name}" already exists in this section` },
+        { status: 400 }
+      );
+    }
+
 
 
     const category = new Category({
@@ -115,7 +135,7 @@ export async function POST(request: NextRequest) {
     }
     
     if (budget) {
-      // Get all categories for this budget
+      // Get all categories for this budget (including the newly created one)
       const sectionNames = budget.sections.map(
         (section: any) => section.name
       );
@@ -126,9 +146,9 @@ export async function POST(request: NextRequest) {
       // Calculate total budgeted from all categories
       const totalBudgeted = allCategories.reduce((sum, cat) => sum + cat.budgeted, 0);
       
-      // Update budget totals
+      // Update budget totals atomically
       const totalBudgetAmount = budget.totalBudgeted + budget.totalAvailable;
-      const newTotalAvailable = totalBudgetAmount - totalBudgeted;
+      const newTotalAvailable = Math.max(0, totalBudgetAmount - totalBudgeted);
 
       await Budget.findByIdAndUpdate(budget._id, {
         totalBudgeted: totalBudgeted,
