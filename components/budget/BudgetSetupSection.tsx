@@ -69,7 +69,7 @@ interface Category {
   name: string;
   budgeted: number;
   spent: number;
-  sectionId: string;
+  budgetId: string;
 }
 
 
@@ -167,7 +167,6 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       await createCategoryMutation.mutateAsync({
         name,
         budgeted,
-        sectionId: "default", // Use a default sectionId for UI compatibility
         budgetId: budget._id,
         userId,
       });

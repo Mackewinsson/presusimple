@@ -67,11 +67,11 @@ export async function POST(request: NextRequest) {
     await dbConnect();
     const body = await request.json();
 
-    const { name, budgeted, sectionId, budgetId } = body;
+    const { name, budgeted, budgetId } = body;
 
-    if (!name || budgeted === undefined || !sectionId || !budgetId) {
+    if (!name || budgeted === undefined || !budgetId) {
       return NextResponse.json(
-        { error: "Missing required fields: name, budgeted, sectionId, budgetId" },
+        { error: "Missing required fields: name, budgeted, budgetId" },
         { status: 400 }
       );
     }
@@ -99,13 +99,12 @@ export async function POST(request: NextRequest) {
 
 
 
-    console.log("Creating category with data:", { name, budgeted, sectionId, budgetId });
+    console.log("Creating category with data:", { name, budgeted, budgetId });
     
     const category = new Category({
       name,
       budgeted,
       spent: 0,
-      sectionId,
       budgetId,
     });
 

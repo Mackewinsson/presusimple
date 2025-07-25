@@ -15,7 +15,7 @@ export interface Category {
   name: string;
   budgeted: number;
   spent: number;
-  sectionId: string;
+  budgetId: string;
 }
 
 export interface Expense {
@@ -150,7 +150,6 @@ export const categoryApi = {
   createCategory: async (categoryData: {
     name: string;
     budgeted: number;
-    sectionId: string;
     budgetId: string;
     userId: string;
   }): Promise<Category> => {
