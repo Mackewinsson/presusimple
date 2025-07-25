@@ -14,6 +14,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await signIn("google", { 
+        callbackUrl: "/budget",
         redirect: true 
       });
     } catch (error) {

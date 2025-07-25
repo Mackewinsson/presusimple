@@ -95,11 +95,8 @@ const handler = NextAuth({
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // For new users, redirect to welcome page
-      // We'll let the app handle the redirect logic since we can't access session here
-      // The app will check session.isNewUser and redirect to /app/welcome if needed
-      
-      // Allow the callbackUrl to work, but default to /budget
+      // Always redirect to /budget after successful login
+      // The budget page will handle redirecting new users to welcome page
       if (url.startsWith(baseUrl)) return url;
       if (url.startsWith("/")) return `${baseUrl}${url}`;
       return baseUrl + "/budget";
