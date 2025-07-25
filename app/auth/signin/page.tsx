@@ -18,7 +18,7 @@ import {
   Shield,
   BarChart3
 } from "lucide-react";
-import { Icon } from "@/components/ui/icon";
+import { AppIcon } from "@/components/ui/app-icon";
 
 export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
@@ -94,7 +94,7 @@ export default function SignIn() {
           <div className="space-y-4">
             <div className="flex items-center justify-center gap-4">
               <div className="bg-white text-slate-900 p-3 rounded-xl shadow-lg">
-                <Icon size={32} />
+                <AppIcon size={32} />
               </div>
               <h1 className="text-5xl font-bold text-white leading-tight">
                 Simple Budget

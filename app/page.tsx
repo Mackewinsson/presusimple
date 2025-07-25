@@ -8,7 +8,7 @@ import {
   Shield,
   Check,
 } from "lucide-react";
-import { Icon } from "@/components/ui/icon";
+import { AppIcon } from "@/components/ui/app-icon";
 import { useSession, signOut } from "next-auth/react";
 import ThemeToggle from "@/components/ThemeToggle";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -27,7 +27,7 @@ export default function LandingPage() {
               className="flex items-center gap-2 sm:gap-3 hover:opacity-90 transition-opacity"
             >
               <div className="bg-white dark:bg-white text-slate-900 p-1.5 sm:p-2 rounded-xl shadow-lg">
-                <Icon size={24} className="h-4 w-4 sm:h-6 sm:w-6" />
+                <AppIcon size={24} className="h-4 w-4 sm:h-6 sm:w-6" />
               </div>
               <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                 Simple Budget

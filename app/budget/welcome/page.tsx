@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Crown } from "lucide-react";
-import { Icon } from "@/components/ui/icon";
+import { AppIcon } from "@/components/ui/app-icon";
 
 export default function WelcomePage() {
   const { data: session } = useSession();
@@ -31,7 +31,7 @@ export default function WelcomePage() {
           </div>
           <div className="flex items-center justify-center gap-3 mb-2">
             <div className="bg-white text-slate-900 p-2 rounded-lg shadow-lg">
-              <Icon size={24} />
+              <AppIcon size={24} />
             </div>
             <h1 className="text-3xl font-bold text-white">Welcome to Simple Budget!</h1>
           </div>
@@ -61,7 +61,7 @@ export default function WelcomePage() {
         </div>
         <div className="flex items-center justify-center gap-3 mb-2">
           <div className="bg-white text-slate-900 p-2 rounded-lg shadow-lg">
-            <Icon size={24} />
+            <AppIcon size={24} />
           </div>
           <h1 className="text-3xl font-bold text-white">Welcome to Simple Budget!</h1>
         </div>
