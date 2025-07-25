@@ -34,6 +34,11 @@ export const FEATURES = {
     description: "Save and reuse budget templates",
     plans: ["pro"]
   },
+  // savingsGoals: {
+  //   label: "Savings Goals",
+  //   description: "Track progress towards savings targets",
+  //   plans: ["pro"]
+  // },
   prioritySupport: {
     label: "Priority Support",
     description: "Get priority customer support",

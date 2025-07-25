@@ -7,7 +7,7 @@ A modern, full-stack budget management application built with Next.js, TypeScrip
 - 🔐 Secure authentication with NextAuth.js
 - 💰 Budget tracking and expense management
 - 📊 Visual insights and analytics
-- 🎯 Savings goals tracking
+- 🎯 Savings goals tracking (coming soon)
 - 💳 Stripe subscription integration
 - 📱 Responsive design
 - 🌙 Dark/Light theme support

@@ -79,17 +79,17 @@ interface BudgetTemplateState {
 - `saveTemplate`: Creates a new template
 - `deleteTemplate`: Removes a template
 
-### Savings Goal Slice (`savingsGoalSlice.ts`)
-Tracks savings targets and progress.
+// ### Savings Goal Slice (`savingsGoalSlice.ts`)
+// Tracks savings targets and progress.
 
-#### State Interface
-```typescript
-interface SavingsGoalState {
-  goals: SavingsGoal[];
-}
-```
+// #### State Interface
+// ```typescript
+// interface SavingsGoalState {
+//   goals: SavingsGoal[];
+// }
+// ```
 
-#### Key Actions
-- `addGoal`: Creates a new savings goal
-- `updateGoalProgress`: Updates progress towards goal
-- `deleteGoal`: Removes a savings goal
+// #### Key Actions
+// - `addGoal`: Creates a new savings goal
+// - `updateGoalProgress`: Updates progress towards goal
+// - `deleteGoal`: Removes a savings goal

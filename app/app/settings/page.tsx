@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import BudgetTemplateSelector from '@/components/budget/BudgetTemplateSelector';
-import SavingsGoalList from '@/components/savings/SavingsGoalList';
+// import SavingsGoalList from '@/components/savings/SavingsGoalList';
 
 export default function SettingsPage() {
   return (
@@ -26,7 +26,7 @@ export default function SettingsPage() {
       <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="max-w-4xl mx-auto space-y-6">
           <BudgetTemplateSelector />
-          <SavingsGoalList />
+          {/* <SavingsGoalList /> */}
         </div>
       </main>
     </div>
