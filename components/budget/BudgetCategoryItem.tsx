@@ -9,6 +9,7 @@ import { useCurrentCurrency } from "@/lib/hooks";
 import { Edit2, Trash2, Check, X } from "lucide-react";
 import { Icon } from "@/components/ui/icon";
 import { toast } from "sonner";
+import { useTranslation } from "@/lib/i18n";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,6 +35,7 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
   onUpdate,
   totalAvailable,
 }) => {
+  const { t } = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(category.name);
@@ -41,7 +43,7 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
 
   const handleRemoveCategory = () => {
     onRemove(category._id || category.id);
-    toast.success("Category removed");
+    toast.success(t("category") + " removed");
   };
 
   const handleStartEdit = () => {
@@ -55,7 +57,7 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
     const budgetAmount = parseFloat(editBudgeted);
     
     if (trimmedName === "") {
-      toast.error("Please enter a category name");
+      toast.error("Please enter a " + t("category").toLowerCase() + " name");
       return;
     }
 
@@ -77,7 +79,7 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
 
     onUpdate(category._id || category.id, trimmedName, budgetAmount);
     setIsEditing(false);
-    toast.success("Category updated");
+    toast.success(t("category") + " updated");
   };
 
   const handleCancel = () => {
@@ -115,7 +117,7 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
                     onChange={(e) => setEditName(e.target.value)}
                     onKeyDown={handleKeyDown}
                     className="flex-1 text-sm"
-                    placeholder="Category name"
+                    placeholder={t("category") + " name"}
                     autoFocus
                   />
                 </div>
@@ -177,10 +179,10 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
                   <AlertDialogContent className="sm:max-w-md">
                     <AlertDialogHeader>
                       <AlertDialogTitle className="text-lg sm:text-xl">
-                        Delete Category
+                        Delete {t("category")}
                       </AlertDialogTitle>
                       <AlertDialogDescription className="text-sm sm:text-base">
-                        Are you sure you want to delete this category? This action cannot be undone.
+                                                  Are you sure you want to delete this {t("category").toLowerCase()}? This action cannot be undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

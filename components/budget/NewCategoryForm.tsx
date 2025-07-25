@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 import { formatMoney } from "@/lib/utils/formatMoney";
+import { useTranslation } from "@/lib/i18n";
 
 interface NewCategoryFormProps {
   onComplete: (name: string, budgeted: number) => void;
@@ -19,6 +20,7 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
   onCancel,
   totalAvailable,
 }) => {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [budgeted, setBudgeted] = useState("");
 
@@ -54,7 +56,7 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
     setBudgeted("");
     onComplete(name.trim(), budgetAmount);
 
-    toast.success("Category added successfully");
+    toast.success(t("category") + " " + t("submit").toLowerCase() + " successfully");
   };
 
   return (
@@ -65,7 +67,7 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Category name (e.g., Rent, Groceries)"
+            placeholder={t("category") + " name (e.g., Rent, Groceries)"}
             className="w-full h-9 sm:h-8 text-sm sm:text-base"
             autoFocus
           />
