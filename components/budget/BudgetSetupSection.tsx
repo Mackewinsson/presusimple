@@ -40,8 +40,8 @@ import { useExpenses } from "@/lib/hooks/useExpenseQueries";
 import type { Budget } from "@/lib/api";
 import { budgetApi } from "@/lib/api";
 import { budgetKeys } from "@/lib/hooks/useBudgetQueries";
-import BudgetSectionItem from "./BudgetSectionItem";
-import NewSectionForm from "./NewSectionForm";
+import BudgetCategoryItem from "./BudgetCategoryItem";
+import NewCategoryForm from "./NewCategoryForm";
 import { AILoading } from "@/components/ui/ai-loading";
 import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
 import { UpgradeToProCTA } from "@/components/UpgradeToProCTA";
@@ -72,12 +72,7 @@ interface Category {
   sectionId: string;
 }
 
-interface Section {
-  _id?: string;
-  id?: string;
-  name: string;
-  amount: number;
-}
+
 
 interface BudgetSetupSectionProps {
   budget: Budget | null;
@@ -110,7 +105,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   const updateBudgetMutation = useUpdateBudget();
   const deleteBudgetMutation = useDeleteBudget();
 
-  const [isAddingSection, setIsAddingSection] = useState(false);
+
   const [isEditingTotal, setIsEditingTotal] = useState(false);
   const [totalBudget, setTotalBudget] = useState("");
   const currency: Currency = currentCurrency; // Use selected currency
@@ -163,7 +158,6 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
 
   // Category CRUD handlers
   const handleAddCategory = async (
-    sectionId: string,
     name: string,
     budgeted: number
   ) => {
@@ -173,7 +167,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       await createCategoryMutation.mutateAsync({
         name,
         budgeted,
-        sectionId,
+        sectionId: "default", // Use a default sectionId for UI compatibility
         budgetId: budget._id,
         userId,
       });
@@ -218,66 +212,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     }
   };
 
-  // Add a new section
-  const handleAddSection = async (name: string) => {
-    if (!budget) return;
-    const newSection = { name, amount: 0 };
-    const updatedSections = [...budget.sections, newSection];
 
-    await updateBudgetMutation.mutateAsync({
-      id: budget._id,
-      updates: {
-        ...budget,
-        sections: updatedSections,
-      },
-    });
-
-    setIsAddingSection(false);
-  };
-
-  // Remove a section
-  const handleRemoveSection = async (sectionName: string) => {
-    if (!budget) return;
-    const section = budget.sections.find((s) => s.name === sectionName);
-    if (!section) return;
-    const updatedSections = budget.sections.filter(
-      (s) => s.name !== sectionName
-    );
-
-    await updateBudgetMutation.mutateAsync({
-      id: budget._id,
-      updates: {
-        ...budget,
-        sections: updatedSections,
-      },
-    });
-  };
-
-  // Update a section name
-  const handleUpdateSection = async (oldSectionName: string, newSectionName: string) => {
-    if (!budget) return;
-    
-    try {
-      // Use the atomic section update API
-      const result = await budgetApi.updateSectionName(
-        budget._id,
-        oldSectionName,
-        newSectionName
-      );
-
-      // Update the cache with the new budget data
-      queryClient.setQueryData(budgetKeys.detail(budget._id), result.budget);
-      
-      // Invalidate queries to refresh the UI
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-      queryClient.invalidateQueries({ queryKey: ["budgets"] });
-
-      toast.success("Section name updated successfully");
-    } catch (error) {
-      console.error("Failed to update section name:", error);
-      toast.error("Failed to update section name. Please try again.");
-    }
-  };
 
   // Update total budget
   const handleSetTotalBudget = async () => {
@@ -770,18 +705,14 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
 
       <CardContent>
         <div className="space-y-4">
-          {budget && budget.sections.length > 0 ? (
+          {budget && categoriesWithSpent.length > 0 ? (
             <div className="space-y-4">
-              {budget.sections.map((section) => (
-                <BudgetSectionItem
-                  key={section._id || section.name}
-                  section={section}
-                  categories={categoriesWithSpent}
-                  onRemove={handleRemoveSection}
-                  onUpdateSection={handleUpdateSection}
-                  onAddCategory={handleAddCategory}
-                  onRemoveCategory={handleRemoveCategory}
-                  onUpdateCategory={handleUpdateCategory}
+              {categoriesWithSpent.map((category) => (
+                <BudgetCategoryItem
+                  key={category._id || category.id}
+                  category={category}
+                  onRemove={handleRemoveCategory}
+                  onUpdate={handleUpdateCategory}
                   totalAvailable={budget.totalAvailable}
                 />
               ))}
@@ -792,26 +723,18 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                 <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-slate-900 dark:text-white" />
               </div>
               <p className="text-sm sm:text-base text-slate-700 dark:text-white/70">
-                {t('noBudgetSections')}
+                No categories yet. Add your first category below.
               </p>
             </div>
           )}
 
-          {isAddingSection ? (
-            <NewSectionForm
-              onComplete={(name: string) => handleAddSection(name)}
-              onCancel={() => setIsAddingSection(false)}
-            />
-          ) : (
-            <Button
-              onClick={() => setIsAddingSection(true)}
-              className="w-full mt-4"
-              variant="outline"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              {t('addBudgetSection')}
-            </Button>
-          )}
+          <NewCategoryForm
+            onComplete={(name: string, budgeted: number) => {
+              handleAddCategory(name, budgeted);
+            }}
+            onCancel={() => {}}
+            totalAvailable={budget?.totalAvailable || 0}
+          />
         </div>
       </CardContent>
     </Card>

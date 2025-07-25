@@ -9,14 +9,12 @@ import { toast } from "sonner";
 import { formatMoney } from "@/lib/utils/formatMoney";
 
 interface NewCategoryFormProps {
-  sectionId: string;
   onComplete: (name: string, budgeted: number) => void;
   onCancel: () => void;
   totalAvailable: number;
 }
 
 const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
-  sectionId,
   onComplete,
   onCancel,
   totalAvailable,
