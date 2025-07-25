@@ -65,19 +65,19 @@ interface MonthlyBudgetState {
 - `saveBudget`: Archives current budget state
 - `deleteBudget`: Removes a saved budget
 
-### Budget Template Slice (`budgetTemplateSlice.ts`)
-Manages reusable budget templates.
+// ### Budget Template Slice (`budgetTemplateSlice.ts`)
+// Manages reusable budget templates.
 
-#### State Interface
-```typescript
-interface BudgetTemplateState {
-  templates: BudgetTemplate[];
-}
-```
+// #### State Interface
+// ```typescript
+// interface BudgetTemplateState {
+//   templates: BudgetTemplate[];
+// }
+// ```
 
-#### Key Actions
-- `saveTemplate`: Creates a new template
-- `deleteTemplate`: Removes a template
+// #### Key Actions
+// - `saveTemplate`: Creates a new template
+// - `deleteTemplate`: Removes a template
 
 // ### Savings Goal Slice (`savingsGoalSlice.ts`)
 // Tracks savings targets and progress.

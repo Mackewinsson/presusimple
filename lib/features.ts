@@ -29,11 +29,11 @@ export const FEATURES = {
     description: "Create unlimited budget categories",
     plans: ["free", "pro"]
   },
-  budgetTemplates: {
-    label: "Budget Templates",
-    description: "Save and reuse budget templates",
-    plans: ["pro"]
-  },
+  // budgetTemplates: {
+  //   label: "Budget Templates",
+  //   description: "Save and reuse budget templates",
+  //   plans: ["pro"]
+  // },
   // savingsGoals: {
   //   label: "Savings Goals",
   //   description: "Track progress towards savings targets",
