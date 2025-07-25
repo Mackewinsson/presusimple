@@ -28,7 +28,7 @@ const handler = NextAuth({
           if (!existingUser) {
             // Create new user with trial activation
             const trialEnd = new Date();
-            trialEnd.setDate(trialEnd.getDate() + 30); // 30-day trial
+            trialEnd.setTime(trialEnd.getTime() + (30 * 24 * 60 * 60 * 1000)); // Exactly 30 days in milliseconds
             
             const newUser = new User({
               email: user.email,
@@ -51,7 +51,7 @@ const handler = NextAuth({
             if (!existingUser.trialEnd && !existingUser.isPaid && !existingUser.subscriptionType) {
               // Give existing users a trial only if they have no trial history
               const trialEnd = new Date();
-              trialEnd.setDate(trialEnd.getDate() + 30); // 30-day trial
+              trialEnd.setTime(trialEnd.getTime() + (30 * 24 * 60 * 60 * 1000)); // Exactly 30 days in milliseconds
               
               existingUser.plan = "pro";
               existingUser.trialStart = new Date();

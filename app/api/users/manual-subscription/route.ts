@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
       case "activate_trial":
         // Activate trial subscription
         const trialEnd = new Date();
-        trialEnd.setDate(trialEnd.getDate() + 30); // 30-day trial
+        trialEnd.setTime(trialEnd.getTime() + (30 * 24 * 60 * 60 * 1000)); // Exactly 30 days in milliseconds
 
         await User.findOneAndUpdate(
           { email },
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
         // Extend trial by specified days
         const { days = 30 } = body;
         const newTrialEnd = new Date();
-        newTrialEnd.setDate(newTrialEnd.getDate() + days);
+        newTrialEnd.setTime(newTrialEnd.getTime() + (days * 24 * 60 * 60 * 1000)); // Exactly specified days in milliseconds
 
         await User.findOneAndUpdate(
           { email },
