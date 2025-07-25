@@ -98,7 +98,7 @@ export default function LandingPage() {
         </section>
 
         {/* Translation Demo Section */}
-        <section className="py-8 sm:py-12 px-4 bg-white/5 dark:bg-white/5">
+        {/* <section className="py-8 sm:py-12 px-4 bg-white/5 dark:bg-white/5">
           <div className="container mx-auto text-center">
             <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-slate-900 dark:text-white">
               Multi-language Support
@@ -108,7 +108,7 @@ export default function LandingPage() {
             </p>
             <TranslationDemo />
           </div>
-        </section>
+        </section> */}
 
         {/* Features Section */}
         <section className="py-12 sm:py-16 md:py-20 bg-white/5 dark:bg-white/5 backdrop-blur-sm">
