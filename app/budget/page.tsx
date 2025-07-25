@@ -90,7 +90,7 @@ function BudgetAppContent() {
     const onboardingComplete = localStorage.getItem("onboardingComplete");
     
     if (session.isNewUser && !userLoading && !onboardingComplete) {
-      router.replace("/app/welcome");
+      router.replace("/budget/welcome");
       return;
     }
   }, [session, status, router, userLoading]);

@@ -65,7 +65,7 @@
       "name": "Add Expense",
       "short_name": "Add Expense",
       "description": "Quickly add a new expense",
-      "url": "/app?action=add-expense",
+      "url": "/budget?action=add-expense",
       "icons": [
         {
           "src": "/icons/icon-96x96.png",

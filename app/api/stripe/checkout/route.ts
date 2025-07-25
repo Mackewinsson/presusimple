@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
       subscription_data: {
         trial_period_days: 30,
       },
-      success_url: `${appUrl}/app?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${appUrl}/app`,
+      success_url: `${appUrl}/budget?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${appUrl}/budget`,
     });
 
     return NextResponse.json({ url: session.url });

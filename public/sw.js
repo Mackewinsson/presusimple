@@ -5,7 +5,7 @@ const DYNAMIC_CACHE = 'dynamic-v1';
 // Resources to cache immediately
 const STATIC_ASSETS = [
   '/',
-  '/app',
+  '/budget',
   '/manifest.json',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png'
@@ -205,7 +205,7 @@ self.addEventListener('notificationclick', (event) => {
   
   if (event.action === 'explore') {
     event.waitUntil(
-      clients.openWindow('/app')
+      clients.openWindow('/budget')
     );
   }
 }); 
