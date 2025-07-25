@@ -24,9 +24,14 @@ export const useSelectedCurrency = () => {
   return useQuery({
     queryKey: ["selectedCurrency"],
     queryFn: async (): Promise<Currency> => {
-      // For now, return USD as default since we don't have API endpoints for currency
-      // This will be implemented when we add currency functionality to the backend
-      return currencies[0];
+      const response = await fetch("/api/users/currency");
+      if (!response.ok) {
+        // Fallback to USD if API fails
+        return currencies[0];
+      }
+      const data = await response.json();
+      const currency = currencies.find(c => c.code === data.currency) || currencies[0];
+      return currency;
     },
   });
 };
@@ -36,9 +41,17 @@ export const useSetCurrency = () => {
 
   return useMutation({
     mutationFn: async (currency: Currency) => {
-      // For now, just return success since we don't have API endpoints
-      // This will be implemented when we add currency functionality to the backend
-      return { success: true };
+      const response = await fetch("/api/users/currency", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currency: currency.code }),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to update currency");
+      }
+      
+      return response.json();
     },
     onSuccess: (_, currency) => {
       queryClient.setQueryData(["selectedCurrency"], currency);

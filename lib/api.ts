@@ -50,6 +50,30 @@ export const getUserByEmail = async (email: string) => {
   return users[0];
 };
 
+// Currency API functions
+export const currencyApi = {
+  // Get user's currency preference
+  getUserCurrency: async (): Promise<string> => {
+    const response = await fetch("/api/users/currency");
+    if (!response.ok) {
+      throw new Error("Failed to get user currency");
+    }
+    const data = await response.json();
+    return data.currency;
+  },
+
+  // Update user's currency preference
+  updateUserCurrency: async (currency: string): Promise<{ currency: string }> => {
+    const response = await fetch("/api/users/currency", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ currency }),
+    });
+    if (!response.ok) throw new Error("Failed to update user currency");
+    return response.json();
+  },
+};
+
 // Budget API functions
 export const budgetApi = {
   // Get budget for a user

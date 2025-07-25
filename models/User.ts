@@ -10,6 +10,7 @@ export interface IUser extends Document {
   trialEnd?: Date;
   subscriptionType?: string; // "stripe", "manual_paid", "manual_trial", etc.
   plan?: "free" | "pro";
+  currency?: string; // Currency code (e.g., "USD", "EUR")
 }
 
 const UserSchema = new Schema<IUser>({
@@ -25,7 +26,8 @@ const UserSchema = new Schema<IUser>({
     type: String,
     enum: ["free", "pro"],
     default: "free"
-  }
+  },
+  currency: { type: String, default: "USD" }
 });
 
 export default models.User || mongoose.model<IUser>("User", UserSchema);
