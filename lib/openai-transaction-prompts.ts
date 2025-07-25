@@ -41,5 +41,8 @@ SUGGESTION RULES:
 - Only suggest categories that actually exist in the user's available categories list
 - If there are only 2 categories available and one is a poor match, suggest the other one
 - Focus on helping users choose between their existing categories
+- For entertainment/leisure expenses, suggest categories that might be more appropriate
+- For transportation expenses, suggest categories that might be more appropriate
+- For food/dining expenses, suggest categories that might be more appropriate
 
 CRITICAL: You can ONLY use the categories provided in the available categories list. Do not assume any specific categories exist - only use what's provided.`; 

@@ -261,15 +261,13 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
               {/* Category Suggestions */}
               {transaction.suggestedCategories && transaction.suggestedCategories.length > 0 && (
                 <div className="text-xs text-muted-foreground mt-2">
-                  <span>Suggestions: </span>
-                  <span className="text-green-300">(Debug: {transaction.suggestedCategories.length} suggestions)</span>
+                  <span>Better category options: </span>
                   {transaction.suggestedCategories
                     .filter(suggestion => availableCategories.some(cat => cat.name === suggestion))
                     .map((suggestion, i) => (
                       <button
                         key={i}
                         onClick={() => {
-                      
                           handleCategoryChange(index, suggestion);
                         }}
                         className="text-blue-300 hover:text-blue-200 underline mr-2"
@@ -277,20 +275,6 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                         {suggestion}
                       </button>
                     ))}
-                  {transaction.suggestedCategories.filter(suggestion => 
-                    !availableCategories.some(cat => cat.name === suggestion)
-                  ).length > 0 && (
-                    <div className="text-xs text-muted-foreground mt-1">
-                      <span>Better categories to add: </span>
-                      {transaction.suggestedCategories
-                        .filter(suggestion => !availableCategories.some(cat => cat.name === suggestion))
-                        .map((suggestion, i) => (
-                          <span key={i} className="text-amber-300 mr-2">
-                            {suggestion}
-                          </span>
-                        ))}
-                    </div>
-                  )}
                 </div>
               )}
               
@@ -374,26 +358,14 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
     }
   }, [budgetId]);
 
-  // Load budget data to get available budget
-  const loadBudget = useCallback(async () => {
-    if (!budgetId) return;
-    
-    try {
-      const response = await fetch(`/api/budgets/${budgetId}`);
-      if (response.ok) {
-        const budgetData = await response.json();
-        setAvailableBudget(budgetData.totalAvailable || 0);
-      }
-    } catch (error) {
-      console.error('Failed to load budget data:', error);
-    }
-  }, [budgetId]);
-
+  // Use React Query to get budget data
+  const { data: budgetData } = useBudget(budgetId);
+  
   React.useEffect(() => {
-    if (budgetId) {
-      loadBudget();
+    if (budgetData) {
+      setAvailableBudget(budgetData.totalAvailable || 0);
     }
-  }, [budgetId]);
+  }, [budgetData]);
 
   const parseTransactions = useMutation({
     mutationFn: async (description: string) => {

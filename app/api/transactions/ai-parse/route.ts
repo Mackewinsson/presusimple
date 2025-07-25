@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
       : '';
     
     const enhancedPrompt = transactionSystemPrompt + availableCategories + 
-      '\n\nCRITICAL: You MUST use ONLY the available categories listed above. NEVER create new categories. If no exact match exists, choose the closest available category from the list provided.';
+      '\n\nCRITICAL: You MUST use ONLY the available categories listed above. NEVER create new categories. If no exact match exists, choose the closest available category from the list provided.\n\nWhen categorizing transactions:\n- For food/dining: prefer categories like "Food", "Groceries", "Dining"\n- For transportation: prefer categories like "Transport", "Gas", "Transportation"\n- For housing: prefer categories like "Rent", "Housing", "Utilities"\n- For entertainment: prefer categories like "Entertainment", "Leisure", "Fun"\n- For income: prefer categories like "Income", "Salary", "Savings"\n\nIf the best category is not available, suggest the next best alternative from the available list.';
 
     // Debug logging
 
