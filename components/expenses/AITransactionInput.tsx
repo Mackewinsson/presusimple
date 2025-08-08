@@ -480,7 +480,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       return;
     }
 
-    console.log('Starting AI parsing with categories:', (categories || []).map((cat: any) => cat.name));
+
 
     if (!userId?.data) {
       toast({

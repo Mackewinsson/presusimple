@@ -23,7 +23,7 @@ describe('BudgetCategoryItem', () => {
     name: 'Groceries',
     budgeted: 300,
     spent: 250,
-    sectionId: 'section1',
+    budgetId: 'budget1',
   };
 
   const mockOnRemove = jest.fn();

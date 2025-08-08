@@ -5,19 +5,14 @@ import User from "@/models/User";
 // GET /api/users - Get all users or filter by email
 export async function GET(request: NextRequest) {
   try {
-    console.log("GET /api/users - Connecting to database...");
     await dbConnect();
-    console.log("GET /api/users - Database connected");
 
     const { searchParams } = new URL(request.url);
     const email = searchParams.get("email");
-    console.log("GET /api/users - Email:", email);
 
     if (email) {
       // Filter by email
-      console.log("GET /api/users - Searching for user with email:", email);
       const user = await User.findOne({ email }).select("-__v");
-      console.log("GET /api/users - Found user:", user ? user._id : "null");
       return NextResponse.json(user ? [user] : []);
     } else {
       // Get all users
@@ -36,29 +31,21 @@ export async function GET(request: NextRequest) {
 // POST /api/users - Create a new user
 export async function POST(request: NextRequest) {
   try {
-    console.log("POST /api/users - Connecting to database...");
     await dbConnect();
-    console.log("POST /api/users - Database connected");
 
     const body = await request.json();
-    console.log("POST /api/users - Request body:", body);
-
     const { email, name } = body;
 
     if (!email) {
-      console.log("POST /api/users - Email is required");
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
     // Check if user already exists
-    console.log("POST /api/users - Checking if user exists:", email);
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      console.log("POST /api/users - User already exists:", existingUser._id);
       return NextResponse.json(existingUser);
     }
 
-    console.log("POST /api/users - Creating new user:", { email, name });
     const user = new User({
       email,
       name: name || "Test User",
@@ -66,7 +53,6 @@ export async function POST(request: NextRequest) {
     });
 
     const savedUser = await user.save();
-    console.log("POST /api/users - User created successfully:", savedUser._id);
     return NextResponse.json(savedUser, { status: 201 });
   } catch (error) {
     console.error("Error creating user:", error);
@@ -80,13 +66,9 @@ export async function POST(request: NextRequest) {
 // PATCH /api/users - Update user subscription status
 export async function PATCH(request: NextRequest) {
   try {
-    console.log("PATCH /api/users - Connecting to database...");
     await dbConnect();
-    console.log("PATCH /api/users - Database connected");
 
     const body = await request.json();
-    console.log("PATCH /api/users - Request body:", body);
-
     const {
       email,
       stripeCustomerId,
@@ -97,12 +79,10 @@ export async function PATCH(request: NextRequest) {
     } = body;
 
     if (!email) {
-      console.log("PATCH /api/users - Email is required");
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
     // Update user subscription fields
-    console.log("PATCH /api/users - Updating user subscription:", email);
     const updatedUser = await User.findOneAndUpdate(
       { email },
       {
@@ -116,14 +96,9 @@ export async function PATCH(request: NextRequest) {
     );
 
     if (!updatedUser) {
-      console.log("PATCH /api/users - User not found:", email);
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    console.log(
-      "PATCH /api/users - User updated successfully:",
-      updatedUser._id
-    );
     return NextResponse.json(updatedUser);
   } catch (error) {
     console.error("Error updating user:", error);
@@ -137,30 +112,22 @@ export async function PATCH(request: NextRequest) {
 // DELETE /api/users - Delete user by email
 export async function DELETE(request: NextRequest) {
   try {
-    console.log("DELETE /api/users - Connecting to database...");
     await dbConnect();
-    console.log("DELETE /api/users - Database connected");
 
     const { searchParams } = new URL(request.url);
     const email = searchParams.get("email");
-    
-    console.log("DELETE /api/users - Email:", email);
 
     if (!email) {
-      console.log("DELETE /api/users - Email is required");
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
     // Delete user by email
-    console.log("DELETE /api/users - Deleting user:", email);
     const deletedUser = await User.findOneAndDelete({ email });
 
     if (!deletedUser) {
-      console.log("DELETE /api/users - User not found:", email);
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    console.log("DELETE /api/users - User deleted successfully:", deletedUser._id);
     return NextResponse.json({ message: "User deleted successfully", user: deletedUser });
   } catch (error) {
     console.error("Error deleting user:", error);

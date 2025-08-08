@@ -31,20 +31,10 @@ export async function GET(request: NextRequest) {
         return NextResponse.json([]);
       }
 
-      console.log("Categories API: Filtering by budget", {
-        budgetId,
-        budgetObjectId: budget._id
-      });
-
       // Get categories for this budget (using budgetId for backend logic)
       const categories = await Category.find({
         budgetId: budget._id,
       }).sort({ createdAt: -1 });
-
-      console.log("Categories API: Found categories", {
-        categoriesCount: categories.length,
-        categories: categories.map(cat => ({ name: cat.name, budgetId: cat.budgetId }))
-      });
 
       return NextResponse.json(categories);
     } else {
@@ -99,8 +89,6 @@ export async function POST(request: NextRequest) {
 
 
 
-    console.log("Creating category with data:", { name, budgeted, budgetId });
-    
     const category = new Category({
       name,
       budgeted,
@@ -109,23 +97,18 @@ export async function POST(request: NextRequest) {
     });
 
     const savedCategory = await category.save();
-    console.log("Category saved successfully:", savedCategory);
 
     // Update the budget's totalBudgeted to reflect the new category
     const budget = await Budget.findById(budgetId);
     
     if (budget) {
-      console.log("Found budget for update:", budget._id);
-      
       // Get all categories for this budget (including the newly created one)
       const allCategories = await Category.find({
         budgetId: budget._id,
       });
-      console.log("All categories found:", allCategories.length);
       
       // Calculate total budgeted from all categories
       const totalBudgeted = allCategories.reduce((sum, cat) => sum + cat.budgeted, 0);
-      console.log("Total budgeted calculated:", totalBudgeted);
       
       // Update budget totals atomically
       const totalBudgetAmount = budget.totalBudgeted + budget.totalAvailable;
@@ -135,13 +118,6 @@ export async function POST(request: NextRequest) {
         totalBudgeted: totalBudgeted,
         totalAvailable: newTotalAvailable,
       }, { new: true });
-      
-      console.log("Budget updated successfully:", {
-        totalBudgeted: updatedBudget.totalBudgeted,
-        totalAvailable: updatedBudget.totalAvailable
-      });
-    } else {
-      console.log("No budget found for budgetId:", budgetId);
     }
 
     return NextResponse.json(savedCategory, { status: 201 });

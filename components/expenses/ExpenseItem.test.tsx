@@ -35,14 +35,14 @@ describe('ExpenseItem', () => {
       name: 'Groceries',
       budgeted: 300,
       spent: 250,
-      sectionId: 'section1',
+      budgetId: 'budget1',
     },
     {
       _id: 'cat2',
       name: 'Transportation',
       budgeted: 200,
       spent: 180,
-      sectionId: 'section1',
+      budgetId: 'budget1',
     },
   ];
 

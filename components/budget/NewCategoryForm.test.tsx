@@ -19,7 +19,6 @@ jest.mock('sonner', () => ({
 describe('NewCategoryForm', () => {
   const mockOnComplete = jest.fn();
   const mockOnCancel = jest.fn();
-  const sectionId = 'section1';
   const totalAvailable = 1000;
 
   beforeEach(() => {
@@ -29,7 +28,6 @@ describe('NewCategoryForm', () => {
   it('renders form fields correctly', () => {
     render(
       <NewCategoryForm
-        sectionId={sectionId}
         onComplete={mockOnComplete}
         onCancel={mockOnCancel}
         totalAvailable={totalAvailable}
@@ -43,7 +41,6 @@ describe('NewCategoryForm', () => {
   it('has submit button', () => {
     render(
       <NewCategoryForm
-        sectionId={sectionId}
         onComplete={mockOnComplete}
         onCancel={mockOnCancel}
         totalAvailable={totalAvailable}
@@ -55,7 +52,6 @@ describe('NewCategoryForm', () => {
   it('validates required fields', () => {
     render(
       <NewCategoryForm
-        sectionId={sectionId}
         onComplete={mockOnComplete}
         onCancel={mockOnCancel}
         totalAvailable={totalAvailable}
@@ -69,7 +65,6 @@ describe('NewCategoryForm', () => {
   it('sets default values correctly', () => {
     render(
       <NewCategoryForm
-        sectionId={sectionId}
         onComplete={mockOnComplete}
         onCancel={mockOnCancel}
         totalAvailable={totalAvailable}

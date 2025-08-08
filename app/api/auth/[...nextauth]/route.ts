@@ -41,7 +41,7 @@ const handler = NextAuth({
             });
             
             await newUser.save();
-            console.log("New user created with trial:", user.email);
+    
             
             // Add a flag to indicate this is a new user
             user.isNewUser = true;
@@ -59,7 +59,7 @@ const handler = NextAuth({
               existingUser.subscriptionType = "trial_signup";
               
               await existingUser.save();
-              console.log("Existing user given trial:", user.email);
+      
               
               // Add a flag to indicate this is a returning user getting trial
               user.isNewUser = true;
