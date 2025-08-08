@@ -37,7 +37,7 @@ import { NewUserOnboarding } from "@/components/NewUserOnboarding";
 import { Suspense } from "react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useTranslation } from "@/lib/i18n";
-import PWAInstaller from "@/components/PWAInstaller";
+
 import { useState } from "react";
 
 function BudgetAppContent() {
@@ -221,8 +221,7 @@ function BudgetAppContent() {
         </div>
       </footer>
       
-      {/* PWA Installer */}
-      <PWAInstaller />
+
       </div>
     </ErrorBoundary>
   );

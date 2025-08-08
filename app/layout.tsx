@@ -16,26 +16,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Simple Budget - Personal Finance Management",
   description: "Track your budget and expenses with this zero-based budgeting app",
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "Simple Budget"
-  },
   icons: {
     icon: [
       { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
       { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" }
-    ],
-    apple: [
-      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" }
     ]
-  },
-  other: {
-    "mobile-web-app-capable": "yes",
-    "apple-mobile-web-app-capable": "yes",
-    "apple-mobile-web-app-status-bar-style": "default",
-    "apple-mobile-web-app-title": "Simple Budget"
   }
 };
 
