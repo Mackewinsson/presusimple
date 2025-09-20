@@ -10,12 +10,21 @@ module.exports = {
     '^@hooks/(.*)$': '<rootDir>/hooks/$1',
   },
   transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
+    '^.+\\.(js|jsx|ts|tsx)$': [
+      '@swc/jest',
+      {
+        jsc: {
+          parser: { syntax: 'typescript', tsx: true },
+          transform: { react: { runtime: 'automatic' } },
+        },
+        module: { type: 'commonjs' },
+      },
+    ],
   },
   transformIgnorePatterns: [
     '/node_modules/(?!(lucide-react|sonner|@radix-ui|@testing-library)/)'
   ],
-  testPathIgnorePatterns: ['/node_modules/', '/.next/'],
+  testPathIgnorePatterns: ['/node_modules/', '/.next/', '__tests__/api/'],
   collectCoverageFrom: [
     'components/**/*.{ts,tsx}',
     'lib/**/*.{ts,tsx}',

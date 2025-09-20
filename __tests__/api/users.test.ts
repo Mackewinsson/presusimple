@@ -16,7 +16,7 @@ jest.mock('@/lib/mongoose', () => ({
   dbConnect: jest.fn(),
 }));
 
-// Mock the User model
+// Define mock data before mocks
 const mockUser = {
   _id: 'user1',
   email: 'test@example.com',
@@ -30,11 +30,15 @@ const mockUser = {
   }),
 };
 
-jest.mock('@/models/User', () => ({
-  findOne: jest.fn().mockResolvedValue(mockUser),
-  find: jest.fn().mockResolvedValue([mockUser]),
-  findOneAndUpdate: jest.fn().mockResolvedValue(mockUser),
-}));
+// Mock the User model using factory to avoid TDZ/hoisting issues
+jest.mock('@/models/User', () => {
+  return {
+    __esModule: true,
+    findOne: jest.fn().mockImplementation(() => Promise.resolve(mockUser)),
+    find: jest.fn().mockImplementation(() => Promise.resolve([mockUser])),
+    findOneAndUpdate: jest.fn().mockImplementation(() => Promise.resolve(mockUser)),
+  };
+});
 
 // NOTE: Skipped due to incompatibility with Jest/node environment (Next.js API routes require edge runtime or web APIs)
 describe.skip('/api/users', () => {

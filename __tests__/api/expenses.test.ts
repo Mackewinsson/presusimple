@@ -16,7 +16,7 @@ jest.mock('@/lib/mongoose', () => ({
   dbConnect: jest.fn(),
 }));
 
-// Mock the Expense model
+// Define mock data before mocks
 const mockExpense = {
   _id: 'exp1',
   userId: 'user1',
@@ -36,13 +36,17 @@ const mockExpense = {
   }),
 };
 
-jest.mock('@/models/Expense', () => ({
-  find: jest.fn().mockResolvedValue([mockExpense]),
-  findOne: jest.fn().mockResolvedValue(mockExpense),
-  findOneAndUpdate: jest.fn().mockResolvedValue(mockExpense),
-  findOneAndDelete: jest.fn().mockResolvedValue(mockExpense),
-  create: jest.fn().mockResolvedValue(mockExpense),
-}));
+// Mock the Expense model using factory to avoid TDZ/hoisting issues
+jest.mock('@/models/Expense', () => {
+  return {
+    __esModule: true,
+    find: jest.fn().mockImplementation(() => Promise.resolve([mockExpense])),
+    findOne: jest.fn().mockImplementation(() => Promise.resolve(mockExpense)),
+    findOneAndUpdate: jest.fn().mockImplementation(() => Promise.resolve(mockExpense)),
+    findOneAndDelete: jest.fn().mockImplementation(() => Promise.resolve(mockExpense)),
+    create: jest.fn().mockImplementation(() => Promise.resolve(mockExpense)),
+  };
+});
 
 // NOTE: Skipped due to incompatibility with Jest/node environment (Next.js API routes require edge runtime or web APIs)
 describe.skip('/api/expenses', () => {

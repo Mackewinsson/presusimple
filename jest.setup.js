@@ -1,20 +1,99 @@
 require('@testing-library/jest-dom');
+require('jest-canvas-mock');
 
-// Mock Next.js router
-jest.mock('next/navigation', () => ({
-  useRouter() {
-    return {
-      push: jest.fn(),
-      replace: jest.fn(),
-      prefetch: jest.fn(),
-      back: jest.fn(),
-    };
-  },
-  useSearchParams() {
-    return new URLSearchParams();
-  },
-  usePathname() {
-    return '/';
+// Mock next-auth
+jest.mock('next-auth/react', () => ({
+  useSession: jest.fn(() => ({
+    data: {
+      user: {
+        id: 'user123',
+        email: 'test@example.com',
+      },
+    },
+    status: 'authenticated',
+  })),
+}));
+
+// Mock currency queries
+jest.mock('@/lib/hooks/useCurrencyQueries', () => ({
+  useSelectedCurrency: () => ({
+    data: { code: 'USD', symbol: '$', name: 'US Dollar' },
+    isLoading: false,
+  }),
+  useSetCurrency: () => ({
+    mutate: jest.fn(),
+    mutateAsync: jest.fn(),
+    isLoading: false,
+  }),
+  useCurrentCurrency: () => ({ code: 'USD', symbol: '$', name: 'US Dollar' }),
+  currencies: [{ code: 'USD', symbol: '$', name: 'US Dollar' }],
+}));
+
+// Mock aggregated hooks
+jest.mock('@/lib/hooks', () => {
+  const actual = jest.requireActual('@/lib/hooks');
+  return {
+    __esModule: true,
+    ...actual,
+    // Ensure currency helpers exist when imported from aggregated hooks
+    useSelectedCurrency: () => ({
+      data: { code: 'USD', symbol: '$', name: 'US Dollar' },
+      isLoading: false,
+    }),
+    useSetCurrency: () => ({
+      mutate: jest.fn(),
+      mutateAsync: jest.fn(),
+      isLoading: false,
+    }),
+    useCurrentCurrency: () => ({ code: 'USD', symbol: '$', name: 'US Dollar' }),
+    currencies: [{ code: 'USD', symbol: '$', name: 'US Dollar' }],
+    useUpdateExpense: () => ({ mutateAsync: jest.fn().mockResolvedValue({}) }),
+    useDeleteExpense: () => ({ mutateAsync: jest.fn().mockResolvedValue({}) }),
+  };
+});
+
+// Mock global fetch for hooks relying on API routes
+global.fetch = jest.fn((input, init) => {
+  const url = typeof input === 'string' ? input : input.toString();
+  
+  if (url.startsWith('/api/users?email=')) {
+    // Return a single user in list for read queries
+    return Promise.resolve({
+      ok: true,
+      json: async () => [{ _id: 'user123', email: url.split('=')[1] }],
+    });
+  }
+  
+  if (url === '/api/users' && init?.method === 'POST') {
+    const body = init?.body ? JSON.parse(init.body) : {};
+    return Promise.resolve({
+      ok: true,
+      json: async () => ({ _id: 'user123', ...body }),
+    });
+  }
+  
+  if (url === '/api/users' && init?.method === 'PATCH') {
+    return Promise.resolve({ 
+      ok: true, 
+      json: async () => ({ success: true }) 
+    });
+  }
+  
+  // Default response for other API calls
+  return Promise.resolve({ 
+    ok: true, 
+    json: async () => ({}) 
+  });
+});
+
+// Mock Next.js server module to avoid Request global issues in API route imports during tests
+jest.mock('next/server', () => ({
+  NextRequest: class {},
+  NextResponse: {
+    json: (data, init) => ({
+      json: async () => data,
+      status: (init && init.status) || 200,
+    }),
   },
 }));
 
