@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
   }
 
   console.log('Session found for user:', session.user.email);
+  console.log('Session details:', { id: session.user.id, email: session.user.email, name: session.user.name });
 
   // Issue a one-time code valid for 60s
   const code = crypto.randomUUID();
@@ -39,6 +40,8 @@ export async function GET(request: NextRequest) {
   url.searchParams.set("code", code);
   
   console.log('Redirecting to:', url.toString());
+  console.log('Code generated:', code);
+  console.log('Code stored in memory store');
   
   return NextResponse.redirect(url.toString());
 }
