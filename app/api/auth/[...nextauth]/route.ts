@@ -95,8 +95,15 @@ const handler = NextAuth({
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // Always redirect to /budget after successful login
-      // The budget page will handle redirecting new users to welcome page
+      console.log('NextAuth redirect callback called with:', { url, baseUrl });
+      
+      // Check if this is a mobile auth callback
+      if (url && url.includes('/api/mobile/finish')) {
+        console.log('Mobile auth callback detected, redirecting to:', url);
+        return url;
+      }
+      
+      // For regular web auth, redirect to /budget
       if (url.startsWith(baseUrl)) return url;
       if (url.startsWith("/")) return `${baseUrl}${url}`;
       return baseUrl + "/budget";

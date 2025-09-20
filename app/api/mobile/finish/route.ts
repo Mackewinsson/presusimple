@@ -8,7 +8,9 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const redirect = searchParams.get("redirect");
   
+  console.log('=== MOBILE FINISH ROUTE CALLED ===');
   console.log('Mobile finish route called with redirect:', redirect);
+  console.log('Request URL:', request.url);
   
   if (!redirect || typeof redirect !== "string" || !redirect.startsWith("exp://")) {
     console.error('Invalid redirect URL:', redirect);
