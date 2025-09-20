@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   
   console.log('Mobile finish route called with redirect:', redirect);
   
-  if (!redirect || typeof redirect !== "string" || !redirect.startsWith("budgetingmobile://")) {
+  if (!redirect || typeof redirect !== "string" || !redirect.startsWith("exp://")) {
     console.error('Invalid redirect URL:', redirect);
     return NextResponse.json({ error: "Invalid redirect" }, { status: 400 });
   }
