@@ -26,8 +26,10 @@ export async function GET(request: NextRequest) {
   });
   
   if (!session?.user?.id) {
-    console.error('No session found');
-    return NextResponse.json({ error: "No session" }, { status: 401 });
+    console.error('No session found - redirecting to signin');
+    // If no session, redirect to signin with the same callback URL
+    const signinUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/signin?callbackUrl=${encodeURIComponent(request.url)}`;
+    return NextResponse.redirect(signinUrl);
   }
 
   console.log('Session found for user:', session.user.email);
