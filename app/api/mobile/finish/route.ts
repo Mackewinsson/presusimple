@@ -18,6 +18,13 @@ export async function GET(request: NextRequest) {
   }
 
   const session = await getServerSession(authOptions);
+  console.log('Session check result:', { 
+    hasSession: !!session, 
+    hasUser: !!session?.user, 
+    hasUserId: !!session?.user?.id,
+    userEmail: session?.user?.email 
+  });
+  
   if (!session?.user?.id) {
     console.error('No session found');
     return NextResponse.json({ error: "No session" }, { status: 401 });
