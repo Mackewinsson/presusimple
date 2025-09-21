@@ -134,9 +134,9 @@ export default function ApiDocs() {
                 <div className="bg-white p-3 rounded border text-sm">
                   <p className="mb-2"><strong>Step 1:</strong> Get a JWT token by calling the login endpoint:</p>
                   <code className="block bg-gray-100 p-2 rounded text-xs overflow-x-auto">
-                    curl -X POST http://localhost:3000/api/mobile-login \<br/>
-                    &nbsp;&nbsp;-H "Content-Type: application/json" \<br/>
-                    &nbsp;&nbsp;-d '{"email":"your-email@example.com","password":"your-password"}'
+                    {`curl -X POST http://localhost:3000/api/mobile-login \\
+  -H "Content-Type: application/json" \\
+  -d '{"email":"your-email@example.com","password":"your-password"}'`}
                   </code>
                   <p className="mt-2"><strong>Step 2:</strong> Click the "Authorize" button (🔒) in Swagger UI below</p>
                   <p><strong>Step 3:</strong> Enter: <code>Bearer &lt;your-jwt-token&gt;</code></p>
