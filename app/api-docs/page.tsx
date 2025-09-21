@@ -107,9 +107,9 @@ export default function ApiDocs() {
                 <div className="mt-2 space-y-2 text-sm">
                   <div><span className="font-mono bg-gray-100 px-2 py-1 rounded">GET</span> <code>/api/expenses</code> - List expenses (with user filtering)</div>
                   <div><span className="font-mono bg-gray-100 px-2 py-1 rounded">POST</span> <code>/api/expenses</code> - Create new expense</div>
-                  <div><span className="font-mono bg-gray-100 px-2 py-1 rounded">GET</span> <code>/api/expenses/{id}</code> - Get specific expense</div>
-                  <div><span className="font-mono bg-gray-100 px-2 py-1 rounded">PUT</span> <code>/api/expenses/{id}</code> - Update expense</div>
-                  <div><span className="font-mono bg-gray-100 px-2 py-1 rounded">DELETE</span> <code>/api/expenses/{id}</code> - Delete expense</div>
+                  <div><span className="font-mono bg-gray-100 px-2 py-1 rounded">GET</span> <code>/api/expenses/{"{id}"}</code> - Get specific expense</div>
+                  <div><span className="font-mono bg-gray-100 px-2 py-1 rounded">PUT</span> <code>/api/expenses/{"{id}"}</code> - Update expense</div>
+                  <div><span className="font-mono bg-gray-100 px-2 py-1 rounded">DELETE</span> <code>/api/expenses/{"{id}"}</code> - Delete expense</div>
                 </div>
               </div>
             </div>
