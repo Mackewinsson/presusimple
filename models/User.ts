@@ -2,6 +2,7 @@ import mongoose, { Schema, Document, models } from "mongoose";
 
 export interface IUser extends Document {
   email: string;
+  password?: string; // For mobile app authentication
   name?: string;
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
@@ -15,6 +16,7 @@ export interface IUser extends Document {
 
 const UserSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },
+  password: { type: String }, // For mobile app authentication
   name: { type: String },
   stripeCustomerId: { type: String },
   stripeSubscriptionId: { type: String },
