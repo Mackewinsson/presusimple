@@ -6,7 +6,67 @@ const options: swaggerJSDoc.Options = {
     info: {
       title: 'Simple Budget API',
       version: '1.0.0',
-      description: 'API documentation for Simple Budget application - a personal finance management tool',
+      description: `# Simple Budget API Documentation
+
+A comprehensive personal finance management tool API with authentication, budget tracking, expense management, and AI-powered features.
+
+## 🔐 Authentication Guide
+
+This API supports two authentication methods:
+
+### 1. JWT Bearer Token (Mobile Apps)
+- **Method**: JWT token in Authorization header
+- **Format**: \`Bearer <your-jwt-token>\`
+- **How to get a token**:
+  1. Use the \`/api/mobile-login\` endpoint to authenticate
+  2. Copy the \`token\` from the response
+  3. Click the "Authorize" button in Swagger UI
+  4. Enter: \`Bearer <your-token>\`
+
+### 2. NextAuth Cookie (Web Apps)
+- **Method**: NextAuth session cookie
+- **Format**: \`next-auth.session-token=<cookie-value>\`
+- **How to get a cookie**:
+  1. Login through your web app at \`/auth/login\`
+  2. Open browser dev tools → Application → Cookies
+  3. Copy the \`next-auth.session-token\` value
+  4. Click "Authorize" in Swagger UI
+  5. Enter: \`next-auth.session-token=<cookie-value>\`
+
+## 🚀 Quick Start
+
+1. **Get a JWT token**:
+   \`\`\`bash
+   curl -X POST http://localhost:3000/api/mobile-login \\
+     -H "Content-Type: application/json" \\
+     -d '{"email":"your-email@example.com","password":"your-password"}'
+   \`\`\`
+
+2. **Authorize in Swagger UI**:
+   - Click the "Authorize" button (🔒) at the top right
+   - In the "BearerAuth" field, enter: \`Bearer <your-jwt-token>\`
+   - Click "Authorize" → "Close"
+
+3. **Test protected endpoints**:
+   - Try the \`/api/mobile-example\` endpoint
+   - You should see: \`"Mobile authentication successful"\`
+
+## 📚 API Features
+
+- **Authentication**: JWT and NextAuth session support
+- **Budget Management**: Create, read, update, delete budgets
+- **Expense Tracking**: Full CRUD operations for expenses
+- **AI Features**: AI-powered budget creation and transaction parsing
+- **Payment Processing**: Stripe integration for subscriptions
+- **User Management**: Profile and currency preferences
+- **Monthly Budgets**: Track monthly budget performance
+
+## 🔧 Development
+
+- **Base URL**: \`http://localhost:3000\` (development)
+- **Production URL**: \`https://simple-budget.vercel.app\`
+- **Rate Limiting**: AI endpoints have rate limits (5-10 requests/minute)
+- **Error Handling**: Comprehensive error responses with details`,
       contact: {
         name: 'Simple Budget API Support',
         email: 'support@simplebudget.com',

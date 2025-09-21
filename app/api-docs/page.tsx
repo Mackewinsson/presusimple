@@ -121,9 +121,39 @@ export default function ApiDocs() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Simple Budget API Documentation
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 mb-6">
             Complete API reference for the Simple Budget application
           </p>
+          
+          {/* Authentication Guide */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+            <h2 className="text-xl font-semibold text-blue-900 mb-4">🔐 Authentication Guide</h2>
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-medium text-blue-800 mb-2">JWT Bearer Token (Recommended)</h3>
+                <div className="bg-white p-3 rounded border text-sm">
+                  <p className="mb-2"><strong>Step 1:</strong> Get a JWT token by calling the login endpoint:</p>
+                  <code className="block bg-gray-100 p-2 rounded text-xs overflow-x-auto">
+                    curl -X POST http://localhost:3000/api/mobile-login \<br/>
+                    &nbsp;&nbsp;-H "Content-Type: application/json" \<br/>
+                    &nbsp;&nbsp;-d '{"email":"your-email@example.com","password":"your-password"}'
+                  </code>
+                  <p className="mt-2"><strong>Step 2:</strong> Click the "Authorize" button (🔒) in Swagger UI below</p>
+                  <p><strong>Step 3:</strong> Enter: <code>Bearer &lt;your-jwt-token&gt;</code></p>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="font-medium text-blue-800 mb-2">NextAuth Cookie (Web Apps)</h3>
+                <div className="bg-white p-3 rounded border text-sm">
+                  <p className="mb-2"><strong>Step 1:</strong> Login through your web app at <code>/auth/login</code></p>
+                  <p className="mb-2"><strong>Step 2:</strong> Open browser dev tools → Application → Cookies</p>
+                  <p className="mb-2"><strong>Step 3:</strong> Copy the <code>next-auth.session-token</code> value</p>
+                  <p><strong>Step 4:</strong> Enter: <code>next-auth.session-token=&lt;cookie-value&gt;</code></p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
