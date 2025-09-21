@@ -29,10 +29,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate password strength
-    const passwordErrors = validatePassword(password);
-    if (passwordErrors.length > 0) {
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
       return NextResponse.json(
-        { error: "Password validation failed", details: passwordErrors },
+        { error: "Password validation failed", details: passwordValidation.errors },
         { status: 400 }
       );
     }
