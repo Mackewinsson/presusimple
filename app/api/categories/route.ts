@@ -3,7 +3,44 @@ import { dbConnect } from "@/lib/mongoose";
 import Category from "../../../models/Category";
 import Budget from "../../../models/Budget";
 
-// GET /api/categories - Get all categories or filter by user
+/**
+ * @swagger
+ * /api/categories:
+ *   get:
+ *     summary: Get categories
+ *     description: Retrieve categories for a specific user or budget
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: query
+ *         name: user
+ *         schema:
+ *           type: string
+ *         description: User ID to filter categories
+ *         example: "688250e72a4d1976843ee892"
+ *       - in: query
+ *         name: budget
+ *         schema:
+ *           type: string
+ *         description: Budget ID to filter categories
+ *         example: "688250e72a4d1976843ee893"
+ *     responses:
+ *       200:
+ *         description: List of categories
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Category'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Internal server error"
+ */
 export async function GET(request: NextRequest) {
   try {
     await dbConnect();

@@ -2,7 +2,39 @@ import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
 
-// GET /api/users - Get all users or filter by email
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Get users
+ *     description: Retrieve all users or filter by email
+ *     tags: [Users]
+ *     parameters:
+ *       - in: query
+ *         name: email
+ *         schema:
+ *           type: string
+ *           format: email
+ *         description: Email to filter users
+ *         example: "user@example.com"
+ *     responses:
+ *       200:
+ *         description: List of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Failed to fetch users"
+ */
 export async function GET(request: NextRequest) {
   try {
     await dbConnect();
