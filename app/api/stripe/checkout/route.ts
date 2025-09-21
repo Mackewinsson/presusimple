@@ -3,6 +3,59 @@ import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
+/**
+ * @swagger
+ * /api/stripe/checkout:
+ *   post:
+ *     summary: Create Stripe checkout session
+ *     description: Create a Stripe checkout session for subscription with 30-day trial
+ *     tags: [Payments]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Customer email address
+ *                 example: "user@example.com"
+ *     responses:
+ *       200:
+ *         description: Checkout session created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 sessionId:
+ *                   type: string
+ *                   description: Stripe checkout session ID
+ *                   example: "cs_test_1234567890"
+ *                 url:
+ *                   type: string
+ *                   description: Checkout URL
+ *                   example: "https://checkout.stripe.com/pay/cs_test_1234567890"
+ *       400:
+ *         description: Bad request - missing email
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Missing email"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Failed to create checkout session"
+ */
 export async function POST(request: NextRequest) {
   try {
     const { email } = await request.json();

@@ -6,6 +6,55 @@ import Expense from "@/models/Expense";
 import { getServerSession } from "next-auth";
 import NextAuth from "next-auth";
 
+/**
+ * @swagger
+ * /api/budgets/reset:
+ *   post:
+ *     summary: Reset user's budget data
+ *     description: Reset all budget data for a user (budgets, categories, expenses)
+ *     tags: [Budgets]
+ *     security:
+ *       - NextAuth: []
+ *     responses:
+ *       200:
+ *         description: Budget data reset successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Budget data reset successfully"
+ *                 deletedCounts:
+ *                   type: object
+ *                   properties:
+ *                     budgets:
+ *                       type: number
+ *                       example: 2
+ *                     categories:
+ *                       type: number
+ *                       example: 15
+ *                     expenses:
+ *                       type: number
+ *                       example: 45
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Unauthorized"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Internal server error"
+ */
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();

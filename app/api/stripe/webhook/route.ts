@@ -5,6 +5,55 @@ import User from "@/models/User";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
+/**
+ * @swagger
+ * /api/stripe/webhook:
+ *   post:
+ *     summary: Stripe webhook handler
+ *     description: Handle Stripe webhook events for subscription management
+ *     tags: [Payments]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             description: Stripe webhook event payload
+ *     parameters:
+ *       - in: header
+ *         name: stripe-signature
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Stripe signature for webhook verification
+ *     responses:
+ *       200:
+ *         description: Webhook processed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 received:
+ *                   type: boolean
+ *                   example: true
+ *       400:
+ *         description: Webhook signature verification failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Webhook Error"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Internal server error"
+ */
 export async function POST(request: NextRequest) {
   const sig = request.headers.get("stripe-signature");
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;

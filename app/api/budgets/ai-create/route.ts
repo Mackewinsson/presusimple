@@ -27,6 +27,82 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+/**
+ * @swagger
+ * /api/budgets/ai-create:
+ *   post:
+ *     summary: Create budget using AI
+ *     description: Generate a personalized budget using OpenAI based on user's financial situation and goals
+ *     tags: [Budgets, AI]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [userId, monthlyIncome, financialGoals]
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: User ID
+ *                 example: "688250e72a4d1976843ee892"
+ *               monthlyIncome:
+ *                 type: number
+ *                 description: Monthly income amount
+ *                 example: 5000
+ *               financialGoals:
+ *                 type: string
+ *                 description: Financial goals and preferences
+ *                 example: "Save for emergency fund, pay off credit card debt, invest for retirement"
+ *               expenses:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     category:
+ *                       type: string
+ *                       example: "Rent"
+ *                     amount:
+ *                       type: number
+ *                       example: 1200
+ *     responses:
+ *       200:
+ *         description: Budget created successfully by AI
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Budget created successfully using AI"
+ *                 budget:
+ *                   $ref: '#/components/schemas/Budget'
+ *       400:
+ *         description: Bad request - missing required fields
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Missing required fields: userId, monthlyIncome, financialGoals"
+ *       429:
+ *         description: Rate limit exceeded
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Rate limit exceeded. Please try again later."
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Failed to create budget with AI"
+ */
 export async function POST(request: NextRequest) {
   try {
     const { description, userId } = await request.json();

@@ -27,6 +27,84 @@ function checkRateLimit(userId: string): boolean {
   return true;
 }
 
+/**
+ * @swagger
+ * /api/transactions/ai-parse:
+ *   post:
+ *     summary: Parse transaction using AI
+ *     description: Use OpenAI to intelligently parse and categorize transaction descriptions
+ *     tags: [AI, Transactions]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [description, userId]
+ *             properties:
+ *               description:
+ *                 type: string
+ *                 description: Raw transaction description to parse
+ *                 example: "STARBUCKS COFFEE #1234 NEW YORK NY"
+ *               userId:
+ *                 type: string
+ *                 description: User ID for rate limiting
+ *                 example: "688250e72a4d1976843ee892"
+ *               amount:
+ *                 type: number
+ *                 description: Transaction amount (optional, helps with categorization)
+ *                 example: 4.50
+ *     responses:
+ *       200:
+ *         description: Transaction parsed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 parsed:
+ *                   type: object
+ *                   properties:
+ *                     merchant:
+ *                       type: string
+ *                       example: "Starbucks"
+ *                     category:
+ *                       type: string
+ *                       example: "Food & Dining"
+ *                     subcategory:
+ *                       type: string
+ *                       example: "Coffee"
+ *                     location:
+ *                       type: string
+ *                       example: "New York, NY"
+ *                     confidence:
+ *                       type: number
+ *                       example: 0.95
+ *       400:
+ *         description: Bad request - missing required fields
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Missing required fields: description, userId"
+ *       429:
+ *         description: Rate limit exceeded
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Rate limit exceeded. Please try again later."
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Failed to parse transaction"
+ */
 export async function POST(request: NextRequest) {
   try {
     const { description, userId, budgetId, categories } = await request.json();

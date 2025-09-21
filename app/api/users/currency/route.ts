@@ -3,6 +3,116 @@ import { getServerSession } from "next-auth";
 import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
 
+/**
+ * @swagger
+ * /api/users/currency:
+ *   get:
+ *     summary: Get user's currency preference
+ *     description: Retrieve the user's preferred currency setting
+ *     tags: [Users]
+ *     security:
+ *       - NextAuth: []
+ *     responses:
+ *       200:
+ *         description: User currency preference retrieved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 currency:
+ *                   type: string
+ *                   example: "USD"
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Unauthorized"
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "User not found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Internal server error"
+ *   put:
+ *     summary: Update user's currency preference
+ *     description: Update the user's preferred currency setting
+ *     tags: [Users]
+ *     security:
+ *       - NextAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [currency]
+ *             properties:
+ *               currency:
+ *                 type: string
+ *                 description: Currency code (e.g., USD, EUR, GBP)
+ *                 example: "USD"
+ *     responses:
+ *       200:
+ *         description: Currency preference updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Currency preference updated successfully"
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Bad request - missing currency
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Currency is required"
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Unauthorized"
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "User not found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Internal server error"
+ */
 // GET /api/users/currency - Get user's currency preference
 export async function GET(request: NextRequest) {
   try {

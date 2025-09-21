@@ -3,6 +3,54 @@ import { dbConnect } from "@/lib/mongoose";
 import MonthlyBudget from "@/models/MonthlyBudget";
 import { getServerSession } from "next-auth";
 
+/**
+ * @swagger
+ * /api/monthly-budgets:
+ *   get:
+ *     summary: Get monthly budgets
+ *     description: Retrieve monthly budgets for a specific user or all budgets (admin)
+ *     tags: [Monthly Budgets]
+ *     parameters:
+ *       - in: query
+ *         name: user
+ *         schema:
+ *           type: string
+ *         description: User ID to filter monthly budgets
+ *         example: "688250e72a4d1976843ee892"
+ *     responses:
+ *       200:
+ *         description: List of monthly budgets
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     example: "688250e72a4d1976843ee893"
+ *                   user:
+ *                     type: string
+ *                     example: "688250e72a4d1976843ee892"
+ *                   month:
+ *                     type: string
+ *                     example: "2024-01"
+ *                   totalBudget:
+ *                     type: number
+ *                     example: 5000
+ *                   totalSpent:
+ *                     type: number
+ *                     example: 3200
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Internal server error"
+ */
 export async function GET(request: NextRequest) {
   try {
     await dbConnect();
