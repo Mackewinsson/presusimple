@@ -5,7 +5,86 @@ import { hashPassword, validatePassword } from "@/lib/password";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-// POST /api/mobile-setup-password - Set up password for existing Google OAuth users
+/**
+ * @swagger
+ * /api/mobile-setup-password:
+ *   post:
+ *     summary: Set password for mobile login
+ *     description: Allow Google OAuth users to set a password for mobile app access
+ *     tags: [Authentication]
+ *     security:
+ *       - NextAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/PasswordSetupRequest'
+ *           example:
+ *             password: "SecurePassword123"
+ *     responses:
+ *       200:
+ *         description: Password set successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Password set successfully. You can now use mobile login."
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *             example:
+ *               message: "Password set successfully. You can now use mobile login."
+ *               user:
+ *                 id: "688250e72a4d1976843ee892"
+ *                 email: "user@example.com"
+ *                 name: "John Doe"
+ *                 plan: "pro"
+ *                 isPaid: false
+ *                 trialEnd: "2025-09-26T08:55:44.965Z"
+ *       400:
+ *         description: Bad request - validation errors
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             examples:
+ *               missing_password:
+ *                 summary: Missing password
+ *                 value:
+ *                   error: "Password is required"
+ *               password_validation:
+ *                 summary: Password validation failed
+ *                 value:
+ *                   error: "Password validation failed"
+ *                   details: ["Password must be at least 8 characters long"]
+ *       401:
+ *         description: Not authenticated via web session
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Not authenticated via web session"
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "User not found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Internal server error"
+ */
 export async function POST(request: NextRequest) {
   try {
     // Check if user is authenticated via NextAuth (Google OAuth)
@@ -85,7 +164,62 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET /api/mobile-setup-password - Check if user can set up password
+/**
+ * @swagger
+ * /api/mobile-setup-password:
+ *   get:
+ *     summary: Check password setup status
+ *     description: Check if a user can set up a password for mobile login
+ *     tags: [Authentication]
+ *     security:
+ *       - NextAuth: []
+ *     responses:
+ *       200:
+ *         description: Password setup status retrieved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 canSetupPassword:
+ *                   type: boolean
+ *                   description: Whether the user can set up a password
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *             example:
+ *               canSetupPassword: true
+ *               user:
+ *                 id: "688250e72a4d1976843ee892"
+ *                 email: "user@example.com"
+ *                 name: "John Doe"
+ *                 plan: "pro"
+ *                 isPaid: false
+ *                 trialEnd: "2025-09-26T08:55:44.965Z"
+ *       401:
+ *         description: Not authenticated via web session
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Authentication required"
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "User not found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Internal server error"
+ */
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
