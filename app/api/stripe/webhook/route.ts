@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
 import { stripe, getWebhookSecret } from "@/lib/stripe";
+import Stripe from "stripe";
 
 /**
  * @swagger
@@ -129,20 +130,22 @@ export async function POST(request: NextRequest) {
         );
         break;
       }
-    case "checkout.session.completed": {
-      // Attach stripeCustomerId to user by email
-      // Don't set plan here - let subscription events handle it
-      const session = event.data.object as Stripe.Checkout.Session;
-      const customerId = session.customer as string;
-      const email = session.customer_email;
-      if (email && customerId) {
-        await User.findOneAndUpdate(
-          { email },
-          { 
-            stripeCustomerId: customerId,
-            // Plan will be set by subscription events
-          }
-        );
+      case "checkout.session.completed": {
+        // Attach stripeCustomerId to user by email
+        // Don't set plan here - let subscription events handle it
+        const session = event.data.object as Stripe.Checkout.Session;
+        const customerId = session.customer as string;
+        const email = session.customer_email;
+        if (email && customerId) {
+          await User.findOneAndUpdate(
+            { email },
+            { 
+              stripeCustomerId: customerId,
+              // Plan will be set by subscription events
+            }
+          );
+        }
+        break;
       }
       case "invoice.payment_succeeded": {
         // Update isPaid to true and plan to pro
@@ -161,33 +164,6 @@ export async function POST(request: NextRequest) {
         // Payment failed - remove access
         const invoice = event.data.object as Stripe.Invoice;
         const customerId = invoice.customer as string;
-        await User.findOneAndUpdate(
-          { stripeCustomerId: customerId },
-          { 
-            isPaid: false,
-            plan: "free"
-          }
-        );
-        break;
-      }
-      case "customer.subscription.past_due": {
-        // Subscription is past due - keep access but mark as unpaid
-        const subscription = event.data.object as Stripe.Subscription;
-        const customerId = subscription.customer as string;
-        await User.findOneAndUpdate(
-          { stripeCustomerId: customerId },
-          { 
-            isPaid: false, // Not paid but still has access
-            plan: "pro"    // Keep pro features during grace period
-          }
-        );
-        break;
-      }
-      case "customer.subscription.incomplete":
-      case "customer.subscription.incomplete_expired": {
-        // Subscription incomplete or expired - remove access
-        const subscription = event.data.object as Stripe.Subscription;
-        const customerId = subscription.customer as string;
         await User.findOneAndUpdate(
           { stripeCustomerId: customerId },
           { 
