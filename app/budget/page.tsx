@@ -37,6 +37,7 @@ import { NewUserOnboarding } from "@/components/NewUserOnboarding";
 import { Suspense } from "react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useTranslation } from "@/lib/i18n";
+import MobileHeader from "@/components/MobileHeader";
 
 import { useState } from "react";
 
@@ -124,45 +125,49 @@ function BudgetAppContent() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen gradient-bg-dark flex flex-col">
-      <header className="border-b border-slate-300/50 dark:border-white/10 bg-white/5 dark:bg-white/5 backdrop-blur-xl sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Link
-                href="/"
-                className="flex items-center gap-2 sm:gap-3 w-fit hover:opacity-90 transition-opacity"
-              >
-                <AppIcon size={24} className="h-4 w-4 sm:h-6 sm:w-6" />
-                <h1 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                  Simple Budget
-                </h1>
-              </Link>
-              <span className="text-sm sm:text-base text-slate-600 dark:text-white/70">
-                {isNewUser ? `${t('welcomeNew')}, ${session?.user?.name}!` : `${t('welcomeBack')}, ${session?.user?.name}!`}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 sm:gap-4">
-              <LanguageSwitcher />
-              <ThemeToggle />
-              <SignOutButton
-                variant="outline"
-                size="sm"
-                showText={true}
-                className="flex items-center gap-1.5 sm:gap-2 text-slate-700 dark:text-white/70 hover:text-slate-900 dark:hover:text-white border-slate-300/50 dark:border-white/20 bg-white/50 dark:bg-white/10 backdrop-blur-sm"
-              />
-              <Link
-                href="/history"
-                className="flex items-center gap-1.5 sm:gap-2 text-slate-700 dark:text-white/70 hover:text-slate-900 dark:hover:text-white transition-colors"
-              >
-                <History className="h-4 w-4 sm:h-5 sm:w-5" />
-                <span className="hidden sm:inline text-sm sm:text-base">
-                  {t('history')}
+        {/* Mobile Header */}
+        <MobileHeader />
+        
+        {/* Desktop Header */}
+        <header className="hidden md:block border-b border-slate-300/50 dark:border-white/10 bg-white/5 dark:bg-white/5 backdrop-blur-xl sticky top-0 z-50">
+          <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Link
+                  href="/"
+                  className="flex items-center gap-2 sm:gap-3 w-fit hover:opacity-90 transition-opacity"
+                >
+                  <AppIcon size={24} className="h-4 w-4 sm:h-6 sm:w-6" />
+                  <h1 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                    Simple Budget
+                  </h1>
+                </Link>
+                <span className="text-sm sm:text-base text-slate-600 dark:text-white/70">
+                  {isNewUser ? `${t('welcomeNew')}, ${session?.user?.name}!` : `${t('welcomeBack')}, ${session?.user?.name}!`}
                 </span>
-              </Link>
+              </div>
+              <div className="flex items-center gap-2 sm:gap-4">
+                <LanguageSwitcher />
+                <ThemeToggle />
+                <SignOutButton
+                  variant="outline"
+                  size="sm"
+                  showText={true}
+                  className="flex items-center gap-1.5 sm:gap-2 text-slate-700 dark:text-white/70 hover:text-slate-900 dark:hover:text-white border-slate-300/50 dark:border-white/20 bg-white/50 dark:bg-white/10 backdrop-blur-sm"
+                />
+                <Link
+                  href="/history"
+                  className="flex items-center gap-1.5 sm:gap-2 text-slate-700 dark:text-white/70 hover:text-slate-900 dark:hover:text-white transition-colors"
+                >
+                  <History className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="hidden sm:inline text-sm sm:text-base">
+                    {t('history')}
+                  </span>
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
       <main className="flex-1 container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8">
         {/* Trial Status */}

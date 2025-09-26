@@ -304,6 +304,11 @@
     main {
       min-height: calc(100vh - 80px - env(safe-area-inset-bottom));
     }
+    
+    /* Mobile header spacing */
+    .mobile-header-spacing {
+      padding-top: calc(60px + env(safe-area-inset-top));
+    }
   }
 
   /* PWA-specific optimizations */

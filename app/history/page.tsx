@@ -32,6 +32,7 @@ import {
   useUserId,
 } from "@/lib/hooks";
 import { HistoryItemSkeleton } from "@/components/ui/loading-skeleton";
+import MobileHeader from "@/components/MobileHeader";
 
 export default function HistoryPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -63,7 +64,11 @@ export default function HistoryPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
-      <header className="border-b bg-card/90 backdrop-blur-lg sticky top-0 z-50">
+      {/* Mobile Header */}
+      <MobileHeader title="Budget History" />
+      
+      {/* Desktop Header */}
+      <header className="hidden md:block border-b bg-card/90 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">

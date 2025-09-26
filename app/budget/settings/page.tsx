@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Crown, Clock, CreditCard, Calendar } from 'lucide-react';
+import MobileHeader from '@/components/MobileHeader';
 // import BudgetTemplateSelector from '@/components/budget/BudgetTemplateSelector';
 // import SavingsGoalList from '@/components/savings/SavingsGoalList';
 
@@ -78,7 +79,11 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
-      <header className="border-b bg-card/80 backdrop-blur-lg sticky top-0 z-50">
+      {/* Mobile Header */}
+      <MobileHeader title="Settings" />
+      
+      {/* Desktop Header */}
+      <header className="hidden md:block border-b bg-card/80 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center gap-4">
             <Link 
