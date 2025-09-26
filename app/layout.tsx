@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import LocaleProvider from "@/components/LocaleProvider";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import ViewportOptimizer from "@/components/ViewportOptimizer";
+import MobileBottomTab from "@/components/MobileBottomTab";
 
 // Load Inter font locally instead of from Google Fonts
 const inter = Inter({
@@ -70,6 +71,7 @@ export default function RootLayout({
             <Providers>
               <main>{children}</main>
               <PWAInstallPrompt />
+              <MobileBottomTab />
             </Providers>
           </LocaleProvider>
         </ThemeProvider>

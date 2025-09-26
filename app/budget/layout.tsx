@@ -9,7 +9,7 @@ export default function BudgetLayout({
 }) {
   return (
     <>
-      <div className="fixed bottom-3 sm:bottom-4 right-3 sm:right-4 z-50 flex items-center gap-2">
+      <div className="fixed bottom-3 sm:bottom-4 right-3 sm:right-4 z-50 flex items-center gap-2 hidden md:flex">
         <CurrencySelector />
         <Link
           href="/budget/settings"

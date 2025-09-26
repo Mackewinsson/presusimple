@@ -294,6 +294,18 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
 
+  /* Mobile bottom tab spacing */
+  @media (max-width: 767px) {
+    body {
+      padding-bottom: calc(80px + env(safe-area-inset-bottom)); /* Space for bottom tab + safe area */
+    }
+    
+    /* Ensure content doesn't get hidden behind bottom tab */
+    main {
+      min-height: calc(100vh - 80px - env(safe-area-inset-bottom));
+    }
+  }
+
   /* PWA-specific optimizations */
   @media (display-mode: standalone) {
     body {
