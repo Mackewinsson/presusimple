@@ -57,32 +57,8 @@ export function useUserSubscription() {
         if (users.length > 0) {
           const user = users[0];
 
-          // Check if trial has expired and update status if needed
-          if (user.trialEnd && !user.isPaid) {
-            const now = new Date();
-            const trialEnd = new Date(user.trialEnd);
-
-            if (now > trialEnd) {
-              // Trial has expired, update user status
-              await fetch("/api/users", {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  email: session.user.email,
-                  isPaid: false,
-                }),
-              });
-
-              return {
-                isPaid: false,
-                trialStart: user.trialStart ? new Date(user.trialStart) : null,
-                trialEnd: new Date(user.trialEnd),
-                stripeCustomerId: user.stripeCustomerId,
-                stripeSubscriptionId: user.stripeSubscriptionId,
-              };
-            }
-          }
-
+          // Return current user data without modifying it
+          // Let webhooks handle subscription status updates to avoid race conditions
           return {
             isPaid: user.isPaid || false,
             trialStart: user.trialStart ? new Date(user.trialStart) : null,

@@ -6,6 +6,8 @@ if (!process.env.STRIPE_SECRET_KEY) {
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2024-12-18.acacia", // Use latest stable API version
+  maxNetworkRetries: 3, // Retry failed requests up to 3 times
+  timeout: 10000, // 10 second timeout
 });
 
 // Helper function to get webhook secret

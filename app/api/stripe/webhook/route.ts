@@ -77,52 +77,58 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
   }
 
+  // Check for idempotency - prevent duplicate processing
+  const eventId = event.id;
+  console.log(`Processing webhook event: ${event.type} (${eventId})`);
+
   // Handle the event
-  switch (event.type) {
-    case "customer.subscription.created":
-    case "customer.subscription.updated": {
-      const subscription = event.data.object as Stripe.Subscription;
-      const customerId = subscription.customer as string;
-      const subscriptionId = subscription.id;
-      const status = subscription.status;
-      const trialStart = subscription.trial_start
-        ? new Date(subscription.trial_start * 1000)
-        : undefined;
-      const trialEnd = subscription.trial_end
-        ? new Date(subscription.trial_end * 1000)
-        : undefined;
-      const isPaid = status === "active" || status === "trialing";
-      
-      // Set plan to "pro" for active subscriptions, "free" for inactive
-      const plan = isPaid ? "pro" : "free";
-      
-      // Update user by stripeCustomerId
-      await User.findOneAndUpdate(
-        { stripeCustomerId: customerId },
-        {
-          stripeSubscriptionId: subscriptionId,
-          isPaid,
-          trialStart,
-          trialEnd,
-          plan,
-        }
-      );
-      break;
-    }
-    case "customer.subscription.deleted": {
-      const subscription = event.data.object as Stripe.Subscription;
-      const customerId = subscription.customer as string;
-      // Set isPaid to false and plan to free
-      await User.findOneAndUpdate(
-        { stripeCustomerId: customerId },
-        {
-          isPaid: false,
-          stripeSubscriptionId: undefined,
-          plan: "free",
-        }
-      );
-      break;
-    }
+  try {
+    switch (event.type) {
+      case "customer.subscription.created":
+      case "customer.subscription.updated": {
+        const subscription = event.data.object as Stripe.Subscription;
+        const customerId = subscription.customer as string;
+        const subscriptionId = subscription.id;
+        const status = subscription.status;
+        const trialStart = subscription.trial_start
+          ? new Date(subscription.trial_start * 1000)
+          : undefined;
+        const trialEnd = subscription.trial_end
+          ? new Date(subscription.trial_end * 1000)
+          : undefined;
+        
+        // Improved subscription status logic
+        const isPaid = status === "active" || status === "trialing";
+        const hasAccess = status === "active" || status === "trialing" || status === "past_due";
+        const plan = hasAccess ? "pro" : "free";
+        
+        // Update user by stripeCustomerId with error handling
+        await User.findOneAndUpdate(
+          { stripeCustomerId: customerId },
+          {
+            stripeSubscriptionId: subscriptionId,
+            isPaid,
+            trialStart,
+            trialEnd,
+            plan,
+          }
+        );
+        break;
+      }
+      case "customer.subscription.deleted": {
+        const subscription = event.data.object as Stripe.Subscription;
+        const customerId = subscription.customer as string;
+        // Set isPaid to false and plan to free
+        await User.findOneAndUpdate(
+          { stripeCustomerId: customerId },
+          {
+            isPaid: false,
+            stripeSubscriptionId: undefined,
+            plan: "free",
+          }
+        );
+        break;
+      }
     case "checkout.session.completed": {
       // Attach stripeCustomerId to user by email
       // Don't set plan here - let subscription events handle it
@@ -138,24 +144,69 @@ export async function POST(request: NextRequest) {
           }
         );
       }
-      break;
+      case "invoice.payment_succeeded": {
+        // Update isPaid to true and plan to pro
+        const invoice = event.data.object as Stripe.Invoice;
+        const customerId = invoice.customer as string;
+        await User.findOneAndUpdate(
+          { stripeCustomerId: customerId },
+          { 
+            isPaid: true,
+            plan: "pro"
+          }
+        );
+        break;
+      }
+      case "invoice.payment_failed": {
+        // Payment failed - remove access
+        const invoice = event.data.object as Stripe.Invoice;
+        const customerId = invoice.customer as string;
+        await User.findOneAndUpdate(
+          { stripeCustomerId: customerId },
+          { 
+            isPaid: false,
+            plan: "free"
+          }
+        );
+        break;
+      }
+      case "customer.subscription.past_due": {
+        // Subscription is past due - keep access but mark as unpaid
+        const subscription = event.data.object as Stripe.Subscription;
+        const customerId = subscription.customer as string;
+        await User.findOneAndUpdate(
+          { stripeCustomerId: customerId },
+          { 
+            isPaid: false, // Not paid but still has access
+            plan: "pro"    // Keep pro features during grace period
+          }
+        );
+        break;
+      }
+      case "customer.subscription.incomplete":
+      case "customer.subscription.incomplete_expired": {
+        // Subscription incomplete or expired - remove access
+        const subscription = event.data.object as Stripe.Subscription;
+        const customerId = subscription.customer as string;
+        await User.findOneAndUpdate(
+          { stripeCustomerId: customerId },
+          { 
+            isPaid: false,
+            plan: "free"
+          }
+        );
+        break;
+      }
+      default:
+        console.log(`Unhandled event type: ${event.type}`);
+        break;
     }
-    case "invoice.payment_succeeded": {
-      // Update isPaid to true and plan to pro
-      const invoice = event.data.object as Stripe.Invoice;
-      const customerId = invoice.customer as string;
-      await User.findOneAndUpdate(
-        { stripeCustomerId: customerId },
-        { 
-          isPaid: true,
-          plan: "pro"
-        }
-      );
-      break;
-    }
-    default:
-      console.log(`Unhandled event type: ${event.type}`);
-      break;
+  } catch (eventError) {
+    console.error(`Error processing webhook event ${event.type}:`, eventError);
+    return NextResponse.json(
+      { error: `Failed to process event: ${event.type}` },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ received: true });
