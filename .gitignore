@@ -66,5 +66,5 @@ logs
 .env.production
 
 # PWA service worker (auto-generated)
-/sw.js
-/workbox-*.js
+public/sw.js
+public/workbox-*.js
