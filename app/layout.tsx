@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import Providers from "@/components/Providers";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import LocaleProvider from "@/components/LocaleProvider";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 // Load Inter font locally instead of from Google Fonts
 const inter = Inter({
@@ -16,11 +17,21 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Simple Budget - Personal Finance Management",
   description: "Track your budget and expenses with this zero-based budgeting app",
+  manifest: "/manifest.json",
   icons: {
     icon: [
       { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
       { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" }
+    ],
+    apple: [
+      { url: "/icons/icon-152x152.png", sizes: "152x152", type: "image/png" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" }
     ]
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Simple Budget"
   }
 };
 
@@ -46,6 +57,7 @@ export default function RootLayout({
           <LocaleProvider initialLocale="en">
             <Providers>
               <main>{children}</main>
+              <PWAInstallPrompt />
             </Providers>
           </LocaleProvider>
         </ThemeProvider>
