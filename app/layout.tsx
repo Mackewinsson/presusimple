@@ -185,6 +185,16 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
         <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
+        <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-192x192.png" />
+        
+        {/* Additional PWA meta tags for better iOS support */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Simple Budget" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="application-name" content="Simple Budget" />
+        <meta name="msapplication-TileColor" content="#0f172a" />
+        <meta name="msapplication-tap-highlight" content="no" />
       </head>
       <body className={inter.className}>
         <ViewportOptimizer />

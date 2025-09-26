@@ -2,205 +2,171 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Download, Share } from 'lucide-react';
-
-interface BeforeInstallPromptEvent extends Event {
-  readonly platforms: string[];
-  readonly userChoice: Promise<{
-    outcome: 'accepted' | 'dismissed';
-    platform: string;
-  }>;
-  prompt(): Promise<void>;
-}
+import { X, Download, Share, Smartphone, ArrowUp, Plus } from 'lucide-react';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 
 export default function PWAInstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const {
+    isInstallable,
+    isInstalled,
+    isIOS,
+    showPrompt,
+    userInteracted,
+    deferredPrompt,
+    handleInstall,
+    dismissPrompt,
+  } = usePWAInstall();
 
+  // Handle visibility animation
   useEffect(() => {
-    // Detect iOS
-    const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    setIsIOS(iOS);
-
-    // Detect if already installed (standalone mode)
-    const standalone = window.matchMedia('(display-mode: standalone)').matches || 
-                      (window.navigator as any).standalone === true;
-    setIsStandalone(standalone);
-
-    // Don't show if already installed
-    if (standalone) {
-      return;
-    }
-
-    const handleBeforeInstallPrompt = (e: Event) => {
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault();
-      // Stash the event so it can be triggered later
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setShowInstallPrompt(true);
-    };
-
-    const handleAppInstalled = () => {
-      setShowInstallPrompt(false);
-      setDeferredPrompt(null);
-    };
-
-    // For iOS, show install prompt after a delay if not dismissed
-    if (iOS && !standalone) {
-      const dismissed = localStorage.getItem('pwa-install-dismissed');
-      if (!dismissed) {
-        // Show iOS install prompt after 3 seconds
-        setTimeout(() => {
-          setShowInstallPrompt(true);
-        }, 3000);
-      }
-    }
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    window.addEventListener('appinstalled', handleAppInstalled);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.removeEventListener('appinstalled', handleAppInstalled);
-    };
-  }, []);
-
-  const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
-
-    // Show the install prompt
-    deferredPrompt.prompt();
-
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice;
-
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt');
+    if (showPrompt) {
+      setTimeout(() => setIsVisible(true), 100);
     } else {
-      console.log('User dismissed the install prompt');
+      setIsVisible(false);
     }
+  }, [showPrompt]);
 
-    // Clear the deferredPrompt so it can only be used once
-    setDeferredPrompt(null);
-    setShowInstallPrompt(false);
-  };
-
-  const handleDismiss = () => {
-    setShowInstallPrompt(false);
-    // Store dismissal in localStorage to avoid showing again for a while
-    localStorage.setItem('pwa-install-dismissed', Date.now().toString());
-  };
-
-  // Don't show if user recently dismissed
-  useEffect(() => {
-    const dismissed = localStorage.getItem('pwa-install-dismissed');
-    if (dismissed) {
-      const dismissedTime = parseInt(dismissed);
-      const daysSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24);
-      if (daysSinceDismissed < 7) { // Don't show for 7 days
-        setShowInstallPrompt(false);
-      }
-    }
-  }, []);
-
-  if (!showInstallPrompt || isStandalone) {
+  if (!showPrompt || isInstalled) {
     return null;
   }
 
-  // iOS-specific install instructions
+  // iOS-specific install instructions with enhanced design
   if (isIOS && !deferredPrompt) {
     return (
-      <div className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:max-w-sm">
-        <div className="bg-background border border-border rounded-lg shadow-lg p-4">
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center space-x-2">
-              <Share className="w-5 h-5 text-primary" />
-              <h3 className="font-semibold text-foreground">Install App</h3>
+      <div className={`fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:max-w-sm transition-all duration-300 ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+      }`}>
+        <div className="bg-background/95 backdrop-blur-sm border border-border rounded-xl shadow-2xl p-6">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Smartphone className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground text-lg">Install Simple Budget</h3>
+                <p className="text-sm text-muted-foreground">Get quick access and offline functionality</p>
+              </div>
             </div>
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleDismiss}
-              className="h-6 w-6 p-0"
+              onClick={dismissPrompt}
+              className="h-8 w-8 p-0 hover:bg-muted"
             >
               <X className="w-4 h-4" />
             </Button>
           </div>
           
-          <p className="text-sm text-muted-foreground mb-4">
-            Install Simple Budget for quick access and offline functionality.
-          </p>
-          
-          <div className="space-y-3">
-            <div className="flex items-center space-x-3 text-sm">
-              <div className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
+          <div className="space-y-4 mb-6">
+            <div className="flex items-center space-x-4 p-3 bg-muted/50 rounded-lg">
+              <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
                 1
               </div>
-              <span>Tap the Share button <Share className="w-4 h-4 inline mx-1" /></span>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium">Tap the</span>
+                <Share className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium">Share button</span>
+              </div>
             </div>
-            <div className="flex items-center space-x-3 text-sm">
-              <div className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
+            
+            <div className="flex items-center space-x-4 p-3 bg-muted/50 rounded-lg">
+              <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
                 2
               </div>
-              <span>Scroll down and tap "Add to Home Screen"</span>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium">Scroll down and tap</span>
+                <div className="flex items-center space-x-1 px-2 py-1 bg-primary/10 rounded text-xs font-medium">
+                  <Plus className="w-3 h-3" />
+                  <span>"Add to Home Screen"</span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center space-x-3 text-sm">
-              <div className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
+            
+            <div className="flex items-center space-x-4 p-3 bg-muted/50 rounded-lg">
+              <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
                 3
               </div>
-              <span>Tap "Add" to install the app</span>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium">Tap</span>
+                <div className="px-2 py-1 bg-primary text-primary-foreground rounded text-xs font-medium">
+                  "Add"
+                </div>
+                <span className="text-sm font-medium">to install</span>
+              </div>
             </div>
           </div>
           
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleDismiss}
-            className="w-full mt-4"
-          >
-            Got it
-          </Button>
+          <div className="flex space-x-3">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={dismissPrompt}
+              className="flex-1"
+            >
+              Maybe later
+            </Button>
+            <Button 
+              size="sm" 
+              onClick={dismissPrompt}
+              className="flex-1"
+            >
+              Got it!
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
-  // Android/Chrome install prompt
+  // Enhanced Android/Chrome install prompt
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:max-w-sm">
-      <div className="bg-background border border-border rounded-lg shadow-lg p-4">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center space-x-2">
-            <Download className="w-5 h-5 text-primary" />
-            <h3 className="font-semibold text-foreground">Install App</h3>
+    <div className={`fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:max-w-sm transition-all duration-300 ${
+      isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+    }`}>
+      <div className="bg-background/95 backdrop-blur-sm border border-border rounded-xl shadow-2xl p-6">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Download className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground text-lg">Install Simple Budget</h3>
+              <p className="text-sm text-muted-foreground">Get quick access and offline functionality</p>
+            </div>
           </div>
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleDismiss}
-            className="h-6 w-6 p-0"
+            onClick={dismissPrompt}
+            className="h-8 w-8 p-0 hover:bg-muted"
           >
             <X className="w-4 h-4" />
           </Button>
         </div>
         
-        <p className="text-sm text-muted-foreground mb-4">
-          Install Simple Budget for quick access and offline functionality.
-        </p>
+        <div className="mb-6 p-4 bg-muted/50 rounded-lg">
+          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <ArrowUp className="w-4 h-4" />
+            <span>Install this app on your device for a better experience</span>
+          </div>
+        </div>
         
-        <div className="flex space-x-2">
-          <Button onClick={handleInstallClick} size="sm" className="flex-1">
-            Install
-          </Button>
+        <div className="flex space-x-3">
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={handleDismiss}
+            onClick={dismissPrompt}
             className="flex-1"
           >
             Not now
+          </Button>
+          <Button 
+            onClick={handleInstall} 
+            size="sm" 
+            className="flex-1"
+          >
+            Install
           </Button>
         </div>
       </div>

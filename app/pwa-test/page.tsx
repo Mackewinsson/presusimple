@@ -4,13 +4,11 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useViewport, useBreakpoint, usePWAViewport, useViewportHeight } from '@/hooks/useViewport';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 
 export default function PWATestPage() {
   const [isOnline, setIsOnline] = useState(true);
   const [serviceWorkerStatus, setServiceWorkerStatus] = useState<string>('Checking...');
-  const [installPrompt, setInstallPrompt] = useState<any>(null);
-  const [isInstalled, setIsInstalled] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
   const [userAgent, setUserAgent] = useState('');
 
   // Viewport hooks
@@ -18,6 +16,19 @@ export default function PWATestPage() {
   const breakpoint = useBreakpoint();
   const pwaViewport = usePWAViewport();
   const viewportHeight = useViewportHeight();
+
+  // PWA Install hook
+  const {
+    isInstallable,
+    isInstalled,
+    isIOS,
+    showPrompt,
+    userInteracted,
+    deferredPrompt,
+    handleInstall,
+    dismissPrompt,
+    showInstallPrompt,
+  } = usePWAInstall();
 
   useEffect(() => {
     // Check online status
@@ -40,38 +51,11 @@ export default function PWATestPage() {
       setServiceWorkerStatus('Not Supported');
     }
 
-    // Check if app is installed
-    const standalone = window.matchMedia('(display-mode: standalone)').matches || 
-                      (window.navigator as any).standalone === true;
-    setIsInstalled(standalone);
-
-    // Detect iOS
-    const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    setIsIOS(iOS);
     setUserAgent(navigator.userAgent);
-
-    // Listen for install prompt
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setInstallPrompt(e);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    return () => {
-      window.removeEventListener('online', updateOnlineStatus);
-      window.removeEventListener('offline', updateOnlineStatus);
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
   }, []);
 
-  const handleInstall = async () => {
-    if (installPrompt) {
-      installPrompt.prompt();
-      const { outcome } = await installPrompt.userChoice;
-      console.log('Install prompt outcome:', outcome);
-      setInstallPrompt(null);
-    }
+  const testInstall = async () => {
+    await handleInstall();
   };
 
   const testOffline = () => {
@@ -128,9 +112,14 @@ export default function PWATestPage() {
                 <div className={`w-3 h-3 rounded-full ${isInstalled ? 'bg-green-500' : 'bg-yellow-500'}`} />
                 <span>{isInstalled ? 'Installed as PWA' : 'Not Installed'}</span>
               </div>
-              {installPrompt && !isInstalled && (
-                <Button onClick={handleInstall} className="w-full">
+              {isInstallable && !isInstalled && (
+                <Button onClick={testInstall} className="w-full">
                   Install App
+                </Button>
+              )}
+              {!isInstallable && !isInstalled && (
+                <Button onClick={showInstallPrompt} className="w-full" variant="outline">
+                  Show Install Prompt
                 </Button>
               )}
               {isIOS && !isInstalled && (
@@ -163,8 +152,20 @@ export default function PWATestPage() {
               </div>
               <div className="flex justify-between">
                 <span>Install Prompt:</span>
-                <span className={installPrompt ? 'text-green-600' : 'text-yellow-600'}>
-                  {installPrompt ? 'Available' : 'Not Available'}
+                <span className={isInstallable ? 'text-green-600' : 'text-yellow-600'}>
+                  {isInstallable ? 'Available' : 'Not Available'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>User Interacted:</span>
+                <span className={userInteracted ? 'text-green-600' : 'text-yellow-600'}>
+                  {userInteracted ? 'Yes' : 'No'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Show Prompt:</span>
+                <span className={showPrompt ? 'text-green-600' : 'text-gray-600'}>
+                  {showPrompt ? 'Yes' : 'No'}
                 </span>
               </div>
             </div>
@@ -190,8 +191,8 @@ export default function PWATestPage() {
               </div>
               <div className="flex justify-between">
                 <span>Install Prompt:</span>
-                <span className={installPrompt ? 'text-green-600' : 'text-yellow-600'}>
-                  {installPrompt ? '✓' : '○'}
+                <span className={isInstallable ? 'text-green-600' : 'text-yellow-600'}>
+                  {isInstallable ? '✓' : '○'}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -299,10 +300,12 @@ export default function PWATestPage() {
           <div className="space-y-2 text-sm">
             <p>1. <strong>Install Test:</strong> Click "Install App" if available to test PWA installation</p>
             <p>2. <strong>iOS Installation:</strong> On iOS, use the Share button → "Add to Home Screen"</p>
-            <p>3. <strong>Offline Test:</strong> Click "Test Offline Mode" to simulate offline behavior</p>
-            <p>4. <strong>Service Worker:</strong> Check that service worker is active for caching</p>
-            <p>5. <strong>Manifest:</strong> Verify manifest.json is accessible at /manifest.json</p>
-            <p>6. <strong>Icons:</strong> Check that app icons are properly configured</p>
+            <p>3. <strong>Enhanced Prompt:</strong> The app now shows a custom install prompt for iOS users</p>
+            <p>4. <strong>Offline Test:</strong> Click "Test Offline Mode" to simulate offline behavior</p>
+            <p>5. <strong>Service Worker:</strong> Check that service worker is active for caching</p>
+            <p>6. <strong>Manifest:</strong> Verify manifest.json is accessible at /manifest.json</p>
+            <p>7. <strong>Icons:</strong> Check that app icons are properly configured</p>
+            <p>8. <strong>User Interaction:</strong> The install prompt waits for user interaction before showing</p>
           </div>
         </CardContent>
       </Card>
