@@ -5,6 +5,7 @@ import Providers from "@/components/Providers";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import LocaleProvider from "@/components/LocaleProvider";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
+import ViewportOptimizer from "@/components/ViewportOptimizer";
 
 // Load Inter font locally instead of from Google Fonts
 const inter = Inter({
@@ -31,7 +32,13 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Simple Budget"
+    title: "Simple Budget",
+    startupImage: [
+      {
+        url: "/icons/icon-512x512.png",
+        media: "(device-width: 768px) and (device-height: 1024px)"
+      }
+    ]
   }
 };
 
@@ -39,7 +46,11 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  minimumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
   themeColor: "#0f172a",
+  colorScheme: "dark light",
 };
 
 export default function RootLayout({
@@ -53,6 +64,7 @@ export default function RootLayout({
         {/* Theme will be handled by ThemeProvider to prevent hydration mismatches */}
       </head>
       <body className={inter.className}>
+        <ViewportOptimizer />
         <ThemeProvider>
           <LocaleProvider initialLocale="en">
             <Providers>

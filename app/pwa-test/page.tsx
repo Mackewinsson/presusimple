@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useViewport, useBreakpoint, usePWAViewport, useViewportHeight } from '@/hooks/useViewport';
 
 export default function PWATestPage() {
   const [isOnline, setIsOnline] = useState(true);
@@ -11,6 +12,12 @@ export default function PWATestPage() {
   const [isInstalled, setIsInstalled] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [userAgent, setUserAgent] = useState('');
+
+  // Viewport hooks
+  const viewport = useViewport();
+  const breakpoint = useBreakpoint();
+  const pwaViewport = usePWAViewport();
+  const viewportHeight = useViewportHeight();
 
   useEffect(() => {
     // Check online status
@@ -203,6 +210,82 @@ export default function PWATestPage() {
           <CardContent>
             <div className="text-xs text-muted-foreground break-all">
               {userAgent}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Viewport Information</CardTitle>
+            <CardDescription>Real-time viewport data</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>Dimensions:</span>
+                <span className="text-blue-600">
+                  {viewport.width} × {viewport.height}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Visual Height:</span>
+                <span className="text-blue-600">
+                  {viewportHeight.visualHeight}px
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Orientation:</span>
+                <span className={viewport.isPortrait ? 'text-green-600' : 'text-orange-600'}>
+                  {viewport.orientation}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Current Breakpoint:</span>
+                <span className="text-purple-600">
+                  {breakpoint.current}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Keyboard Open:</span>
+                <span className={viewportHeight.isKeyboardOpen ? 'text-red-600' : 'text-green-600'}>
+                  {viewportHeight.isKeyboardOpen ? 'Yes' : 'No'}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Device Classification</CardTitle>
+            <CardDescription>Responsive device detection</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>Mobile:</span>
+                <span className={viewport.isMobile ? 'text-green-600' : 'text-gray-600'}>
+                  {viewport.isMobile ? '✓' : '✗'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Tablet:</span>
+                <span className={viewport.isTablet ? 'text-green-600' : 'text-gray-600'}>
+                  {viewport.isTablet ? '✓' : '✗'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Desktop:</span>
+                <span className={viewport.isDesktop ? 'text-green-600' : 'text-gray-600'}>
+                  {viewport.isDesktop ? '✓' : '✗'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Mobile/Tablet:</span>
+                <span className={viewport.isMobileOrTablet ? 'text-green-600' : 'text-gray-600'}>
+                  {viewport.isMobileOrTablet ? '✓' : '✗'}
+                </span>
+              </div>
             </div>
           </CardContent>
         </Card>
