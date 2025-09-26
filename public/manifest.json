@@ -7,6 +7,7 @@
   "display": "standalone",
   "orientation": "portrait-primary",
   "display_override": ["window-controls-overlay", "standalone"],
+  "prefer_related_applications": false,
   "scope": "/",
   "start_url": "/",
   "categories": ["finance", "productivity", "utilities"],
