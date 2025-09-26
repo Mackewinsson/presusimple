@@ -91,7 +91,7 @@ export default function MobileBottomTab() {
                     : "text-slate-600 dark:text-slate-400"
                 )}
               >
-                {t(item.translationKey)}
+                {t(item.translationKey as any)}
               </span>
             </Link>
           );
