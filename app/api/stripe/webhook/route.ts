@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
 import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+import { stripe, getWebhookSecret } from "@/lib/stripe";
 
 /**
  * @swagger
@@ -56,18 +54,28 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
  */
 export async function POST(request: NextRequest) {
   const sig = request.headers.get("stripe-signature");
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
-  let event;
-
-  try {
-    const body = await request.text();
-    event = stripe.webhooks.constructEvent(body, sig!, webhookSecret);
-  } catch (err) {
-    console.error("Webhook signature verification failed.", err);
-    return NextResponse.json({ error: "Webhook Error" }, { status: 400 });
+  
+  if (!sig) {
+    console.error("Missing stripe-signature header");
+    return NextResponse.json({ error: "Missing signature" }, { status: 400 });
   }
 
-  await dbConnect();
+  let event;
+  try {
+    const body = await request.text();
+    const webhookSecret = getWebhookSecret();
+    event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
+  } catch (err) {
+    console.error("Webhook signature verification failed:", err);
+    return NextResponse.json({ error: "Webhook signature verification failed" }, { status: 400 });
+  }
+
+  try {
+    await dbConnect();
+  } catch (err) {
+    console.error("Database connection failed:", err);
+    return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+  }
 
   // Handle the event
   switch (event.type) {
@@ -116,7 +124,8 @@ export async function POST(request: NextRequest) {
       break;
     }
     case "checkout.session.completed": {
-      // Attach stripeCustomerId to user by email and set plan to pro
+      // Attach stripeCustomerId to user by email
+      // Don't set plan here - let subscription events handle it
       const session = event.data.object as Stripe.Checkout.Session;
       const customerId = session.customer as string;
       const email = session.customer_email;
@@ -125,7 +134,7 @@ export async function POST(request: NextRequest) {
           { email },
           { 
             stripeCustomerId: customerId,
-            plan: "pro" // New customers get pro plan
+            // Plan will be set by subscription events
           }
         );
       }
@@ -145,7 +154,8 @@ export async function POST(request: NextRequest) {
       break;
     }
     default:
-      
+      console.log(`Unhandled event type: ${event.type}`);
+      break;
   }
 
   return NextResponse.json({ received: true });

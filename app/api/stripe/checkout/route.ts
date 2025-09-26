@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+import { stripe, getPriceId } from "@/lib/stripe";
 
 /**
  * @swagger
@@ -74,7 +72,7 @@ export async function POST(request: NextRequest) {
       customer_email: email,
       line_items: [
         {
-          price: process.env.STRIPE_PRICE_ID!,
+          price: getPriceId(),
           quantity: 1,
         },
       ],
