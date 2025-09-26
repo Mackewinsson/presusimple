@@ -9,6 +9,8 @@ export default function PWATestPage() {
   const [serviceWorkerStatus, setServiceWorkerStatus] = useState<string>('Checking...');
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [userAgent, setUserAgent] = useState('');
 
   useEffect(() => {
     // Check online status
@@ -32,9 +34,14 @@ export default function PWATestPage() {
     }
 
     // Check if app is installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsInstalled(true);
-    }
+    const standalone = window.matchMedia('(display-mode: standalone)').matches || 
+                      (window.navigator as any).standalone === true;
+    setIsInstalled(standalone);
+
+    // Detect iOS
+    const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    setIsIOS(iOS);
+    setUserAgent(navigator.userAgent);
 
     // Listen for install prompt
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -119,6 +126,40 @@ export default function PWATestPage() {
                   Install App
                 </Button>
               )}
+              {isIOS && !isInstalled && (
+                <div className="text-sm text-muted-foreground">
+                  <p>iOS detected - Use Share button to install</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Device Information</CardTitle>
+            <CardDescription>Platform and browser details</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>Platform:</span>
+                <span className={isIOS ? 'text-blue-600' : 'text-green-600'}>
+                  {isIOS ? 'iOS' : 'Other'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Standalone Mode:</span>
+                <span className={isInstalled ? 'text-green-600' : 'text-yellow-600'}>
+                  {isInstalled ? 'Yes' : 'No'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Install Prompt:</span>
+                <span className={installPrompt ? 'text-green-600' : 'text-yellow-600'}>
+                  {installPrompt ? 'Available' : 'Not Available'}
+                </span>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -153,6 +194,18 @@ export default function PWATestPage() {
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>User Agent</CardTitle>
+            <CardDescription>Browser identification</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xs text-muted-foreground break-all">
+              {userAgent}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Card className="mt-6">
@@ -162,10 +215,11 @@ export default function PWATestPage() {
         <CardContent>
           <div className="space-y-2 text-sm">
             <p>1. <strong>Install Test:</strong> Click "Install App" if available to test PWA installation</p>
-            <p>2. <strong>Offline Test:</strong> Click "Test Offline Mode" to simulate offline behavior</p>
-            <p>3. <strong>Service Worker:</strong> Check that service worker is active for caching</p>
-            <p>4. <strong>Manifest:</strong> Verify manifest.json is accessible at /manifest.json</p>
-            <p>5. <strong>Icons:</strong> Check that app icons are properly configured</p>
+            <p>2. <strong>iOS Installation:</strong> On iOS, use the Share button → "Add to Home Screen"</p>
+            <p>3. <strong>Offline Test:</strong> Click "Test Offline Mode" to simulate offline behavior</p>
+            <p>4. <strong>Service Worker:</strong> Check that service worker is active for caching</p>
+            <p>5. <strong>Manifest:</strong> Verify manifest.json is accessible at /manifest.json</p>
+            <p>6. <strong>Icons:</strong> Check that app icons are properly configured</p>
           </div>
         </CardContent>
       </Card>

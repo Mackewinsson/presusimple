@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Download, Share } from 'lucide-react';
+import { X, Download } from 'lucide-react';
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -16,24 +16,8 @@ interface BeforeInstallPromptEvent extends Event {
 export default function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
-    // Detect iOS
-    const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    setIsIOS(iOS);
-
-    // Detect if already installed (standalone mode)
-    const standalone = window.matchMedia('(display-mode: standalone)').matches || 
-                      (window.navigator as any).standalone === true;
-    setIsStandalone(standalone);
-
-    // Don't show if already installed
-    if (standalone) {
-      return;
-    }
-
     const handleBeforeInstallPrompt = (e: Event) => {
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
@@ -46,17 +30,6 @@ export default function PWAInstallPrompt() {
       setShowInstallPrompt(false);
       setDeferredPrompt(null);
     };
-
-    // For iOS, show install prompt after a delay if not dismissed
-    if (iOS && !standalone) {
-      const dismissed = localStorage.getItem('pwa-install-dismissed');
-      if (!dismissed) {
-        // Show iOS install prompt after 3 seconds
-        setTimeout(() => {
-          setShowInstallPrompt(true);
-        }, 3000);
-      }
-    }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
@@ -105,69 +78,10 @@ export default function PWAInstallPrompt() {
     }
   }, []);
 
-  if (!showInstallPrompt || isStandalone) {
+  if (!showInstallPrompt || !deferredPrompt) {
     return null;
   }
 
-  // iOS-specific install instructions
-  if (isIOS && !deferredPrompt) {
-    return (
-      <div className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:max-w-sm">
-        <div className="bg-background border border-border rounded-lg shadow-lg p-4">
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center space-x-2">
-              <Share className="w-5 h-5 text-primary" />
-              <h3 className="font-semibold text-foreground">Install App</h3>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleDismiss}
-              className="h-6 w-6 p-0"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-          
-          <p className="text-sm text-muted-foreground mb-4">
-            Install Simple Budget for quick access and offline functionality.
-          </p>
-          
-          <div className="space-y-3">
-            <div className="flex items-center space-x-3 text-sm">
-              <div className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
-                1
-              </div>
-              <span>Tap the Share button <Share className="w-4 h-4 inline mx-1" /></span>
-            </div>
-            <div className="flex items-center space-x-3 text-sm">
-              <div className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
-                2
-              </div>
-              <span>Scroll down and tap "Add to Home Screen"</span>
-            </div>
-            <div className="flex items-center space-x-3 text-sm">
-              <div className="flex-shrink-0 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
-                3
-              </div>
-              <span>Tap "Add" to install the app</span>
-            </div>
-          </div>
-          
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleDismiss}
-            className="w-full mt-4"
-          >
-            Got it
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  // Android/Chrome install prompt
   return (
     <div className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:max-w-sm">
       <div className="bg-background border border-border rounded-lg shadow-lg p-4">
