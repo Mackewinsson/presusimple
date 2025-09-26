@@ -41,9 +41,19 @@ export default function MobileHeader({
     // Default back navigation logic
     if (pathname.startsWith('/budget/settings')) return '/budget';
     if (pathname.startsWith('/history')) return '/budget';
-    if (pathname.startsWith('/budget')) return '/';
     
     return '/budget';
+  };
+
+  // Determine if back button should be shown
+  const shouldShowBackButton = () => {
+    if (!showBackButton) return false;
+    
+    // Don't show back button on main budget page
+    if (pathname === '/budget') return false;
+    
+    // Show back button on sub-pages
+    return pathname.startsWith('/budget/settings') || pathname.startsWith('/history');
   };
 
   // Determine title if not provided
@@ -52,7 +62,7 @@ export default function MobileHeader({
     
     if (pathname.startsWith('/budget/settings')) return t('settings');
     if (pathname.startsWith('/history')) return t('history');
-    if (pathname.startsWith('/budget')) return t('budget');
+    if (pathname === '/budget') return 'Simple Budget'; // Main budget page shows app title
     
     return 'Simple Budget';
   };
@@ -65,7 +75,7 @@ export default function MobileHeader({
     )}>
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
-          {showBackButton && (
+          {shouldShowBackButton() && (
             <Link
               href={getBackHref()}
               className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
@@ -73,10 +83,19 @@ export default function MobileHeader({
               <ArrowLeft className="h-4 w-4 text-slate-700 dark:text-slate-300" />
             </Link>
           )}
-          <h1 className="text-lg font-semibold text-slate-900 dark:text-white">
+          {shouldShowBackButton() && (
+            <h1 className="text-lg font-semibold text-slate-900 dark:text-white">
+              {getTitle()}
+            </h1>
+          )}
+        </div>
+        
+        {/* Centered title for main budget page */}
+        {!shouldShowBackButton() && (
+          <h1 className="text-lg font-semibold text-slate-900 dark:text-white text-center flex-1">
             {getTitle()}
           </h1>
-        </div>
+        )}
         
         {/* Home button for quick access to main budget page */}
         {pathname !== '/budget' && !pathname.startsWith('/budget/') && (
