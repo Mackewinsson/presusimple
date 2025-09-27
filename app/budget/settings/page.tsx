@@ -9,8 +9,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Crown, Clock, CreditCard, Calendar } from 'lucide-react';
+import { Crown, Clock, CreditCard, Calendar, LogOut } from 'lucide-react';
 import MobileHeader from '@/components/MobileHeader';
+import SignOutButton from '@/components/SignOutButton';
+import { useViewport } from '@/hooks/useViewport';
 // import BudgetTemplateSelector from '@/components/budget/BudgetTemplateSelector';
 // import SavingsGoalList from '@/components/savings/SavingsGoalList';
 
@@ -18,6 +20,7 @@ export default function SettingsPage() {
   const { data: session } = useSession();
   const { data: subscription, isLoading: subscriptionLoading } = useUserSubscription();
   const { data: user, isLoading: userLoading } = useUserData();
+  const { isMobile } = useViewport();
 
   const isLoading = subscriptionLoading || userLoading;
   const subscriptionStatus = getSubscriptionStatus(subscription || {});
@@ -191,6 +194,20 @@ export default function SettingsPage() {
                             </Button>
                           </div>
                         )}
+
+                        {/* Sign Out Button - Mobile Accessible */}
+                        <div className="pt-6 border-t border-border">
+                          <div className="flex items-center gap-2 mb-3">
+                            <LogOut className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm font-medium">Account Actions</span>
+                          </div>
+                          <SignOutButton 
+                            variant="outline" 
+                            size="sm" 
+                            className="w-full"
+                            showText={true}
+                          />
+                        </div>
                       </div>
                     </>
                   )}
@@ -218,6 +235,22 @@ export default function SettingsPage() {
                   {/* Future settings will go here */}
                   {/* <BudgetTemplateSelector /> */}
                   {/* <SavingsGoalList /> */}
+
+                  {/* Mobile Sign Out - Alternative Access */}
+                  {isMobile && (
+                    <div className="pt-6 border-t border-border">
+                      <div className="flex items-center gap-2 mb-3">
+                        <LogOut className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">Account</span>
+                      </div>
+                      <SignOutButton 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full"
+                        showText={true}
+                      />
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

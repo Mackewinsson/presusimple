@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Download, Share, Smartphone, ArrowUp, Plus } from 'lucide-react';
+import { X, Download, Share, Smartphone, ArrowUp, Plus, Check } from 'lucide-react';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
+import { usePWAStatus } from '@/hooks/usePWAStatus';
 
 export default function PWAInstallPrompt() {
   const [isVisible, setIsVisible] = useState(false);
+  const pwaStatus = usePWAStatus();
   const {
     isInstallable,
     isInstalled,
@@ -16,7 +18,7 @@ export default function PWAInstallPrompt() {
     deferredPrompt,
     handleInstall,
     dismissPrompt,
-  } = usePWAInstall();
+  } = pwaStatus.pwaInstall;
 
   // Handle visibility animation
   useEffect(() => {
@@ -59,42 +61,20 @@ export default function PWAInstallPrompt() {
           </div>
           
           <div className="space-y-4 mb-6">
-            <div className="flex items-center space-x-4 p-3 bg-muted/50 rounded-lg">
-              <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
-                1
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium">Tap the</span>
-                <Share className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium">Share button</span>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4 p-3 bg-muted/50 rounded-lg">
-              <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
-                2
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium">Scroll down and tap</span>
-                <div className="flex items-center space-x-1 px-2 py-1 bg-primary/10 rounded text-xs font-medium">
-                  <Plus className="w-3 h-3" />
-                  <span>"Add to Home Screen"</span>
+            {pwaStatus.installInstructions.map((instruction) => (
+              <div key={instruction.step} className="flex items-center space-x-4 p-3 bg-muted/50 rounded-lg">
+                <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
+                  {instruction.step}
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-lg">{instruction.icon}</span>
+                  <div>
+                    <div className="text-sm font-medium">{instruction.title}</div>
+                    <div className="text-xs text-muted-foreground">{instruction.description}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            <div className="flex items-center space-x-4 p-3 bg-muted/50 rounded-lg">
-              <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
-                3
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium">Tap</span>
-                <div className="px-2 py-1 bg-primary text-primary-foreground rounded text-xs font-medium">
-                  "Add"
-                </div>
-                <span className="text-sm font-medium">to install</span>
-              </div>
-            </div>
+            ))}
           </div>
           
           <div className="flex space-x-3">
@@ -145,10 +125,22 @@ export default function PWAInstallPrompt() {
           </Button>
         </div>
         
-        <div className="mb-6 p-4 bg-muted/50 rounded-lg">
-          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-            <ArrowUp className="w-4 h-4" />
-            <span>Install this app on your device for a better experience</span>
+        <div className="mb-6 space-y-4">
+          <div className="p-4 bg-muted/50 rounded-lg">
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-3">
+              <ArrowUp className="w-4 h-4" />
+              <span>Install this app on your device for a better experience</span>
+            </div>
+            <div className="space-y-2">
+              {pwaStatus.installBenefits.common.slice(0, 3).map((benefit, index) => (
+                <div key={index} className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Check className="h-2 w-2 text-white" />
+                  </div>
+                  <span>{benefit}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         
