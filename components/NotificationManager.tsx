@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { subscribeUser, unsubscribeUser, sendNotification } from '@/app/actions'
+// We'll use the existing API routes instead of Server Actions to avoid client-side import issues
 
 // Helper function to convert VAPID key
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
@@ -111,16 +111,23 @@ export default function NotificationManager() {
         applicationServerKey: convertedVapidKey as BufferSource,
       })
 
-      // Send subscription to server using Server Action
-      const result = await subscribeUser(subscription)
-      
-      if (result.success) {
-        setIsSubscribed(true)
-        setIsLoading(false)
-        return true
-      } else {
-        throw new Error(result.error || 'Failed to save subscription')
+      // Send subscription to server using API route
+      const subscribeResponse = await fetch('/api/notifications/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(subscription),
+      })
+
+      if (!subscribeResponse.ok) {
+        const errorText = await subscribeResponse.text()
+        throw new Error('Failed to save subscription: ' + errorText)
       }
+      
+      setIsSubscribed(true)
+      setIsLoading(false)
+      return true
     } catch (error) {
       console.error('Error subscribing to notifications:', error)
       setError(error instanceof Error ? error.message : 'Failed to subscribe to notifications')
@@ -134,15 +141,21 @@ export default function NotificationManager() {
     setError(null)
 
     try {
-      const result = await unsubscribeUser()
-      
-      if (result.success) {
-        setIsSubscribed(false)
-        setIsLoading(false)
-        return true
-      } else {
-        throw new Error(result.error || 'Failed to unsubscribe')
+      const response = await fetch('/api/notifications/unsubscribe', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error('Failed to unsubscribe: ' + errorText)
       }
+      
+      setIsSubscribed(false)
+      setIsLoading(false)
+      return true
     } catch (error) {
       console.error('Error unsubscribing from notifications:', error)
       setError(error instanceof Error ? error.message : 'Failed to unsubscribe from notifications')
@@ -161,10 +174,20 @@ export default function NotificationManager() {
     setError(null)
 
     try {
-      const result = await sendNotification('This is a test notification from your PWA!')
-      
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to send test notification')
+      const response = await fetch('/api/notifications/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'test',
+          message: 'This is a test notification from your PWA!',
+        }),
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error('Failed to send test notification: ' + errorText)
       }
       
       setIsLoading(false)

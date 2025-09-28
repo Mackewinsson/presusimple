@@ -43,19 +43,19 @@ export default function NotificationTestPage() {
           <CardContent>
             <div className="space-y-2 text-sm">
               <div className="flex items-center space-x-2">
-                <div className={`w-3 h-3 rounded-full ${window.isSecureContext ? 'bg-green-500' : 'bg-red-500'}`} />
+                <div className={`w-3 h-3 rounded-full ${typeof window !== 'undefined' && window.isSecureContext ? 'bg-green-500' : 'bg-red-500'}`} />
                 <span>HTTPS or localhost (Secure Context)</span>
               </div>
               <div className="flex items-center space-x-2">
-                <div className={`w-3 h-3 rounded-full ${'serviceWorker' in navigator ? 'bg-green-500' : 'bg-red-500'}`} />
+                <div className={`w-3 h-3 rounded-full ${typeof navigator !== 'undefined' && 'serviceWorker' in navigator ? 'bg-green-500' : 'bg-red-500'}`} />
                 <span>Service Worker Support</span>
               </div>
               <div className="flex items-center space-x-2">
-                <div className={`w-3 h-3 rounded-full ${'PushManager' in window ? 'bg-green-500' : 'bg-red-500'}`} />
+                <div className={`w-3 h-3 rounded-full ${typeof window !== 'undefined' && 'PushManager' in window ? 'bg-green-500' : 'bg-red-500'}`} />
                 <span>Push Manager Support</span>
               </div>
               <div className="flex items-center space-x-2">
-                <div className={`w-3 h-3 rounded-full ${'Notification' in window ? 'bg-green-500' : 'bg-red-500'}`} />
+                <div className={`w-3 h-3 rounded-full ${typeof window !== 'undefined' && 'Notification' in window ? 'bg-green-500' : 'bg-red-500'}`} />
                 <span>Notification API Support</span>
               </div>
             </div>
