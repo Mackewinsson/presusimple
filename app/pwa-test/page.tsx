@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useViewport, useBreakpoint, usePWAViewport, useViewportHeight } from '@/hooks/useViewport';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
-import { useNotifications } from '@/hooks/useNotifications';
+import NotificationManager from '@/components/NotificationManager';
 
 export default function PWATestPage() {
   const [isOnline, setIsOnline] = useState(true);
@@ -31,19 +31,7 @@ export default function PWATestPage() {
     showInstallPrompt,
   } = usePWAInstall();
 
-  // Notifications hook
-  const {
-    permission,
-    isSupported,
-    isSubscribed,
-    isLoading,
-    error,
-    requestPermission,
-    subscribe,
-    unsubscribe,
-    sendTestNotification,
-    clearError,
-  } = useNotifications();
+  // Notifications will be handled by NotificationManager component
 
   // Debug service worker registration
   const checkServiceWorker = async () => {
@@ -51,7 +39,7 @@ export default function PWATestPage() {
     
     if ('serviceWorker' in navigator) {
       try {
-        const registration = await navigator.serviceWorker.getRegistration();
+        let registration = await navigator.serviceWorker.getRegistration();
         console.log('📱 Service worker registration:', registration);
         
         if (registration) {
@@ -60,14 +48,22 @@ export default function PWATestPage() {
           console.log('🔍 Active:', registration.active?.state);
           console.log('🔍 Installing:', registration.installing?.state);
           console.log('🔍 Waiting:', registration.waiting?.state);
+          setServiceWorkerStatus('Active');
         } else {
-          console.log('❌ No service worker registration found');
+          console.log('❌ No service worker registration found, registering...');
+          registration = await navigator.serviceWorker.register('/sw.js', {
+            scope: '/'
+          });
+          console.log('✅ Service worker registered:', registration);
+          setServiceWorkerStatus('Registered');
         }
       } catch (error) {
         console.error('❌ Error checking service worker:', error);
+        setServiceWorkerStatus('Error');
       }
     } else {
       console.log('❌ Service Worker not supported');
+      setServiceWorkerStatus('Not Supported');
     }
   };
 
@@ -81,26 +77,39 @@ export default function PWATestPage() {
     window.addEventListener('offline', updateOnlineStatus);
     updateOnlineStatus();
 
-    // Manual service worker registration
-    const registerServiceWorker = async () => {
+    // Check and register service worker
+    const checkAndRegisterServiceWorker = async () => {
       if ('serviceWorker' in navigator) {
         try {
-          console.log('🔧 Manually registering service worker...');
-          const registration = await navigator.serviceWorker.register('/sw.js', {
-            scope: '/'
-          });
-          console.log('✅ Service worker registered manually:', registration);
-          setServiceWorkerStatus('Active');
+          console.log('🔍 Checking service worker registration...');
+          let registration = await navigator.serviceWorker.getRegistration();
+          
+          if (registration) {
+            console.log('✅ Service worker found:', registration);
+            setServiceWorkerStatus('Active');
+          } else {
+            console.log('❌ No service worker registration found, registering...');
+            registration = await navigator.serviceWorker.register('/sw.js', {
+              scope: '/'
+            });
+            console.log('✅ Service worker registered:', registration);
+            setServiceWorkerStatus('Registered');
+            
+            // Wait for service worker to be ready
+            await navigator.serviceWorker.ready;
+            console.log('✅ Service worker is ready');
+            setServiceWorkerStatus('Active');
+          }
         } catch (error) {
-          console.error('❌ Manual service worker registration failed:', error);
-          setServiceWorkerStatus('Registration Failed');
+          console.error('❌ Error with service worker:', error);
+          setServiceWorkerStatus('Error');
         }
       } else {
         setServiceWorkerStatus('Not Supported');
       }
     };
 
-    registerServiceWorker();
+    checkAndRegisterServiceWorker();
     setUserAgent(navigator.userAgent);
   }, []);
 
@@ -251,119 +260,15 @@ export default function PWATestPage() {
               </div>
               <div className="flex justify-between">
                 <span>Notifications:</span>
-                <span className={isSupported ? 'text-green-600' : 'text-red-600'}>
-                  {isSupported ? '✓' : '✗'}
+                <span className={('Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window) ? 'text-green-600' : 'text-red-600'}>
+                  {('Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window) ? '✓' : '✗'}
                 </span>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Push Notifications</CardTitle>
-            <CardDescription>Test notification functionality</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                  <p className="text-sm text-red-600">{error}</p>
-                  <Button 
-                    onClick={clearError} 
-                    variant="outline" 
-                    size="sm" 
-                    className="mt-2"
-                  >
-                    Clear Error
-                  </Button>
-                </div>
-              )}
-              
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <div className={`w-3 h-3 rounded-full ${
-                    permission === 'granted' ? 'bg-green-500' : 
-                    permission === 'denied' ? 'bg-red-500' : 'bg-yellow-500'
-                  }`} />
-                  <span className="text-sm">
-                    Permission: {permission}
-                  </span>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <div className={`w-3 h-3 rounded-full ${isSubscribed ? 'bg-green-500' : 'bg-yellow-500'}`} />
-                  <span className="text-sm">
-                    Subscribed: {isSubscribed ? 'Yes' : 'No'}
-                  </span>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <div className={`w-3 h-3 rounded-full ${isSupported ? 'bg-green-500' : 'bg-red-500'}`} />
-                  <span className="text-sm">
-                    Supported: {isSupported ? 'Yes' : 'No'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Button 
-                  onClick={checkServiceWorker}
-                  variant="outline"
-                  className="w-full"
-                >
-                  🔍 Check Service Worker
-                </Button>
-                
-                {!isSupported && (
-                  <p className="text-sm text-red-600">
-                    Notifications are not supported in this browser
-                  </p>
-                )}
-                
-                {isSupported && permission !== 'granted' && (
-                  <Button 
-                    onClick={requestPermission} 
-                    disabled={isLoading}
-                    className="w-full"
-                  >
-                    {isLoading ? 'Requesting...' : 'Request Permission'}
-                  </Button>
-                )}
-                
-                {permission === 'granted' && !isSubscribed && (
-                  <Button 
-                    onClick={subscribe} 
-                    disabled={isLoading}
-                    className="w-full"
-                  >
-                    {isLoading ? 'Subscribing...' : 'Subscribe to Notifications'}
-                  </Button>
-                )}
-                
-                {isSubscribed && (
-                  <div className="space-y-2">
-                    <Button 
-                      onClick={sendTestNotification} 
-                      disabled={isLoading}
-                      className="w-full"
-                    >
-                      {isLoading ? 'Sending...' : 'Send Test Notification'}
-                    </Button>
-                    <Button 
-                      onClick={unsubscribe} 
-                      disabled={isLoading}
-                      variant="outline"
-                      className="w-full"
-                    >
-                      {isLoading ? 'Unsubscribing...' : 'Unsubscribe'}
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <NotificationManager />
 
         <Card>
           <CardHeader>

@@ -89,5 +89,8 @@
       "purpose": "maskable any"
     }
   ],
-  "splash_pages": null
+  "splash_pages": null,
+  "permissions": [
+    "notifications"
+  ]
 }

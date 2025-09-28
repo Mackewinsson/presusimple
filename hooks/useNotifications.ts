@@ -34,7 +34,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   for (let i = 0; i < rawData.length; ++i) {
     outputArray[i] = rawData.charCodeAt(i);
   }
-  return outputArray;
+  return outputArray as Uint8Array;
 }
 
 export function useNotifications(): NotificationHookReturn {
@@ -134,21 +134,47 @@ export function useNotifications(): NotificationHookReturn {
         throw new Error('Push Manager not supported');
       }
       
+      // Check if we're in a secure context
+      if (!window.isSecureContext) {
+        throw new Error('Push notifications require HTTPS or localhost');
+      }
+      
       console.log('⏳ Waiting for service worker to be ready...');
       
-      // Add timeout to prevent hanging
+      // Get existing registration or register if not found
+      let registration = await navigator.serviceWorker.getRegistration();
+      
+      if (!registration) {
+        console.log('🔧 No service worker found, registering...');
+        registration = await navigator.serviceWorker.register('/sw.js', {
+          scope: '/'
+        });
+        console.log('✅ Service worker registered:', registration);
+      }
+      
+      console.log('✅ Service worker found:', registration.scope);
+      
+      // Wait for service worker to be ready with a longer timeout
       const registrationPromise = navigator.serviceWorker.ready;
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Service worker ready timeout')), 10000)
+      const timeoutPromise = new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Service worker ready timeout')), 30000)
       );
       
-      const registration = await Promise.race([registrationPromise, timeoutPromise]);
+      registration = await Promise.race([registrationPromise, timeoutPromise]);
       console.log('✅ Service worker ready');
-      console.log('🔍 Service worker scope:', registration.scope);
-      console.log('🔍 Service worker active:', registration.active?.state);
-      console.log('🔍 Service worker installing:', registration.installing?.state);
-      console.log('🔍 Service worker waiting:', registration.waiting?.state);
-      console.log('🔍 Push manager available:', !!registration.pushManager);
+      console.log('🔍 Service worker scope:', registration?.scope);
+      console.log('🔍 Service worker active:', registration?.active?.state);
+      console.log('🔍 Service worker installing:', registration?.installing?.state);
+      console.log('🔍 Service worker waiting:', registration?.waiting?.state);
+      console.log('🔍 Push manager available:', !!registration?.pushManager);
+      
+      // Ensure we have an active service worker
+      if (!registration.active) {
+        throw new Error('No active service worker found');
+      }
+      
+      // Wait a bit more for the service worker to be fully ready
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Get VAPID public key
       console.log('🔑 Getting VAPID public key...');
@@ -174,7 +200,7 @@ export function useNotifications(): NotificationHookReturn {
       console.log('📱 Subscribing to push notifications...');
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: convertedVapidKey,
+        applicationServerKey: convertedVapidKey as BufferSource,
       });
       console.log('✅ Push subscription created:', subscription.endpoint);
 

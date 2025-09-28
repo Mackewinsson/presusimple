@@ -1,5 +1,5 @@
-// Custom Service Worker with Notification Support
-// This will be used instead of the auto-generated one
+// Service Worker for Simple Budget PWA
+// Following Next.js PWA documentation patterns
 
 // Skip waiting and claim clients immediately
 self.skipWaiting();
@@ -76,7 +76,6 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
-
 
 // ===== NOTIFICATION HANDLING =====
 
@@ -218,6 +217,6 @@ self.addEventListener('message', (event) => {
   }
 });
 
-console.log('Custom service worker loaded with notification support');
+console.log('Service worker loaded with notification support');
 console.log('Service worker scope:', self.registration?.scope);
 console.log('Service worker state:', self.registration?.active?.state);

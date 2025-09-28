@@ -4,7 +4,12 @@ import { getVAPIDPublicKey } from '@/lib/vapid';
 export async function GET() {
   try {
     const publicKey = getVAPIDPublicKey();
-    return NextResponse.json({ publicKey });
+    // Return as plain text to match the Next.js PWA documentation
+    return new NextResponse(publicKey, {
+      headers: {
+        'Content-Type': 'text/plain',
+      },
+    });
   } catch (error) {
     console.error('Error getting VAPID public key:', error);
     return NextResponse.json(

@@ -3,9 +3,7 @@ const withPWA = require('next-pwa')({
   register: true,
   skipWaiting: true,
   disable: false, // Enable PWA in development for testing notifications
-  swSrc: 'public/custom-sw.js', // Use our custom service worker
-  // Remove runtimeCaching since we're using a custom service worker
-  // All caching is handled in custom-sw.js
+  // Use default service worker for now, we'll add custom notification handling
 });
 
 /** @type {import('next').NextConfig} */
@@ -38,6 +36,23 @@ const nextConfig = {
           {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
+          },
+        ],
+      },
+      {
+        source: "/sw.js",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "application/javascript; charset=utf-8",
+          },
+          {
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: "default-src 'self'; script-src 'self'",
           },
         ],
       },
