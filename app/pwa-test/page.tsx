@@ -260,8 +260,8 @@ export default function PWATestPage() {
               </div>
               <div className="flex justify-between">
                 <span>Notifications:</span>
-                <span className={('Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window) ? 'text-green-600' : 'text-red-600'}>
-                  {('Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window) ? '✓' : '✗'}
+                <span className={(typeof window !== 'undefined' && 'Notification' in window && typeof navigator !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window) ? 'text-green-600' : 'text-red-600'}>
+                  {(typeof window !== 'undefined' && 'Notification' in window && typeof navigator !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window) ? '✓' : '✗'}
                 </span>
               </div>
             </div>
