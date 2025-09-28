@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useViewport, useBreakpoint, usePWAViewport, useViewportHeight } from '@/hooks/useViewport';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
+import { useNotifications } from '@/hooks/useNotifications';
 
 export default function PWATestPage() {
   const [isOnline, setIsOnline] = useState(true);
@@ -29,6 +30,20 @@ export default function PWATestPage() {
     dismissPrompt,
     showInstallPrompt,
   } = usePWAInstall();
+
+  // Notifications hook
+  const {
+    permission,
+    isSupported,
+    isSubscribed,
+    isLoading,
+    error,
+    requestPermission,
+    subscribe,
+    unsubscribe,
+    sendTestNotification,
+    clearError,
+  } = useNotifications();
 
   useEffect(() => {
     // Check online status
@@ -198,6 +213,110 @@ export default function PWATestPage() {
               <div className="flex justify-between">
                 <span>Manifest:</span>
                 <span className="text-green-600">✓</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Notifications:</span>
+                <span className={isSupported ? 'text-green-600' : 'text-red-600'}>
+                  {isSupported ? '✓' : '✗'}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Push Notifications</CardTitle>
+            <CardDescription>Test notification functionality</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                  <p className="text-sm text-red-600">{error}</p>
+                  <Button 
+                    onClick={clearError} 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-2"
+                  >
+                    Clear Error
+                  </Button>
+                </div>
+              )}
+              
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <div className={`w-3 h-3 rounded-full ${
+                    permission === 'granted' ? 'bg-green-500' : 
+                    permission === 'denied' ? 'bg-red-500' : 'bg-yellow-500'
+                  }`} />
+                  <span className="text-sm">
+                    Permission: {permission}
+                  </span>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <div className={`w-3 h-3 rounded-full ${isSubscribed ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                  <span className="text-sm">
+                    Subscribed: {isSubscribed ? 'Yes' : 'No'}
+                  </span>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <div className={`w-3 h-3 rounded-full ${isSupported ? 'bg-green-500' : 'bg-red-500'}`} />
+                  <span className="text-sm">
+                    Supported: {isSupported ? 'Yes' : 'No'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {!isSupported && (
+                  <p className="text-sm text-red-600">
+                    Notifications are not supported in this browser
+                  </p>
+                )}
+                
+                {isSupported && permission !== 'granted' && (
+                  <Button 
+                    onClick={requestPermission} 
+                    disabled={isLoading}
+                    className="w-full"
+                  >
+                    {isLoading ? 'Requesting...' : 'Request Permission'}
+                  </Button>
+                )}
+                
+                {permission === 'granted' && !isSubscribed && (
+                  <Button 
+                    onClick={subscribe} 
+                    disabled={isLoading}
+                    className="w-full"
+                  >
+                    {isLoading ? 'Subscribing...' : 'Subscribe to Notifications'}
+                  </Button>
+                )}
+                
+                {isSubscribed && (
+                  <div className="space-y-2">
+                    <Button 
+                      onClick={sendTestNotification} 
+                      disabled={isLoading}
+                      className="w-full"
+                    >
+                      {isLoading ? 'Sending...' : 'Send Test Notification'}
+                    </Button>
+                    <Button 
+                      onClick={unsubscribe} 
+                      disabled={isLoading}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      {isLoading ? 'Unsubscribing...' : 'Unsubscribe'}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>

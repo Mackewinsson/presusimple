@@ -12,6 +12,10 @@ export interface IUser extends Document {
   subscriptionType?: string; // "stripe", "manual_paid", "manual_trial", etc.
   plan?: "free" | "pro";
   currency?: string; // Currency code (e.g., "USD", "EUR")
+  // Notification fields
+  pushSubscription?: any; // Push subscription object
+  notificationEnabled?: boolean;
+  lastNotificationUpdate?: Date;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -29,7 +33,11 @@ const UserSchema = new Schema<IUser>({
     enum: ["free", "pro"],
     default: "free"
   },
-  currency: { type: String, default: "USD" }
+  currency: { type: String, default: "USD" },
+  // Notification fields
+  pushSubscription: { type: Schema.Types.Mixed }, // Push subscription object
+  notificationEnabled: { type: Boolean, default: false },
+  lastNotificationUpdate: { type: Date }
 });
 
 export default models.User || mongoose.model<IUser>("User", UserSchema);

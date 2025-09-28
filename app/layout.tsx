@@ -5,6 +5,7 @@ import Providers from "@/components/Providers";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import LocaleProvider from "@/components/LocaleProvider";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
+import NotificationPrompt from "@/components/NotificationPrompt";
 import ViewportOptimizer from "@/components/ViewportOptimizer";
 import MobileBottomTab from "@/components/MobileBottomTab";
 
@@ -203,6 +204,7 @@ export default function RootLayout({
             <Providers>
               <main>{children}</main>
               <PWAInstallPrompt />
+              <NotificationPrompt />
               <MobileBottomTab />
             </Providers>
           </LocaleProvider>
