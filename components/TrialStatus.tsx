@@ -23,6 +23,11 @@ export function TrialStatus() {
     return null;
   }
 
+  // ✅ Add explicit check for paid users - don't show trial status for paid users
+  if (user?.isPaid) {
+    return null;
+  }
+
   // Don't show for new users who just completed onboarding
   const onboardingComplete = typeof window !== 'undefined' ? localStorage.getItem("onboardingComplete") : null;
   

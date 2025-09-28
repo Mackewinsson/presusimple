@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
           {
             isPaid: true,
             plan: "pro", // Set plan to pro for paid users
-            trialStart: new Date(),
+            trialStart: null, // ✅ Fixed: Don't set trial start for paid users
             trialEnd: null, // No trial end for paid users
             subscriptionType: subscriptionType || "manual_paid",
           }
