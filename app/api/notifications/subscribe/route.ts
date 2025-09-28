@@ -6,14 +6,19 @@ import User from '@/models/User';
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('🔔 Subscribe API called');
+    
     // Check authentication
     const session = await getServerSession(authOptions);
+    console.log('👤 Session:', session?.user?.email ? 'Authenticated' : 'Not authenticated');
+    
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Parse subscription data
     const subscription = await request.json();
+    console.log('📱 Subscription data received:', subscription ? 'Valid' : 'Invalid');
     
     if (!subscription || !subscription.endpoint) {
       return NextResponse.json(
@@ -26,6 +31,7 @@ export async function POST(request: NextRequest) {
     await dbConnect();
 
     // Update user with push subscription
+    console.log('💾 Saving subscription to database...');
     const updatedUser = await User.findOneAndUpdate(
       { email: session.user.email },
       {
@@ -36,6 +42,8 @@ export async function POST(request: NextRequest) {
       { new: true, upsert: false }
     );
 
+    console.log('👤 User update result:', updatedUser ? 'Success' : 'Failed');
+    
     if (!updatedUser) {
       return NextResponse.json(
         { error: 'User not found' },
@@ -43,7 +51,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`Push subscription saved for user: ${session.user.email}`);
+    console.log(`✅ Push subscription saved for user: ${session.user.email}`);
+    console.log('🔔 Subscription endpoint:', subscription.endpoint);
 
     return NextResponse.json({
       success: true,

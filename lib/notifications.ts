@@ -8,19 +8,28 @@ import { getVAPIDPrivateKey, getVAPIDSubject, validateVAPIDConfig } from './vapi
 
 // Initialize web-push with VAPID keys
 export function initializeWebPush(): boolean {
+  console.log('🔧 Validating VAPID configuration...');
   if (!validateVAPIDConfig()) {
+    console.error('❌ VAPID configuration validation failed');
     return false;
   }
+  console.log('✅ VAPID configuration is valid');
 
   try {
+    console.log('🔧 Setting VAPID details...');
+    console.log('📧 Subject:', getVAPIDSubject());
+    console.log('🔑 Public Key:', process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ? 'Set' : 'Missing');
+    console.log('🔐 Private Key:', process.env.VAPID_PRIVATE_KEY ? 'Set' : 'Missing');
+    
     webpush.setVapidDetails(
       getVAPIDSubject(),
       process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
       getVAPIDPrivateKey()
     );
+    console.log('✅ VAPID details set successfully');
     return true;
   } catch (error) {
-    console.error('Error initializing web-push:', error);
+    console.error('❌ Error initializing web-push:', error);
     return false;
   }
 }
@@ -58,17 +67,27 @@ export async function sendNotificationToUser(
   payload: NotificationPayload
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    console.log('🚀 Initializing web-push...');
     if (!initializeWebPush()) {
+      console.error('❌ Web-push initialization failed');
       return { success: false, error: 'Web-push not initialized' };
     }
+    console.log('✅ Web-push initialized successfully');
 
     const notificationPayload = JSON.stringify(payload);
+    console.log('📤 Sending notification with payload:', notificationPayload);
     
     await webpush.sendNotification(subscription, notificationPayload);
+    console.log('✅ Notification sent successfully');
     
     return { success: true };
   } catch (error: any) {
-    console.error('Error sending notification:', error);
+    console.error('❌ Error sending notification:', error);
+    console.error('❌ Error details:', {
+      message: error.message,
+      statusCode: error.statusCode,
+      headers: error.headers,
+    });
     
     // Handle specific web-push errors
     if (error.statusCode === 410) {
@@ -137,6 +156,9 @@ export async function sendTestNotification(
   subscription: any,
   customMessage?: string
 ): Promise<{ success: boolean; error?: string }> {
+  console.log('🧪 Sending test notification...');
+  console.log('📱 Subscription:', subscription ? 'Valid' : 'Invalid');
+  
   const payload: NotificationPayload = {
     title: 'Test Notification',
     body: customMessage || 'This is a test notification from your Budget App!',
@@ -159,6 +181,7 @@ export async function sendTestNotification(
     ],
   };
 
+  console.log('📦 Payload:', payload);
   return sendNotificationToUser(subscription, payload);
 }
 

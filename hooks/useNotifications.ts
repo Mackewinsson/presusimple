@@ -110,6 +110,10 @@ export function useNotifications(): NotificationHookReturn {
   }, [state.isSupported]);
 
   const subscribe = useCallback(async (): Promise<boolean> => {
+    console.log('🔔 Starting subscription process...');
+    console.log('📱 Is supported:', state.isSupported);
+    console.log('🔐 Permission:', state.permission);
+    
     if (!state.isSupported || state.permission !== 'granted') {
       setState(prev => ({ ...prev, error: 'Permission not granted' }));
       return false;
@@ -118,23 +122,64 @@ export function useNotifications(): NotificationHookReturn {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const registration = await navigator.serviceWorker.ready;
+      console.log('⚙️ Getting service worker registration...');
+      console.log('🔍 Service worker support:', 'serviceWorker' in navigator);
+      console.log('🔍 Push manager support:', 'PushManager' in window);
+      
+      if (!('serviceWorker' in navigator)) {
+        throw new Error('Service Worker not supported');
+      }
+      
+      if (!('PushManager' in window)) {
+        throw new Error('Push Manager not supported');
+      }
+      
+      console.log('⏳ Waiting for service worker to be ready...');
+      
+      // Add timeout to prevent hanging
+      const registrationPromise = navigator.serviceWorker.ready;
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Service worker ready timeout')), 10000)
+      );
+      
+      const registration = await Promise.race([registrationPromise, timeoutPromise]);
+      console.log('✅ Service worker ready');
+      console.log('🔍 Service worker scope:', registration.scope);
+      console.log('🔍 Service worker active:', registration.active?.state);
+      console.log('🔍 Service worker installing:', registration.installing?.state);
+      console.log('🔍 Service worker waiting:', registration.waiting?.state);
+      console.log('🔍 Push manager available:', !!registration.pushManager);
       
       // Get VAPID public key
+      console.log('🔑 Getting VAPID public key...');
       const response = await fetch('/api/notifications/vapid-public-key');
+      console.log('🔍 VAPID response status:', response.status);
+      console.log('🔍 VAPID response ok:', response.ok);
+      
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ VAPID key fetch failed:', errorText);
         throw new Error('Failed to get VAPID public key');
       }
+      
       const vapidPublicKey = await response.text();
+      console.log('✅ VAPID public key received');
+      console.log('🔍 VAPID key length:', vapidPublicKey.length);
+      console.log('🔍 VAPID key preview:', vapidPublicKey.substring(0, 20) + '...');
+      
       const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
+      console.log('✅ VAPID key converted to Uint8Array');
 
       // Subscribe to push notifications
+      console.log('📱 Subscribing to push notifications...');
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: convertedVapidKey,
       });
+      console.log('✅ Push subscription created:', subscription.endpoint);
 
       // Send subscription to server
+      console.log('💾 Saving subscription to server...');
       const subscribeResponse = await fetch('/api/notifications/subscribe', {
         method: 'POST',
         headers: {
@@ -144,8 +189,11 @@ export function useNotifications(): NotificationHookReturn {
       });
 
       if (!subscribeResponse.ok) {
+        const errorText = await subscribeResponse.text();
+        console.error('❌ Failed to save subscription:', errorText);
         throw new Error('Failed to save subscription');
       }
+      console.log('✅ Subscription saved to server');
 
       setState(prev => ({
         ...prev,
@@ -154,12 +202,18 @@ export function useNotifications(): NotificationHookReturn {
         isLoading: false,
       }));
 
+      console.log('🎉 Subscription completed successfully!');
       return true;
     } catch (error) {
-      console.error('Error subscribing to notifications:', error);
+      console.error('❌ Error subscribing to notifications:', error);
+      console.error('❌ Error details:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : 'No stack trace'
+      });
       setState(prev => ({
         ...prev,
-        error: 'Failed to subscribe to notifications',
+        error: error instanceof Error ? error.message : 'Failed to subscribe to notifications',
         isLoading: false,
       }));
       return false;
@@ -221,10 +275,8 @@ export function useNotifications(): NotificationHookReturn {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          title: 'Test Notification',
-          body: 'This is a test notification from your PWA!',
-          icon: '/icons/icon-192x192.png',
-          url: '/pwa-test',
+          type: 'test',
+          message: 'This is a test notification from your PWA!',
         }),
       });
 

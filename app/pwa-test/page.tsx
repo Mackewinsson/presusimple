@@ -45,6 +45,32 @@ export default function PWATestPage() {
     clearError,
   } = useNotifications();
 
+  // Debug service worker registration
+  const checkServiceWorker = async () => {
+    console.log('🔍 Checking service worker registration...');
+    
+    if ('serviceWorker' in navigator) {
+      try {
+        const registration = await navigator.serviceWorker.getRegistration();
+        console.log('📱 Service worker registration:', registration);
+        
+        if (registration) {
+          console.log('✅ Service worker found');
+          console.log('🔍 Scope:', registration.scope);
+          console.log('🔍 Active:', registration.active?.state);
+          console.log('🔍 Installing:', registration.installing?.state);
+          console.log('🔍 Waiting:', registration.waiting?.state);
+        } else {
+          console.log('❌ No service worker registration found');
+        }
+      } catch (error) {
+        console.error('❌ Error checking service worker:', error);
+      }
+    } else {
+      console.log('❌ Service Worker not supported');
+    }
+  };
+
   useEffect(() => {
     // Check online status
     const updateOnlineStatus = () => {
@@ -55,17 +81,26 @@ export default function PWATestPage() {
     window.addEventListener('offline', updateOnlineStatus);
     updateOnlineStatus();
 
-    // Check service worker status
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.ready.then(() => {
-        setServiceWorkerStatus('Active');
-      }).catch(() => {
-        setServiceWorkerStatus('Not Available');
-      });
-    } else {
-      setServiceWorkerStatus('Not Supported');
-    }
+    // Manual service worker registration
+    const registerServiceWorker = async () => {
+      if ('serviceWorker' in navigator) {
+        try {
+          console.log('🔧 Manually registering service worker...');
+          const registration = await navigator.serviceWorker.register('/sw.js', {
+            scope: '/'
+          });
+          console.log('✅ Service worker registered manually:', registration);
+          setServiceWorkerStatus('Active');
+        } catch (error) {
+          console.error('❌ Manual service worker registration failed:', error);
+          setServiceWorkerStatus('Registration Failed');
+        }
+      } else {
+        setServiceWorkerStatus('Not Supported');
+      }
+    };
 
+    registerServiceWorker();
     setUserAgent(navigator.userAgent);
   }, []);
 
@@ -272,6 +307,14 @@ export default function PWATestPage() {
               </div>
 
               <div className="space-y-2">
+                <Button 
+                  onClick={checkServiceWorker}
+                  variant="outline"
+                  className="w-full"
+                >
+                  🔍 Check Service Worker
+                </Button>
+                
                 {!isSupported && (
                   <p className="text-sm text-red-600">
                     Notifications are not supported in this browser

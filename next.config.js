@@ -2,7 +2,7 @@ const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development',
+  disable: false, // Enable PWA in development for testing notifications
   swSrc: 'public/custom-sw.js', // Use our custom service worker
   // Remove runtimeCaching since we're using a custom service worker
   // All caching is handled in custom-sw.js

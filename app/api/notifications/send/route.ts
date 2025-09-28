@@ -7,14 +7,19 @@ import { sendNotificationToUser, sendTestNotification, NotificationPayload } fro
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('🔔 Notification send API called');
+    
     // Check authentication
     const session = await getServerSession(authOptions);
+    console.log('👤 Session:', session?.user?.email ? 'Authenticated' : 'Not authenticated');
+    
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Parse notification data
     const notificationData = await request.json();
+    console.log('📝 Notification data:', notificationData);
     
     if (!notificationData) {
       return NextResponse.json(
@@ -28,6 +33,7 @@ export async function POST(request: NextRequest) {
 
     // Get user's push subscription
     const user = await User.findOne({ email: session.user.email });
+    console.log('👤 User found:', user ? 'Yes' : 'No');
     
     if (!user) {
       return NextResponse.json(
@@ -36,6 +42,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log('🔔 User push subscription:', user.pushSubscription ? 'Exists' : 'Missing');
     if (!user.pushSubscription) {
       return NextResponse.json(
         { error: 'User not subscribed to notifications' },
