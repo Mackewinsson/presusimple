@@ -357,7 +357,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
     if (budgetId && refetchCategories) {
       refetchCategories();
     }
-  }, [budgetId]);
+  }, [budgetId, refetchCategories]);
 
   // Use React Query to get budget data
   const { data: budgetData } = useBudget(budgetId);

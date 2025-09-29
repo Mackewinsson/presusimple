@@ -84,13 +84,11 @@ export default function NotificationManager() {
     setError(null)
 
     try {
-      // Get service worker registration
+      // Get service worker registration (next-pwa should handle registration)
       let registration = await navigator.serviceWorker.getRegistration()
       
       if (!registration) {
-        registration = await navigator.serviceWorker.register('/sw.js', {
-          scope: '/'
-        })
+        throw new Error('Service worker not registered. Please refresh the page.')
       }
       
       // Wait for service worker to be ready

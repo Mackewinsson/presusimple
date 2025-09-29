@@ -141,15 +141,12 @@ export function useNotifications(): NotificationHookReturn {
       
       console.log('⏳ Waiting for service worker to be ready...');
       
-      // Get existing registration or register if not found
+      // Get existing registration (next-pwa should handle registration)
       let registration = await navigator.serviceWorker.getRegistration();
       
       if (!registration) {
-        console.log('🔧 No service worker found, registering...');
-        registration = await navigator.serviceWorker.register('/sw.js', {
-          scope: '/'
-        });
-        console.log('✅ Service worker registered:', registration);
+        console.log('⚠️ No service worker found - next-pwa should have registered it');
+        throw new Error('Service worker not registered. Please refresh the page.');
       }
       
       console.log('✅ Service worker found:', registration.scope);

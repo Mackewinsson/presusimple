@@ -29,7 +29,7 @@ const SubscriptionButton = () => {
       }, 5000); // Show for 5 seconds
       return () => clearTimeout(timer);
     }
-  }, [subscriptionStatus]);
+  }, [subscriptionStatus, showThankYou]);
 
   const handleSubscribe = async () => {
     setLoading(true);
