@@ -4,7 +4,7 @@ const withPWA = require('next-pwa')({
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development', // Disable PWA in development to avoid GenerateSW warnings
   buildExcludes: [/middleware-manifest\.json$/],
-  // Use default service worker for now, we'll add custom notification handling
+  customWorkerDir: 'worker', // Extend auto-generated SW with custom notification handling
 });
 
 /** @type {import('next').NextConfig} */

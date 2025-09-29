@@ -1,82 +1,5 @@
-// Custom Service Worker with Notification Support
-// This will be used instead of the auto-generated one
-
-// Skip waiting and claim clients immediately
-self.skipWaiting();
-self.addEventListener('activate', () => {
-  self.clients.claim();
-});
-
-// Basic caching without external dependencies
-const CACHE_NAME = 'budget-app-v1';
-const urlsToCache = [
-  '/',
-  '/budget',
-  '/dashboard',
-  '/history',
-  '/settings',
-  '/manifest.json'
-];
-
-// Install event - cache resources
-self.addEventListener('install', (event) => {
-  console.log('Service worker installing...');
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-      .catch((error) => {
-        console.error('Cache installation failed:', error);
-      })
-  );
-});
-
-// Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
-  console.log('Service worker activating...');
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
-});
-
-// Fetch event - serve from cache, fallback to network
-self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests
-  if (event.request.method !== 'GET') {
-    return;
-  }
-
-  // Skip chrome-extension and other non-http requests
-  if (!event.request.url.startsWith('http')) {
-    return;
-  }
-
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request);
-      })
-      .catch(() => {
-        // If both cache and network fail, return offline page for navigation requests
-        if (event.request.mode === 'navigate') {
-          return caches.match('/');
-        }
-      })
-  );
-});
-
+// Custom Service Worker Extensions for Simple Budget PWA
+// This extends the auto-generated next-pwa service worker with notification functionality
 
 // ===== NOTIFICATION HANDLING =====
 
@@ -218,6 +141,4 @@ self.addEventListener('message', (event) => {
   }
 });
 
-console.log('Custom service worker loaded with notification support');
-console.log('Service worker scope:', self.registration?.scope);
-console.log('Service worker state:', self.registration?.active?.state);
+console.log('Custom service worker extensions loaded with notification support');
