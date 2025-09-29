@@ -296,18 +296,25 @@
 
   /* Mobile bottom tab spacing */
   @media (max-width: 767px) {
-    body {
-      padding-bottom: calc(80px + env(safe-area-inset-bottom)); /* Space for bottom tab + safe area */
-    }
+    /* Remove body padding-bottom as it's causing issues */
+    /* body {
+      padding-bottom: calc(80px + env(safe-area-inset-bottom));
+    } */
     
-    /* Ensure content doesn't get hidden behind bottom tab */
+    /* Ensure main content has proper bottom padding for mobile bottom tab */
     main {
+      padding-bottom: calc(80px + env(safe-area-inset-bottom)); /* Space for bottom tab + safe area */
       min-height: calc(100vh - 80px - env(safe-area-inset-bottom));
     }
     
     /* Mobile header spacing */
     .mobile-header-spacing {
       padding-top: calc(60px + env(safe-area-inset-top));
+    }
+    
+    /* Ensure all page containers have proper bottom spacing on mobile */
+    .page-container {
+      padding-bottom: calc(80px + env(safe-area-inset-bottom));
     }
   }
 

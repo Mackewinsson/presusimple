@@ -109,7 +109,7 @@ export default function BudgetDetailPage() {
           </div>
         </header>
 
-        <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-20 md:pb-8">
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
@@ -160,7 +160,7 @@ export default function BudgetDetailPage() {
           </div>
         </header>
 
-        <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-20 md:pb-8">
           <div className="text-center py-12">
             <p className="text-muted-foreground">
               Budget not found. It may have been deleted.
