@@ -70,7 +70,7 @@ WEBPUSH_CONTACT_EMAIL=${vapidKeys.subject}`;
   
   console.log('\n🔄 Next steps:');
   console.log('   1. Restart your development server: npm run dev');
-  console.log('   2. Visit /web-push-example to test notifications');
+  console.log('   2. Visit /dev-tools to test notifications');
   console.log('   3. Run the test script: node scripts/test-mongo-notifications.js');
   
   console.log('\n⚠️  Security Note:');

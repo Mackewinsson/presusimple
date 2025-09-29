@@ -34,7 +34,7 @@ The enhanced PWA install prompt provides a better user experience for iOS users 
 1. **`hooks/usePWAInstall.ts`** - Custom hook for PWA install logic
 2. **`components/PWAInstallPrompt.tsx`** - Enhanced install prompt component
 3. **`app/layout.tsx`** - Added additional PWA meta tags
-4. **`app/pwa-test/page.tsx`** - Updated test page to use new hook
+4. **`app/dev-tools/page.tsx`** - Unified developer tools with PWA testing
 
 ### Key Components
 
@@ -82,7 +82,7 @@ const isIOSDevice = (): boolean => {
 
 ## Testing
 
-Visit `/pwa-test` to test the implementation:
+Visit `/dev-tools` to test the implementation:
 - Check device detection
 - Test install prompt functionality
 - Verify user interaction tracking

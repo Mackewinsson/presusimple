@@ -118,7 +118,7 @@ async function testWebPushImplementation() {
     
     if (usersWithSubscriptions.length === 0) {
       console.log('ℹ️  No users have subscribed to push notifications yet');
-      console.log('   Visit /web-push-example to subscribe and test notifications\n');
+      console.log('   Visit /dev-tools to subscribe and test notifications\n');
       return;
     }
 
@@ -132,7 +132,7 @@ async function testWebPushImplementation() {
       body: 'This is a test notification from the web push implementation test script',
       icon: '/icons/icon-192x192.png',
       badge: '/icons/icon-72x72.png',
-      url: '/web-push-example',
+      url: '/dev-tools',
       data: {
         type: 'test',
         timestamp: Date.now(),
@@ -182,8 +182,7 @@ async function testWebPushImplementation() {
   await mongoose.disconnect();
   console.log('✅ Test completed successfully!');
   console.log('\n📋 Next Steps:');
-  console.log('   1. Visit /web-push-example to test the full implementation');
-  console.log('   2. Visit /notification-test for detailed testing');
+  console.log('   1. Visit /dev-tools to test the full implementation');
   console.log('   3. Check browser DevTools → Application → Service Workers');
   console.log('   4. Monitor console logs for detailed debugging information');
 }

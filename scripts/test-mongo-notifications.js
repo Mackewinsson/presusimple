@@ -93,7 +93,7 @@ async function testMongoNotificationIntegration() {
       });
     } else {
       console.log('ℹ️  No users have subscribed to push notifications yet');
-      console.log('   Visit /web-push-example to subscribe and test notifications');
+      console.log('   Visit /dev-tools to subscribe and test notifications');
     }
     console.log('');
   } catch (error) {
@@ -190,8 +190,7 @@ async function testMongoNotificationIntegration() {
   await mongoose.disconnect();
   console.log('\n✅ MongoDB connection closed');
   console.log('\n📋 Next Steps:');
-  console.log('   1. Visit /web-push-example to test the full implementation');
-  console.log('   2. Visit /notification-test for detailed testing');
+  console.log('   1. Visit /dev-tools to test the full implementation');
   console.log('   3. Use the API endpoints to manage subscriptions');
   console.log('   4. Check browser DevTools for service worker status');
 }

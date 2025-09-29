@@ -129,7 +129,7 @@ async function debugNotifications() {
 
     if (!userWithSubscription) {
       console.log('❌ No user with active subscription found');
-      console.log('   Please subscribe to notifications first at /web-push-example\n');
+      console.log('   Please subscribe to notifications first at /dev-tools\n');
       return;
     }
 

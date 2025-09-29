@@ -113,7 +113,7 @@ async function testNotificationDelivery() {
 
     if (!user) {
       console.log('❌ No user with active subscription found');
-      console.log('   Please subscribe to notifications first at /web-push-example\n');
+      console.log('   Please subscribe to notifications first at /dev-tools\n');
       return;
     }
 
@@ -126,7 +126,7 @@ async function testNotificationDelivery() {
       body: 'If you can see this, notifications are working!',
       icon: '/icons/icon-192x192.png',
       badge: '/icons/icon-72x72.png',
-      url: '/notification-debug',
+      url: '/dev-tools',
       data: {
         type: 'delivery-test',
         timestamp: Date.now(),
@@ -173,7 +173,7 @@ async function testNotificationDelivery() {
       console.log('   - Check if notifications are blocked in browser settings');
       console.log('   - Try refreshing the page and re-subscribing');
       console.log('   - Test in a different browser');
-      console.log('   - Visit /notification-debug for detailed diagnostics');
+      console.log('   - Visit /dev-tools for detailed diagnostics');
       console.log('');
       
     } catch (error) {

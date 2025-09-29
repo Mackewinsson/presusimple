@@ -131,7 +131,7 @@ async function fixVapidMismatch() {
   
   console.log('\n📋 Next Steps:');
   console.log('   1. Restart your development server: npm run dev');
-  console.log('   2. Visit /web-push-example or /notification-dashboard');
+  console.log('   2. Visit /dev-tools to test notifications');
   console.log('   3. Re-subscribe to notifications with the correct VAPID keys');
   console.log('   4. Test notification sending');
   

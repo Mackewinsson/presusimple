@@ -53,7 +53,7 @@ The safe wiring implementation provides a non-conflicting, additive approach to 
 
 ### Testing
 
-1. **Visit test page**: `/pwa-test`
+1. **Visit test page**: `/dev-tools`
 2. **Enable notifications**: Click "Enable Notifications"
 3. **Send test push**: Click "Send test push"
 

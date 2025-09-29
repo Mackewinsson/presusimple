@@ -8,7 +8,7 @@
 ### Solutions Implemented
 
 #### 1. Created PWA Debug Page
-- **URL**: `http://localhost:3003/pwa-debug`
+- **URL**: `http://localhost:3000/dev-tools`
 - **Purpose**: Debug PWA installation status and force show install prompt
 - **Features**: 
   - Real-time PWA status display
@@ -45,7 +45,7 @@ npm run dev
 4. Reload the page
 
 #### Step 3: Test PWA Installation
-1. **Visit the debug page**: `http://localhost:3003/pwa-debug`
+1. **Visit the debug page**: `http://localhost:3000/dev-tools`
 2. **Check PWA status**: Verify all conditions are met
 3. **Simulate user interaction**: Click "Simulate User Interaction" button
 4. **Force show prompt**: Click "Force Show Prompt" button
@@ -54,7 +54,7 @@ npm run dev
 #### Step 4: Test on Different Pages
 1. **Home page**: `http://localhost:3003/`
 2. **Budget page**: `http://localhost:3003/budget`
-3. **PWA test page**: `http://localhost:3003/pwa-test`
+3. **PWA test page**: `http://localhost:3000/dev-tools`
 
 ### PWA Install Prompt Conditions
 
@@ -152,4 +152,4 @@ curl http://localhost:3003/api/debug/service-worker
 ---
 
 **Status**: ✅ PWA enabled in development, debug tools created
-**Next Action**: Test install prompt at `http://localhost:3003/pwa-debug`
+**Next Action**: Test install prompt at `http://localhost:3000/dev-tools`
