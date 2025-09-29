@@ -2,7 +2,7 @@ const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development', // Disable PWA in development to avoid GenerateSW warnings
+  disable: false, // Enable PWA in development for testing
   buildExcludes: [/middleware-manifest\.json$/],
   customWorkerDir: 'worker', // Extend auto-generated SW with custom notification handling
 });
