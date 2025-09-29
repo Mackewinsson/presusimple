@@ -15,7 +15,7 @@ export async function GET() {
         '3. Check Service Workers section',
         '4. Look for service worker at /sw.js',
         '5. Check if it shows as "activated"',
-        '6. Try subscribing to notifications on /pwa-test page',
+        '6. Try subscribing to notifications on /dev-tools page',
         '7. Check console for any errors'
       ]
     });

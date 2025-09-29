@@ -46,7 +46,7 @@ disable: process.env.NODE_ENV === 'development' && !process.env.ENABLE_PWA_DEV
    - Check console for any errors
 
 5. **Test notification subscription:**
-   - Visit `/pwa-test` page
+   - Visit `/dev-tools` page
    - Click "Subscribe to Notifications"
    - Grant permission when prompted
    - Verify subscription is successful

@@ -60,7 +60,7 @@ npm run dev
 
 ### 1. Access Test Page
 
-Navigate to `/notification-test` to access the dedicated notification testing page.
+Navigate to `/dev-tools` to access the unified developer tools and notification testing page.
 
 ### 2. Test Steps
 
@@ -208,7 +208,7 @@ Push notifications are supported in:
 
 - `app/actions.ts` - Server Actions for notification management
 - `components/NotificationManager.tsx` - React component for notification UI
-- `app/notification-test/page.tsx` - Test page for notifications
+- `app/dev-tools/page.tsx` - Unified developer tools and notification testing page
 - `public/sw-custom.js` - Service worker with notification support
 - `next.config.js` - Security headers for service worker
 - `public/manifest.json` - Added notification permissions

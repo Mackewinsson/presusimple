@@ -258,8 +258,8 @@ export async function sendTestNotification(
     body: customMessage || 'This is a test notification from your Budget App!',
     icon: '/icons/icon-192x192.png',
     badge: '/icons/icon-72x72.png',
-    url: '/pwa-test',
-    defaultActionUrl: '/pwa-test',
+    url: '/dev-tools',
+    defaultActionUrl: '/dev-tools',
     data: {
       type: 'test',
       timestamp: Date.now(),
@@ -268,7 +268,7 @@ export async function sendTestNotification(
       {
         action: 'view',
         title: 'View App',
-        url: '/pwa-test',
+        url: '/dev-tools',
       },
       {
         action: 'dismiss',
