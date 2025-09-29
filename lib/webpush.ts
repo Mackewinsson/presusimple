@@ -1,9 +1,15 @@
 import webpush from "web-push";
+import { getVAPIDSubject, getVAPIDPrivateKey, validateVAPIDConfig } from './vapid';
 
-webpush.setVapidDetails(
-  process.env.WEBPUSH_CONTACT_EMAIL!,
-  process.env.WEBPUSH_PUBLIC_KEY!,
-  process.env.WEBPUSH_PRIVATE_KEY!,
-);
+// Initialize web-push with VAPID keys using the centralized configuration
+if (validateVAPIDConfig()) {
+  webpush.setVapidDetails(
+    getVAPIDSubject(),
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+    getVAPIDPrivateKey()
+  );
+} else {
+  console.error('❌ VAPID configuration is invalid. Push notifications will not work.');
+}
 
 export { webpush };
