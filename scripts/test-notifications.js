@@ -16,6 +16,45 @@ const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
 const VAPID_SUBJECT = process.env.VAPID_SUBJECT;
 
+function buildDeclarativePayload(basePayload) {
+  const defaultActionUrl = basePayload.url || '/';
+  const actions = (basePayload.actions || []).map((action) => ({
+    ...action,
+    url: action.url || defaultActionUrl,
+  }));
+  const actionUrlMap = actions.reduce((map, action) => {
+    if (action.action) {
+      map[action.action] = action.url;
+    }
+    return map;
+  }, {});
+
+  return {
+    ...basePayload,
+    actions,
+    default_action_url: defaultActionUrl,
+    options: {
+      body: basePayload.body,
+      icon: basePayload.icon,
+      badge: basePayload.badge,
+      data: {
+        ...(basePayload.data || {}),
+        url: defaultActionUrl,
+        defaultActionUrl,
+        actionUrls: actionUrlMap,
+      },
+      actions,
+      requireInteraction: basePayload.requireInteraction,
+      silent: basePayload.silent,
+      tag: basePayload.tag,
+      renotify: basePayload.renotify,
+      vibrate: basePayload.vibrate,
+    },
+    mutable: true,
+    app_badge: basePayload.appBadge,
+  };
+}
+
 async function testNotificationSystem() {
   console.log('🔍 Starting notification system diagnostic...\n');
 
@@ -79,7 +118,7 @@ async function testNotificationSystem() {
     // 4. Test sending notification
     console.log('4️⃣ Testing notification sending...');
     
-    const testPayload = {
+    const basePayload = {
       title: 'Test Notification',
       body: 'This is a test notification from the diagnostic script',
       icon: '/icons/icon-192x192.png',
@@ -100,6 +139,8 @@ async function testNotificationSystem() {
         },
       ],
     };
+
+    const testPayload = buildDeclarativePayload(basePayload);
 
     console.log('📤 Sending test notification...');
     console.log('   Payload:', JSON.stringify(testPayload, null, 2));

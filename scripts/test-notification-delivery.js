@@ -34,6 +34,45 @@ const UserSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', UserSchema);
 
+function buildDeclarativePayload(basePayload) {
+  const defaultActionUrl = basePayload.url || '/';
+  const actions = (basePayload.actions || []).map(action => ({
+    ...action,
+    url: action.url || defaultActionUrl,
+  }));
+  const actionUrlMap = actions.reduce((map, action) => {
+    if (action.action) {
+      map[action.action] = action.url;
+    }
+    return map;
+  }, {});
+
+  return {
+    ...basePayload,
+    actions,
+    default_action_url: defaultActionUrl,
+    options: {
+      body: basePayload.body,
+      icon: basePayload.icon,
+      badge: basePayload.badge,
+      data: {
+        ...(basePayload.data || {}),
+        url: defaultActionUrl,
+        defaultActionUrl,
+        actionUrls: actionUrlMap,
+      },
+      actions,
+      requireInteraction: basePayload.requireInteraction,
+      silent: basePayload.silent,
+      tag: basePayload.tag,
+      renotify: basePayload.renotify,
+      vibrate: basePayload.vibrate,
+    },
+    mutable: true,
+    app_badge: basePayload.appBadge,
+  };
+}
+
 async function testNotificationDelivery() {
   console.log('🧪 Testing Notification Delivery');
   console.log('=================================\n');
@@ -82,7 +121,7 @@ async function testNotificationDelivery() {
     console.log(`   Subscription endpoint: ${user.pushSubscription.endpoint.substring(0, 50)}...\n`);
 
     // Send test notification
-    const testPayload = {
+    const basePayload = {
       title: '🔔 Test Notification',
       body: 'If you can see this, notifications are working!',
       icon: '/icons/icon-192x192.png',
@@ -106,6 +145,8 @@ async function testNotificationDelivery() {
       requireInteraction: true,
       tag: 'test-notification'
     };
+
+    const testPayload = buildDeclarativePayload(basePayload);
 
     console.log('📤 Sending test notification...');
     console.log('   Title:', testPayload.title);

@@ -34,6 +34,45 @@ const UserSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', UserSchema);
 
+function buildDeclarativePayload(basePayload) {
+  const defaultActionUrl = basePayload.url || '/';
+  const actions = (basePayload.actions || []).map(action => ({
+    ...action,
+    url: action.url || defaultActionUrl,
+  }));
+  const actionUrlMap = actions.reduce((map, action) => {
+    if (action.action) {
+      map[action.action] = action.url;
+    }
+    return map;
+  }, {});
+
+  return {
+    ...basePayload,
+    actions,
+    default_action_url: defaultActionUrl,
+    options: {
+      body: basePayload.body,
+      icon: basePayload.icon,
+      badge: basePayload.badge,
+      data: {
+        ...(basePayload.data || {}),
+        url: defaultActionUrl,
+        defaultActionUrl,
+        actionUrls: actionUrlMap,
+      },
+      actions,
+      requireInteraction: basePayload.requireInteraction,
+      silent: basePayload.silent,
+      tag: basePayload.tag,
+      renotify: basePayload.renotify,
+      vibrate: basePayload.vibrate,
+    },
+    mutable: true,
+    app_badge: basePayload.appBadge,
+  };
+}
+
 async function debugNotifications() {
   console.log('🔍 Debugging Notification Issues');
   console.log('==================================\n');
@@ -121,7 +160,7 @@ async function debugNotifications() {
 
     // Test 5: Send test notification
     console.log('5. Sending test notification...');
-    const testPayload = {
+    const basePayload = {
       title: 'Debug Test Notification',
       body: 'This is a debug test notification to verify the system is working',
       icon: '/icons/icon-192x192.png',
@@ -143,6 +182,8 @@ async function debugNotifications() {
         }
       ]
     };
+
+    const testPayload = buildDeclarativePayload(basePayload);
 
     try {
       console.log('📤 Sending notification...');

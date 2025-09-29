@@ -12,6 +12,45 @@ require('dotenv').config({ path: '.env.local' });
 // Import models - using dynamic import for TypeScript compatibility
 let User;
 
+function buildDeclarativePayload(basePayload) {
+  const defaultActionUrl = basePayload.url || '/';
+  const actions = (basePayload.actions || []).map(action => ({
+    ...action,
+    url: action.url || defaultActionUrl,
+  }));
+  const actionUrlMap = actions.reduce((map, action) => {
+    if (action.action) {
+      map[action.action] = action.url;
+    }
+    return map;
+  }, {});
+
+  return {
+    ...basePayload,
+    actions,
+    default_action_url: defaultActionUrl,
+    options: {
+      body: basePayload.body,
+      icon: basePayload.icon,
+      badge: basePayload.badge,
+      data: {
+        ...(basePayload.data || {}),
+        url: defaultActionUrl,
+        defaultActionUrl,
+        actionUrls: actionUrlMap,
+      },
+      actions,
+      requireInteraction: basePayload.requireInteraction,
+      silent: basePayload.silent,
+      tag: basePayload.tag,
+      renotify: basePayload.renotify,
+      vibrate: basePayload.vibrate,
+    },
+    mutable: true,
+    app_badge: basePayload.appBadge,
+  };
+}
+
 // VAPID configuration
 const vapidKeys = {
   publicKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
@@ -88,7 +127,7 @@ async function testWebPushImplementation() {
     const testUser = usersWithSubscriptions[0];
     console.log(`   Testing with user: ${testUser.email}`);
 
-    const testPayload = {
+    const basePayload = {
       title: 'Web Push Test',
       body: 'This is a test notification from the web push implementation test script',
       icon: '/icons/icon-192x192.png',
@@ -110,6 +149,8 @@ async function testWebPushImplementation() {
         }
       ]
     };
+
+    const testPayload = buildDeclarativePayload(basePayload);
 
     try {
       await webpush.sendNotification(

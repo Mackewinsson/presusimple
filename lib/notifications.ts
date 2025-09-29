@@ -34,22 +34,116 @@ export function initializeWebPush(): boolean {
   }
 }
 
+export interface NotificationAction {
+  action: string;
+  title: string;
+  icon?: string;
+  url?: string;
+}
+
 export interface NotificationPayload {
   title: string;
   body: string;
   icon?: string;
   badge?: string;
   url?: string;
+  defaultActionUrl?: string;
   data?: Record<string, any>;
-  actions?: Array<{
-    action: string;
-    title: string;
-  }>;
+  actions?: NotificationAction[];
   requireInteraction?: boolean;
   silent?: boolean;
   tag?: string;
   renotify?: boolean;
   vibrate?: number[];
+  mutable?: boolean;
+  appBadge?: number;
+}
+
+export function buildWebPushPayload(payload: NotificationPayload) {
+  const {
+    title,
+    body,
+    icon = '/icons/icon-192x192.png',
+    badge = '/icons/icon-72x72.png',
+    url = '/',
+    defaultActionUrl,
+    data = {},
+    actions = [],
+    requireInteraction = false,
+    silent = false,
+    tag,
+    renotify = false,
+    vibrate,
+    mutable = true,
+    appBadge,
+  } = payload;
+
+  const resolvedDefaultUrl = defaultActionUrl ?? url;
+
+  const actionUrlMap = actions.reduce<Record<string, string>>((map, current) => {
+    if (current.action) {
+      map[current.action] = current.url ?? resolvedDefaultUrl;
+    }
+    return map;
+  }, {});
+
+  const baseActions = actions.map(({ action, title, icon }) => ({
+    action,
+    title,
+    ...(icon ? { icon } : {}),
+  }));
+
+  const declarativeActions = actions.map(({ action, title, icon, url }) => ({
+    action,
+    title,
+    ...(icon ? { icon } : {}),
+    ...(url || resolvedDefaultUrl ? { url: url ?? resolvedDefaultUrl } : {}),
+  }));
+
+  const mergedData = {
+    ...data,
+    url,
+    defaultActionUrl: resolvedDefaultUrl,
+    actionUrls: actionUrlMap,
+  };
+
+  const basePayload = {
+    title,
+    body,
+    icon,
+    badge,
+    url,
+    data: mergedData,
+    actions: baseActions,
+    requireInteraction,
+    silent,
+    ...(tag ? { tag } : {}),
+    ...(renotify ? { renotify } : {}),
+    ...(vibrate ? { vibrate } : {}),
+  };
+
+  const declarativePayload = {
+    default_action_url: resolvedDefaultUrl,
+    mutable,
+    options: {
+      body,
+      icon,
+      badge,
+      data: mergedData,
+      actions: declarativeActions,
+      requireInteraction,
+      silent,
+      ...(tag ? { tag } : {}),
+      ...(renotify ? { renotify } : {}),
+      ...(vibrate ? { vibrate } : {}),
+    },
+    ...(typeof appBadge === 'number' ? { app_badge: appBadge } : {}),
+  };
+
+  return {
+    ...basePayload,
+    ...declarativePayload,
+  };
 }
 
 export interface NotificationResult {
@@ -74,7 +168,7 @@ export async function sendNotificationToUser(
     }
     console.log('✅ Web-push initialized successfully');
 
-    const notificationPayload = JSON.stringify(payload);
+    const notificationPayload = JSON.stringify(buildWebPushPayload(payload));
     console.log('📤 Sending notification with payload:', notificationPayload);
     
     await webpush.sendNotification(subscription, notificationPayload);
@@ -165,6 +259,7 @@ export async function sendTestNotification(
     icon: '/icons/icon-192x192.png',
     badge: '/icons/icon-72x72.png',
     url: '/pwa-test',
+    defaultActionUrl: '/pwa-test',
     data: {
       type: 'test',
       timestamp: Date.now(),
@@ -173,12 +268,14 @@ export async function sendTestNotification(
       {
         action: 'view',
         title: 'View App',
+        url: '/pwa-test',
       },
       {
         action: 'dismiss',
         title: 'Dismiss',
       },
     ],
+    mutable: true,
   };
 
   console.log('📦 Payload:', payload);
@@ -203,6 +300,7 @@ export async function sendBudgetAlertNotification(
     icon: '/icons/icon-192x192.png',
     badge: '/icons/icon-72x72.png',
     url: '/budget',
+    defaultActionUrl: '/budget',
     data: {
       type: 'budget-alert',
       category: budgetInfo.category,
@@ -215,6 +313,7 @@ export async function sendBudgetAlertNotification(
       {
         action: 'view',
         title: 'View Budget',
+        url: '/budget',
       },
       {
         action: 'dismiss',
@@ -223,6 +322,7 @@ export async function sendBudgetAlertNotification(
     ],
     tag: `budget-alert-${budgetInfo.category}`,
     requireInteraction: budgetInfo.percentage >= 90,
+    mutable: true,
   };
 
   return sendNotificationToUser(subscription, payload);
@@ -247,6 +347,7 @@ export async function sendExpenseReminderNotification(
     icon: '/icons/icon-192x192.png',
     badge: '/icons/icon-72x72.png',
     url: '/budget',
+    defaultActionUrl: '/budget',
     data: {
       type: 'expense-reminder',
       reminderType,
@@ -256,6 +357,7 @@ export async function sendExpenseReminderNotification(
       {
         action: 'view',
         title: 'Add Expense',
+        url: '/budget',
       },
       {
         action: 'dismiss',
@@ -263,6 +365,7 @@ export async function sendExpenseReminderNotification(
       },
     ],
     tag: `expense-reminder-${reminderType}`,
+    mutable: true,
   };
 
   return sendNotificationToUser(subscription, payload);

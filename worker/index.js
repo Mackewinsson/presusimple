@@ -42,13 +42,42 @@ if (!self.__SB_PUSH_WIRED__) {
       }
     })();
 
-    const title = data.title || 'Simple Budget';
+    const optionsData = data.options || {};
+    const defaultActionUrl = data.default_action_url || data.defaultActionUrl || data.url || optionsData.default_action_url || '/';
+    const declaredActions = Array.isArray(optionsData.actions) && optionsData.actions.some((action) => action && action.url)
+      ? optionsData.actions
+      : Array.isArray(data.actions)
+        ? data.actions
+        : Array.isArray(optionsData.actions)
+          ? optionsData.actions
+          : [];
+    const actions = declaredActions.map((action) => ({
+      action: action.action,
+      title: action.title,
+      icon: action.icon
+    }));
+
+    const actionUrlMap = declaredActions.reduce((map, action) => {
+      if (action && action.action) {
+        map[action.action] = action.url || defaultActionUrl;
+      }
+      return map;
+    }, {});
+
+    const mergedData = {
+      ...data.data,
+      ...(optionsData.data || {}),
+      url: data.url || optionsData.data?.url || defaultActionUrl,
+      defaultActionUrl,
+      actionUrls: Object.keys(actionUrlMap).length > 0 ? actionUrlMap : (data.data?.actionUrls || optionsData.data?.actionUrls || {})
+    };
+
     const options = {
-      body: data.body || 'You have a new update.',
-      icon: data.icon || '/icons/icon-192x192.png',
-      badge: data.badge || '/icons/icon-192x192.png',
-      data: { url: data.url || '/' },
-      actions: data.actions || [
+      body: data.body ?? optionsData.body ?? 'You have a new update.',
+      icon: data.icon ?? optionsData.icon ?? '/icons/icon-192x192.png',
+      badge: data.badge ?? optionsData.badge ?? '/icons/icon-192x192.png',
+      data: mergedData,
+      actions: actions.length > 0 ? actions : [
         {
           action: 'view',
           title: 'View'
@@ -58,12 +87,14 @@ if (!self.__SB_PUSH_WIRED__) {
           title: 'Dismiss'
         }
       ],
-      requireInteraction: data.requireInteraction || false,
-      silent: data.silent || false,
-      tag: data.tag || 'budget-notification',
-      renotify: data.renotify || false,
-      vibrate: data.vibrate || [200, 100, 200]
+      requireInteraction: data.requireInteraction ?? optionsData.requireInteraction ?? false,
+      silent: data.silent ?? optionsData.silent ?? false,
+      tag: data.tag ?? optionsData.tag ?? 'budget-notification',
+      renotify: data.renotify ?? optionsData.renotify ?? false,
+      vibrate: data.vibrate ?? optionsData.vibrate ?? [200, 100, 200]
     };
+
+    const title = data.title || optionsData.title || 'Simple Budget';
 
     console.log('📤 Showing notification:', { title, options });
 
@@ -83,8 +114,10 @@ if (!self.__SB_PUSH_WIRED__) {
     console.log('🔔 Notification clicked:', event.notification.title);
     event.notification.close();
     
-    const url = event.notification.data?.url || '/';
+    const actionUrls = event.notification.data?.actionUrls || {};
+    const fallbackUrl = event.notification.data?.defaultActionUrl || event.notification.data?.url || '/';
     const action = event.action;
+    const targetUrl = action && actionUrls[action] ? actionUrls[action] : fallbackUrl;
     
     event.waitUntil((async () => {
       // Handle notification actions
@@ -93,13 +126,13 @@ if (!self.__SB_PUSH_WIRED__) {
         return;
       }
       
-      if (action === 'view' || !action) {
+      if (!action || action === 'view' || actionUrls[action]) {
         // Try to focus existing window or open new one
         const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-        
+
         // Look for existing window with the same URL
         for (const client of all) {
-          if (client.url.includes(url) || url === '/') {
+          if (client.url.includes(targetUrl) || targetUrl === '/') {
             console.log('🔄 Focusing existing window:', client.url);
             return client.focus();
           }
@@ -107,8 +140,8 @@ if (!self.__SB_PUSH_WIRED__) {
         
         // Open new window if no existing window found
         if (self.clients.openWindow) {
-          console.log('🆕 Opening new window:', url);
-          return self.clients.openWindow(url);
+          console.log('🆕 Opening new window:', targetUrl);
+          return self.clients.openWindow(targetUrl);
         }
       }
     })());

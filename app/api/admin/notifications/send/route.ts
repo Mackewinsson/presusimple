@@ -64,22 +64,29 @@ export async function POST(request: NextRequest) {
       icon: notificationData.icon || '/icons/icon-192x192.png',
       badge: notificationData.badge || '/icons/icon-72x72.png',
       url: notificationData.url || '/budget',
+      defaultActionUrl: notificationData.defaultActionUrl || notificationData.url || '/budget',
       data: notificationData.data || {},
-      actions: notificationData.actions || [
+      actions: (notificationData.actions || [
         {
           action: 'view',
           title: 'View Details',
+          url: notificationData.url || '/budget',
         },
         {
           action: 'dismiss',
           title: 'Dismiss',
         },
-      ],
+      ]).map((action: any) => ({
+        ...action,
+        url: action.url || notificationData.url || '/budget',
+      })),
       requireInteraction: notificationData.requireInteraction || false,
       silent: notificationData.silent || false,
       tag: notificationData.tag || 'admin-notification',
       renotify: notificationData.renotify || false,
       vibrate: notificationData.vibrate || [200, 100, 200],
+      mutable: notificationData.mutable ?? true,
+      appBadge: notificationData.appBadge,
     };
 
     // Get all push subscriptions
