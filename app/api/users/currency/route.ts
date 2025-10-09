@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { requireAuth } from "@/lib/auth-middleware";
 import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
 
@@ -116,19 +117,37 @@ import User from "@/models/User";
 // GET /api/users/currency - Get user's currency preference
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession();
-    if (!session?.user?.email) {
+    let userEmail: string | null = null;
+
+    // Check for JWT token (mobile app)
+    const authHeader = request.headers.get("authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      const authResult = requireAuth(request);
+      if ("error" in authResult) {
+        return authResult.error;
+      }
+      userEmail = authResult.user.email;
+    } else {
+      // Check for NextAuth session (web app)
+      const session = await getServerSession();
+      if (!session?.user?.email) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      userEmail = session.user.email;
+    }
+
+    if (!userEmail) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await dbConnect();
 
-    const user = await User.findOne({ email: session.user.email });
-    if (!user) {
+    const userDoc = await User.findOne({ email: userEmail });
+    if (!userDoc) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ currency: user.currency || "USD" });
+    return NextResponse.json({ currency: userDoc.currency || "USD" });
   } catch (error) {
     console.error("Error getting user currency:", error);
     return NextResponse.json(
@@ -141,8 +160,26 @@ export async function GET(request: NextRequest) {
 // PUT /api/users/currency - Update user's currency preference
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession();
-    if (!session?.user?.email) {
+    let userEmail: string | null = null;
+
+    // Check for JWT token (mobile app)
+    const authHeader = request.headers.get("authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      const authResult = requireAuth(request);
+      if ("error" in authResult) {
+        return authResult.error;
+      }
+      userEmail = authResult.user.email;
+    } else {
+      // Check for NextAuth session (web app)
+      const session = await getServerSession();
+      if (!session?.user?.email) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      userEmail = session.user.email;
+    }
+
+    if (!userEmail) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -159,7 +196,7 @@ export async function PUT(request: NextRequest) {
     await dbConnect();
 
     const updatedUser = await User.findOneAndUpdate(
-      { email: session.user.email },
+      { email: userEmail },
       { currency },
       { new: true }
     );
