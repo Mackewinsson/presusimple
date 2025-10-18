@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -103,7 +103,7 @@ export default function DevToolsPage() {
     setLogs([]);
   };
 
-  const runDiagnostics = async () => {
+  const runDiagnostics = useCallback(async () => {
     setIsLoadingStats(true);
     const info: DebugInfo = {
       serviceWorkerStatus: 'Unknown',
@@ -161,7 +161,7 @@ export default function DevToolsPage() {
     } finally {
       setIsLoadingStats(false);
     }
-  };
+  }, [subscription]);
 
   const loadNotificationStats = async () => {
     setIsLoadingStats(true);
@@ -300,7 +300,7 @@ export default function DevToolsPage() {
   useEffect(() => {
     runDiagnostics();
     loadNotificationStats();
-  }, [subscription]);
+  }, [subscription, runDiagnostics]);
 
   return (
     <div className="container mx-auto p-6 space-y-6">

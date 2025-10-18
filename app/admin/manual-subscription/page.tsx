@@ -16,6 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { Settings } from "lucide-react";
+import Link from "next/link";
 
 // List of authorized admin emails
 const AUTHORIZED_ADMINS = [
@@ -146,6 +148,14 @@ export default function ManualSubscriptionPage() {
             <p className="text-sm text-green-600 mt-1">
               Logged in as: {session.user?.email}
             </p>
+            <div className="mt-4">
+              <Link href="/admin">
+                <Button variant="outline" className="border-blue-500 text-blue-600 hover:bg-blue-50">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Go to Unified Admin Dashboard
+                </Button>
+              </Link>
+            </div>
           </div>
 
           <Card>

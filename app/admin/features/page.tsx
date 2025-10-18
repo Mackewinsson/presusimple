@@ -5,8 +5,10 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { FEATURES } from "@/lib/features";
-import { Crown, Lock, CheckCircle, XCircle } from "lucide-react";
+import { Crown, Lock, CheckCircle, XCircle, Flag, Settings } from "lucide-react";
+import Link from "next/link";
 
 export default function FeaturesAdminPage() {
   const { data: session, status } = useSession();
@@ -30,19 +32,37 @@ export default function FeaturesAdminPage() {
     <div className="min-h-screen gradient-bg-dark">
       <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Feature Flags Dashboard</h1>
-          <p className="text-slate-300">
-            Manage which features are available to different subscription plans
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2">Feature Management</h1>
+              <p className="text-slate-300">
+                Manage which features are available to different subscription plans
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Link href="/admin">
+                <Button variant="outline" className="border-blue-500 text-blue-300 hover:bg-blue-500/10">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Unified Admin Dashboard
+                </Button>
+              </Link>
+              <Link href="/admin/feature-flags">
+                <Button variant="outline" className="border-purple-500 text-purple-300 hover:bg-purple-500/10">
+                  <Flag className="h-4 w-4 mr-2" />
+                  Dynamic Feature Flags
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
 
         <div className="grid gap-6">
           {/* Feature Overview */}
           <Card className="bg-white/5 border-white/10">
             <CardHeader>
-              <CardTitle className="text-white">Feature Overview</CardTitle>
+              <CardTitle className="text-white">Static Feature Overview</CardTitle>
               <CardDescription className="text-slate-300">
-                All features and their plan availability
+                Hard-coded features and their plan availability. Use Dynamic Feature Flags for runtime control.
               </CardDescription>
             </CardHeader>
             <CardContent>

@@ -1,5 +1,5 @@
 import { hasAccess, getUserPlan, getAvailableFeatures, getProFeatures } from "@/lib/userAccess";
-import { FEATURES } from "@/lib/features";
+import { FEATURES, FeatureKey } from "@/lib/features";
 
 const mockUserFree = { plan: "free" } as any;
 const mockUserPro = { plan: "pro" } as any;
@@ -13,8 +13,8 @@ describe("userAccess helpers", () => {
 
   it("hasAccess reflects feature plan matrix", () => {
     // Pick one pro-only feature and one available for free
-    const proOnly = Object.entries(FEATURES).find(([, f]) => f.plans.includes("pro") && !f.plans.includes("free"))![0] as any;
-    const freeFeature = Object.entries(FEATURES).find(([, f]) => f.plans.includes("free"))![0] as any;
+    const proOnly = Object.entries(FEATURES).find(([, f]) => f.plans.includes("pro" as any) && !f.plans.includes("free" as any))![0] as FeatureKey;
+    const freeFeature = Object.entries(FEATURES).find(([, f]) => f.plans.includes("free" as any))![0] as FeatureKey;
 
     expect(hasAccess(mockUserFree, freeFeature)).toBe(true);
     expect(hasAccess(mockUserFree, proOnly)).toBe(false);
