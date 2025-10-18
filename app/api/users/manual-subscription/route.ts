@@ -1,3 +1,83 @@
+/**
+ * @swagger
+ * /api/users/manual-subscription:
+ *   post:
+ *     summary: Manual subscription management
+ *     description: Admin-only endpoint for manually managing user subscriptions
+ *     tags: [Admin - Subscriptions]
+ *     security:
+ *       - BearerAuth: []
+ *       - NextAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/SubscriptionActionRequest'
+ *     responses:
+ *       200:
+ *         description: Subscription action completed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Subscription activated successfully"
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     email:
+ *                       type: string
+ *                       format: email
+ *                     plan:
+ *                       type: string
+ *                       enum: [free, pro]
+ *                     isPaid:
+ *                       type: boolean
+ *                     subscriptionType:
+ *                       type: string
+ *                       enum: [free, trial, paid]
+ *                     trialStart:
+ *                       type: string
+ *                       format: date-time
+ *                     trialEnd:
+ *                       type: string
+ *                       format: date-time
+ *                     stripeCustomerId:
+ *                       type: string
+ *                     stripeSubscriptionId:
+ *                       type: string
+ *       400:
+ *         description: Bad request - Invalid input data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Unauthorized - Admin access required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authConfig } from "@/app/auth/auth.config";

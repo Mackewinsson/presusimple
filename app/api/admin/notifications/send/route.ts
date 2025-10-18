@@ -1,3 +1,59 @@
+/**
+ * @swagger
+ * /api/admin/notifications/send:
+ *   post:
+ *     summary: Send push notifications
+ *     description: Admin-only endpoint for sending push notifications to users
+ *     tags: [Admin - Notifications]
+ *     security:
+ *       - BearerAuth: []
+ *       - NextAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/NotificationRequest'
+ *     responses:
+ *       200:
+ *         description: Notifications sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Notifications sent successfully"
+ *                 sent:
+ *                   type: integer
+ *                   description: Number of notifications sent
+ *                 failed:
+ *                   type: integer
+ *                   description: Number of notifications that failed
+ *       400:
+ *         description: Bad request - Invalid input data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Unauthorized - Admin access required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';

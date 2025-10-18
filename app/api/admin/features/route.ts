@@ -1,3 +1,124 @@
+/**
+ * @swagger
+ * /api/admin/features:
+ *   get:
+ *     summary: List all feature flags
+ *     description: Get all feature flags with pagination and filtering options
+ *     tags: [Admin - Feature Flags]
+ *     security:
+ *       - BearerAuth: []
+ *       - NextAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of items per page
+ *       - in: query
+ *         name: enabled
+ *         schema:
+ *           type: boolean
+ *         description: Filter by enabled status
+ *       - in: query
+ *         name: platform
+ *         schema:
+ *           type: string
+ *           enum: [web, mobile]
+ *         description: Filter by platform
+ *       - in: query
+ *         name: userType
+ *         schema:
+ *           type: string
+ *           enum: [free, pro, admin]
+ *         description: Filter by user type
+ *     responses:
+ *       200:
+ *         description: List of feature flags
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 features:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Feature'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     page:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
+ *                     total:
+ *                       type: integer
+ *                     pages:
+ *                       type: integer
+ *       401:
+ *         description: Unauthorized - Admin access required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *   post:
+ *     summary: Create a new feature flag
+ *     description: Create a new feature flag with specified configuration
+ *     tags: [Admin - Feature Flags]
+ *     security:
+ *       - BearerAuth: []
+ *       - NextAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/FeatureCreateRequest'
+ *     responses:
+ *       201:
+ *         description: Feature flag created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Feature'
+ *       400:
+ *         description: Bad request - Invalid input data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Unauthorized - Admin access required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       409:
+ *         description: Conflict - Feature flag with this key already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';

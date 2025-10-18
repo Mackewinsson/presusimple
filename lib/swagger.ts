@@ -60,6 +60,10 @@ This API supports two authentication methods:
 - **Payment Processing**: Stripe integration for subscriptions
 - **User Management**: Profile and currency preferences
 - **Monthly Budgets**: Track monthly budget performance
+- **Feature Flags**: Dynamic feature control for web and mobile apps
+- **Admin Management**: Unified admin dashboard with comprehensive controls
+- **Manual Subscriptions**: Admin-controlled subscription management
+- **Push Notifications**: Web push notification system
 
 ## 🔧 Development
 
@@ -320,6 +324,212 @@ This API supports two authentication methods:
               type: 'string',
               minLength: 8,
               description: 'New password for mobile login',
+            },
+          },
+        },
+        Feature: {
+          type: 'object',
+          properties: {
+            key: {
+              type: 'string',
+              description: 'Unique feature flag key',
+            },
+            name: {
+              type: 'string',
+              description: 'Feature display name',
+            },
+            description: {
+              type: 'string',
+              description: 'Feature description',
+            },
+            enabled: {
+              type: 'boolean',
+              description: 'Whether the feature is enabled',
+            },
+            platforms: {
+              type: 'array',
+              items: {
+                type: 'string',
+                enum: ['web', 'mobile'],
+              },
+              description: 'Target platforms',
+            },
+            userTypes: {
+              type: 'array',
+              items: {
+                type: 'string',
+                enum: ['free', 'pro', 'admin'],
+              },
+              description: 'Target user types',
+            },
+            rolloutPercentage: {
+              type: 'number',
+              minimum: 0,
+              maximum: 100,
+              description: 'Rollout percentage (0-100)',
+            },
+            targetUsers: {
+              type: 'array',
+              items: {
+                type: 'string',
+              },
+              description: 'Specific user IDs to target',
+            },
+            excludeUsers: {
+              type: 'array',
+              items: {
+                type: 'string',
+              },
+              description: 'Specific user IDs to exclude',
+            },
+            metadata: {
+              type: 'object',
+              description: 'Additional feature metadata',
+            },
+            createdBy: {
+              type: 'string',
+              description: 'User ID who created the feature',
+            },
+            lastModifiedBy: {
+              type: 'string',
+              description: 'User ID who last modified the feature',
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Creation timestamp',
+            },
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Last update timestamp',
+            },
+          },
+        },
+        FeatureCreateRequest: {
+          type: 'object',
+          required: ['key', 'name', 'description'],
+          properties: {
+            key: {
+              type: 'string',
+              description: 'Unique feature flag key',
+            },
+            name: {
+              type: 'string',
+              description: 'Feature display name',
+            },
+            description: {
+              type: 'string',
+              description: 'Feature description',
+            },
+            enabled: {
+              type: 'boolean',
+              default: false,
+              description: 'Whether the feature is enabled',
+            },
+            platforms: {
+              type: 'array',
+              items: {
+                type: 'string',
+                enum: ['web', 'mobile'],
+              },
+              default: ['web'],
+              description: 'Target platforms',
+            },
+            userTypes: {
+              type: 'array',
+              items: {
+                type: 'string',
+                enum: ['free', 'pro', 'admin'],
+              },
+              default: ['free'],
+              description: 'Target user types',
+            },
+            rolloutPercentage: {
+              type: 'number',
+              minimum: 0,
+              maximum: 100,
+              default: 100,
+              description: 'Rollout percentage (0-100)',
+            },
+            targetUsers: {
+              type: 'array',
+              items: {
+                type: 'string',
+              },
+              description: 'Specific user IDs to target',
+            },
+            excludeUsers: {
+              type: 'array',
+              items: {
+                type: 'string',
+              },
+              description: 'Specific user IDs to exclude',
+            },
+            metadata: {
+              type: 'object',
+              description: 'Additional feature metadata',
+            },
+          },
+        },
+        SubscriptionActionRequest: {
+          type: 'object',
+          required: ['action', 'email'],
+          properties: {
+            action: {
+              type: 'string',
+              enum: ['activate_paid', 'activate_trial', 'deactivate', 'set_pro_plan', 'set_free_plan', 'extend_trial'],
+              description: 'Subscription action to perform',
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              description: 'User email address',
+            },
+            trialDays: {
+              type: 'number',
+              description: 'Number of trial days (for extend_trial action)',
+            },
+          },
+        },
+        NotificationRequest: {
+          type: 'object',
+          required: ['title', 'body'],
+          properties: {
+            title: {
+              type: 'string',
+              description: 'Notification title',
+            },
+            body: {
+              type: 'string',
+              description: 'Notification body',
+            },
+            icon: {
+              type: 'string',
+              description: 'Notification icon URL',
+            },
+            badge: {
+              type: 'string',
+              description: 'Notification badge URL',
+            },
+            data: {
+              type: 'object',
+              description: 'Additional notification data',
+            },
+            targetUsers: {
+              type: 'array',
+              items: {
+                type: 'string',
+              },
+              description: 'Specific user IDs to target (optional)',
+            },
+            userTypes: {
+              type: 'array',
+              items: {
+                type: 'string',
+                enum: ['free', 'pro', 'admin'],
+              },
+              description: 'Target user types (optional)',
             },
           },
         },

@@ -1,3 +1,65 @@
+/**
+ * @swagger
+ * /api/features:
+ *   get:
+ *     summary: Get user's applicable feature flags
+ *     description: Retrieve feature flags that apply to the current user based on their plan, platform, and targeting rules
+ *     tags: [Feature Flags]
+ *     security:
+ *       - BearerAuth: []
+ *       - NextAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: platform
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [web, mobile]
+ *         description: Platform requesting feature flags
+ *     responses:
+ *       200:
+ *         description: User's applicable feature flags
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 features:
+ *                   type: object
+ *                   additionalProperties:
+ *                     type: boolean
+ *                   description: Object with feature keys as properties and boolean values indicating if feature is enabled for user
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     plan:
+ *                       type: string
+ *                       enum: [free, pro]
+ *                     platform:
+ *                       type: string
+ *                       enum: [web, mobile]
+ *       401:
+ *         description: Unauthorized - Authentication required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       400:
+ *         description: Bad request - Platform parameter required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
