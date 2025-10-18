@@ -63,6 +63,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { requireAuth } from '@/lib/auth-middleware';
 import { dbConnect } from '@/lib/mongoose';
 import Feature from '@/models/Feature';
 import User from '@/models/User';
@@ -70,20 +71,41 @@ import User from '@/models/User';
 // GET /api/features - Get feature flags for the current user
 export async function GET(request: NextRequest) {
   try {
-    // Check authentication
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     // Connect to database
     await dbConnect();
 
+    let user = null;
+    let userEmail = null;
+
+    // Check for JWT Bearer token (mobile apps)
+    const authHeader = request.headers.get("authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      console.log('[Features API] JWT Bearer token detected');
+      const authResult = requireAuth(request);
+      if ("error" in authResult) {
+        return authResult.error;
+      }
+      userEmail = authResult.user.email;
+      console.log('[Features API] JWT user email:', userEmail);
+    } else {
+      // Check for NextAuth session (web apps)
+      console.log('[Features API] Checking NextAuth session');
+      const session = await getServerSession(authOptions);
+      if (!session?.user?.email) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      userEmail = session.user.email;
+      console.log('[Features API] NextAuth user email:', userEmail);
+    }
+
     // Get user information
-    const user = await User.findOne({ email: session.user.email });
+    user = await User.findOne({ email: userEmail });
     if (!user) {
+      console.log('[Features API] User not found for email:', userEmail);
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    console.log('[Features API] User found:', user._id, 'Plan:', user.subscriptionStatus);
 
     // Determine user type
     const userType = user.subscriptionStatus === 'active' ? 'pro' : 'free';
@@ -91,6 +113,7 @@ export async function GET(request: NextRequest) {
     // Get platform from query parameter or default to web
     const url = new URL(request.url);
     const platform = url.searchParams.get('platform') || 'web';
+    console.log('[Features API] Platform:', platform, 'User type:', userType);
 
     // Get all enabled features for this user type and platform
     const features = await Feature.find({
@@ -98,6 +121,7 @@ export async function GET(request: NextRequest) {
       platforms: platform,
       userTypes: userType,
     });
+    console.log('[Features API] Found features:', features.length, features.map(f => f.key));
 
     // Filter features based on rollout percentage and user targeting
     const userFeatures: Record<string, boolean> = {};
@@ -122,6 +146,12 @@ export async function GET(request: NextRequest) {
 
       userFeatures[feature.key] = shouldEnable;
     }
+
+    console.log('[Features API] Final user features:', userFeatures);
+
+    // Add test feature flag "aa" for testing
+    userFeatures['aa'] = true;
+    console.log('[Features API] Added test feature flag "aa":', userFeatures['aa']);
 
     return NextResponse.json({
       features: userFeatures,
