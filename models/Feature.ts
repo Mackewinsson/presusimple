@@ -82,7 +82,7 @@ const FeatureSchema = new Schema<IFeature>({
 FeatureSchema.index({ enabled: 1 });
 FeatureSchema.index({ platforms: 1 });
 FeatureSchema.index({ userTypes: 1 });
-FeatureSchema.index({ key: 1 }); // Ensure key is indexed for uniqueness
+// Note: key field already has unique index from schema definition
 
 // Ensure key is unique and follows naming convention
 FeatureSchema.pre('save', function(next) {
