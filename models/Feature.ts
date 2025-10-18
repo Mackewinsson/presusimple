@@ -78,8 +78,11 @@ const FeatureSchema = new Schema<IFeature>({
   timestamps: true,
 });
 
-// Index for efficient queries
-FeatureSchema.index({ enabled: 1, platforms: 1, userTypes: 1 });
+// Indexes for efficient queries (separate indexes to avoid parallel array indexing issues)
+FeatureSchema.index({ enabled: 1 });
+FeatureSchema.index({ platforms: 1 });
+FeatureSchema.index({ userTypes: 1 });
+FeatureSchema.index({ key: 1 }); // Ensure key is indexed for uniqueness
 
 // Ensure key is unique and follows naming convention
 FeatureSchema.pre('save', function(next) {
