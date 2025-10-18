@@ -149,10 +149,6 @@ export async function GET(request: NextRequest) {
 
     console.log('[Features API] Final user features:', userFeatures);
 
-    // Add test feature flag "aa" for testing
-    userFeatures['aa'] = true;
-    console.log('[Features API] Added test feature flag "aa":', userFeatures['aa']);
-
     return NextResponse.json({
       features: userFeatures,
       userType,
