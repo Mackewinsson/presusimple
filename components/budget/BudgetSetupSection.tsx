@@ -45,7 +45,8 @@ import { budgetKeys } from "@/lib/hooks/useBudgetQueries";
 import BudgetCategoryItem from "./BudgetCategoryItem";
 import NewCategoryForm from "./NewCategoryForm";
 import { AILoading } from "@/components/ui/ai-loading";
-import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
+import { useFeatureFlags as usePlanFeatureFlags } from "@/lib/hooks/useFeatureFlags";
+import { useFeatureFlags as useRemoteFeatureFlags } from "@/hooks/useFeatureFlags";
 import { UpgradeToProCTA } from "@/components/UpgradeToProCTA";
 import {
   AlertDialog,
@@ -97,7 +98,11 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   const { data: expenses = [] } = useExpenses(userId || "");
 
   const queryClient = useQueryClient();
-  const featureFlags = useFeatureFlags();
+  const planFeatureFlags = usePlanFeatureFlags();
+  const remoteFeatureFlags = useRemoteFeatureFlags();
+  const isAIFeatureFlagEnabled = remoteFeatureFlags.isFeatureEnabled("aa");
+  const canAccessAIBudgeting = planFeatureFlags.hasFeatureAccess("aiBudgeting");
+  const showAIBudgetCreation = isAIFeatureFlagEnabled && canAccessAIBudgeting;
   
   // React Query mutations
   const createBudgetMutation = useCreateBudget();
@@ -461,11 +466,11 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="manual" className="w-full">
-            <TabsList className={`grid w-full ${featureFlags.hasFeatureAccess("aiBudgeting") ? "grid-cols-2" : "grid-cols-1"}`}>
+            <TabsList className={`grid w-full ${isAIFeatureFlagEnabled ? "grid-cols-2" : "grid-cols-1"}`}>
               <TabsTrigger value="manual" className="text-sm font-medium">
                 Manual Setup
               </TabsTrigger>
-              {featureFlags.hasFeatureAccess("aiBudgeting") && (
+              {isAIFeatureFlagEnabled && (
                 <TabsTrigger value="ai" className="flex items-center gap-2 text-sm font-medium bg-gradient-to-r from-purple-600/20 to-pink-600/20 hover:from-purple-600/30 hover:to-pink-600/30 border-purple-500/30 data-[state=active]:from-purple-600/40 data-[state=active]:to-pink-600/40 data-[state=active]:border-purple-500/50 transition-all duration-200">
                   <Sparkles className="h-4 w-4 flex-shrink-0 text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text" />
                   AI Assistant
@@ -524,8 +529,9 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
           </form>
             </TabsContent>
             
+            {isAIFeatureFlagEnabled && (
             <TabsContent value="ai" className="space-y-4 mt-4">
-              {featureFlags.hasFeatureAccess("aiBudgeting") ? (
+              {showAIBudgetCreation ? (
                 <form onSubmit={handleCreateBudgetWithAI} className="space-y-4">
                 <div className="space-y-2">
                   <label htmlFor="aiDescription" className="text-sm font-medium text-foreground">
@@ -604,6 +610,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                 <UpgradeToProCTA feature="aiBudgeting" />
               )}
             </TabsContent>
+            )}
           </Tabs>
         </CardContent>
       </Card>

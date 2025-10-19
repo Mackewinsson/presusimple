@@ -6,7 +6,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import BudgetSetupSection from "@/components/budget/BudgetSetupSection";
 import DailySpendingTracker from "@/components/expenses/DailySpendingTracker";
-import { AITransactionInput } from "@/components/expenses/AITransactionInput";
 import ResetButton from "@/components/ResetButton";
 import Summary from "@/components/Summary";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -24,7 +23,8 @@ import {
   useUserSubscription,
 } from "@/lib/hooks";
 import { useAccessControl } from "@/lib/hooks/useAccessControl";
-import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
+import { useFeatureFlags as usePlanFeatureFlags } from "@/lib/hooks/useFeatureFlags";
+import { useFeatureFlags as useRemoteFeatureFlags } from "@/hooks/useFeatureFlags";
 import { useUserData } from "@/lib/hooks/useUserData";
 import { AppLoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -64,8 +64,9 @@ function BudgetAppContent() {
   );
   const { data: subscription } = useUserSubscription();
   const accessControl = useAccessControl();
-  const featureFlags = useFeatureFlags();
-  const [inputMode, setInputMode] = useState<'manual' | 'ai'>('manual');
+  const planFeatureFlags = usePlanFeatureFlags();
+  const remoteFeatureFlags = useRemoteFeatureFlags();
+  const isAIFeatureFlagEnabled = remoteFeatureFlags.isFeatureEnabled("aa");
 
   // Check if any data is loading
   const isLoading =
@@ -192,12 +193,7 @@ function BudgetAppContent() {
             )}
           </div>
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
-            {/* AI Magic - Always visible when budget exists */}
-            {budget && accessControl.canAccessExpenses && featureFlags.hasFeatureAccess("transactionTextInput") && (
-              <AITransactionInput budgetId={budget._id} />
-            )}
-            
-            {/* Manual Input Mode */}
+            {/* Daily Spending Tracker with AI tab controlled by feature flag */}
             {budget && accessControl.canAccessExpenses && (
               <DailySpendingTracker
                 budget={budget}

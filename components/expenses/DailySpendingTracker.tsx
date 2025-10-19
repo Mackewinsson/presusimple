@@ -17,6 +17,8 @@ import ExpenseList from "./ExpenseList";
 import { AITransactionInput } from "./AITransactionInput";
 import type { Budget } from "@/lib/api";
 import { useTranslation } from "@/lib/i18n";
+import { useFeatureFlags as usePlanFeatureFlags } from "@/lib/hooks/useFeatureFlags";
+import { useFeatureFlags as useRemoteFeatureFlags } from "@/hooks/useFeatureFlags";
 
 interface Category {
   _id?: string;
@@ -48,6 +50,11 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
   expenses,
 }) => {
   const { t } = useTranslation();
+  const planFeatureFlags = usePlanFeatureFlags();
+  const remoteFeatureFlags = useRemoteFeatureFlags();
+  const isAIFeatureFlagEnabled = remoteFeatureFlags.isFeatureEnabled("aa");
+  const canShowAITransactions = 
+    planFeatureFlags.hasFeatureAccess("transactionTextInput") && isAIFeatureFlagEnabled;
   const totalSpent = expenses.reduce((sum, expense) => {
     return (
       sum + (expense.type === "expense" ? expense.amount : -expense.amount)
@@ -98,13 +105,15 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="add" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-4">
+          <TabsList className={`grid w-full ${canShowAITransactions ? "grid-cols-3" : "grid-cols-2"} mb-4`}>
             <TabsTrigger value="add" className="text-xs sm:text-sm">
               {t('addTransaction')}
             </TabsTrigger>
-            <TabsTrigger value="ai" className="text-xs sm:text-sm">
-              {t('aiQuickInput')}
-            </TabsTrigger>
+            {canShowAITransactions && (
+              <TabsTrigger value="ai" className="text-xs sm:text-sm">
+                {t('aiQuickInput')}
+              </TabsTrigger>
+            )}
             <TabsTrigger value="history" className="text-xs sm:text-sm">
               {t('transactionHistory')}
             </TabsTrigger>
@@ -118,9 +127,11 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
             />
           </TabsContent>
 
-          <TabsContent value="ai" className="space-y-4">
-            <AITransactionInput budgetId={budget._id} />
-          </TabsContent>
+          {canShowAITransactions && (
+            <TabsContent value="ai" className="space-y-4">
+              <AITransactionInput budgetId={budget._id} />
+            </TabsContent>
+          )}
 
           <TabsContent value="history">
             <div
