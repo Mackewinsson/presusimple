@@ -23,8 +23,10 @@ import { usePWAStatus } from '@/hooks/usePWAStatus';
 import { useViewport } from '@/hooks/useViewport';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useTranslation } from '@/lib/i18n';
 
 export default function PWALandingPage() {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const { isMobile } = useViewport();
   const pwaStatus = usePWAStatus();
@@ -75,7 +77,7 @@ export default function PWALandingPage() {
                     size="sm"
                     className="text-white hover:bg-white/10"
                   >
-                    Sign Out
+                    {t('signOut')}
                   </Button>
                 )}
               </div>
@@ -92,10 +94,10 @@ export default function PWALandingPage() {
             
             <div className="space-y-2">
               <h1 className="text-2xl font-bold text-white">
-                Install Presusimple
+                {t('installApp')} Presusimple
               </h1>
               <p className="text-slate-300 text-sm">
-                Get the full app experience with offline access and faster performance
+                {t('getTheFullAppExperience')}
               </p>
             </div>
 
@@ -120,7 +122,7 @@ export default function PWALandingPage() {
                   size="lg"
                 >
                   <Download className="h-5 w-5 mr-2" />
-                  Install App
+                  {t('installApp')}
                 </Button>
               ) : (
                 <Button
@@ -129,7 +131,7 @@ export default function PWALandingPage() {
                   size="lg"
                 >
                   <Share className="h-5 w-5 mr-2" />
-                  Show Install Instructions
+                  {t('showInstallInstructions')}
                 </Button>
               )}
 
@@ -139,7 +141,7 @@ export default function PWALandingPage() {
                 className="w-full border-white/20 text-white hover:bg-white/10"
                 size="lg"
               >
-                Continue in Browser
+                {t('continueInBrowser')}
               </Button>
             </div>
           </div>
@@ -149,9 +151,9 @@ export default function PWALandingPage() {
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
               <Card className="w-full max-w-sm bg-white/95 backdrop-blur-sm border-white/20">
                 <CardHeader className="text-center">
-                  <CardTitle className="text-lg">Install Instructions</CardTitle>
+                  <CardTitle className="text-lg">{t('installInstructions')}</CardTitle>
                   <CardDescription>
-                    Follow these steps to install Presusimple
+                    {t('showInstallInstructions')} Presusimple
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -176,7 +178,7 @@ export default function PWALandingPage() {
                     className="w-full mt-4"
                     size="sm"
                   >
-                    Got it!
+                    {t('gotIt')}
                   </Button>
                 </CardContent>
               </Card>
@@ -210,24 +212,24 @@ export default function PWALandingPage() {
                   onClick={handleSignOut}
                   className="inline-flex items-center gap-1.5 bg-white/10 dark:bg-white/10 backdrop-blur-sm text-slate-900 dark:text-white border border-gray-300/50 dark:border-white/20 px-2 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-white/20 dark:hover:bg-white/20 transition-all duration-200 text-xs sm:text-sm"
                 >
-                  <span className="hidden sm:inline">Sign Out</span>
-                  <span className="sm:hidden">Out</span>
+                  <span className="hidden sm:inline">{t('signOut')}</span>
+                  <span className="sm:hidden">{t('signOut')}</span>
                 </button>
               ) : (
                 <Link
                   href="/auth/login"
                   className="inline-flex items-center gap-1.5 bg-white/10 dark:bg-white/10 backdrop-blur-sm text-slate-900 dark:text-white border border-gray-300/50 dark:border-white/20 px-2 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-white/20 dark:hover:bg-white/20 transition-all duration-200 text-xs sm:text-sm"
                 >
-                  <span className="hidden sm:inline">Sign In</span>
-                  <span className="sm:hidden">In</span>
+                  <span className="hidden sm:inline">{t('signIn')}</span>
+                  <span className="sm:hidden">{t('signIn')}</span>
                 </Link>
               )}
               <button
                 onClick={handleLaunchApp}
                 className="inline-flex items-center gap-1.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-2 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-slate-800 dark:hover:bg-gray-100 transition-all duration-200 text-xs sm:text-sm shadow-lg font-medium"
               >
-                <span className="hidden sm:inline">Launch App</span>
-                <span className="sm:hidden">Launch</span>
+                <span className="hidden sm:inline">{t('launchApp')}</span>
+                <span className="sm:hidden">{t('launchApp')}</span>
                 <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />
               </button>
             </div>
@@ -240,17 +242,16 @@ export default function PWALandingPage() {
         <section className="py-8 sm:py-12 md:py-20 px-4">
           <div className="container mx-auto text-center">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-gray-200 dark:to-white bg-clip-text text-transparent leading-tight">
-              Simple Budgeting Made Easy
+              {t('simpleBudgetingMadeEasy')}
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-slate-700 dark:text-white/80 max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-10 px-4">
-              Take control of your finances with our simple budgeting app. Every
-              dollar has a purpose, every expense is tracked.
+              {t('takeControlOfYourFinances')}
             </p>
             <button
               onClick={handleLaunchApp}
               className="inline-flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2.5 sm:px-5 md:px-6 sm:py-3 rounded-lg text-sm sm:text-base md:text-lg font-medium hover:bg-slate-800 dark:hover:bg-gray-100 transition-all duration-200 shadow-lg transform hover:scale-105"
             >
-              Start Budgeting Now
+              {t('startBudgetingNow')}
               <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
@@ -260,38 +261,36 @@ export default function PWALandingPage() {
         <section className="py-12 sm:py-16 md:py-20 bg-white/5 dark:bg-white/5 backdrop-blur-sm">
           <div className="container mx-auto px-4">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-6 sm:mb-8 md:mb-12 text-slate-900 dark:text-white">
-              Everything you need to succeed
+              {t('everythingYouNeedToSucceed')}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-5xl mx-auto">
               <div className="p-4 sm:p-6 rounded-xl glass-card hover-card shadow-lg hover:shadow-xl">
                 <Home className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-slate-900 dark:text-white mb-3 sm:mb-4" />
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2 text-slate-900 dark:text-white">
-                  Monthly Planning
+                  {t('monthlyPlanning')}
                 </h3>
                 <p className="text-sm sm:text-base text-slate-700 dark:text-white/70">
-                  Plan your budget month by month, adjusting as your needs
-                  change.
+                  {t('monthlyPlanningDesc')}
                 </p>
               </div>
 
               <div className="p-4 sm:p-6 rounded-xl glass-card hover-card shadow-lg hover:shadow-xl">
                 <Zap className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-slate-900 dark:text-white mb-3 sm:mb-4" />
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2 text-slate-900 dark:text-white">
-                  Expense Tracking
+                  {t('expenseTracking')}
                 </h3>
                 <p className="text-sm sm:text-base text-slate-700 dark:text-white/70">
-                  Track every expense in real-time with beautiful
-                  visualizations.
+                  {t('expenseTrackingDesc')}
                 </p>
               </div>
 
               <div className="p-4 sm:p-6 rounded-xl glass-card hover-card shadow-lg hover:shadow-xl sm:col-span-2 lg:col-span-1 sm:max-w-md lg:max-w-none mx-auto w-full">
                 <Shield className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-slate-900 dark:text-white mb-3 sm:mb-4" />
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2 text-slate-900 dark:text-white">
-                  Secure & Private
+                  {t('secureAndPrivate')}
                 </h3>
                 <p className="text-sm sm:text-base text-slate-700 dark:text-white/70">
-                  Your financial data stays private and secure on your device.
+                  {t('secureAndPrivateDesc')}
                 </p>
               </div>
             </div>
@@ -303,20 +302,20 @@ export default function PWALandingPage() {
           <section className="py-12 sm:py-16 md:py-20">
             <div className="container mx-auto px-4">
               <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-6 sm:mb-8 md:mb-12 text-slate-900 dark:text-white">
-                Get the App Experience
+                {t('getTheAppExperience')}
               </h2>
               <div className="max-w-4xl mx-auto">
                 <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
                   <CardHeader className="text-center">
-                    <CardTitle className="text-2xl text-white">Install Presusimple</CardTitle>
+                    <CardTitle className="text-2xl text-white">{t('installApp')} Presusimple</CardTitle>
                     <CardDescription className="text-slate-300">
-                      Get the full app experience with offline access and faster performance
+                      {t('getTheFullAppExperience')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-4">
-                        <h3 className="font-semibold text-white">App Benefits</h3>
+                        <h3 className="font-semibold text-white">{t('appBenefits')}</h3>
                         {pwaStatus.installBenefits.common.map((benefit, index) => (
                           <div key={index} className="flex items-center gap-3">
                             <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
@@ -327,19 +326,19 @@ export default function PWALandingPage() {
                         ))}
                       </div>
                       <div className="space-y-4">
-                        <h3 className="font-semibold text-white">Install Now</h3>
+                        <h3 className="font-semibold text-white">{t('installNow')}</h3>
                         {pwaStatus.isInstallable ? (
                           <Button
                             onClick={handleInstall}
                             className="w-full bg-white hover:bg-gray-100 text-gray-900 font-medium"
                           >
                             <Download className="h-4 w-4 mr-2" />
-                            Install App
+                            {t('installApp')}
                           </Button>
                         ) : (
                           <div className="space-y-2">
                             <p className="text-slate-300 text-sm">
-                              Look for the install option in your browser menu or follow the instructions for your device.
+                              {t('lookForInstallOption')}
                             </p>
                             <Button
                               onClick={() => setShowInstallInstructions(true)}
@@ -347,7 +346,7 @@ export default function PWALandingPage() {
                               className="w-full border-white/20 text-white hover:bg-white/10"
                             >
                               <Share className="h-4 w-4 mr-2" />
-                              Show Instructions
+                              {t('showInstructions')}
                             </Button>
                           </div>
                         )}
@@ -364,7 +363,7 @@ export default function PWALandingPage() {
         <footer className="mt-auto py-4 sm:py-8 border-t border-slate-300/50 dark:border-white/10 bg-white/5 dark:bg-white/5 backdrop-blur-sm sticky bottom-0 sm:static">
           <div className="container mx-auto px-4 text-center">
             <p className="text-slate-600 dark:text-white/60 text-xs sm:text-sm">
-              © 2025 Presusimple. All rights reserved.
+              © 2025 Presusimple. {t('allRightsReserved')}.
             </p>
           </div>
         </footer>
