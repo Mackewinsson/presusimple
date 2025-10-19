@@ -139,7 +139,7 @@ function BudgetAppContent() {
                 >
                   <AppIcon size={24} className="h-4 w-4 sm:h-6 sm:w-6" />
                   <h1 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                    Simple Budget
+                    Presusimple
                   </h1>
                 </Link>
                 <span className="text-sm sm:text-base text-slate-600 dark:text-white/70">
@@ -220,7 +220,7 @@ function BudgetAppContent() {
       <footer className="mt-auto border-t border-slate-300/50 dark:border-white/10 py-3 sm:py-4 md:py-6 bg-white/5 dark:bg-white/5 backdrop-blur-sm hidden md:block">
         <div className="container mx-auto px-4 sm:px-6">
           <p className="text-center text-xs sm:text-sm text-slate-600 dark:text-white/60">
-            &copy; {new Date().getFullYear()} Simple Budget. All rights
+            &copy; {new Date().getFullYear()} Presusimple. All rights
             reserved.
           </p>
         </div>

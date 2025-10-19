@@ -1,6 +1,6 @@
 # Web Push Notifications - Complete Guide
 
-This comprehensive guide covers everything about web push notifications in the Simple Budget PWA, including setup, implementation, troubleshooting, and best practices.
+This comprehensive guide covers everything about web push notifications in the Presusimple PWA, including setup, implementation, troubleshooting, and best practices.
 
 ## 📋 Table of Contents
 
@@ -15,7 +15,7 @@ This comprehensive guide covers everything about web push notifications in the S
 
 ## 🎯 Overview
 
-The Simple Budget PWA includes a complete web push notification system that follows industry best practices and integrates seamlessly with MongoDB for user management.
+The Presusimple PWA includes a complete web push notification system that follows industry best practices and integrates seamlessly with MongoDB for user management.
 
 ### ✅ Features
 

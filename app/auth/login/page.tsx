@@ -37,7 +37,7 @@ export default function LoginPage() {
             <div className="flex items-center justify-center gap-3 mb-2">
               <AppIcon size={24} />
               <CardTitle className="text-2xl font-bold text-white">
-                Welcome to Simple Budget
+                Welcome to Presusimple
               </CardTitle>
             </div>
             <p className="text-slate-300 text-sm">

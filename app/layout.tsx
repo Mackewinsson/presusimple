@@ -18,7 +18,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Simple Budget - Personal Finance Management",
+  title: "Presusimple - Personal Finance Management",
   description: "Track your budget and expenses with this zero-based budgeting app",
   manifest: "/manifest.json",
   icons: {
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Simple Budget",
+    title: "Presusimple",
     startupImage: [
       {
         url: "/splash/iphone-se.png",
@@ -142,7 +142,7 @@ export const metadata: Metadata = {
   other: {
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "black-translucent",
-    "apple-mobile-web-app-title": "Simple Budget",
+    "apple-mobile-web-app-title": "Presusimple",
     "mobile-web-app-capable": "yes",
     "msapplication-TileColor": "#0f172a",
     "msapplication-tap-highlight": "no",
@@ -174,7 +174,7 @@ export default function RootLayout({
         {/* iOS-specific meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Simple Budget" />
+        <meta name="apple-mobile-web-app-title" content="Presusimple" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-tap-highlight" content="no" />
@@ -187,13 +187,13 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
         <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
         <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-192x192.png" />
-        
+
         {/* Additional PWA meta tags for better iOS support */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Simple Budget" />
+        <meta name="apple-mobile-web-app-title" content="Presusimple" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="application-name" content="Simple Budget" />
+        <meta name="application-name" content="Presusimple" />
         <meta name="msapplication-TileColor" content="#0f172a" />
         <meta name="msapplication-tap-highlight" content="no" />
       </head>

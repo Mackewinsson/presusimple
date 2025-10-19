@@ -76,7 +76,7 @@ export function TrialStatus() {
       <Alert className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20 mb-6">
         <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
         <AlertDescription className="text-red-800 dark:text-red-200">
-          Your free trial has expired. Upgrade to continue using Simple Budget.
+          Your free trial has expired. Upgrade to continue using Presusimple.
         </AlertDescription>
         <Button
           onClick={handleUpgrade}

@@ -1,4 +1,4 @@
-# Simple Budget - Personal Finance Management
+# Presusimple - Personal Finance Management
 
 A modern, full-stack budget management application built with Next.js, TypeScript, and MongoDB.
 
@@ -35,7 +35,7 @@ A modern, full-stack budget management application built with Next.js, TypeScrip
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd simple-budget
+cd presusimple
 ```
 
 2. Install dependencies:

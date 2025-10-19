@@ -1,4 +1,4 @@
-// Custom Service Worker Extensions for Simple Budget PWA
+// Custom Service Worker Extensions for Presusimple PWA
 // This extends the auto-generated next-pwa service worker with notification functionality
 // Based on next-pwa web-push example: https://github.com/shadowwalker/next-pwa/tree/master/examples/web-push
 
@@ -94,7 +94,7 @@ if (!self.__SB_PUSH_WIRED__) {
       vibrate: data.vibrate ?? optionsData.vibrate ?? [200, 100, 200]
     };
 
-    const title = data.title || optionsData.title || 'Simple Budget';
+    const title = data.title || optionsData.title || 'Presusimple';
 
     console.log('📤 Showing notification:', { title, options });
 

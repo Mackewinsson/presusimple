@@ -31,7 +31,7 @@ export default function WelcomePage() {
           </div>
           <div className="flex items-center justify-center gap-3 mb-2">
             <AppIcon size={24} />
-            <h1 className="text-3xl font-bold text-white">Welcome to Simple Budget!</h1>
+            <h1 className="text-3xl font-bold text-white">Welcome to Presusimple!</h1>
           </div>
           <p className="text-lg text-slate-300 mb-6">
             Sign in to start managing your finances
@@ -59,7 +59,7 @@ export default function WelcomePage() {
         </div>
         <div className="flex items-center justify-center gap-3 mb-2">
           <AppIcon size={24} />
-          <h1 className="text-3xl font-bold text-white">Welcome to Simple Budget!</h1>
+          <h1 className="text-3xl font-bold text-white">Welcome to Presusimple!</h1>
         </div>
         <p className="text-lg text-slate-300 mb-6">
           You're all set up with your 30-day free trial. Start budgeting and take control of your finances!

@@ -4,9 +4,9 @@ const options: swaggerJSDoc.Options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Simple Budget API',
+      title: 'Presusimple API',
       version: '1.0.0',
-      description: `# Simple Budget API Documentation
+      description: `# Presusimple API Documentation
 
 A comprehensive personal finance management tool API with authentication, budget tracking, expense management, and AI-powered features.
 
@@ -68,12 +68,12 @@ This API supports two authentication methods:
 ## 🔧 Development
 
 - **Base URL**: \`http://localhost:3000\` (development)
-- **Production URL**: \`https://simple-budget.vercel.app\`
+- **Production URL**: \`https://presusimple.vercel.app\`
 - **Rate Limiting**: AI endpoints have rate limits (5-10 requests/minute)
 - **Error Handling**: Comprehensive error responses with details`,
       contact: {
-        name: 'Simple Budget API Support',
-        email: 'support@simplebudget.com',
+        name: 'Presusimple API Support',
+        email: 'support@presusimple.com',
       },
     },
     servers: [
@@ -82,7 +82,7 @@ This API supports two authentication methods:
         description: 'Development server',
       },
       {
-        url: 'https://simple-budget.vercel.app',
+        url: 'https://presusimple.vercel.app',
         description: 'Production server',
       },
     ],

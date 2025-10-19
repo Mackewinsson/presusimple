@@ -48,7 +48,7 @@ export default function AccessRestricted({
             Trial Expired
           </h2>
           <p className="text-gray-600 dark:text-gray-300 max-w-md">
-            Your free trial has ended. Upgrade to continue using Simple Budget
+            Your free trial has ended. Upgrade to continue using Presusimple
             and unlock all features.
           </p>
         </div>
@@ -83,7 +83,7 @@ export default function AccessRestricted({
             Start Your Free Trial
           </h2>
           <p className="text-gray-600 dark:text-gray-300 max-w-md">
-            Unlock all Simple Budget features with a 30-day free trial. No
+            Unlock all Presusimple features with a 30-day free trial. No
             credit card required to start.
           </p>
         </div>

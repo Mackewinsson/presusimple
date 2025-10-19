@@ -95,7 +95,7 @@ export default function SignIn() {
             <div className="flex items-center justify-center gap-4">
               <AppIcon size={32} />
               <h1 className="text-5xl font-bold text-white leading-tight">
-                Simple Budget
+                Presusimple
               </h1>
             </div>
             <p className="text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">

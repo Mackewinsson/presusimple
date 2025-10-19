@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Offline - Simple Budget',
+  title: 'Offline - Presusimple',
   description: 'You are currently offline',
 };
 

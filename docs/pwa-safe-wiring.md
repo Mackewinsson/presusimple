@@ -1,6 +1,6 @@
 # PWA Safe Wiring Implementation
 
-This document describes the safe wiring approach implemented for web push notifications in Simple Budget.
+This document describes the safe wiring approach implemented for web push notifications in Presusimple.
 
 ## Overview
 

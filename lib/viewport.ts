@@ -1,6 +1,6 @@
 /**
  * Viewport utilities for consistent mobile-first responsive design
- * across the Simple Budget PWA application
+ * across the Presusimple PWA application
  */
 
 // Viewport breakpoints matching Tailwind CSS

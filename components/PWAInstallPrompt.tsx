@@ -46,7 +46,7 @@ export default function PWAInstallPrompt() {
                 <Smartphone className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground text-lg">Install Simple Budget</h3>
+                <h3 className="font-semibold text-foreground text-lg">Install Presusimple</h3>
                 <p className="text-sm text-muted-foreground">Get quick access and offline functionality</p>
               </div>
             </div>
@@ -111,7 +111,7 @@ export default function PWAInstallPrompt() {
               <Download className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h3 className="font-semibold text-foreground text-lg">Install Simple Budget</h3>
+              <h3 className="font-semibold text-foreground text-lg">Install Presusimple</h3>
               <p className="text-sm text-muted-foreground">Get quick access and offline functionality</p>
             </div>
           </div>

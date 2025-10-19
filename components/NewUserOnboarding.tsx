@@ -16,7 +16,7 @@ export function NewUserOnboarding({ onComplete }: NewUserOnboardingProps) {
             <Crown className="h-8 w-8 text-white" />
           </span>
         </div>
-        <h1 className="text-3xl font-bold text-white mb-2">Welcome to Simple Budget!</h1>
+        <h1 className="text-3xl font-bold text-white mb-2">Welcome to Presusimple!</h1>
         <p className="text-lg text-slate-300 mb-6">
           You're all set up with your 30-day free trial. Start budgeting and take control of your finances!
         </p>

@@ -63,7 +63,7 @@ export default function PWALandingPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <AppIcon size={24} className="h-6 w-6" />
-                <h1 className="text-lg font-bold text-white">Simple Budget</h1>
+                <h1 className="text-lg font-bold text-white">Presusimple</h1>
               </div>
               <div className="flex items-center gap-2">
                 <LanguageSwitcher />
@@ -92,7 +92,7 @@ export default function PWALandingPage() {
             
             <div className="space-y-2">
               <h1 className="text-2xl font-bold text-white">
-                Install Simple Budget
+                Install Presusimple
               </h1>
               <p className="text-slate-300 text-sm">
                 Get the full app experience with offline access and faster performance
@@ -151,7 +151,7 @@ export default function PWALandingPage() {
                 <CardHeader className="text-center">
                   <CardTitle className="text-lg">Install Instructions</CardTitle>
                   <CardDescription>
-                    Follow these steps to install Simple Budget
+                    Follow these steps to install Presusimple
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -199,7 +199,7 @@ export default function PWALandingPage() {
             >
               <AppIcon size={24} className="h-4 w-4 sm:h-6 sm:w-6" />
               <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                Simple Budget
+                Presusimple
               </h1>
             </Link>
             <div className="flex items-center gap-2 sm:gap-4">
@@ -308,7 +308,7 @@ export default function PWALandingPage() {
               <div className="max-w-4xl mx-auto">
                 <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
                   <CardHeader className="text-center">
-                    <CardTitle className="text-2xl text-white">Install Simple Budget</CardTitle>
+                    <CardTitle className="text-2xl text-white">Install Presusimple</CardTitle>
                     <CardDescription className="text-slate-300">
                       Get the full app experience with offline access and faster performance
                     </CardDescription>
@@ -364,7 +364,7 @@ export default function PWALandingPage() {
         <footer className="mt-auto py-4 sm:py-8 border-t border-slate-300/50 dark:border-white/10 bg-white/5 dark:bg-white/5 backdrop-blur-sm sticky bottom-0 sm:static">
           <div className="container mx-auto px-4 text-center">
             <p className="text-slate-600 dark:text-white/60 text-xs sm:text-sm">
-              © 2025 Simple Budget. All rights reserved.
+              © 2025 Presusimple. All rights reserved.
             </p>
           </div>
         </footer>

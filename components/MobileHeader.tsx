@@ -62,9 +62,9 @@ export default function MobileHeader({
     
     if (pathname.startsWith('/budget/settings')) return t('settings');
     if (pathname.startsWith('/history')) return t('history');
-    if (pathname === '/budget') return 'Simple Budget'; // Main budget page shows app title
-    
-    return 'Simple Budget';
+    if (pathname === '/budget') return 'Presusimple'; // Main budget page shows app title
+
+    return 'Presusimple';
   };
 
   return (

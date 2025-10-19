@@ -2,7 +2,7 @@
 
 const webpush = require('web-push');
 
-console.log('🔑 Generating VAPID keys for Simple Budget...\n');
+console.log('🔑 Generating VAPID keys for Presusimple...\n');
 
 const vapidKeys = webpush.generateVAPIDKeys();
 
