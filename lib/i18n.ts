@@ -146,7 +146,7 @@ export type Locale = 'en' | 'es';
 export type TranslationKey = keyof typeof translations.en;
 
 // Context for current locale
-export const LocaleContext = createContext<Locale>('en');
+export const LocaleContext = createContext<Locale>('es');
 
 // Hook to get current locale
 export const useLocale = () => useContext(LocaleContext);

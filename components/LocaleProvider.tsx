@@ -8,7 +8,7 @@ interface LocaleProviderProps {
   initialLocale?: Locale;
 }
 
-export default function LocaleProvider({ children, initialLocale = 'en' }: LocaleProviderProps) {
+export default function LocaleProvider({ children, initialLocale = 'es' }: LocaleProviderProps) {
   const [locale, setLocale] = useState<Locale>(initialLocale);
 
   return (

@@ -200,7 +200,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ViewportOptimizer />
         <ThemeProvider>
-          <LocaleProvider initialLocale="en">
+          <LocaleProvider initialLocale="es">
             <Providers>
               <main>{children}</main>
               <PWAInstallPrompt />
