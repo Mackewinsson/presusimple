@@ -97,6 +97,10 @@ const translations = {
     showInstallInstructions: "Show Install Instructions",
     allRightsReserved: "All rights reserved",
     lookForInstallOption: "Look for the install option in your browser menu or follow the instructions for your device.",
+    addCategory: "Add Category",
+    cancel: "Cancel",
+    add: "Add",
+    willCreate: "Will Create",
   },
   es: {
     createBudget: "Crear Presupuesto",
@@ -193,6 +197,10 @@ const translations = {
     showInstallInstructions: "Mostrar Instrucciones de Instalación",
     allRightsReserved: "Todos los derechos reservados",
     lookForInstallOption: "Busca la opción de instalación en el menú de tu navegador o sigue las instrucciones para tu dispositivo.",
+    addCategory: "Agregar Categoría",
+    cancel: "Cancelar",
+    add: "Agregar",
+    willCreate: "Se Creará",
   },
 };
 

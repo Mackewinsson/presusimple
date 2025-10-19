@@ -98,7 +98,7 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
             className="h-9 sm:h-8 text-sm sm:text-base"
           >
             <X className="h-4 w-4 mr-1" />
-            Cancel
+            {t('cancel')}
           </Button>
           <Button
             type="submit"
@@ -106,7 +106,7 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
             disabled={name.trim() === "" || budgeted === ""}
             className="h-9 sm:h-8 text-sm sm:text-base"
           >
-            Add
+            {t('add')}
           </Button>
         </div>
       </form>

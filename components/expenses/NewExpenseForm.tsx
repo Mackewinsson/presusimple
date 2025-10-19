@@ -178,7 +178,7 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="category">Category</Label>
+          <Label htmlFor="category">{t('category')}</Label>
           <Select value={categoryId} onValueChange={setCategoryId}>
             <SelectTrigger>
               <SelectValue placeholder={t('selectACategory')} />

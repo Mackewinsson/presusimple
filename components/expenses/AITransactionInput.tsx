@@ -4,6 +4,7 @@ import React, { useState, useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useUserId, useCategoriesByBudget, useBudget } from "@/lib/hooks";
+import { useTranslation } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,7 +20,6 @@ import { Icon } from "@/components/ui/icon";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { AITransactionLoading } from "@/components/ui/ai-transaction-loading";
 import { useToast } from "@/hooks/use-toast";
-import { useTranslation } from "@/lib/i18n";
 
 interface ParsedTransaction {
   description: string;
@@ -52,6 +52,7 @@ interface TransactionPreviewProps {
 }
 
 const TransactionPreview = ({ transactions, missingCategories, availableBudget, availableCategories, onConfirm, onCancel, isSaving }: TransactionPreviewProps) => {
+  const { t } = useTranslation();
   const [newCategoriesToCreate, setNewCategoriesToCreate] = useState<CategoryBudget[]>([]);
   const [budgetInputs, setBudgetInputs] = useState<Record<string, number>>({});
   const [categoryChanges, setCategoryChanges] = useState<Record<number, string>>({});
@@ -170,7 +171,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                         : "bg-gradient-to-r from-slate-600 to-slate-700 text-white border-0 hover:from-slate-500 hover:to-slate-600"
                     } transition-all duration-200 transform hover:scale-105`}
                   >
-                    {isSelected ? "Will Create" : "Create Category"}
+                    {isSelected ? t('willCreate') : t('addCategory')}
                   </Button>
                 </div>
                 
