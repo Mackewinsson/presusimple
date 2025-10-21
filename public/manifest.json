@@ -1,7 +1,7 @@
 {
   "name": "Presusimple",
   "short_name": "Presusimple",
-  "description": "A simple and intuitive budget management application",
+  "description": "Presusimple - Simple and intuitive budget management",
   "theme_color": "#0f172a",
   "background_color": "#0f172a",
   "display": "standalone",

@@ -23,7 +23,7 @@ import mongoose from "mongoose";
  *                   example: "MongoDB connection successful"
  *                 database:
  *                   type: string
- *                   example: "simple-budget"
+ *                   example: "presusimple"
  *                 collections:
  *                   type: array
  *                   items:
