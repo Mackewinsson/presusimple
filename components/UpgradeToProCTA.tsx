@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, Lock, Crown } from "lucide-react";
 import { FEATURES, FeatureKey } from "@/lib/features";
+import { useTranslation } from "@/lib/i18n";
 
 interface UpgradeToProCTAProps {
   feature: FeatureKey;
@@ -11,6 +12,7 @@ interface UpgradeToProCTAProps {
 }
 
 export function UpgradeToProCTA({ feature, className = "" }: UpgradeToProCTAProps) {
+  const { t } = useTranslation();
   const featureInfo = FEATURES[feature];
 
   return (
@@ -33,11 +35,11 @@ export function UpgradeToProCTA({ feature, className = "" }: UpgradeToProCTAProp
         <div className="flex items-center justify-center gap-2">
           <Badge variant="outline" className="border-amber-500 text-amber-700 dark:text-amber-300">
             <Crown className="h-3 w-3 mr-1" />
-            Pro Feature
+            {t('proFeature')}
           </Badge>
         </div>
         <p className="text-sm text-amber-600 dark:text-amber-400">
-          Upgrade to Pro to unlock this feature and many more!
+          {t('upgradeToUnlockFeature')}
         </p>
         <Button 
           className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold"
@@ -47,7 +49,7 @@ export function UpgradeToProCTA({ feature, className = "" }: UpgradeToProCTAProp
           }}
         >
           <Sparkles className="h-4 w-4 mr-2" />
-          Upgrade to Pro
+          {t('upgradeToPro')}
         </Button>
       </CardContent>
     </Card>

@@ -43,7 +43,7 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
 
   const handleRemoveCategory = () => {
     onRemove(category._id || category.id);
-    toast.success(t("category") + " removed");
+    toast.success(t("categoryRemoved"));
   };
 
   const handleStartEdit = () => {
@@ -57,19 +57,19 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
     const budgetAmount = parseFloat(editBudgeted);
     
     if (trimmedName === "") {
-      toast.error("Please enter a " + t("category").toLowerCase() + " name");
+      toast.error(t("pleaseEnterCategoryName"));
       return;
     }
 
     if (isNaN(budgetAmount) || budgetAmount < 0) {
-      toast.error("Budgeted amount cannot be negative");
+      toast.error(t("budgetedAmountCannotBeNegative"));
       return;
     }
 
     const budgetDiff = budgetAmount - category.budgeted;
     if (budgetDiff > totalAvailable) {
       toast.error(
-        `Cannot increase budget by more than available amount (${formatMoney(
+        `${t('cannotIncreaseBudgetByMore')} (${formatMoney(
           totalAvailable,
           currentCurrency
         )})`
@@ -79,7 +79,7 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
 
     onUpdate(category._id || category.id, trimmedName, budgetAmount);
     setIsEditing(false);
-    toast.success(t("category") + " updated");
+    toast.success(t("categoryUpdated"));
   };
 
   const handleCancel = () => {
@@ -117,7 +117,7 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
                     onChange={(e) => setEditName(e.target.value)}
                     onKeyDown={handleKeyDown}
                     className="flex-1 text-sm"
-                    placeholder={t("category") + " name"}
+                    placeholder={t("categoryName")}
                     autoFocus
                   />
                 </div>
@@ -179,21 +179,21 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
                   <AlertDialogContent className="sm:max-w-md">
                     <AlertDialogHeader>
                       <AlertDialogTitle className="text-lg sm:text-xl">
-                        Delete {t("category")}
+                        {t('deleteCategory')}
                       </AlertDialogTitle>
                       <AlertDialogDescription className="text-sm sm:text-base">
-                                                  Are you sure you want to delete this {t("category").toLowerCase()}? This action cannot be undone.
+                        {t('areYouSureDeleteCategory')}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel className="text-sm sm:text-base">
-                        Cancel
+                        {t('cancel')}
                       </AlertDialogCancel>
                       <AlertDialogAction
                         onClick={handleRemoveCategory}
                         className="text-sm sm:text-base"
                       >
-                        Delete
+                        {t('delete')}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -218,7 +218,7 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
               {category.spent >= category.budgeted
                 ? `${((category.spent / category.budgeted - 1) * 100).toFixed(
                     0
-                  )}% over`
+                  )}% ${t('over')}`
                 : `${((category.spent / category.budgeted) * 100).toFixed(
                     0
                   )}%`}

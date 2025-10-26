@@ -69,8 +69,7 @@ const SubscriptionButton = () => {
         <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20">
           <Crown className="h-4 w-4 text-green-600 dark:text-green-400" />
           <AlertDescription className="text-green-800 dark:text-green-200">
-            You have an active subscription. Thank you for supporting Simple
-            Budget!
+            {t('youHaveActiveSubscription')}
           </AlertDescription>
         </Alert>
       );
@@ -95,7 +94,7 @@ const SubscriptionButton = () => {
           disabled={loading || !session?.user?.email}
           className="w-full"
         >
-          {loading ? "Redirecting..." : t('upgradeNow')}
+          {loading ? t('redirecting') : t('upgradeNow')}
         </Button>
         {error && <div className="text-red-500 text-sm">{error}</div>}
       </div>

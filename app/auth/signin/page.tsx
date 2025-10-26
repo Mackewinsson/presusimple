@@ -19,8 +19,10 @@ import {
   BarChart3
 } from "lucide-react";
 import { AppIcon } from "@/components/ui/app-icon";
+import { useTranslation } from "@/lib/i18n";
 
 export default function SignIn() {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -51,26 +53,26 @@ export default function SignIn() {
   const steps = [
     {
       icon: <Crown className="h-10 w-10 text-amber-400" />,
-      title: "Professional Budgeting",
-      description: "Enterprise-grade tools for personal finance management",
+      title: t('professionalBudgeting'),
+      description: t('enterpriseGradeTools'),
       progress: 25
     },
     {
       icon: <Sparkles className="h-10 w-10 text-purple-400" />,
-      title: "AI-Powered Insights",
-      description: "Advanced analytics and intelligent recommendations",
+      title: t('aiPoweredInsights'),
+      description: t('advancedAnalyticsAndRecommendations'),
       progress: 50
     },
     {
       icon: <TrendingUp className="h-10 w-10 text-green-400" />,
-      title: "Smart Automation",
-      description: "Automated categorization and expense tracking",
+      title: t('smartAutomation'),
+      description: t('automatedCategorizationAndTracking'),
       progress: 75
     },
     {
       icon: <Target className="h-10 w-10 text-blue-400" />,
-      title: "Ready to Transform",
-      description: "Start your journey to financial freedom today",
+      title: t('readyToTransform'),
+      description: t('startJourneyToFinancialFreedom'),
       progress: 100
     }
   ];
@@ -99,18 +101,18 @@ export default function SignIn() {
               </h1>
             </div>
             <p className="text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
-              The professional budgeting platform that transforms your financial life with AI-powered insights and enterprise-grade tools.
+              {t('professionalBudgetingPlatform')}
             </p>
           </div>
 
           <div className="flex justify-center gap-3">
             <Badge variant="outline" className="border-amber-500 text-amber-400 px-4 py-2 text-sm font-medium">
               <Crown className="h-4 w-4 mr-2" />
-              30-Day Free Trial
+              {t('thirtyDayFreeTrial')}
             </Badge>
             <Badge variant="outline" className="border-green-500 text-green-400 px-4 py-2 text-sm font-medium">
               <Shield className="h-4 w-4 mr-2" />
-              Enterprise Security
+              {t('enterpriseSecurity')}
             </Badge>
           </div>
         </div>

@@ -7,6 +7,7 @@ import { Bell, X, CheckCircle, AlertTriangle, Target } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useBudgetStatus } from '@/hooks/useBudgetStatus';
 import { useSession } from 'next-auth/react';
+import { useTranslation } from '@/lib/i18n';
 
 interface NotificationPromptProps {
   onDismiss?: () => void;
@@ -17,6 +18,7 @@ export default function NotificationPrompt({
   onDismiss, 
   showForExistingUsers = true 
 }: NotificationPromptProps) {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const { hasBudget, isLoading: budgetLoading } = useBudgetStatus();
   const {
@@ -129,7 +131,7 @@ export default function NotificationPrompt({
             <div className="flex items-center gap-2">
               <Bell className="h-5 w-5 text-blue-600" />
               <CardTitle className="text-lg text-blue-900">
-                Stay Updated! 🔔
+                {t('stayUpdated')}
               </CardTitle>
             </div>
             <Button
@@ -142,7 +144,7 @@ export default function NotificationPrompt({
             </Button>
           </div>
           <CardDescription className="text-blue-700">
-            Get notified about your budget progress and important updates
+            {t('getNotifiedDescription')}
           </CardDescription>
         </CardHeader>
         
@@ -156,7 +158,7 @@ export default function NotificationPrompt({
                 size="sm" 
                 className="mt-1"
               >
-                Clear Error
+{t('clearError')}
               </Button>
             </div>
           )}
@@ -164,15 +166,15 @@ export default function NotificationPrompt({
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm text-blue-800">
               <CheckCircle className="h-4 w-4 text-green-600" />
-              <span>Budget alerts when approaching limits</span>
+              <span>{t('budgetAlertsWhenApproaching')}</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-blue-800">
               <AlertTriangle className="h-4 w-4 text-orange-600" />
-              <span>Expense reminders and tips</span>
+              <span>{t('expenseRemindersAndTips')}</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-blue-800">
               <Target className="h-4 w-4 text-purple-600" />
-              <span>Goal achievements and milestones</span>
+              <span>{t('goalAchievementsAndMilestones')}</span>
             </div>
           </div>
 
@@ -182,14 +184,14 @@ export default function NotificationPrompt({
               disabled={isLoading}
               className="flex-1 bg-blue-600 hover:bg-blue-700"
             >
-              {isLoading ? 'Enabling...' : 'Enable Notifications'}
+              {isLoading ? t('enabling') : t('enableNotifications')}
             </Button>
             <Button 
               variant="outline" 
               onClick={handleDismiss}
               disabled={isLoading}
             >
-              Later
+              {t('later')}
             </Button>
           </div>
 
@@ -200,7 +202,7 @@ export default function NotificationPrompt({
               onClick={handleDontAskAgain}
               className="text-xs text-gray-500 hover:text-gray-700"
             >
-              Don't ask again
+              {t('dontAskAgain')}
             </Button>
           </div>
         </CardContent>

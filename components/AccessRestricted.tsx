@@ -45,11 +45,10 @@ export default function AccessRestricted({
         <div className="text-center space-y-4">
           <AlertTriangle className="h-16 w-16 text-red-500 mx-auto" />
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Trial Expired
+            {t('trialExpired')}
           </h2>
           <p className="text-gray-600 dark:text-gray-300 max-w-md">
-            Your free trial has ended. Upgrade to continue using Presusimple
-            and unlock all features.
+            {t('trialExpiredDescription')}
           </p>
         </div>
 
@@ -57,7 +56,7 @@ export default function AccessRestricted({
           <Alert className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20">
             <Lock className="h-4 w-4 text-red-600 dark:text-red-400" />
             <AlertDescription className="text-red-800 dark:text-red-200">
-              All features are currently locked. Upgrade to continue.
+              {t('allFeaturesLocked')}
             </AlertDescription>
           </Alert>
 
@@ -67,7 +66,7 @@ export default function AccessRestricted({
             className="w-full"
             size="lg"
           >
-            {loading ? "Redirecting..." : t('upgradeNow')}
+            {loading ? t('redirecting') : t('upgradeNow')}
           </Button>
         </div>
       </div>
@@ -80,11 +79,10 @@ export default function AccessRestricted({
         <div className="text-center space-y-4">
           <Crown className="h-16 w-16 text-orange-500 mx-auto" />
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Start Your Free Trial
+            {t('startYourFreeTrial')}
           </h2>
           <p className="text-gray-600 dark:text-gray-300 max-w-md">
-            Unlock all Presusimple features with a 30-day free trial. No
-            credit card required to start.
+            {t('unlockAllFeatures')}
           </p>
         </div>
 
@@ -92,7 +90,7 @@ export default function AccessRestricted({
           <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950/20">
             <Lock className="h-4 w-4 text-orange-600 dark:text-orange-400" />
             <AlertDescription className="text-orange-800 dark:text-orange-200">
-              Features are locked until you start your trial.
+              {t('featuresLockedUntilTrial')}
             </AlertDescription>
           </Alert>
 
@@ -102,7 +100,7 @@ export default function AccessRestricted({
             className="w-full"
             size="lg"
           >
-            {loading ? "Redirecting..." : "Start Free Trial"}
+            {loading ? t('redirecting') : t('startFreeTrial')}
           </Button>
         </div>
       </div>

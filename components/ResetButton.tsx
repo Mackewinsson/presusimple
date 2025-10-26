@@ -64,7 +64,7 @@ const ResetButton: React.FC<ResetButtonProps> = ({
 
   const handleReset = async () => {
     if (!budget || !userId) {
-      toast.error("No budget found to reset");
+      toast.error(t('noBudgetFoundToReset'));
       return;
     }
 
@@ -124,11 +124,11 @@ const ResetButton: React.FC<ResetButtonProps> = ({
       // Then reset the budget (clear expenses and reset spent amounts)
       await resetBudgetMutation.mutateAsync(userId);
 
-      toast.success("Current month saved and reset for a new month");
+      toast.success(t('currentMonthSavedAndReset'));
       setIsOpen(false); // Close the modal after successful reset
     } catch (error) {
       console.error("Error during reset:", error);
-      toast.error("Failed to reset budget. Please try again.");
+      toast.error(t('failedToResetBudget'));
     }
   };
 
@@ -147,30 +147,29 @@ const ResetButton: React.FC<ResetButtonProps> = ({
       <AlertDialogContent className="sm:max-w-md">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-lg sm:text-xl">
-            Save and Reset Monthly Budget
+            {t('saveAndResetMonthlyBudget')}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-sm sm:text-base">
-            This will save your current month's data and reset all spending, but
-            keep your budget categories and their assigned amounts.
+            {t('saveAndResetDescription')}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         <div className="space-y-2 py-4">
           <Label htmlFor="monthName" className="text-sm sm:text-base">
-            Month Name
+            {t('monthName')}
           </Label>
           <Input
             id="monthName"
             value={monthName}
             onChange={(e) => setMonthName(e.target.value)}
-            placeholder="Enter a name for this month"
+            placeholder={t('enterNameForMonth')}
             className="text-sm sm:text-base"
           />
         </div>
 
         <AlertDialogFooter>
           <AlertDialogCancel className="text-sm sm:text-base">
-            Cancel
+            {t('cancel')}
           </AlertDialogCancel>
           <LoadingButton
             onClick={handleReset}
@@ -180,7 +179,7 @@ const ResetButton: React.FC<ResetButtonProps> = ({
               saveMonthlyBudgetMutation.isPending
             }
           >
-            Save and Reset
+            {t('saveAndReset')}
           </LoadingButton>
         </AlertDialogFooter>
       </AlertDialogContent>
