@@ -33,7 +33,12 @@ import {
   BarChart3,
   History,
   UserCheck,
-  UserX
+  UserX,
+  Lock,
+  Eye,
+  EyeOff,
+  Search,
+  KeyRound
 } from "lucide-react";
 import { FEATURES } from "@/lib/features";
 
@@ -125,6 +130,12 @@ export default function UnifiedAdminDashboard() {
   });
   const [userData, setUserData] = useState<any>(null);
   const [subscriptionMessage, setSubscriptionMessage] = useState('');
+
+  // User Management state
+  const [userManagementEmail, setUserManagementEmail] = useState('');
+  const [userManagementData, setUserManagementData] = useState<any>(null);
+  const [resetPasswordForm, setResetPasswordForm] = useState({ newPassword: '' });
+  const [showResetPassword, setShowResetPassword] = useState(false);
 
   // Loading states
   const [loading, setLoading] = useState(false);
@@ -370,6 +381,71 @@ export default function UnifiedAdminDashboard() {
     }
   };
 
+  // User Management functions
+  const lookupUser = async () => {
+    if (!userManagementEmail) {
+      toast.error('Please enter a user email');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/users/manual-subscription?email=${encodeURIComponent(userManagementEmail)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setUserManagementData(data);
+        setResetPasswordForm({ newPassword: '' });
+      } else {
+        toast.error('User not found');
+        setUserManagementData(null);
+      }
+    } catch (error) {
+      console.error('Error looking up user:', error);
+      toast.error('Failed to look up user');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAdminResetPassword = async () => {
+    if (!resetPasswordForm.newPassword) {
+      toast.error('Please enter a new password');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch('/api/admin/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: userManagementEmail,
+          newPassword: resetPasswordForm.newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(data.message || 'Password reset successfully');
+        setResetPasswordForm({ newPassword: '' });
+        setShowResetPassword(false);
+        // Refresh user data to show updated hasPassword status
+        await lookupUser();
+      } else {
+        const errorMsg = data.details
+          ? data.details.join(', ')
+          : data.error || 'Failed to reset password';
+        toast.error(errorMsg);
+      }
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      toast.error('Failed to reset password');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (status === "loading") {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
@@ -394,12 +470,13 @@ export default function UnifiedAdminDashboard() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="feature-flags">Feature Flags</TabsTrigger>
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
-              <TabsTrigger value="static-features">Static Features</TabsTrigger>
+              <TabsTrigger value="user-management">Users</TabsTrigger>
+              <TabsTrigger value="static-features">Features</TabsTrigger>
             </TabsList>
 
             {/* Overview Tab */}
@@ -1036,6 +1113,151 @@ export default function UnifiedAdminDashboard() {
                     </div>
                   </CardContent>
                 </Card>
+              )}
+            </TabsContent>
+
+            {/* User Management Tab */}
+            <TabsContent value="user-management" className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold">User Management</h2>
+                <p className="text-muted-foreground">Look up users and manage their passwords</p>
+              </div>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Search className="h-5 w-5" />
+                    Look Up User
+                  </CardTitle>
+                  <CardDescription>
+                    Search for a user by email to view their info and manage their password
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex gap-2">
+                    <Input
+                      type="email"
+                      value={userManagementEmail}
+                      onChange={(e) => setUserManagementEmail(e.target.value)}
+                      placeholder="user@example.com"
+                      onKeyDown={(e) => e.key === 'Enter' && lookupUser()}
+                    />
+                    <Button onClick={lookupUser} disabled={loading || !userManagementEmail}>
+                      <Search className="h-4 w-4 mr-2" />
+                      Look Up
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {userManagementData && (
+                <>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>User Information</CardTitle>
+                      <CardDescription>{userManagementData.email}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                        <div>
+                          <strong>Name:</strong>
+                          <div className="text-muted-foreground">{userManagementData.name || 'N/A'}</div>
+                        </div>
+                        <div>
+                          <strong>Email:</strong>
+                          <div className="text-muted-foreground">{userManagementData.email}</div>
+                        </div>
+                        <div>
+                          <strong>Plan:</strong>
+                          <Badge variant={userManagementData.plan === 'pro' ? "default" : "secondary"} className="ml-1">
+                            {userManagementData.plan || 'free'}
+                          </Badge>
+                        </div>
+                        <div>
+                          <strong>Is Paid:</strong>
+                          <Badge variant={userManagementData.isPaid ? "default" : "secondary"} className="ml-1">
+                            {userManagementData.isPaid ? "Yes" : "No"}
+                          </Badge>
+                        </div>
+                        <div>
+                          <strong>Subscription Type:</strong>
+                          <div className="text-muted-foreground">{userManagementData.subscriptionType || 'None'}</div>
+                        </div>
+                        <div>
+                          <strong>Has Password:</strong>
+                          <Badge variant={userManagementData.password ? "default" : "secondary"} className="ml-1">
+                            {userManagementData.password ? "Yes" : "No"}
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <KeyRound className="h-5 w-5" />
+                        Reset Password
+                      </CardTitle>
+                      <CardDescription>
+                        Set or reset the password for this user (does not require their current password)
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {!showResetPassword ? (
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowResetPassword(true)}
+                        >
+                          <Lock className="h-4 w-4 mr-2" />
+                          Reset User Password
+                        </Button>
+                      ) : (
+                        <>
+                          <div className="space-y-2">
+                            <Label htmlFor="adminNewPassword">New Password</Label>
+                            <Input
+                              id="adminNewPassword"
+                              type="text"
+                              value={resetPasswordForm.newPassword}
+                              onChange={(e) => setResetPasswordForm({ newPassword: e.target.value })}
+                              placeholder="Enter new password for user"
+                            />
+                          </div>
+
+                          <div className="text-xs text-muted-foreground space-y-1">
+                            <p>Password requirements:</p>
+                            <ul className="list-disc list-inside">
+                              <li>At least 8 characters</li>
+                              <li>At least one uppercase letter</li>
+                              <li>At least one lowercase letter</li>
+                              <li>At least one number</li>
+                            </ul>
+                          </div>
+
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={handleAdminResetPassword}
+                              disabled={loading || !resetPasswordForm.newPassword}
+                            >
+                              <KeyRound className="h-4 w-4 mr-2" />
+                              {loading ? 'Resetting...' : 'Confirm Reset'}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                setShowResetPassword(false);
+                                setResetPasswordForm({ newPassword: '' });
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                    </CardContent>
+                  </Card>
+                </>
               )}
             </TabsContent>
 
