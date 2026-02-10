@@ -17,6 +17,7 @@ import { Crown, Clock, CreditCard, Calendar, LogOut, Lock, Eye, EyeOff } from 'l
 import MobileHeader from '@/components/MobileHeader';
 import SignOutButton from '@/components/SignOutButton';
 import { useViewport } from '@/hooks/useViewport';
+import { useTranslation } from '@/lib/i18n';
 import { toast } from 'sonner';
 // import BudgetTemplateSelector from '@/components/budget/BudgetTemplateSelector';
 // import SavingsGoalList from '@/components/savings/SavingsGoalList';
@@ -26,6 +27,7 @@ export default function SettingsPage() {
   const { data: subscription, isLoading: subscriptionLoading } = useUserSubscription();
   const { data: user, isLoading: userLoading } = useUserData();
   const { isMobile } = useViewport();
+  const { t } = useTranslation();
 
   // Change password state
   const [passwordForm, setPasswordForm] = useState({
@@ -48,12 +50,12 @@ export default function SettingsPage() {
     const { currentPassword, newPassword, confirmPassword } = passwordForm;
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-      toast.error('All password fields are required');
+      toast.error(t('allPasswordFieldsRequired'));
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      toast.error('New password and confirmation do not match');
+      toast.error(t('passwordsDoNotMatch'));
       return;
     }
 
@@ -68,17 +70,17 @@ export default function SettingsPage() {
       const data = await res.json();
 
       if (res.ok) {
-        toast.success(data.message || 'Password changed successfully');
+        toast.success(data.message || t('passwordChangedSuccess'));
         setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
       } else {
         const errorMsg = data.details
           ? data.details.join(', ')
-          : data.error || 'Failed to change password';
+          : data.error || t('failedToChangePassword');
         toast.error(errorMsg);
       }
     } catch (err) {
       console.error('Failed to change password:', err);
-      toast.error('Failed to change password');
+      toast.error(t('failedToChangePassword'));
     } finally {
       setPasswordLoading(false);
     }
@@ -103,13 +105,13 @@ export default function SettingsPage() {
   const getPlanBadge = () => {
     switch (subscriptionStatus) {
       case "paid":
-        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Pro Plan</Badge>;
+        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">{t('proPlan')}</Badge>;
       case "trial":
-        return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">Trial</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">{t('trial')}</Badge>;
       case "expired":
-        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">Expired</Badge>;
+        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">{t('expired')}</Badge>;
       default:
-        return <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">Free Plan</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">{t('freePlan')}</Badge>;
     }
   };
 
@@ -123,13 +125,13 @@ export default function SettingsPage() {
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm font-medium">Trial Period</span>
+          <span className="text-sm font-medium">{t('trialPeriod')}</span>
         </div>
         <div className="text-sm text-muted-foreground space-y-1">
-          <div>Start: {subscription.trialStart ? new Date(subscription.trialStart).toLocaleDateString() : 'N/A'}</div>
-          <div>End: {trialEnd.toLocaleDateString()}</div>
+          <div>{t('start')}: {subscription.trialStart ? new Date(subscription.trialStart).toLocaleDateString() : 'N/A'}</div>
+          <div>{t('end')}: {trialEnd.toLocaleDateString()}</div>
           <div className={isExpired ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'}>
-            {isExpired ? 'Expired' : `${trialDaysLeft} days remaining`}
+            {isExpired ? t('expired') : `${trialDaysLeft} ${t('daysRemaining')}`}
           </div>
         </div>
       </div>
@@ -139,7 +141,7 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
       {/* Mobile Header */}
-      <MobileHeader title="Settings" />
+      <MobileHeader title={t('settings')} />
       
       {/* Desktop Header */}
       <header className="hidden md:block border-b bg-card/80 backdrop-blur-lg sticky top-0 z-50">
@@ -150,9 +152,9 @@ export default function SettingsPage() {
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="h-5 w-5" />
-              Back to Budget
+              {t('backToBudget')}
             </Link>
-            <h1 className="text-xl sm:text-2xl font-bold">Settings</h1>
+            <h1 className="text-xl sm:text-2xl font-bold">{t('settings')}</h1>
           </div>
         </div>
       </header>
@@ -163,11 +165,11 @@ export default function SettingsPage() {
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="profile" className="flex items-center gap-2">
                 <User className="h-4 w-4" />
-                Profile
+                {t('profile')}
               </TabsTrigger>
               <TabsTrigger value="settings" className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
-                Settings
+                {t('settings')}
               </TabsTrigger>
             </TabsList>
 
@@ -176,10 +178,10 @@ export default function SettingsPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <User className="h-5 w-5" />
-                    Account Information
+                    {t('accountInformation')}
                   </CardTitle>
                   <CardDescription>
-                    Your account details and subscription status
+                    {t('accountDetailsAndSubscription')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -195,7 +197,7 @@ export default function SettingsPage() {
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className="font-medium">{session?.user?.name || 'User'}</div>
+                            <div className="font-medium">{session?.user?.name || t('unknown')}</div>
                             <div className="text-sm text-muted-foreground">{session?.user?.email}</div>
                           </div>
                           {getPlanBadge()}
@@ -206,23 +208,23 @@ export default function SettingsPage() {
                       <div className="space-y-4">
                         <div className="flex items-center gap-2">
                           <CreditCard className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm font-medium">Subscription Details</span>
+                          <span className="text-sm font-medium">{t('subscriptionDetails')}</span>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                           <div>
-                            <span className="font-medium">Status:</span>
+                            <span className="font-medium">{t('status')}:</span>
                             <div className="text-muted-foreground capitalize">{subscriptionStatus}</div>
                           </div>
                           <div>
-                            <span className="font-medium">Plan:</span>
+                            <span className="font-medium">{t('plan')}:</span>
                             <div className="text-muted-foreground">
-                              {subscription?.isPaid ? 'Pro' : 'Free'}
+                              {subscription?.isPaid ? t('pro') : t('free')}
                             </div>
                           </div>
                           {subscription?.stripeCustomerId && (
                             <div>
-                              <span className="font-medium">Customer ID:</span>
+                              <span className="font-medium">{t('customerId')}:</span>
                               <div className="text-muted-foreground font-mono text-xs">
                                 {subscription.stripeCustomerId}
                               </div>
@@ -230,7 +232,7 @@ export default function SettingsPage() {
                           )}
                           {subscription?.stripeSubscriptionId && (
                             <div>
-                              <span className="font-medium">Subscription ID:</span>
+                              <span className="font-medium">{t('subscriptionId')}:</span>
                               <div className="text-muted-foreground font-mono text-xs">
                                 {subscription.stripeSubscriptionId}
                               </div>
@@ -246,7 +248,7 @@ export default function SettingsPage() {
                           <div className="pt-4">
                             <Button onClick={handleUpgrade} className="w-full">
                               <Crown className="h-4 w-4 mr-2" />
-                              Upgrade to Pro
+                              {t('upgradeToPro')}
                             </Button>
                           </div>
                         )}
@@ -255,7 +257,7 @@ export default function SettingsPage() {
                         <div className="pt-6 border-t border-border">
                           <div className="flex items-center gap-2 mb-3">
                             <LogOut className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">Account Actions</span>
+                            <span className="text-sm font-medium">{t('accountActions')}</span>
                           </div>
                           <SignOutButton 
                             variant="outline" 
@@ -277,22 +279,22 @@ export default function SettingsPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Lock className="h-5 w-5" />
-                    Change Password
+                    {t('changePassword')}
                   </CardTitle>
                   <CardDescription>
-                    Update your account password for mobile login
+                    {t('updatePasswordDescription')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="currentPassword">Current Password</Label>
+                    <Label htmlFor="currentPassword">{t('currentPassword')}</Label>
                     <div className="relative">
                       <Input
                         id="currentPassword"
                         type={showCurrentPassword ? 'text' : 'password'}
                         value={passwordForm.currentPassword}
                         onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                        placeholder="Enter current password"
+                        placeholder={t('enterCurrentPassword')}
                       />
                       <Button
                         type="button"
@@ -307,14 +309,14 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="newPassword">New Password</Label>
+                    <Label htmlFor="newPassword">{t('newPassword')}</Label>
                     <div className="relative">
                       <Input
                         id="newPassword"
                         type={showNewPassword ? 'text' : 'password'}
                         value={passwordForm.newPassword}
                         onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                        placeholder="Enter new password"
+                        placeholder={t('enterNewPassword')}
                       />
                       <Button
                         type="button"
@@ -329,14 +331,14 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                    <Label htmlFor="confirmPassword">{t('confirmNewPassword')}</Label>
                     <div className="relative">
                       <Input
                         id="confirmPassword"
                         type={showConfirmPassword ? 'text' : 'password'}
                         value={passwordForm.confirmPassword}
                         onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                        placeholder="Confirm new password"
+                        placeholder={t('confirmNewPasswordPlaceholder')}
                       />
                       <Button
                         type="button"
@@ -351,12 +353,12 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="text-xs text-muted-foreground space-y-1">
-                    <p>Password requirements:</p>
+                    <p>{t('passwordRequirements')}</p>
                     <ul className="list-disc list-inside">
-                      <li>At least 8 characters</li>
-                      <li>At least one uppercase letter</li>
-                      <li>At least one lowercase letter</li>
-                      <li>At least one number</li>
+                      <li>{t('passwordMinChars')}</li>
+                      <li>{t('passwordUppercase')}</li>
+                      <li>{t('passwordLowercase')}</li>
+                      <li>{t('passwordNumber')}</li>
                     </ul>
                   </div>
 
@@ -366,7 +368,7 @@ export default function SettingsPage() {
                     className="w-full"
                   >
                     <Lock className="h-4 w-4 mr-2" />
-                    {passwordLoading ? 'Changing Password...' : 'Change Password'}
+                    {passwordLoading ? t('changingPassword') : t('changePassword')}
                   </Button>
                 </CardContent>
               </Card>
@@ -376,16 +378,16 @@ export default function SettingsPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Settings className="h-5 w-5" />
-                    Application Settings
+                    {t('applicationSettings')}
                   </CardTitle>
                   <CardDescription>
-                    Configure your budget and application preferences
+                    {t('configurePreferences')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="text-center py-8 text-muted-foreground">
                     <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>More settings features coming soon...</p>
+                    <p>{t('moreSettingsComingSoon')}</p>
                   </div>
                   
                   {/* Future settings will go here */}
@@ -397,7 +399,7 @@ export default function SettingsPage() {
                     <div className="pt-6 border-t border-border">
                       <div className="flex items-center gap-2 mb-3">
                         <LogOut className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">Account</span>
+                        <span className="text-sm font-medium">{t('account')}</span>
                       </div>
                       <SignOutButton 
                         variant="outline" 

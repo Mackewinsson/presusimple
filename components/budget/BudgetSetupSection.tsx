@@ -712,7 +712,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                   )}
                 </div>
                 <div className="text-xs sm:text-sm text-slate-600 dark:text-white/60">
-                  Total Budget (click to edit)
+                  Total Budget (clic para editar)
                 </div>
               </div>
             )}
@@ -722,7 +722,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div className="p-3 sm:p-4 rounded-xl bg-slate-900/10 dark:bg-white/10 backdrop-blur-sm border border-slate-900/20 dark:border-white/20">
             <div className="text-xs sm:text-sm text-slate-600 dark:text-white/60">
-              Budgeted
+              {t('budgeted')}
             </div>
             <div className="text-base sm:text-lg font-medium mt-1 text-slate-900 dark:text-white">
               {formatMoney(calculatedTotalBudgeted, currency)}
@@ -730,7 +730,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
           </div>
           <div className="p-3 sm:p-4 rounded-xl bg-slate-900/10 dark:bg-white/10 backdrop-blur-sm border border-slate-900/20 dark:border-white/20">
             <div className="text-xs sm:text-sm text-slate-600 dark:text-white/60">
-              Available to Budget
+              {t('availableToBudget')}
             </div>
             <div className="text-base sm:text-lg font-medium mt-1 text-slate-900 dark:text-white">
               {formatMoney(budget?.totalAvailable || 0, currency)}
@@ -759,7 +759,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                 <Icon size={24} className="h-5 w-5 sm:h-6 sm:w-6 text-slate-900 dark:text-white" />
               </div>
               <p className="text-sm sm:text-base text-slate-700 dark:text-white/70">
-                No categories yet. Add your first category below.
+                {t('noBudgetSections')}
               </p>
             </div>
           )}

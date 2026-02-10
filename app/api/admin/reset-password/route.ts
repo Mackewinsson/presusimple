@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user?.email) {
       return NextResponse.json(
-        { error: "Authentication required" },
+        { error: "Autenticación requerida" },
         { status: 401 }
       );
     }
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     // Check admin authorization
     if (!AUTHORIZED_ADMINS.includes(session.user.email)) {
       return NextResponse.json(
-        { error: "Access denied. Admin privileges required." },
+        { error: "Acceso denegado. Se requieren privilegios de administrador." },
         { status: 403 }
       );
     }
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     if (!email || !newPassword) {
       return NextResponse.json(
-        { error: "User email and new password are required" },
+        { error: "El correo del usuario y la nueva contraseña son requeridos" },
         { status: 400 }
       );
     }
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     const passwordValidation = validatePassword(newPassword);
     if (!passwordValidation.isValid) {
       return NextResponse.json(
-        { error: "Password validation failed", details: passwordValidation.errors },
+        { error: "La validación de contraseña falló", details: passwordValidation.errors },
         { status: 400 }
       );
     }
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: "User not found" },
+        { error: "Usuario no encontrado" },
         { status: 404 }
       );
     }
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     await user.save();
 
     return NextResponse.json({
-      message: `Password reset successfully for ${email}`,
+      message: `Contraseña restablecida exitosamente para ${email}`,
       user: {
         id: user._id.toString(),
         email: user.email,
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Admin reset password error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Error interno del servidor" },
       { status: 500 }
     );
   }

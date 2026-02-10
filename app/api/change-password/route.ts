@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user?.email) {
       return NextResponse.json(
-        { error: "Authentication required. Please log in first." },
+        { error: "Autenticación requerida. Por favor inicia sesión primero." },
         { status: 401 }
       );
     }
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     // Validate required fields
     if (!currentPassword || !newPassword || !confirmPassword) {
       return NextResponse.json(
-        { error: "Current password, new password, and confirmation are required" },
+        { error: "La contraseña actual, nueva contraseña y confirmación son requeridas" },
         { status: 400 }
       );
     }
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     // Check passwords match
     if (newPassword !== confirmPassword) {
       return NextResponse.json(
-        { error: "New password and confirmation do not match" },
+        { error: "La nueva contraseña y la confirmación no coinciden" },
         { status: 400 }
       );
     }
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     const passwordValidation = validatePassword(newPassword);
     if (!passwordValidation.isValid) {
       return NextResponse.json(
-        { error: "Password validation failed", details: passwordValidation.errors },
+        { error: "La validación de contraseña falló", details: passwordValidation.errors },
         { status: 400 }
       );
     }
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: "User not found" },
+        { error: "Usuario no encontrado" },
         { status: 404 }
       );
     }
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     // User must have a password set to change it
     if (!user.password) {
       return NextResponse.json(
-        { error: "No password set for this account. Please set up a password first." },
+        { error: "No hay contraseña configurada para esta cuenta. Por favor configura una contraseña primero." },
         { status: 400 }
       );
     }
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     const isCurrentPasswordValid = await comparePassword(currentPassword, user.password);
     if (!isCurrentPasswordValid) {
       return NextResponse.json(
-        { error: "Current password is incorrect" },
+        { error: "La contraseña actual es incorrecta" },
         { status: 403 }
       );
     }
@@ -83,12 +83,12 @@ export async function POST(request: NextRequest) {
     await user.save();
 
     return NextResponse.json({
-      message: "Password changed successfully",
+      message: "Contraseña cambiada exitosamente",
     });
   } catch (error) {
     console.error("Change password error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Error interno del servidor" },
       { status: 500 }
     );
   }

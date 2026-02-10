@@ -384,7 +384,7 @@ export default function UnifiedAdminDashboard() {
   // User Management functions
   const lookupUser = async () => {
     if (!userManagementEmail) {
-      toast.error('Please enter a user email');
+      toast.error('Por favor ingresa un correo electrónico');
       return;
     }
 
@@ -396,12 +396,12 @@ export default function UnifiedAdminDashboard() {
         setUserManagementData(data);
         setResetPasswordForm({ newPassword: '' });
       } else {
-        toast.error('User not found');
+        toast.error('Usuario no encontrado');
         setUserManagementData(null);
       }
     } catch (error) {
       console.error('Error looking up user:', error);
-      toast.error('Failed to look up user');
+      toast.error('Error al buscar usuario');
     } finally {
       setLoading(false);
     }
@@ -409,7 +409,7 @@ export default function UnifiedAdminDashboard() {
 
   const handleAdminResetPassword = async () => {
     if (!resetPasswordForm.newPassword) {
-      toast.error('Please enter a new password');
+      toast.error('Por favor ingresa una nueva contraseña');
       return;
     }
 
@@ -427,7 +427,7 @@ export default function UnifiedAdminDashboard() {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success(data.message || 'Password reset successfully');
+        toast.success(data.message || 'Contraseña restablecida exitosamente');
         setResetPasswordForm({ newPassword: '' });
         setShowResetPassword(false);
         // Refresh user data to show updated hasPassword status
@@ -435,12 +435,12 @@ export default function UnifiedAdminDashboard() {
       } else {
         const errorMsg = data.details
           ? data.details.join(', ')
-          : data.error || 'Failed to reset password';
+          : data.error || 'Error al restablecer contraseña';
         toast.error(errorMsg);
       }
     } catch (error) {
       console.error('Error resetting password:', error);
-      toast.error('Failed to reset password');
+      toast.error('Error al restablecer contraseña');
     } finally {
       setLoading(false);
     }
@@ -475,8 +475,8 @@ export default function UnifiedAdminDashboard() {
               <TabsTrigger value="feature-flags">Feature Flags</TabsTrigger>
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
-              <TabsTrigger value="user-management">Users</TabsTrigger>
-              <TabsTrigger value="static-features">Features</TabsTrigger>
+              <TabsTrigger value="user-management">Usuarios</TabsTrigger>
+              <TabsTrigger value="static-features">Funciones</TabsTrigger>
             </TabsList>
 
             {/* Overview Tab */}
@@ -1119,18 +1119,18 @@ export default function UnifiedAdminDashboard() {
             {/* User Management Tab */}
             <TabsContent value="user-management" className="space-y-6">
               <div>
-                <h2 className="text-2xl font-bold">User Management</h2>
-                <p className="text-muted-foreground">Look up users and manage their passwords</p>
+                <h2 className="text-2xl font-bold">Gestión de Usuarios</h2>
+                <p className="text-muted-foreground">Buscar usuarios y gestionar sus contraseñas</p>
               </div>
 
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Search className="h-5 w-5" />
-                    Look Up User
+                    Buscar Usuario
                   </CardTitle>
                   <CardDescription>
-                    Search for a user by email to view their info and manage their password
+                    Busca un usuario por correo electrónico para ver su información y gestionar su contraseña
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -1139,12 +1139,12 @@ export default function UnifiedAdminDashboard() {
                       type="email"
                       value={userManagementEmail}
                       onChange={(e) => setUserManagementEmail(e.target.value)}
-                      placeholder="user@example.com"
+                      placeholder="usuario@ejemplo.com"
                       onKeyDown={(e) => e.key === 'Enter' && lookupUser()}
                     />
                     <Button onClick={lookupUser} disabled={loading || !userManagementEmail}>
                       <Search className="h-4 w-4 mr-2" />
-                      Look Up
+                      Buscar
                     </Button>
                   </div>
                 </CardContent>
@@ -1154,39 +1154,39 @@ export default function UnifiedAdminDashboard() {
                 <>
                   <Card>
                     <CardHeader>
-                      <CardTitle>User Information</CardTitle>
+                      <CardTitle>Información del Usuario</CardTitle>
                       <CardDescription>{userManagementData.email}</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                         <div>
-                          <strong>Name:</strong>
+                          <strong>Nombre:</strong>
                           <div className="text-muted-foreground">{userManagementData.name || 'N/A'}</div>
                         </div>
                         <div>
-                          <strong>Email:</strong>
+                          <strong>Correo:</strong>
                           <div className="text-muted-foreground">{userManagementData.email}</div>
                         </div>
                         <div>
                           <strong>Plan:</strong>
                           <Badge variant={userManagementData.plan === 'pro' ? "default" : "secondary"} className="ml-1">
-                            {userManagementData.plan || 'free'}
+                            {userManagementData.plan || 'gratuito'}
                           </Badge>
                         </div>
                         <div>
-                          <strong>Is Paid:</strong>
+                          <strong>Es Pago:</strong>
                           <Badge variant={userManagementData.isPaid ? "default" : "secondary"} className="ml-1">
-                            {userManagementData.isPaid ? "Yes" : "No"}
+                            {userManagementData.isPaid ? "Sí" : "No"}
                           </Badge>
                         </div>
                         <div>
-                          <strong>Subscription Type:</strong>
-                          <div className="text-muted-foreground">{userManagementData.subscriptionType || 'None'}</div>
+                          <strong>Tipo de Suscripción:</strong>
+                          <div className="text-muted-foreground">{userManagementData.subscriptionType || 'Ninguno'}</div>
                         </div>
                         <div>
-                          <strong>Has Password:</strong>
+                          <strong>Tiene Contraseña:</strong>
                           <Badge variant={userManagementData.password ? "default" : "secondary"} className="ml-1">
-                            {userManagementData.password ? "Yes" : "No"}
+                            {userManagementData.password ? "Sí" : "No"}
                           </Badge>
                         </div>
                       </div>
@@ -1197,10 +1197,10 @@ export default function UnifiedAdminDashboard() {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <KeyRound className="h-5 w-5" />
-                        Reset Password
+                        Restablecer Contraseña
                       </CardTitle>
                       <CardDescription>
-                        Set or reset the password for this user (does not require their current password)
+                        Establecer o restablecer la contraseña de este usuario (no requiere su contraseña actual)
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -1210,28 +1210,28 @@ export default function UnifiedAdminDashboard() {
                           onClick={() => setShowResetPassword(true)}
                         >
                           <Lock className="h-4 w-4 mr-2" />
-                          Reset User Password
+                          Restablecer Contraseña del Usuario
                         </Button>
                       ) : (
                         <>
                           <div className="space-y-2">
-                            <Label htmlFor="adminNewPassword">New Password</Label>
+                            <Label htmlFor="adminNewPassword">Nueva Contraseña</Label>
                             <Input
                               id="adminNewPassword"
                               type="text"
                               value={resetPasswordForm.newPassword}
                               onChange={(e) => setResetPasswordForm({ newPassword: e.target.value })}
-                              placeholder="Enter new password for user"
+                              placeholder="Ingresa la nueva contraseña para el usuario"
                             />
                           </div>
 
                           <div className="text-xs text-muted-foreground space-y-1">
-                            <p>Password requirements:</p>
+                            <p>Requisitos de contraseña:</p>
                             <ul className="list-disc list-inside">
-                              <li>At least 8 characters</li>
-                              <li>At least one uppercase letter</li>
-                              <li>At least one lowercase letter</li>
-                              <li>At least one number</li>
+                              <li>Al menos 8 caracteres</li>
+                              <li>Al menos una letra mayúscula</li>
+                              <li>Al menos una letra minúscula</li>
+                              <li>Al menos un número</li>
                             </ul>
                           </div>
 
@@ -1241,7 +1241,7 @@ export default function UnifiedAdminDashboard() {
                               disabled={loading || !resetPasswordForm.newPassword}
                             >
                               <KeyRound className="h-4 w-4 mr-2" />
-                              {loading ? 'Resetting...' : 'Confirm Reset'}
+                              {loading ? 'Restableciendo...' : 'Confirmar Restablecimiento'}
                             </Button>
                             <Button
                               variant="outline"
@@ -1250,7 +1250,7 @@ export default function UnifiedAdminDashboard() {
                                 setResetPasswordForm({ newPassword: '' });
                               }}
                             >
-                              Cancel
+                              Cancelar
                             </Button>
                           </div>
                         </>

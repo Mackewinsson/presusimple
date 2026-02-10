@@ -203,7 +203,6 @@
   }
   
   html {
-    overflow-x: hidden;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
     scroll-behavior: smooth;
@@ -219,9 +218,13 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Prevent horizontal scrolling and ensure proper box model */
-  * {
+  /* Prevent media elements from overflowing their containers */
+  img, video, svg, canvas, iframe {
     max-width: 100%;
+  }
+
+  /* Ensure proper box model */
+  * {
     box-sizing: border-box;
   }
 
