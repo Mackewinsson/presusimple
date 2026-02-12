@@ -4,16 +4,33 @@ Guidance for AI coding assistants working on the Presusimple codebase.
 
 ---
 
+## Quick Reference
+
+| Task | Location / Command |
+|------|-------------------|
+| Add API route | `app/api/[resource]/route.ts` → `lib/api.ts` → `lib/hooks/use*Queries.ts` |
+| Add page | `app/[route]/page.tsx` |
+| Add translation | `lib/i18n.ts` (add key to `translations.en` and `translations.es`) |
+| Add feature flag | `lib/features.ts` + `lib/userAccess.ts` (hasAccess) |
+| Run tests | `npm test` |
+| Type check | `npm run type-check` |
+| Path alias | Use `@/` for imports from project root |
+
+---
+
 ## Project Overview
 
 **Presusimple** is a personal finance management web application built with:
-- **Framework**: Next.js 15, React 18
+- **Framework**: Next.js 15, React 18 (App Router)
 - **Language**: TypeScript
 - **Database**: MongoDB with Mongoose
 - **Auth**: NextAuth.js (Google OAuth, credentials)
 - **Styling**: Tailwind CSS, Radix UI (shadcn/ui)
 - **State/Data**: TanStack React Query
 - **Payments**: Stripe
+- **i18n**: `lib/i18n.ts` (en/es, `useTranslation()`, `useLocale()`)
+- **PWA**: next-pwa, `lib/pwa-utils.ts`, `worker/`
+- **Feature flags**: `lib/features.ts`, `lib/userAccess.ts`
 
 ---
 
@@ -31,7 +48,7 @@ Guidance for AI coding assistants working on the Presusimple codebase.
 | `hooks/` | Feature-specific hooks (PWA, notifications, etc.) |
 | `types/` | TypeScript declarations |
 | `__tests__/` | Jest tests (unit, API) |
-| `docs/` | Feature documentation (auth, PWA, notifications, etc.) |
+| `docs/` | Feature docs (auth, PWA, notifications, etc.) |
 
 ---
 
@@ -66,6 +83,7 @@ The project enforces strict code quality. See `.cursor/rules/rule.mdc` for full 
 - **Hooks**: `lib/hooks/*`, `hooks/*`
 - **Models**: `models/*.ts`
 - **Auth**: `lib/auth.ts`, `lib/auth-middleware.ts`, `lib/jwt.ts`
+- **i18n**: `lib/i18n.ts` (add keys to both `en` and `es`)
 
 **Required steps**: Identify dependencies, explain impact, get confirmation before proceeding.
 
@@ -79,18 +97,57 @@ The project enforces strict code quality. See `.cursor/rules/rule.mdc` for full 
 
 ---
 
+## Auth Patterns
+
+Two auth mechanisms exist:
+
+| Context | Method | Usage |
+|---------|--------|-------|
+| **Web (cookie)** | `getServerSession(authOptions)` | Most routes: notifications, monthly-budgets, admin, users/currency |
+| **Mobile/API (JWT)** | `requireAuth(request)` from `lib/auth-middleware.ts` | Bearer token in `Authorization` header |
+
+**Note**: Core CRUD routes (`/api/budgets`, `/api/expenses`, `/api/categories`) accept `userId` as a query/body param. Auth is enforced at the page/layout level; the client supplies the session-derived userId.
+
+---
+
+## Data Flow & React Query
+
+1. **API client**: `lib/api.ts` – fetch wrappers for each resource.
+2. **React Query hooks**: `lib/hooks/use*Queries.ts` – use `useQuery`/`useMutation` with typed query keys.
+3. **Components**: Import hooks; never call `lib/api.ts` directly from components.
+
+### Query Key Pattern
+
+```ts
+export const expenseKeys = {
+  all: ["expenses"] as const,
+  lists: () => [...expenseKeys.all, "list"] as const,
+  list: (userId: string) => [...expenseKeys.lists(), userId] as const,
+  details: () => [...expenseKeys.all, "detail"] as const,
+  detail: (id: string) => [...expenseKeys.details(), id] as const,
+};
+```
+
+### Mutation Invalidation
+
+Expense mutations invalidate: `expenseKeys.lists()`, `["categories"]`, `["budgets"]`. Follow this pattern for related data.
+
+---
+
 ## Key Shared Modules
 
 | Module | Purpose | Dependencies |
 |--------|---------|--------------|
 | `lib/mongoose.ts` | MongoDB connection | Used by all API routes |
 | `lib/auth.ts` | NextAuth config | Sessions, providers |
-| `lib/auth-middleware.ts` | Route protection | Auth state |
-| `lib/userAccess.ts` | User/tenant access | Budgets, expenses |
+| `lib/auth-middleware.ts` | JWT auth for mobile/API | Bearer tokens |
+| `lib/features.ts` | Feature flag definitions | FEATURES, FeatureKey |
+| `lib/userAccess.ts` | Plan/feature access (hasAccess, getUserPlan) | IUser, FEATURES |
 | `lib/hooks/useUserId.ts` | Current user ID | Many components |
 | `lib/hooks/useExpenseQueries.ts` | Expense CRUD | ExpenseList, forms |
 | `lib/hooks/useBudgetQueries.ts` | Budget CRUD | Budget pages |
 | `lib/utils/formatMoney.ts` | Money formatting | Summary, lists |
+| `lib/i18n.ts` | Translations (en/es) | useTranslation, useLocale |
 
 ---
 
@@ -101,6 +158,52 @@ The project enforces strict code quality. See `.cursor/rules/rule.mdc` for full 
 - **Resources**: `/api/budgets`, `/api/expenses`, `/api/categories`, `/api/monthly-budgets`
 - **Admin**: `/api/admin/features`, `/api/admin/notifications`
 - **Docs**: Swagger at `/api-docs`, spec at `/api/swagger`
+
+**Swagger**: Add JSDoc `@swagger` comments to route handlers for API documentation.
+
+---
+
+## How to Add...
+
+### New API endpoint
+
+1. Create `app/api/[resource]/route.ts` (or add to existing).
+2. Call `dbConnect()` at route start.
+3. For protected routes: use `getServerSession(authOptions)` from `lib/auth` (web) or `requireAuth(request)` (JWT).
+4. Add `@swagger` JSDoc for docs.
+5. Add fetch function in `lib/api.ts`.
+6. Add React Query hook in `lib/hooks/use*Queries.ts` with proper query keys and invalidation.
+
+### New page
+
+1. Create `app/[route]/page.tsx`.
+2. Use `useUserId()` and existing hooks for data.
+3. Add translations in `lib/i18n.ts` if needed.
+
+### New translation key
+
+1. Add key to `translations.en` and `translations.es` in `lib/i18n.ts`.
+2. Use `useTranslation().t("key")` in components.
+
+---
+
+## Common Pitfalls
+
+- **Forgetting `dbConnect()`** – All API routes that touch MongoDB must call `await dbConnect()`.
+- **Wrong auth** – Use `getServerSession` for web; `requireAuth` for JWT. Don’t mix them.
+- **Missing invalidation** – Mutations that affect related data (e.g. expenses → categories) must invalidate those query keys.
+- **Hardcoded strings** – Use `lib/i18n.ts` for user-facing text.
+- **Editing shared modules** – Check usages first; avoid breaking callers.
+
+---
+
+## Don’t
+
+- Don’t call `lib/api.ts` directly from components; use `lib/hooks/*` React Query hooks.
+- Don’t add inline magic strings; extract to constants or i18n.
+- Don’t modify `lib/userAccess.ts` or `lib/features.ts` without understanding feature flag usage.
+- Don’t skip `getServerSession`/`requireAuth` on routes that should be protected.
+- Don’t forget to add `@swagger` docs for new API endpoints.
 
 ---
 
