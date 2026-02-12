@@ -45,3 +45,4 @@ export {
   type Currency,
 } from "./useCurrencyQueries";
 export { useAccessControl } from "./useAccessControl";
+export { useStreak } from "./useStreak";

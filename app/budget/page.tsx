@@ -38,6 +38,7 @@ import { Suspense } from "react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useTranslation } from "@/lib/i18n";
 import MobileHeader from "@/components/MobileHeader";
+import { StreakWidget } from "@/components/streak/StreakWidget";
 
 import { useState } from "react";
 
@@ -148,6 +149,7 @@ function BudgetAppContent() {
                 </span>
               </div>
               <div className="flex items-center gap-2 sm:gap-4">
+                <StreakWidget />
                 <LanguageSwitcher />
                 <ThemeToggle />
                 <SignOutButton

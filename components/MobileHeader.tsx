@@ -6,6 +6,7 @@ import { useViewport } from "@/hooks/useViewport";
 import { useTranslation } from "@/lib/i18n";
 import { ArrowLeft, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { StreakWidget } from "@/components/streak/StreakWidget";
 
 interface MobileHeaderProps {
   title?: string;
@@ -97,15 +98,18 @@ export default function MobileHeader({
           </h1>
         )}
         
-        {/* Home button for quick access to main budget page */}
-        {pathname !== '/budget' && !pathname.startsWith('/budget/') && (
-          <Link
-            href="/budget"
-            className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-          >
-            <Home className="h-4 w-4 text-slate-700 dark:text-slate-300" />
-          </Link>
-        )}
+        <div className="flex items-center gap-2">
+          {pathname === '/budget' && <StreakWidget />}
+          {/* Home button for quick access to main budget page */}
+          {pathname !== '/budget' && !pathname.startsWith('/budget/') && (
+            <Link
+              href="/budget"
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            >
+              <Home className="h-4 w-4 text-slate-700 dark:text-slate-300" />
+            </Link>
+          )}
+        </div>
       </div>
     </header>
   );
