@@ -16,7 +16,6 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { useSession } from "next-auth/react";
 import { useUserId, useCreateExpense } from "@/lib/hooks";
-import { LoadingButton } from "@/components/ui/loading-skeleton";
 import { useTranslation } from "@/lib/i18n";
 
 interface Budget {
@@ -208,14 +207,25 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
         </div>
       </div>
 
-      <LoadingButton
+      <Button
         type="submit"
-        className="w-full"
-        loading={createExpenseMutation.isPending}
+        variant="default"
+        size="lg"
+        className="w-full font-semibold shadow-md hover:shadow-lg transition-shadow"
+        disabled={createExpenseMutation.isPending}
       >
-        <Plus className="h-4 w-4 mr-2" />
-        {t('addTransaction')}
-      </LoadingButton>
+        {createExpenseMutation.isPending ? (
+          <>
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2" />
+            {t('addTransaction')}
+          </>
+        ) : (
+          <>
+            <Plus className="h-4 w-4 mr-2" />
+            {t('addTransaction')}
+          </>
+        )}
+      </Button>
     </form>
   );
 };

@@ -87,37 +87,78 @@ export function SpendingChart({
 
   const datasets = [];
 
-  // Add budgeted dataset if requested
   if (showBudgeted) {
+    // Stacked single-bar pattern:
+    // Bottom (colored) = spent amount
+    // Top (gray) = remaining budget (budgeted - spent)
+    // Total bar height = budgeted amount
+
+    // 1. Spent – colored portion at the bottom of the bar
     datasets.push({
-      label: 'Budgeted',
-      data: chartData.map(item => item.budgeted),
-      backgroundColor: currentTheme === 'dark' ? '#374151' : '#E5E7EB',
-      borderColor: currentTheme === 'dark' ? '#6B7280' : '#9CA3AF',
-      borderWidth: 2,
-      borderRadius: 6,
+      label: 'Gastado',
+      data: chartData.map(item => Math.min(item.spent, item.budgeted)),
+      backgroundColor: chartData.map((item, index) =>
+        item.overBudget
+          ? '#EF4444'
+          : getChartColors(index)
+      ),
+      borderColor: 'transparent',
+      borderWidth: 0,
+      borderRadius: 0, // flat top where it meets the gray portion
+      borderSkipped: false, // round the bottom
+      barPercentage: 0.5,
+      categoryPercentage: 0.75,
+      stack: 'budget',
+    });
+
+    // 2. Remaining – gray portion on top (budget minus spent)
+    datasets.push({
+      label: 'Restante',
+      data: chartData.map(item => Math.max(0, item.budgeted - item.spent)),
+      backgroundColor: currentTheme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)',
+      borderColor: 'transparent',
+      borderWidth: 0,
+      borderRadius: { topLeft: 12, topRight: 12, bottomLeft: 0, bottomRight: 0 },
       borderSkipped: false,
+      barPercentage: 0.5,
+      categoryPercentage: 0.75,
+      stack: 'budget',
+    });
+
+    // 3. Over-budget portion (if spent > budgeted, show the excess in red on top)
+    const hasOverBudget = chartData.some(item => item.overBudget);
+    if (hasOverBudget) {
+      datasets.push({
+        label: 'Excedido',
+        data: chartData.map(item => item.overBudget ? item.spent - item.budgeted : 0),
+        backgroundColor: 'rgba(239, 68, 68, 0.4)',
+        borderColor: 'transparent',
+        borderWidth: 0,
+        borderRadius: { topLeft: 12, topRight: 12, bottomLeft: 0, bottomRight: 0 },
+        borderSkipped: false,
+        barPercentage: 0.5,
+        categoryPercentage: 0.75,
+        stack: 'budget',
+      });
+    }
+  } else {
+    // Single bar mode (no budgeted background) – just show spent
+    datasets.push({
+      label: 'Gastado',
+      data: chartData.map(item => item.spent),
+      backgroundColor: chartData.map((item, index) =>
+        item.overBudget
+          ? '#EF4444'
+          : getChartColors(index)
+      ),
+      borderColor: 'transparent',
+      borderWidth: 0,
+      borderRadius: 12,
+      borderSkipped: false,
+      barPercentage: 0.5,
+      categoryPercentage: 0.75,
     });
   }
-
-  // Add spent dataset
-  datasets.push({
-    label: 'Spent',
-    data: chartData.map(item => item.spent),
-    backgroundColor: chartData.map((item, index) => 
-      item.overBudget 
-        ? '#EF4444' // Red for over budget
-        : getChartColors(index)
-    ),
-    borderColor: chartData.map((item, index) => 
-      item.overBudget 
-        ? '#EF4444' // Red for over budget
-        : getChartColors(index)
-    ),
-    borderWidth: 1,
-    borderRadius: 6,
-    borderSkipped: false,
-  });
 
   return (
     <div className={`w-full ${className}`} style={{ height }}>
@@ -151,56 +192,53 @@ export function SpendingChart({
               bodyColor: currentTheme === 'dark' ? '#F9FAFB' : '#374151',
               borderColor: currentTheme === 'dark' ? '#6B7280' : '#D1D5DB',
               borderWidth: 1,
-              cornerRadius: 8,
-              displayColors: true,
+              cornerRadius: 12,
+              displayColors: false,
+              padding: 12,
               titleFont: {
-                size: 12,
+                size: 13,
                 weight: 'bold',
               },
               bodyFont: {
-                size: 10,
+                size: 11,
               },
               callbacks: {
+                // Show a combined tooltip instead of per-dataset
                 label: function(context) {
-                  const label = context.dataset.label || '';
-                  const value = context.parsed.y;
-                  return `${label}: ${formatMoney(value)}`;
+                  if (!showBudgeted) {
+                    return `Gastado: ${formatMoney(context.parsed.y)}`;
+                  }
+                  // Only show full info on the first dataset hit
+                  if (context.datasetIndex === 0) {
+                    const idx = context.dataIndex;
+                    const spent = chartData[idx]?.spent || 0;
+                    const budgeted = chartData[idx]?.budgeted || 0;
+                    const pct = budgeted > 0 ? Math.round((spent / budgeted) * 100) : 0;
+                    return [
+                      `Presupuestado: ${formatMoney(budgeted)}`,
+                      `Gastado: ${formatMoney(spent)}`,
+                      `${pct}% utilizado`,
+                    ];
+                  }
+                  return [];
                 },
-                ...(showBudgeted && {
-                  afterBody: function(context) {
-                    const dataIndex = context[0].dataIndex;
-                    const budgeted = chartData[dataIndex]?.budgeted || 0;
-                    const spent = chartData[dataIndex]?.spent || 0;
-                    const difference = spent - budgeted;
-                    
-                    if (context[0].dataset.label === 'Budgeted') {
-                      // Only show spent info if there's actual spent data
-                      if (spent > 0) {
-                        return [
-                          `Spent: ${formatMoney(spent)}`,
-                          `Difference: ${formatMoney(difference)}`
-                        ];
-                      } else {
-                        return [
-                          `No spending recorded yet`
-                        ];
-                      }
-                    }
-                    return [];
-                  },
-                }),
+                // Filter out duplicate tooltip entries from stacked datasets
+                filter: function(tooltipItem) {
+                  return tooltipItem.datasetIndex === 0;
+                },
               },
             },
           },
           scales: {
             x: {
+              stacked: true,
               grid: {
                 display: false,
               },
               ticks: {
-                color: currentTheme === 'dark' ? '#F9FAFB' : '#374151',
+                color: currentTheme === 'dark' ? '#F9FAFB' : '#6B7280',
                 font: {
-                  size: data.length > 6 ? 8 : 10,
+                  size: data.length > 6 ? 9 : 11,
                   weight: 'normal',
                 },
                 maxRotation: 45,
@@ -209,18 +247,21 @@ export function SpendingChart({
                 maxTicksLimit: data.length > 6 ? 4 : 6,
               },
               border: {
-                color: currentTheme === 'dark' ? '#6B7280' : '#D1D5DB',
+                display: false,
               },
             },
             y: {
+              stacked: true, // stack spent + remaining into one bar
               border: {
-                color: currentTheme === 'dark' ? '#6B7280' : '#D1D5DB',
+                display: false,
               },
               grid: {
-                color: currentTheme === 'dark' ? '#374151' : '#E5E7EB',
+                color: currentTheme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                lineWidth: 1,
+                drawTicks: false,
               },
               ticks: {
-                color: currentTheme === 'dark' ? '#F9FAFB' : '#374151',
+                color: currentTheme === 'dark' ? '#F9FAFB' : '#6B7280',
                 font: {
                   size: 9,
                   weight: 'normal',
@@ -237,7 +278,7 @@ export function SpendingChart({
           },
           animation: {
             duration: 750,
-            easing: 'easeInOutQuart',
+            easing: 'easeOutQuart',
           },
         }}
       />

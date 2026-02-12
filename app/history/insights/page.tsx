@@ -363,17 +363,18 @@ function InsightsContent() {
                     <BarChart
                       data={categoryData}
                       margin={{
-                        top: 20,
-                        right: 30,
+                        top: 24,
+                        right: 24,
                         left: 20,
-                        bottom: 30,
+                        bottom: 24,
                       }}
-                      barGap={8}
+                      barGap={12}
+                      barCategoryGap="20%"
                     >
                       <CartesianGrid
                         strokeDasharray="3 3"
                         vertical={false}
-                        stroke="hsl(var(--muted-foreground)/0.2)"
+                        stroke="hsl(var(--muted-foreground)/0.15)"
                       />
                       <XAxis
                         dataKey="name"
@@ -404,13 +405,13 @@ function InsightsContent() {
                       <Bar
                         dataKey="budgeted"
                         fill="hsl(var(--muted))"
-                        radius={[4, 4, 0, 0]}
-                        maxBarSize={40}
+                        radius={[10, 10, 0, 0]}
+                        maxBarSize={48}
                       />
                       <Bar
                         dataKey="spent"
-                        radius={[4, 4, 0, 0]}
-                        maxBarSize={40}
+                        radius={[10, 10, 0, 0]}
+                        maxBarSize={48}
                       >
                         {categoryData.map((entry, index) => (
                           <Cell
