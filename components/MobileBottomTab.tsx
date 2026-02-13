@@ -1,15 +1,12 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useViewport } from "@/hooks/useViewport";
 import { useTranslation } from "@/lib/i18n";
-import { 
-  Home, 
-  History, 
-  Settings, 
-  Wallet
-} from "lucide-react";
+import { Home, History, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TabItem {
@@ -44,6 +41,11 @@ export default function MobileBottomTab() {
   const { isMobile } = useViewport();
   const pathname = usePathname();
   const { t } = useTranslation();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Only render on mobile devices
   if (!isMobile) {
@@ -55,8 +57,17 @@ export default function MobileBottomTab() {
     return null;
   }
 
-  return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-700/50 pb-[env(safe-area-inset-bottom)]">
+  // Use transform: translateZ(0) to force GPU compositing - fixes iOS Safari fixed
+  // position bug where the tab bar drifts to the middle of the screen when scrolling.
+  const navContent = (
+    <nav
+      className="fixed inset-x-0 bottom-0 z-[100] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-700/50 pb-[env(safe-area-inset-bottom)]"
+      style={{
+        transform: "translateZ(0)",
+        WebkitBackfaceVisibility: "hidden",
+        backfaceVisibility: "hidden",
+      }}
+    >
       <div className="flex items-center justify-around px-2 py-2">
         {tabItems.map((item) => {
           const Icon = item.icon;
@@ -99,4 +110,12 @@ export default function MobileBottomTab() {
       </div>
     </nav>
   );
+
+  // Portal to document.body ensures no ancestor (overflow, transform, etc.) can
+  // create a containing block that breaks fixed positioning on mobile scroll.
+  if (mounted && typeof document !== "undefined") {
+    return createPortal(navContent, document.body);
+  }
+
+  return null;
 }
