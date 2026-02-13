@@ -7,7 +7,7 @@ The Feature Flags API allows mobile applications to dynamically control features
 ## Base URL
 
 ```
-Production: https://www.presusimple.pro
+Production: https://www.presusimple.com
 Development: http://localhost:3000
 ```
 
