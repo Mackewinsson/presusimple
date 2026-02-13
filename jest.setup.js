@@ -1,6 +1,18 @@
 require('@testing-library/jest-dom');
 require('jest-canvas-mock');
 
+// Mock i18n so components render with English in tests (default locale is 'es')
+jest.mock('@/lib/i18n', () => {
+  const actual = jest.requireActual('@/lib/i18n');
+  const en = actual.getTranslations('en');
+  return {
+    ...actual,
+    useTranslation: () => ({
+      t: (key) => en[key] || key,
+    }),
+  };
+});
+
 // Mock next-auth
 jest.mock('next-auth/react', () => ({
   useSession: jest.fn(() => ({

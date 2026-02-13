@@ -8,6 +8,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  type TooltipItem,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { useTheme } from "next-themes";
@@ -204,7 +205,7 @@ export function SpendingChart({
               },
               callbacks: {
                 // Show a combined tooltip instead of per-dataset
-                label: function(context) {
+                label: function(this: unknown, context: TooltipItem<"bar">) {
                   if (!showBudgeted) {
                     return `Gastado: ${formatMoney(context.parsed.y)}`;
                   }
@@ -222,11 +223,9 @@ export function SpendingChart({
                   }
                   return [];
                 },
-                // Filter out duplicate tooltip entries from stacked datasets
-                filter: function(tooltipItem) {
-                  return tooltipItem.datasetIndex === 0;
-                },
               },
+              // Filter out duplicate tooltip entries from stacked datasets
+              filter: (e: TooltipItem<"bar">) => e.datasetIndex === 0,
             },
           },
           scales: {
