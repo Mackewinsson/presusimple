@@ -42,6 +42,8 @@ import { StreakWidget } from "@/components/streak/StreakWidget";
 import { StreakEncouragementTrigger } from "@/components/streak/StreakEncouragementTrigger";
 
 import { useState } from "react";
+import { useSilentSync } from "@/hooks/useSilentSync";
+import { toast } from "sonner";
 
 function BudgetAppContent() {
   const { t } = useTranslation();
@@ -57,11 +59,11 @@ function BudgetAppContent() {
   const { data: user, isLoading: userLoading } = useUserData();
 
   // Get data using React Query
-  const { data: budget, isLoading: budgetLoading } = useBudget(userId || "");
-  const { data: categories = [], isLoading: categoriesLoading } = useCategories(
+  const { data: budget, isLoading: budgetLoading, isFetching: budgetFetching } = useBudget(userId || "");
+  const { data: categories = [], isLoading: categoriesLoading, isFetching: categoriesFetching } = useCategories(
     userId || ""
   );
-  const { data: expenses = [], isLoading: expensesLoading } = useExpenses(
+  const { data: expenses = [], isLoading: expensesLoading, isFetching: expensesFetching } = useExpenses(
     userId || ""
   );
   const { data: subscription } = useUserSubscription();
@@ -70,13 +72,24 @@ function BudgetAppContent() {
   const remoteFeatureFlags = useRemoteFeatureFlags();
   const isAIFeatureFlagEnabled = remoteFeatureFlags.isFeatureEnabled("aa");
 
-  // Check if any data is loading
-  const isLoading =
-    userIdLoading || 
-    userLoading || 
-    budgetLoading || 
-    categoriesLoading || 
-    expensesLoading;
+  // Silent sync for PWA - checks for updates in background
+  useSilentSync({
+    enabled: !!userId,
+    initialDelay: 2000, // Wait 2 seconds after load
+    checkInterval: 30000, // Check every 30 seconds
+    onUpdatesAvailable: () => {
+      // Optional: show a subtle notification
+      console.log('[PWA] Updates detected and loaded in background');
+    },
+  });
+
+  // Only show loading if we have NO data at all (first load)
+  // If we have cached data, show it immediately even if refetching
+  const hasNoData = !budget && !categories.length && !expenses.length;
+  const isInitialLoad = (budgetLoading || categoriesLoading || expensesLoading) && hasNoData;
+  
+  // Check if any data is loading for initial load only
+  const isLoading = userIdLoading || userLoading || isInitialLoad;
 
   // Only check subscription status after user data has loaded
   const subscriptionStatus = getSubscriptionStatus(subscription || {});
