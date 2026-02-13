@@ -236,7 +236,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                         budgeted: cat.budgeted,
                         overBudget: cat.spent > cat.budgeted,
                       }))}
-                      showBudgeted={false}
+                      showBudgeted={true}
                       showLegend={false}
                       height="100%"
                     />
