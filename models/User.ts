@@ -16,6 +16,9 @@ export interface IUser extends Document {
   pushSubscription?: any; // Push subscription object
   notificationEnabled?: boolean;
   lastNotificationUpdate?: Date;
+  // Streak (Duolingo-style)
+  streakCount?: number;
+  lastActivityDate?: Date;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -37,7 +40,10 @@ const UserSchema = new Schema<IUser>({
   // Notification fields
   pushSubscription: { type: Schema.Types.Mixed }, // Push subscription object
   notificationEnabled: { type: Boolean, default: false },
-  lastNotificationUpdate: { type: Date }
+  lastNotificationUpdate: { type: Date },
+  // Streak
+  streakCount: { type: Number, default: 0 },
+  lastActivityDate: { type: Date }
 });
 
 export default models.User || mongoose.model<IUser>("User", UserSchema);
