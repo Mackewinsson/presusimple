@@ -7,7 +7,7 @@ The Feature Flags API allows mobile applications to dynamically control features
 ## Base URL
 
 ```
-Production: https://www.simple-budget.pro
+Production: https://www.presusimple.pro
 Development: http://localhost:3000
 ```
 
@@ -194,7 +194,7 @@ class FeatureFlagService {
   }
 }
 
-export default new FeatureFlagService('https://www.simple-budget.pro');
+export default new FeatureFlagService('https://www.presusimple.pro');
 ```
 
 ### Usage in React Native Components
@@ -267,7 +267,7 @@ import Foundation
 
 class FeatureFlagService {
     static let shared = FeatureFlagService()
-    private let baseURL = "https://www.simple-budget.pro"
+    private let baseURL = "https://www.presusimple.pro"
     
     private var features: [String: Bool] = [:]
     private var userType: String?
@@ -339,7 +339,7 @@ import java.net.URL
 
 class FeatureFlagService {
     companion object {
-        private const val BASE_URL = "https://www.simple-budget.pro"
+        private const val BASE_URL = "https://www.presusimple.pro"
         private val json = Json { ignoreUnknownKeys = true }
     }
     

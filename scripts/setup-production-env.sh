@@ -28,7 +28,7 @@ cat > .env.production << 'EOF'
 NODE_ENV=production
 
 # NextAuth Configuration
-NEXTAUTH_URL=https://www.simple-budget.pro
+NEXTAUTH_URL=https://www.presusimple.pro
 NEXTAUTH_SECRET=your-nextauth-secret-key-here
 
 # Google OAuth (Production)
@@ -47,7 +47,7 @@ STRIPE_WEBHOOK_SECRET=whsec_your-webhook-secret
 STRIPE_PRICE_ID=price_your-price-id
 
 # App Configuration
-NEXT_PUBLIC_APP_URL=https://www.simple-budget.pro
+NEXT_PUBLIC_APP_URL=https://www.presusimple.pro
 EOF
 
 echo "✅ .env.production template created!"
@@ -55,8 +55,8 @@ echo ""
 echo "🔧 Next Steps:"
 echo "1. Edit .env.production and replace placeholder values with your actual production values"
 echo "2. Make sure your Google OAuth configuration includes:"
-echo "   - Authorized redirect URIs: https://www.simple-budget.pro/api/auth/callback/google"
-echo "   - Authorized JavaScript origins: https://www.simple-budget.pro"
+echo "   - Authorized redirect URIs: https://www.presusimple.pro/api/auth/callback/google"
+echo "   - Authorized JavaScript origins: https://www.presusimple.pro"
 echo "3. Run: ./scripts/simulate-production.sh"
 echo ""
 echo "📋 Required values to fill in:"

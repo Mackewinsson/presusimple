@@ -122,7 +122,7 @@ const translations = {
     later: "Later",
     dontAskAgain: "Don't ask again",
     // SubscriptionButton component
-    youHaveActiveSubscription: "You have an active subscription. Thank you for supporting Simple Budget!",
+    youHaveActiveSubscription: "You have an active subscription. Thank you for supporting Presusimple!",
     // UpgradeToProCTA component
     proFeature: "Pro Feature",
     upgradeToUnlockFeature: "Upgrade to Pro to unlock this feature and many more!",
@@ -371,7 +371,7 @@ const translations = {
     later: "Más tarde",
     dontAskAgain: "No preguntar de nuevo",
     // SubscriptionButton component
-    youHaveActiveSubscription: "Tienes una suscripción activa. ¡Gracias por apoyar Simple Budget!",
+    youHaveActiveSubscription: "Tienes una suscripción activa. ¡Gracias por apoyar Presusimple!",
     // UpgradeToProCTA component
     proFeature: "Función Pro",
     upgradeToUnlockFeature: "¡Actualiza a Pro para desbloquear esta función y muchas más!",
