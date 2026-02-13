@@ -39,6 +39,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useTranslation } from "@/lib/i18n";
 import MobileHeader from "@/components/MobileHeader";
 import { StreakWidget } from "@/components/streak/StreakWidget";
+import { StreakEncouragementTrigger } from "@/components/streak/StreakEncouragementTrigger";
 
 import { useState } from "react";
 
@@ -126,6 +127,7 @@ function BudgetAppContent() {
 
   return (
     <ErrorBoundary>
+      <StreakEncouragementTrigger />
       <div className="min-h-screen gradient-bg-dark flex flex-col">
         {/* Mobile Header */}
         <MobileHeader />
