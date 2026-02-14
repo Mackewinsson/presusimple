@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatMoney } from "@/lib/utils/formatMoney";
+import { getChartColor } from "@/lib/theme";
 import { format, parseISO } from "date-fns";
 import Link from "next/link";
 import {
@@ -388,13 +389,7 @@ export default function BudgetDetailPage() {
                     <div className="flex justify-between items-center mb-3">
                       <div className="flex items-center gap-3">
                         <div className="w-3 h-3 rounded-full" style={{ 
-                          backgroundColor: index === 0 ? '#60A5FA' : 
-                                        index === 1 ? '#34D399' : 
-                                        index === 2 ? '#FBBF24' : 
-                                        index === 3 ? '#F87171' : 
-                                        index === 4 ? '#A78BFA' : 
-                                        index === 5 ? '#F472B6' : 
-                                        index === 6 ? '#34D399' : '#F59E0B'
+                          backgroundColor: getChartColor(index).hex
                         }}></div>
                         <span className="font-semibold text-lg">{category.name}</span>
                       </div>

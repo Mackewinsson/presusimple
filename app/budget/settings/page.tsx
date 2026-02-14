@@ -141,13 +141,13 @@ export default function SettingsPage() {
   const getPlanBadge = () => {
     switch (subscriptionStatus) {
       case "paid":
-        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">{t('proPlan')}</Badge>;
+        return <Badge className="bg-success/20 text-success-foreground">{t('proPlan')}</Badge>;
       case "trial":
-        return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">{t('trial')}</Badge>;
+        return <Badge className="bg-info/20 text-info-foreground">{t('trial')}</Badge>;
       case "expired":
-        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">{t('expired')}</Badge>;
+        return <Badge className="bg-destructive/20 text-destructive-foreground">{t('expired')}</Badge>;
       default:
-        return <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">{t('freePlan')}</Badge>;
+        return <Badge className="bg-muted text-muted-foreground">{t('freePlan')}</Badge>;
     }
   };
 
@@ -166,7 +166,7 @@ export default function SettingsPage() {
         <div className="text-sm text-muted-foreground space-y-1">
           <div>{t('start')}: {subscription.trialStart ? new Date(subscription.trialStart).toLocaleDateString() : 'N/A'}</div>
           <div>{t('end')}: {trialEnd.toLocaleDateString()}</div>
-          <div className={isExpired ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'}>
+          <div className={isExpired ? 'text-destructive' : 'text-info'}>
             {isExpired ? t('expired') : `${trialDaysLeft} ${t('daysRemaining')}`}
           </div>
         </div>

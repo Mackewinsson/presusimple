@@ -44,9 +44,9 @@
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
     
-    /* Accent colors */
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    /* Accent colors (#D3FF3D) */
+    --accent: 67 100% 67%;
+    --accent-foreground: 222.2 84% 4.9%;
     
     /* Destructive colors */
     --destructive: 0 62.8% 30.6%;
@@ -105,9 +105,9 @@
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
     
-    /* Accent colors */
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    /* Accent colors (#D3FF3D) */
+    --accent: 67 100% 67%;
+    --accent-foreground: 222.2 84% 4.9%;
     
     /* Destructive colors */
     --destructive: 0 62.8% 30.6%;
@@ -163,8 +163,8 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
     
-    /* Accent colors */
-    --accent: 210 40% 96.1%;
+    /* Accent colors (#D3FF3D) */
+    --accent: 67 100% 67%;
     --accent-foreground: 222.2 84% 4.9%;
     
     /* Destructive colors */
@@ -376,12 +376,9 @@
   @apply h-3 rounded-full overflow-hidden backdrop-blur-sm;
 }
 
-.dark .budget-progress {
-  @apply bg-white/10;
-}
-
+.dark .budget-progress,
 .light .budget-progress {
-  @apply bg-gray-200/50;
+  @apply bg-muted;
 }
 
 .budget-progress-bar {
@@ -389,15 +386,15 @@
 }
 
 .budget-progress-bar.success {
-  @apply bg-gradient-to-r from-emerald-400 to-emerald-500;
+  @apply bg-success;
 }
 
 .budget-progress-bar.warning {
-  @apply bg-gradient-to-r from-yellow-400 to-orange-400;
+  @apply bg-warning;
 }
 
 .budget-progress-bar.danger {
-  @apply bg-gradient-to-r from-red-400 to-red-500;
+  @apply bg-destructive;
 }
 
 /* Modern button styles */
@@ -405,24 +402,18 @@
   @apply font-semibold rounded-xl px-6 py-3 shadow-lg transition-all duration-200 transform hover:scale-105;
 }
 
-.dark .btn-primary {
-  @apply bg-white text-slate-900 hover:bg-gray-100;
-}
-
+.dark .btn-primary,
 .light .btn-primary {
-  @apply bg-slate-900 text-white hover:bg-slate-800;
+  @apply bg-primary text-primary-foreground hover:bg-primary/90;
 }
 
 .btn-accent {
   @apply font-semibold rounded-xl px-6 py-3 shadow-lg transition-all duration-200 transform hover:scale-105;
 }
 
-.dark .btn-accent {
-  @apply bg-gradient-to-r from-gray-100 to-white text-slate-900 hover:from-white hover:to-gray-100;
-}
-
+.dark .btn-accent,
 .light .btn-accent {
-  @apply bg-gradient-to-r from-slate-100 to-white text-slate-900 hover:from-white hover:to-slate-100;
+  @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
 }
 
 .btn-outline {
@@ -586,6 +577,6 @@ select {
 .light .radix-select-item[data-state="focused"],
 .light .radix-select-item:focus,
 .light .radix-select-item:hover {
-  background-color: #e2e8f0 !important; /* Tailwind slate-200 */
-  color: #0f172a !important; /* Tailwind slate-900 */
+  background-color: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
 }

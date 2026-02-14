@@ -105,26 +105,26 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
   return (
     <div className="space-y-6">
       <div className="text-sm text-muted-foreground flex items-center gap-2">
-        <CheckCircle className="h-4 w-4 text-white animate-pulse" />
+        <CheckCircle className="h-4 w-4 text-primary animate-pulse" />
         <span>AI found {transactions.length} transaction{transactions.length !== 1 ? 's' : ''}!</span>
       </div>
       
       {/* Budget Summary */}
-      <div className="p-4 border border-blue-500/30 rounded-lg bg-blue-500/10">
+      <div className="p-4 border border-primary/30 rounded-lg bg-primary/10">
         <div className="flex items-center justify-between mb-3">
-          <span className="font-medium text-blue-300">{t('availableBudget')}</span>
-          <span className="font-mono text-blue-300">${availableBudget.toFixed(2)}</span>
+          <span className="font-medium text-primary">{t('availableBudget')}</span>
+          <span className="font-mono text-primary">${availableBudget.toFixed(2)}</span>
         </div>
         {newCategoriesToCreate.length > 0 && (
           <div className="flex items-center justify-between text-sm mb-2">
             <span className="text-muted-foreground">{t('budgetNeededForNewCategories')}</span>
-            <span className={`font-mono ${hasInsufficientBudget ? 'text-red-400' : 'text-green-400'}`}>
+            <span className={`font-mono ${hasInsufficientBudget ? 'text-destructive' : 'text-success'}`}>
               ${totalBudgetNeeded.toFixed(2)}
             </span>
           </div>
         )}
         {hasInsufficientBudget && (
-          <div className="flex items-center gap-2 mt-3 text-red-400 text-sm">
+          <div className="flex items-center gap-2 mt-3 text-destructive text-sm">
             <AlertCircle className="h-4 w-4" />
             <span>{t('insufficientBudget')}</span>
           </div>
@@ -134,7 +134,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
       {/* Missing Categories Section */}
       {missingCategories.length > 0 && (
         <div className="space-y-4">
-          <div className="flex items-center gap-2 text-amber-300">
+          <div className="flex items-center gap-2 text-warning">
             <AlertTriangle className="h-4 w-4" />
             <span className="font-medium">{t('newCategoriesFound')}</span>
           </div>
@@ -150,13 +150,13 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                 key={index}
                 className={`p-3 border rounded-lg transition-all duration-200 ${
                   isSelected 
-                    ? 'border-amber-500/50 bg-amber-500/10' 
-                    : 'border-amber-500/30 bg-amber-500/5'
+                    ? 'border-warning/50 bg-warning/10' 
+                    : 'border-warning/30 bg-warning/5'
                 }`}
               >
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <span className="font-medium text-amber-300">{missingCategory.name}</span>
+                    <span className="font-medium text-warning">{missingCategory.name}</span>
                     <div className="text-xs text-muted-foreground">
                       {missingCategory.transactions.length} transaction{missingCategory.transactions.length !== 1 ? 's' : ''} • Total: ${missingCategory.totalAmount.toFixed(2)}
                     </div>
@@ -167,8 +167,8 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                     onClick={() => handleCategoryToggle(missingCategory.name)}
                     className={`${
                       isSelected 
-                        ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-0 shadow-md" 
-                        : "bg-gradient-to-r from-slate-600 to-slate-700 text-white border-0 hover:from-slate-500 hover:to-slate-600"
+                        ? "bg-primary text-primary-foreground border-0 shadow-md" 
+                        : "bg-secondary text-secondary-foreground border-0 hover:bg-secondary/80"
                     } transition-all duration-200 transform hover:scale-105`}
                   >
                     {isSelected ? t('willCreate') : t('addCategory')}
@@ -208,7 +208,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
       
       {/* Transactions Section */}
       <div className="space-y-4">
-        <div className="text-sm font-medium text-white mb-3">{t('transactionsToSave')}</div>
+        <div className="text-sm font-medium text-foreground mb-3">{t('transactionsToSave')}</div>
         {transactions.map((transaction, index) => {
           const isMissingCategory = missingCategories.some(mc => 
             mc.transactions.some(t => t === transaction)
@@ -222,7 +222,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
             <div 
               key={index} 
               className={`p-4 border rounded-lg hover:shadow-md transition-all duration-300 transform hover:scale-[1.02] animate-in slide-in-from-left-2 ${
-                isMissingCategory ? 'border-amber-500/50 bg-amber-500/5' : ''
+                isMissingCategory ? 'border-warning/50 bg-warning/5' : ''
               }`}
               style={{ animationDelay: `${index * 100}ms` }}
             >
@@ -244,7 +244,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                       </SelectContent>
                     </Select>
                     {isMissingCategory && (
-                      <Badge variant="outline" className="text-amber-300 border-amber-300 w-fit">
+                      <Badge variant="outline" className="text-warning border-warning w-fit">
                         New Category
                       </Badge>
                     )}
@@ -272,7 +272,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                         onClick={() => {
                           handleCategoryChange(index, suggestion);
                         }}
-                        className="text-blue-300 hover:text-blue-200 underline mr-2"
+                        className="text-primary hover:text-primary/80 underline mr-2"
                       >
                         {suggestion}
                       </button>
@@ -295,7 +295,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                         onClick={() => {
                           handleCategoryChange(index, cat.name);
                         }}
-                        className="text-blue-300 hover:text-blue-200 underline mr-2"
+                        className="text-primary hover:text-primary/80 underline mr-2"
                       >
                         {cat.name}
                       </button>
@@ -307,14 +307,14 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
         })}
       </div>
       
-      <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+      <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-border">
         <Button
           onClick={handleConfirm}
           disabled={isSaving || hasInsufficientBudget}
           className={`flex-1 ${
             hasInsufficientBudget 
-              ? "bg-gradient-to-r from-red-500 to-red-600 text-white opacity-50 cursor-not-allowed" 
-              : "bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl"
+              ? "bg-destructive text-destructive-foreground opacity-50 cursor-not-allowed" 
+              : "bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg hover:shadow-xl"
           } transition-all duration-300 transform hover:scale-[1.02] border-0`}
         >
           {isSaving ? "Saving..." : `Save Transactions${newCategoriesToCreate.length > 0 ? ` & Create ${newCategoriesToCreate.length} Categor${newCategoriesToCreate.length === 1 ? 'y' : 'ies'}` : ''}`}
@@ -323,7 +323,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
           variant="outline"
           onClick={onCancel}
           disabled={isSaving}
-          className="bg-gradient-to-r from-slate-600 to-slate-700 text-white border-0 hover:from-slate-500 hover:to-slate-600 transition-all duration-200 transform hover:scale-105"
+          className="bg-secondary text-secondary-foreground border-0 hover:bg-secondary/80 transition-all duration-200 transform hover:scale-105"
         >
           {t('cancel')}
         </Button>
@@ -768,7 +768,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
   return (
     <>
       <AITransactionLoading isProcessing={isParsing} currentStep={currentStep} />
-      <Card className="glass-card hover-card group bg-white border border-gray-200 shadow-2xl">
+      <Card className="glass-card hover-card group bg-card border border-border shadow-2xl">
         <CardHeader>
                   <CardTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl">
           <div className="relative">
@@ -780,7 +780,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
           </span>
           <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-transparent bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text animate-bounce" />
         </CardTitle>
-          <CardDescription className="text-sm sm:text-base text-gray-600">
+          <CardDescription className="text-sm sm:text-base text-muted-foreground">
             {t('aiDescription')}
           </CardDescription>
         </CardHeader>
@@ -793,7 +793,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
               className="min-h-[100px]"
               disabled={isParsing}
             />
-            <div className="flex justify-between items-center text-xs text-gray-500">
+            <div className="flex justify-between items-center text-xs text-muted-foreground">
               <span>{description.length}/500 {t('charactersRemaining')}</span>
               <span>{description.length < 3 ? 'Need more detail' : 'Ready to parse'}</span>
             </div>
@@ -803,7 +803,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
             <Button
               onClick={handleParse}
               disabled={!description.trim() || isParsing || isLoadingCategories || categories?.length === 0}
-              className="flex-1 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] border-0"
+              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] border-0"
             >
               {isParsing ? (
                 <>
@@ -830,7 +830,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
           </div>
 
           {categories?.length === 0 && !isLoadingCategories && (
-            <div className="text-xs text-muted-foreground bg-white/10 p-3 rounded-lg">
+            <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg">
               <p className="font-medium mb-1">{t('setupRequired')}</p>
               <p>{t('setupRequiredMessage')}</p>
             </div>

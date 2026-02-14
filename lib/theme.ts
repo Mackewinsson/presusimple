@@ -5,6 +5,10 @@
  *
  * Centralized theme configuration for consistent design across web and mobile.
  *
+ * SYNC: Semantic color values (chart-1..5, success, warning, destructive, primary,
+ * foreground, etc.) should match app/globals.css CSS variables so that JS consumers
+ * (charts, getChartColor, getBudgetProgressColor) stay consistent with Tailwind/UI.
+ *
  * MOBILE DEVELOPERS: Copy this entire file to your mobile app!
  * All colors are provided in multiple formats: HSL, RGB, and HEX
  *
@@ -35,10 +39,10 @@ export const theme = {
       description: 'Light variant of primary',
     },
     accent: {
-      hsl: '217.2 32.6% 17.5%',
-      rgb: 'rgb(30, 39, 56)',
-      hex: '#1E2738',
-      description: 'Accent color - Mid-dark slate',
+      hsl: '67 100% 67%',
+      rgb: 'rgb(211, 255, 61)',
+      hex: '#D3FF3D',
+      description: 'Accent color - Lime',
     },
   },
 
@@ -209,14 +213,14 @@ export const theme = {
     },
     accent: {
       base: {
-        hsl: '217.2 32.6% 17.5%',
-        rgb: 'rgb(30, 39, 56)',
-        hex: '#1E2738',
+        hsl: '67 100% 67%',
+        rgb: 'rgb(211, 255, 61)',
+        hex: '#D3FF3D',
       },
       foreground: {
-        hsl: '210 40% 98%',
-        rgb: 'rgb(247, 249, 252)',
-        hex: '#F7F9FC',
+        hsl: '222.2 84% 4.9%',
+        rgb: 'rgb(7, 9, 25)',
+        hex: '#070919',
       },
     },
     border: {
@@ -323,9 +327,9 @@ export const theme = {
     },
     accent: {
       base: {
-        hsl: '210 40% 96.1%',
-        rgb: 'rgb(241, 245, 249)',
-        hex: '#F1F5F9',
+        hsl: '67 100% 67%',
+        rgb: 'rgb(211, 255, 61)',
+        hex: '#D3FF3D',
       },
       foreground: {
         hsl: '222.2 84% 4.9%',

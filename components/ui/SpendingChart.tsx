@@ -15,6 +15,7 @@ import { useTheme } from "next-themes";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { useTranslation } from "@/lib/i18n";
 import { useCurrentDecimalSeparator } from "@/lib/hooks";
+import { theme, getChartColor } from "@/lib/theme";
 
 // Register Chart.js components
 ChartJS.register(
@@ -52,36 +53,13 @@ export function SpendingChart({
   const decimalSeparator = useCurrentDecimalSeparator();
   const { t } = useTranslation();
 
-  // Get high-contrast colors for dark mode
-  const getChartColors = (index: number) => {
-    if (currentTheme === 'dark') {
-      // Bright colors for dark mode
-      const darkModeColors = [
-        '#60A5FA', // Blue
-        '#34D399', // Green
-        '#FBBF24', // Yellow
-        '#F87171', // Red
-        '#A78BFA', // Purple
-        '#F472B6', // Pink
-        '#34D399', // Teal
-        '#F59E0B', // Orange
-      ];
-      return darkModeColors[index % darkModeColors.length];
-    } else {
-      // Standard colors for light mode
-      const lightModeColors = [
-        '#3B82F6', // Blue
-        '#10B981', // Green
-        '#F59E0B', // Yellow
-        '#EF4444', // Red
-        '#8B5CF6', // Purple
-        '#EC4899', // Pink
-        '#06B6D4', // Teal
-        '#F97316', // Orange
-      ];
-      return lightModeColors[index % lightModeColors.length];
-    }
-  };
+  const chartColor = (index: number) => getChartColor(index).hex;
+  const destructiveHex = currentTheme === 'dark' ? theme.semantic.error.hex : theme.semantic.errorLight.hex;
+  const palette = currentTheme === 'dark' ? theme.dark : theme.light;
+  const textColor = palette.foreground.hex;
+  const tooltipBg = palette.card.background.hex;
+  const borderColor = palette.border.hex;
+  const mutedColor = palette.muted.foreground.hex;
 
   const chartData = data.map((category, index) => ({
     name: category.name,
@@ -104,8 +82,8 @@ export function SpendingChart({
       data: chartData.map(item => Math.min(item.spent, item.budgeted)),
       backgroundColor: chartData.map((item, index) =>
         item.overBudget
-          ? '#EF4444'
-          : getChartColors(index)
+          ? destructiveHex
+          : chartColor(index)
       ),
       borderColor: 'transparent',
       borderWidth: 0,
@@ -136,7 +114,7 @@ export function SpendingChart({
       datasets.push({
         label: t('exceeded'),
         data: chartData.map(item => item.overBudget ? item.spent - item.budgeted : 0),
-        backgroundColor: 'rgba(239, 68, 68, 0.4)',
+        backgroundColor: `${destructiveHex}66`,
         borderColor: 'transparent',
         borderWidth: 0,
         borderRadius: { topLeft: 12, topRight: 12, bottomLeft: 0, bottomRight: 0 },
@@ -153,8 +131,8 @@ export function SpendingChart({
       data: chartData.map(item => item.spent),
       backgroundColor: chartData.map((item, index) =>
         item.overBudget
-          ? '#EF4444'
-          : getChartColors(index)
+          ? destructiveHex
+          : chartColor(index)
       ),
       borderColor: 'transparent',
       borderWidth: 0,
@@ -180,7 +158,7 @@ export function SpendingChart({
               display: showLegend,
               position: 'top' as const,
               labels: {
-                color: currentTheme === 'dark' ? '#F9FAFB' : '#374151',
+                color: textColor,
                 font: {
                   size: 12,
                   weight: 'bold',
@@ -192,10 +170,10 @@ export function SpendingChart({
               },
             },
             tooltip: {
-              backgroundColor: currentTheme === 'dark' ? '#1F2937' : '#FFFFFF',
-              titleColor: currentTheme === 'dark' ? '#F9FAFB' : '#374151',
-              bodyColor: currentTheme === 'dark' ? '#F9FAFB' : '#374151',
-              borderColor: currentTheme === 'dark' ? '#6B7280' : '#D1D5DB',
+              backgroundColor: tooltipBg,
+              titleColor: textColor,
+              bodyColor: textColor,
+              borderColor: borderColor,
               borderWidth: 1,
               cornerRadius: 12,
               displayColors: false,
@@ -239,7 +217,7 @@ export function SpendingChart({
                 display: false,
               },
               ticks: {
-                color: currentTheme === 'dark' ? '#F9FAFB' : '#6B7280',
+                color: mutedColor,
                 font: {
                   size: data.length > 6 ? 9 : 11,
                   weight: 'normal',
@@ -259,12 +237,12 @@ export function SpendingChart({
                 display: false,
               },
               grid: {
-                color: currentTheme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                color: currentTheme === 'dark' ? 'rgba(247,249,252,0.06)' : 'rgba(7,9,25,0.06)',
                 lineWidth: 1,
                 drawTicks: false,
               },
               ticks: {
-                color: currentTheme === 'dark' ? '#F9FAFB' : '#6B7280',
+                color: mutedColor,
                 font: {
                   size: 9,
                   weight: 'normal',
