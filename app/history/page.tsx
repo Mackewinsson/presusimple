@@ -42,6 +42,7 @@ export default function HistoryPage() {
     userId || ""
   );
   const deleteBudgetMutation = useDeleteMonthlyBudget();
+  const decimalSeparator = useCurrentDecimalSeparator();
 
   const sortedBudgets = [...budgets].sort(
     (a, b) => parseISO(b.createdAt).getTime() - parseISO(a.createdAt).getTime()

@@ -27,8 +27,8 @@ interface BudgetCategoryItemProps {
   onRemove: (categoryId: string) => void;
   onUpdate: (categoryId: string, name: string, budgeted: number) => void;
   totalAvailable: number;
-  dragHandleProps?: Record<string, unknown>;
-  draggableProps?: Record<string, unknown>;
+  dragHandleProps?: any; // DraggableProvidedDragHandleProps from @hello-pangea/dnd
+  draggableProps?: any; // DraggableProvidedDraggableProps from @hello-pangea/dnd
   innerRef?: (element: HTMLElement | null) => void;
 }
 

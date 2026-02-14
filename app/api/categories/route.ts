@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     const maxOrderCategory = await Category.findOne({ budgetId })
       .sort({ order: -1 })
       .select("order")
-      .lean();
+      .lean() as { order?: number } | null;
     const nextOrder = (maxOrderCategory?.order ?? -1) + 1;
 
     const category = new Category({
