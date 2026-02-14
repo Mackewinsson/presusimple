@@ -130,8 +130,8 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
     return (
       <div className="p-4 border rounded-lg bg-card">
         <div className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-hidden">
+            <div className="space-y-2 min-w-0">
               <label className="text-sm font-medium">{t('amount')}</label>
               <Input
                 type="number"
@@ -141,7 +141,7 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
                 step="0.01"
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 min-w-0">
               <label className="text-sm font-medium">{t('type')}</label>
               <Select
                 value={editedType}
@@ -166,8 +166,8 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-hidden">
+            <div className="space-y-2 min-w-0">
               <label className="text-sm font-medium">{t('category')}</label>
               <Select
                 value={editedCategoryId}
@@ -188,12 +188,13 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 min-w-0">
               <label className="text-sm font-medium">{t('date')}</label>
               <Input
                 type="date"
                 value={editedDate}
                 onChange={(e) => setEditedDate(e.target.value)}
+                className="min-w-0 max-w-full"
               />
             </div>
           </div>

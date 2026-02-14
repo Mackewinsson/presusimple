@@ -95,24 +95,26 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ categories, expenses }) => {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2 min-w-0">
             <Label htmlFor="startDate">{t('startDate')}</Label>
             <Input
               id="startDate"
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
+              className="min-w-0 max-w-full"
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 min-w-0">
             <Label htmlFor="endDate">{t('endDate')}</Label>
             <Input
               id="endDate"
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
+              className="min-w-0 max-w-full"
             />
           </div>
         </div>
