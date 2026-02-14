@@ -187,7 +187,7 @@ function BudgetAppContent() {
           </div>
         </header>
 
-      <main className="flex-1 container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8 pb-20 md:pb-8">
+      <main className="flex-1 container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8 pb-28 md:pb-8">
         {/* Trial Status */}
         <TrialStatus />
 
