@@ -233,6 +233,10 @@ const translations = {
     configurePreferences: "Configure your budget and application preferences",
     moreSettingsComingSoon: "More settings features coming soon...",
     account: "Account",
+    language: "Language",
+    languageDescription: "Choose the language for the app interface.",
+    english: "English",
+    spanish: "Spanish",
     // Streak modal
     streakTitle: "{{count}} Day Streak!",
     streakSubtitle: "Keep tracking your budget every day to maintain your streak.",
@@ -529,6 +533,10 @@ const translations = {
     configurePreferences: "Configura tus preferencias de presupuesto y aplicación",
     moreSettingsComingSoon: "Más funciones de configuración próximamente...",
     account: "Cuenta",
+    language: "Idioma",
+    languageDescription: "Elige el idioma de la interfaz de la aplicación.",
+    english: "Inglés",
+    spanish: "Español",
     // Streak modal
     streakTitle: "¡{{count}} días de racha!",
     streakSubtitle: "Sigue registrando tu presupuesto cada día para mantener tu racha.",

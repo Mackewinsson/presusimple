@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
 import { ArrowLeft, User, Settings } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useUserSubscription, useUserData, useDecimalSeparator, useSetDecimalSeparator } from '@/lib/hooks';
@@ -24,10 +25,37 @@ import { Crown, Clock, CreditCard, Calendar, LogOut, Lock, Eye, EyeOff } from 'l
 import MobileHeader from '@/components/MobileHeader';
 import SignOutButton from '@/components/SignOutButton';
 import { useViewport } from '@/hooks/useViewport';
-import { useTranslation } from '@/lib/i18n';
+import { useTranslation, useLocale } from '@/lib/i18n';
 import { toast } from 'sonner';
 // import BudgetTemplateSelector from '@/components/budget/BudgetTemplateSelector';
 // import SavingsGoalList from '@/components/savings/SavingsGoalList';
+
+function LanguageSetting() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const currentLocale = useLocale();
+  const { t } = useTranslation();
+
+  const handleChange = (value: string) => {
+    if (value === 'es' && !pathname.startsWith('/es')) {
+      router.push(`/es${pathname}`);
+    } else if (value === 'en' && pathname.startsWith('/es')) {
+      router.push(pathname.replace('/es', '') || '/');
+    }
+  };
+
+  return (
+    <Select value={currentLocale} onValueChange={handleChange}>
+      <SelectTrigger className="w-full max-w-[240px]" aria-label={t('language')}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent position="popper" sideOffset={4}>
+        <SelectItem value="en">{t('english')}</SelectItem>
+        <SelectItem value="es">{t('spanish')}</SelectItem>
+      </SelectContent>
+    </Select>
+  );
+}
 
 function DecimalSeparatorSetting() {
   const { data: decimalSeparator, isLoading } = useDecimalSeparator();
@@ -421,6 +449,14 @@ export default function SettingsPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <Label className="text-base font-medium">{t('language')}</Label>
+                    <p className="text-sm text-muted-foreground">
+                      {t('languageDescription')}
+                    </p>
+                    <LanguageSetting />
+                  </div>
+
                   <div className="space-y-4">
                     <Label className="text-base font-medium">Decimal separator</Label>
                     <p className="text-sm text-muted-foreground">
