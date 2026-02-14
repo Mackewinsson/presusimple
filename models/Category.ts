@@ -5,6 +5,7 @@ export interface ICategory extends Document {
   budgeted: number;
   spent: number;
   budgetId: string;
+  order: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,6 +30,10 @@ const CategorySchema: Schema = new Schema(
     budgetId: {
       type: String,
       required: true,
+    },
+    order: {
+      type: Number,
+      default: 0,
     },
   },
   {

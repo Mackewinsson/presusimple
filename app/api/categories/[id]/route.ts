@@ -14,18 +14,21 @@ export async function PUT(
     await dbConnect();
     const body = await request.json();
 
-    const { name, budgeted } = body;
+    const update: { name?: string; budgeted?: number; order?: number } = {};
+    if (body.name !== undefined) update.name = body.name;
+    if (body.budgeted !== undefined) update.budgeted = body.budgeted;
+    if (body.order !== undefined) update.order = body.order;
 
-    if (!name || budgeted === undefined) {
+    if (Object.keys(update).length === 0) {
       return NextResponse.json(
-        { error: "Missing required fields: name, budgeted" },
+        { error: "At least one field required: name, budgeted, order" },
         { status: 400 }
       );
     }
 
     const updatedCategory = await Category.findByIdAndUpdate(
       id,
-      { name, budgeted },
+      update,
       { new: true, runValidators: true }
     );
 

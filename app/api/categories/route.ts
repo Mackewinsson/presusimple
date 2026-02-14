@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
       // Get categories for this budget (using budgetId for backend logic)
       const categories = await Category.find({
         budgetId: budget._id,
-      }).sort({ createdAt: -1 });
+      }).sort({ order: 1, createdAt: 1 });
 
       return NextResponse.json(categories);
     } else if (budgetId) {
@@ -71,12 +71,12 @@ export async function GET(request: NextRequest) {
       // Get categories for this budget (using budgetId for backend logic)
       const categories = await Category.find({
         budgetId: budget._id,
-      }).sort({ createdAt: -1 });
+      }).sort({ order: 1, createdAt: 1 });
 
       return NextResponse.json(categories);
     } else {
       // Get all categories (for admin purposes)
-      const categories = await Category.find({}).sort({ createdAt: -1 });
+      const categories = await Category.find({}).sort({ order: 1, createdAt: 1 });
       return NextResponse.json(categories);
     }
   } catch (error) {
@@ -110,27 +110,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Temporarily disabled validation to debug
-    // Check if category with same name already exists in this section
-    // const existingCategory = await Category.findOne({
-    //   name: name.trim(),
-    //   sectionId: sectionId
-    // });
-
-    // if (existingCategory) {
-    //   return NextResponse.json(
-    //     { error: `Category "${name}" already exists in this section` },
-    //     { status: 400 }
-    //   );
-    // }
-
-
+    const maxOrderCategory = await Category.findOne({ budgetId })
+      .sort({ order: -1 })
+      .select("order")
+      .lean();
+    const nextOrder = (maxOrderCategory?.order ?? -1) + 1;
 
     const category = new Category({
       name,
       budgeted,
       spent: 0,
       budgetId,
+      order: nextOrder,
     });
 
     const savedCategory = await category.save();

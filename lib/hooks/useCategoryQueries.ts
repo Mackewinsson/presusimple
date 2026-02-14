@@ -73,6 +73,29 @@ export const useUpdateCategory = () => {
   });
 };
 
+// Reorder categories mutation (no invalidation on success — optimistic update is kept)
+export const useReorderCategories = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      budgetId,
+      categoryIds,
+    }: {
+      budgetId: string;
+      categoryIds: string[];
+    }) => categoryApi.reorderCategories(budgetId, categoryIds),
+    onSuccess: () => {
+      // Do not invalidate: BudgetSetupSection already updated cache optimistically.
+      // Invalidating would refetch and can overwrite with stale/cached response.
+    },
+    onError: (error) => {
+      console.error("Failed to reorder categories:", error);
+      toast.error("Failed to reorder categories");
+    },
+  });
+};
+
 // Delete category mutation
 export const useDeleteCategory = () => {
   const queryClient = useQueryClient();

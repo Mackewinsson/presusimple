@@ -30,6 +30,7 @@ import {
   useCreateBudget,
   useCreateCategory,
   useUpdateCategory,
+  useReorderCategories,
   useDeleteCategory,
   useUpdateBudget,
   useDeleteBudget,
@@ -42,6 +43,7 @@ import NotificationPrompt from "@/components/NotificationPrompt";
 import type { Budget } from "@/lib/api";
 import { budgetApi } from "@/lib/api";
 import { budgetKeys } from "@/lib/hooks/useBudgetQueries";
+import { categoryKeys } from "@/lib/hooks/useCategoryQueries";
 import BudgetCategoryItem from "./BudgetCategoryItem";
 import NewCategoryForm from "./NewCategoryForm";
 import { AILoading } from "@/components/ui/ai-loading";
@@ -65,6 +67,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 
 interface Category {
   _id?: string;
@@ -108,6 +111,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   const createBudgetMutation = useCreateBudget();
   const createCategoryMutation = useCreateCategory();
   const updateCategoryMutation = useUpdateCategory();
+  const reorderCategoriesMutation = useReorderCategories();
   const deleteCategoryMutation = useDeleteCategory();
   const updateBudgetMutation = useUpdateBudget();
   const deleteBudgetMutation = useDeleteBudget();
@@ -198,6 +202,37 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       // Budget totals are automatically updated by the API
     } catch (error) {
       console.error("Error removing category:", error);
+    }
+  };
+
+  const handleDragEnd = async (result: DropResult) => {
+    if (!result.destination || !budget || !userId) return;
+    const { source, destination } = result;
+    if (source.index === destination.index) return;
+
+    const reordered = [...categoriesWithSpent];
+    const [removed] = reordered.splice(source.index, 1);
+    reordered.splice(destination.index, 0, removed);
+
+    const categoryIds = reordered.map((c) => c._id || c.id).filter(Boolean) as string[];
+    const queryKey = categoryKeys.list(userId);
+
+    const previousCategories =
+      queryClient.getQueryData<Category[]>(queryKey) ?? categories;
+    const reorderedRaw = categoryIds
+      .map((id) => previousCategories.find((c) => (c._id || c.id) === id))
+      .filter(Boolean) as Category[];
+
+    queryClient.setQueryData(queryKey, reorderedRaw);
+
+    try {
+      await reorderCategoriesMutation.mutateAsync({
+        budgetId: String(budget._id),
+        categoryIds,
+      });
+    } catch (error) {
+      console.error("Error reordering categories:", error);
+      queryClient.setQueryData(queryKey, previousCategories);
     }
   };
 
@@ -741,17 +776,38 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       <CardContent>
         <div className="space-y-4">
           {budget && categoriesWithSpent.length > 0 ? (
-            <div className="space-y-4">
-              {categoriesWithSpent.map((category) => (
-                <BudgetCategoryItem
-                  key={category._id || category.id}
-                  category={category}
-                  onRemove={handleRemoveCategory}
-                  onUpdate={handleUpdateCategory}
-                  totalAvailable={budget.totalAvailable}
-                />
-              ))}
-            </div>
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="categories">
+                {(provided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className="space-y-4"
+                  >
+                    {categoriesWithSpent.map((category, index) => (
+                      <Draggable
+                        key={category._id || category.id}
+                        draggableId={category._id || category.id || `cat-${index}`}
+                        index={index}
+                      >
+                        {(draggableProvided) => (
+                          <BudgetCategoryItem
+                            category={category}
+                            onRemove={handleRemoveCategory}
+                            onUpdate={handleUpdateCategory}
+                            totalAvailable={budget.totalAvailable}
+                            dragHandleProps={draggableProvided.dragHandleProps}
+                            draggableProps={draggableProvided.draggableProps}
+                            innerRef={draggableProvided.innerRef}
+                          />
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           ) : (
             <div className="text-center py-8 sm:py-12 px-4 rounded-lg bg-slate-900/5 dark:bg-white/5 backdrop-blur-sm border border-slate-900/10 dark:border-white/10">
               <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-900/20 dark:bg-white/20 mb-3 sm:mb-4">

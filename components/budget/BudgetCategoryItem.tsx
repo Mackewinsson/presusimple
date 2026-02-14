@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { useCurrentCurrency } from "@/lib/hooks";
-import { Edit2, Trash2, Check, X } from "lucide-react";
+import { Edit2, Trash2, Check, X, GripVertical } from "lucide-react";
 import { Icon } from "@/components/ui/icon";
 import { toast } from "sonner";
 import { useTranslation } from "@/lib/i18n";
@@ -27,6 +27,9 @@ interface BudgetCategoryItemProps {
   onRemove: (categoryId: string) => void;
   onUpdate: (categoryId: string, name: string, budgeted: number) => void;
   totalAvailable: number;
+  dragHandleProps?: Record<string, unknown>;
+  draggableProps?: Record<string, unknown>;
+  innerRef?: (element: HTMLElement | null) => void;
 }
 
 const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
@@ -34,6 +37,9 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
   onRemove,
   onUpdate,
   totalAvailable,
+  dragHandleProps,
+  draggableProps,
+  innerRef,
 }) => {
   const { t } = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -104,10 +110,23 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
   };
 
   return (
-    <Card className="border hover-card bg-card/50">
+    <Card
+      ref={innerRef}
+      {...(draggableProps || {})}
+      className="border hover-card bg-card/50"
+    >
       <CardContent className="p-4">
         <div className="space-y-3">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center gap-2">
+            {dragHandleProps && (
+              <div
+                {...dragHandleProps}
+                className="flex-shrink-0 cursor-grab active:cursor-grabbing touch-none p-1 -m-1 rounded text-muted-foreground hover:text-foreground"
+                aria-label="Drag to reorder"
+              >
+                <GripVertical className="h-4 w-4" />
+              </div>
+            )}
             {isEditing ? (
               <div className="flex-1 space-y-2">
                 <div className="flex items-center gap-2">

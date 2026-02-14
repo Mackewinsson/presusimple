@@ -15,6 +15,7 @@ export interface Category {
   budgeted: number;
   spent: number;
   budgetId: string;
+  order?: number;
 }
 
 export interface Expense {
@@ -142,9 +143,11 @@ export const budgetApi = {
 
 // Category API functions
 export const categoryApi = {
-  // Get categories for a user
+  // Get categories for a user (no-store so reorder refetch gets fresh order)
   getCategories: async (userId: string): Promise<Category[]> => {
-    const response = await fetch(`/api/categories?user=${userId}`);
+    const response = await fetch(`/api/categories?user=${userId}`, {
+      cache: "no-store",
+    });
     if (!response.ok) throw new Error("Failed to fetch categories");
     return response.json();
   },
@@ -195,6 +198,19 @@ export const categoryApi = {
       method: "DELETE",
     });
     if (!response.ok) throw new Error("Failed to delete category");
+  },
+
+  // Reorder categories
+  reorderCategories: async (
+    budgetId: string,
+    categoryIds: string[]
+  ): Promise<void> => {
+    const response = await fetch("/api/categories/reorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ budgetId, categoryIds }),
+    });
+    if (!response.ok) throw new Error("Failed to reorder categories");
   },
 };
 

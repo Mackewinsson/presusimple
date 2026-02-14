@@ -18,6 +18,7 @@ export {
   useCategoriesByBudget,
   useCreateCategory,
   useUpdateCategory,
+  useReorderCategories,
   useDeleteCategory,
 } from "./useCategoryQueries";
 export {
