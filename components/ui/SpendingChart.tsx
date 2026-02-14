@@ -14,6 +14,7 @@ import { Bar } from 'react-chartjs-2';
 import { useTheme } from "next-themes";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { useTranslation } from "@/lib/i18n";
+import { useCurrentDecimalSeparator } from "@/lib/hooks";
 
 // Register Chart.js components
 ChartJS.register(
@@ -48,6 +49,7 @@ export function SpendingChart({
   className = ""
 }: SpendingChartProps) {
   const { theme: currentTheme } = useTheme();
+  const decimalSeparator = useCurrentDecimalSeparator();
   const { t } = useTranslation();
 
   // Get high-contrast colors for dark mode
@@ -209,7 +211,7 @@ export function SpendingChart({
                 // Show a combined tooltip instead of per-dataset
                 label: function(this: unknown, context: TooltipItem<"bar">) {
                   if (!showBudgeted) {
-                    return `${t('totalSpent')}: ${formatMoney(context.parsed.y)}`;
+                    return `${t('totalSpent')}: ${formatMoney(context.parsed.y, undefined, decimalSeparator)}`;
                   }
                   // Only show full info on the first dataset hit
                   if (context.datasetIndex === 0) {
@@ -218,8 +220,8 @@ export function SpendingChart({
                     const budgeted = chartData[idx]?.budgeted || 0;
                     const pct = budgeted > 0 ? Math.round((spent / budgeted) * 100) : 0;
                     return [
-                      `${t('budgeted')}: ${formatMoney(budgeted)}`,
-                      `${t('totalSpent')}: ${formatMoney(spent)}`,
+                      `${t('budgeted')}: ${formatMoney(budgeted, undefined, decimalSeparator)}`,
+                      `${t('totalSpent')}: ${formatMoney(spent, undefined, decimalSeparator)}`,
                       `${pct}${t('percentUsed')}`,
                     ];
                   }
@@ -268,7 +270,7 @@ export function SpendingChart({
                   weight: 'normal',
                 },
                 callback: function(value) {
-                  return formatMoney(value as number);
+                  return formatMoney(value as number, undefined, decimalSeparator);
                 },
               },
             },

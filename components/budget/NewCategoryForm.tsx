@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { X } from "lucide-react";
 import { toast } from "sonner";
-import { formatMoney } from "@/lib/utils/formatMoney";
+import { formatMoney, parseDecimalInput } from "@/lib/utils/formatMoney";
 import { useTranslation } from "@/lib/i18n";
+import { useCurrentCurrency, useCurrentDecimalSeparator } from "@/lib/hooks";
 
 interface NewCategoryFormProps {
   onComplete: (name: string, budgeted: number) => void;
@@ -21,6 +22,8 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
   totalAvailable,
 }) => {
   const { t } = useTranslation();
+  const currentCurrency = useCurrentCurrency();
+  const decimalSeparator = useCurrentDecimalSeparator();
   const [name, setName] = useState("");
   const [budgeted, setBudgeted] = useState("");
 
@@ -32,9 +35,9 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
       return;
     }
 
-    const budgetAmount = parseFloat(budgeted);
+    const budgetAmount = parseDecimalInput(budgeted);
 
-    if (isNaN(budgetAmount)) {
+    if (budgetAmount <= 0) {
       toast.error("Please enter a valid amount");
       return;
     }
@@ -46,7 +49,9 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
     if (budgetAmount > totalAvailable) {
       toast.error(
         `Cannot budget more than available amount (${formatMoney(
-          totalAvailable
+          totalAvailable,
+          currentCurrency,
+          decimalSeparator
         )})`
       );
       return;
@@ -84,7 +89,7 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
               className="w-full h-9 sm:h-8 text-sm sm:text-base"
             />
             <div className="absolute right-0 top-0 h-9 sm:h-8 px-2 flex items-center text-xs sm:text-sm text-muted-foreground pointer-events-none">
-              Available: {formatMoney(totalAvailable)}
+              Available: {formatMoney(totalAvailable, currentCurrency, decimalSeparator)}
             </div>
           </div>
         </div>

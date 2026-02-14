@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { formatMoney } from "@/lib/utils/formatMoney";
-import { useCurrentCurrency } from "@/lib/hooks";
+import { formatMoney, parseDecimalInput } from "@/lib/utils/formatMoney";
+import { useCurrentCurrency, useCurrentDecimalSeparator } from "@/lib/hooks";
 import { useTranslation } from "@/lib/i18n";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -64,6 +64,7 @@ interface ExpenseItemProps {
 const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
   const { t } = useTranslation();
   const currentCurrency = useCurrentCurrency();
+  const decimalSeparator = useCurrentDecimalSeparator();
   const updateExpenseMutation = useUpdateExpense();
   const deleteExpenseMutation = useDeleteExpense();
 
@@ -89,9 +90,9 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
   };
 
   const handleSaveEdit = async () => {
-    const newAmount = parseFloat(editedAmount);
+    const newAmount = parseDecimalInput(editedAmount);
 
-    if (isNaN(newAmount) || newAmount <= 0) {
+    if (newAmount <= 0) {
       toast.error("Please enter a valid amount");
       return;
     }
@@ -240,7 +241,7 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
               ) : (
                 <ArrowDownCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
               )}
-                                {formatMoney(expense.amount, currentCurrency)}
+                                {formatMoney(expense.amount, currentCurrency, decimalSeparator)}
             </div>
           </div>
           <div className="flex items-center gap-1">

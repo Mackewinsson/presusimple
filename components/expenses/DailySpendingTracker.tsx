@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatMoney } from "@/lib/utils/formatMoney";
+import { useCurrentDecimalSeparator } from "@/lib/hooks";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
@@ -50,6 +51,7 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
   expenses,
 }) => {
   const { t } = useTranslation();
+  const decimalSeparator = useCurrentDecimalSeparator();
   const planFeatureFlags = usePlanFeatureFlags();
   const remoteFeatureFlags = useRemoteFeatureFlags();
   const isAIFeatureFlagEnabled = remoteFeatureFlags.isFeatureEnabled("aa");
@@ -83,7 +85,7 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
                 remaining < 0 ? "text-destructive" : ""
               }`}
             >
-              {formatMoney(remaining)}
+              {formatMoney(remaining, undefined, decimalSeparator)}
             </div>
             <div className="text-xs sm:text-sm text-muted-foreground">
               {t('availableToSpend')}

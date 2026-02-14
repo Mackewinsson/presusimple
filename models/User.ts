@@ -12,6 +12,7 @@ export interface IUser extends Document {
   subscriptionType?: string; // "stripe", "manual_paid", "manual_trial", etc.
   plan?: "free" | "pro";
   currency?: string; // Currency code (e.g., "USD", "EUR")
+  decimalSeparator?: "dot" | "comma"; // Number format: dot (1,234.56) or comma (1.234,56)
   // Notification fields
   pushSubscription?: any; // Push subscription object
   notificationEnabled?: boolean;
@@ -37,6 +38,7 @@ const UserSchema = new Schema<IUser>({
     default: "free"
   },
   currency: { type: String, default: "USD" },
+  decimalSeparator: { type: String, enum: ["dot", "comma"], default: "dot" },
   // Notification fields
   pushSubscription: { type: Schema.Types.Mixed }, // Push subscription object
   notificationEnabled: { type: Boolean, default: false },

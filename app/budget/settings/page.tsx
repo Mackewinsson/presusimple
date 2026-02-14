@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, User, Settings } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { useUserSubscription, useUserData } from '@/lib/hooks';
+import { useUserSubscription, useUserData, useDecimalSeparator, useSetDecimalSeparator } from '@/lib/hooks';
 import { getSubscriptionStatus, calculateTrialDaysLeft } from '@/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Crown, Clock, CreditCard, Calendar, LogOut, Lock, Eye, EyeOff } from 'lucide-react';
 import MobileHeader from '@/components/MobileHeader';
@@ -21,6 +28,35 @@ import { useTranslation } from '@/lib/i18n';
 import { toast } from 'sonner';
 // import BudgetTemplateSelector from '@/components/budget/BudgetTemplateSelector';
 // import SavingsGoalList from '@/components/savings/SavingsGoalList';
+
+function DecimalSeparatorSetting() {
+  const { data: decimalSeparator, isLoading } = useDecimalSeparator();
+  const setDecimalSeparator = useSetDecimalSeparator();
+
+  const value = decimalSeparator ?? 'dot';
+
+  const handleChange = (v: string) => {
+    if (v === 'dot' || v === 'comma') {
+      setDecimalSeparator.mutate(v);
+    }
+  };
+
+  if (isLoading) {
+    return <div className="h-10 bg-muted animate-pulse rounded-md w-48" />;
+  }
+
+  return (
+    <Select value={value} onValueChange={handleChange}>
+      <SelectTrigger className="w-full max-w-[240px]" aria-label="Decimal separator">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent position="popper" sideOffset={4}>
+        <SelectItem value="dot">Dot — 1,234.56</SelectItem>
+        <SelectItem value="comma">Comma — 1.234,56</SelectItem>
+      </SelectContent>
+    </Select>
+  );
+}
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -385,14 +421,13 @@ export default function SettingsPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>{t('moreSettingsComingSoon')}</p>
+                  <div className="space-y-4">
+                    <Label className="text-base font-medium">Decimal separator</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Choose how numbers are displayed and entered (e.g. in amounts).
+                    </p>
+                    <DecimalSeparatorSetting />
                   </div>
-                  
-                  {/* Future settings will go here */}
-                  {/* <BudgetTemplateSelector /> */}
-                  {/* <SavingsGoalList /> */}
 
                   {/* Mobile Sign Out - Alternative Access */}
                   {isMobile && (

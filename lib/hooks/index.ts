@@ -45,6 +45,11 @@ export {
   currencies,
   type Currency,
 } from "./useCurrencyQueries";
+export {
+  useDecimalSeparator,
+  useSetDecimalSeparator,
+  useCurrentDecimalSeparator,
+} from "./useDecimalSeparatorQueries";
 export { useAccessControl } from "./useAccessControl";
 export { useStreak } from "./useStreak";
 export { useBudgetPageData } from "./useBudgetPageData";

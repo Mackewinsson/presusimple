@@ -17,6 +17,7 @@ import { format } from "date-fns";
 import { useSession } from "next-auth/react";
 import { useUserId, useCreateExpense } from "@/lib/hooks";
 import { useTranslation } from "@/lib/i18n";
+import { parseDecimalInput } from "@/lib/utils/formatMoney";
 
 interface Budget {
   _id: string;
@@ -74,8 +75,8 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
       return;
     }
 
-    const numAmount = parseFloat(amount);
-    if (isNaN(numAmount) || numAmount <= 0) {
+    const numAmount = parseDecimalInput(amount);
+    if (numAmount <= 0) {
       toast.error("Please enter a valid amount");
       return;
     }

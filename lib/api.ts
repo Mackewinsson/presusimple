@@ -75,6 +75,27 @@ export const currencyApi = {
   },
 };
 
+export type DecimalSeparator = "dot" | "comma";
+
+// Decimal separator API
+export const decimalSeparatorApi = {
+  get: async (): Promise<DecimalSeparator> => {
+    const response = await fetch("/api/users/decimal-separator");
+    if (!response.ok) throw new Error("Failed to get decimal separator");
+    const data = await response.json();
+    return data.decimalSeparator === "comma" ? "comma" : "dot";
+  },
+  update: async (decimalSeparator: DecimalSeparator): Promise<{ decimalSeparator: DecimalSeparator }> => {
+    const response = await fetch("/api/users/decimal-separator", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ decimalSeparator }),
+    });
+    if (!response.ok) throw new Error("Failed to update decimal separator");
+    return response.json();
+  },
+};
+
 // Budget API functions
 export const budgetApi = {
   // Get budget for a user

@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatMoney } from "@/lib/utils/formatMoney";
-import { useCurrentCurrency } from "@/lib/hooks";
+import { formatMoney, parseDecimalInput } from "@/lib/utils/formatMoney";
+import { useCurrentCurrency, useCurrentDecimalSeparator } from "@/lib/hooks";
 import { Edit2, Trash2, Check, X, GripVertical } from "lucide-react";
 import { Icon } from "@/components/ui/icon";
 import { toast } from "sonner";
@@ -43,6 +43,7 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
 }) => {
   const { t } = useTranslation();
   const currentCurrency = useCurrentCurrency();
+  const decimalSeparator = useCurrentDecimalSeparator();
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(category.name);
   const [editBudgeted, setEditBudgeted] = useState(category.budgeted.toString());
@@ -60,7 +61,7 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
 
   const handleSave = () => {
     const trimmedName = editName.trim();
-    const budgetAmount = parseFloat(editBudgeted);
+    const budgetAmount = parseDecimalInput(editBudgeted);
     
     if (trimmedName === "") {
       toast.error(t("pleaseEnterCategoryName"));
@@ -77,7 +78,8 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
       toast.error(
         `${t('cannotIncreaseBudgetByMore')} (${formatMoney(
           totalAvailable,
-          currentCurrency
+          currentCurrency,
+          decimalSeparator
         )})`
       );
       return;
@@ -222,8 +224,8 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
           </div>
           <div className="flex justify-between text-sm mb-1">
             <span className="text-muted-foreground">
-              {formatMoney(category.spent, currentCurrency)} of{" "}
-              {formatMoney(category.budgeted, currentCurrency)}
+              {formatMoney(category.spent, currentCurrency, decimalSeparator)} of{" "}
+              {formatMoney(category.budgeted, currentCurrency, decimalSeparator)}
             </span>
             <span
               className={

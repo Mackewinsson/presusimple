@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { SpendingChart } from "@/components/ui/SpendingChart";
-import { useCurrentCurrency } from "@/lib/hooks";
+import { useCurrentCurrency, useCurrentDecimalSeparator } from "@/lib/hooks";
 import { useTranslation } from "@/lib/i18n";
 
 import { motion } from "framer-motion";
@@ -46,6 +46,7 @@ interface SummaryProps {
 const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
   const { t } = useTranslation();
   const currentCurrency = useCurrentCurrency();
+  const decimalSeparator = useCurrentDecimalSeparator();
   // Calculate total spent from expenses
   const totalSpent = expenses.reduce((sum, expense) => {
     return (
@@ -188,7 +189,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
               {t('totalBudgeted')}
             </div>
             <div className="text-lg sm:text-xl md:text-2xl font-semibold">
-                              {formatMoney(calculatedTotalBudgeted, currentCurrency)}
+                              {formatMoney(calculatedTotalBudgeted, currentCurrency, decimalSeparator)}
             </div>
           </div>
 
@@ -197,7 +198,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
               {t('totalSpent')}
             </div>
             <div className="text-lg sm:text-xl md:text-2xl font-semibold">
-                              {formatMoney(totalSpent, currentCurrency)}
+                              {formatMoney(totalSpent, currentCurrency, decimalSeparator)}
             </div>
           </div>
 
@@ -212,7 +213,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                   : ""
               }`}
             >
-                              {formatMoney(calculatedTotalBudgeted - totalSpent, currentCurrency)}
+                              {formatMoney(calculatedTotalBudgeted - totalSpent, currentCurrency, decimalSeparator)}
             </div>
           </div>
         </div>

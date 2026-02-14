@@ -21,7 +21,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { SpendingChart } from "@/components/ui/SpendingChart";
-import { useMonthlyBudgets, useUserId, useDeleteMonthlyBudget, useExpenses, useCategories } from "@/lib/hooks";
+import { useMonthlyBudgets, useUserId, useDeleteMonthlyBudget, useExpenses, useCategories, useCurrentDecimalSeparator } from "@/lib/hooks";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
@@ -44,6 +44,7 @@ export default function BudgetDetailPage() {
   const budgetId = params.id as string;
   
   const { data: userId } = useUserId();
+  const decimalSeparator = useCurrentDecimalSeparator();
   const { data: budgets = [], isLoading: budgetsLoading } = useMonthlyBudgets(
     userId || ""
   );
@@ -239,13 +240,13 @@ export default function BudgetDetailPage() {
                       Total Budgeted
                     </span>
                     <span className="font-medium">
-                      {formatMoney(selectedBudget.totalBudgeted)}
+                      {formatMoney(selectedBudget.totalBudgeted, undefined, decimalSeparator)}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Total Spent</span>
                     <span className="font-medium">
-                      {formatMoney(selectedBudget.totalSpent)}
+                      {formatMoney(selectedBudget.totalSpent, undefined, decimalSeparator)}
                     </span>
                   </div>
                   <div className="flex justify-between pt-2 border-t">
@@ -261,7 +262,9 @@ export default function BudgetDetailPage() {
                     >
                       {formatMoney(
                         selectedBudget.totalBudgeted -
-                          selectedBudget.totalSpent
+                          selectedBudget.totalSpent,
+                        undefined,
+                        decimalSeparator
                       )}
                     </span>
                   </div>
@@ -399,10 +402,10 @@ export default function BudgetDetailPage() {
                         <div className={`text-lg font-bold ${
                           category.spent > category.budgeted ? "text-destructive" : "text-primary"
                         }`}>
-                          {formatMoney(category.spent)}
+                          {formatMoney(category.spent, undefined, decimalSeparator)}
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          of {formatMoney(category.budgeted)} budgeted
+                          of {formatMoney(category.budgeted, undefined, decimalSeparator)} budgeted
                         </div>
                       </div>
                     </div>
@@ -430,8 +433,8 @@ export default function BudgetDetailPage() {
                           category.spent > category.budgeted ? "text-destructive" : "text-primary"
                         }`}>
                           {category.spent > category.budgeted 
-                            ? `+${formatMoney(category.spent - category.budgeted)} over`
-                            : `${formatMoney(category.budgeted - category.spent)} remaining`
+                            ? `+${formatMoney(category.spent - category.budgeted, undefined, decimalSeparator)} over`
+                            : `${formatMoney(category.budgeted - category.spent, undefined, decimalSeparator)} remaining`
                           }
                         </span>
                       </div>

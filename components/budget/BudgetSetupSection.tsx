@@ -20,9 +20,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { formatMoney } from "@/lib/utils/formatMoney";
+import { formatMoney, parseDecimalInput } from "@/lib/utils/formatMoney";
 import { toast } from "sonner";
-import { currencies, type Currency, useCurrentCurrency } from "@/lib/hooks";
+import { currencies, type Currency, useCurrentCurrency, useCurrentDecimalSeparator } from "@/lib/hooks";
 import { useSession } from "next-auth/react";
 import { useTranslation } from "@/lib/i18n";
 import {
@@ -93,6 +93,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   const { t } = useTranslation();
   const { data: session } = useSession();
   const currentCurrency = useCurrentCurrency();
+  const decimalSeparator = useCurrentDecimalSeparator();
   const {
     data: userId,
     isLoading: userIdLoading,
@@ -263,8 +264,8 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   const handleSetTotalBudget = async () => {
     if (!budget) return;
     
-    const amount = parseFloat(totalBudget);
-    if (isNaN(amount) || amount < 0) {
+    const amount = parseDecimalInput(totalBudget);
+    if (amount < 0) {
       toast.error("Please enter a valid amount");
       return;
     }
@@ -299,7 +300,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
 
   const handleCreateBudget = async (e: React.FormEvent) => {
     e.preventDefault();
-    const total = parseFloat(newTotal);
+    const total = parseDecimalInput(newTotal);
     if (isNaN(total) || total <= 0) {
       toast.error("Please enter a valid total budget");
       return;
@@ -742,7 +743,8 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                 <div className="text-base sm:text-lg font-medium text-slate-900 dark:text-white">
                   {formatMoney(
                     calculatedTotalBudgeted + (budget?.totalAvailable || 0),
-                    currency
+                    currency,
+                    decimalSeparator
                   )}
                 </div>
                 <div className="text-xs sm:text-sm text-slate-600 dark:text-white/60">
@@ -759,7 +761,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
               {t('budgeted')}
             </div>
             <div className="text-base sm:text-lg font-medium mt-1 text-slate-900 dark:text-white">
-              {formatMoney(calculatedTotalBudgeted, currency)}
+              {formatMoney(calculatedTotalBudgeted, currency, decimalSeparator)}
             </div>
           </div>
           <div className="p-3 sm:p-4 rounded-xl bg-slate-900/10 dark:bg-white/10 backdrop-blur-sm border border-slate-900/20 dark:border-white/20">
@@ -767,7 +769,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
               {t('availableToBudget')}
             </div>
             <div className="text-base sm:text-lg font-medium mt-1 text-slate-900 dark:text-white">
-              {formatMoney(budget?.totalAvailable || 0, currency)}
+              {formatMoney(budget?.totalAvailable || 0, currency, decimalSeparator)}
             </div>
           </div>
         </div>

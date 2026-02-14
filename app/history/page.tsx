@@ -30,6 +30,7 @@ import {
   useMonthlyBudgets,
   useDeleteMonthlyBudget,
   useUserId,
+  useCurrentDecimalSeparator,
 } from "@/lib/hooks";
 import { HistoryItemSkeleton } from "@/components/ui/loading-skeleton";
 import MobileHeader from "@/components/MobileHeader";
@@ -171,7 +172,7 @@ export default function HistoryPage() {
                           Total Budgeted
                         </div>
                         <div className="font-medium">
-                          {formatMoney(budget.totalBudgeted)}
+                          {formatMoney(budget.totalBudgeted, undefined, decimalSeparator)}
                         </div>
                       </div>
                       <div className="space-y-1">
@@ -179,7 +180,7 @@ export default function HistoryPage() {
                           Total Spent
                         </div>
                         <div className="font-medium">
-                          {formatMoney(budget.totalSpent)}
+                          {formatMoney(budget.totalSpent, undefined, decimalSeparator)}
                         </div>
                       </div>
                       <div className="space-y-1">

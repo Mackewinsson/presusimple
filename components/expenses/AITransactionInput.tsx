@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { Sparkles, Zap, XCircle, CheckCircle, AlertCircle, Plus, Minus, AlertTriangle } from "lucide-react";
 import { Icon } from "@/components/ui/icon";
-import { formatMoney } from "@/lib/utils/formatMoney";
+import { formatMoney, parseDecimalInput } from "@/lib/utils/formatMoney";
 import { AITransactionLoading } from "@/components/ui/ai-transaction-loading";
 import { useToast } from "@/hooks/use-toast";
 
@@ -189,7 +189,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                           min="0"
                           step="0.01"
                           value={budgetAmount}
-                          onChange={(e) => handleBudgetChange(missingCategory.name, parseFloat(e.target.value) || 0)}
+                          onChange={(e) => handleBudgetChange(missingCategory.name, parseDecimalInput(e.target.value))}
                           className="pl-8 w-32"
                           placeholder="0.00"
                         />
