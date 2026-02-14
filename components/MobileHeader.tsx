@@ -7,6 +7,7 @@ import { useTranslation } from "@/lib/i18n";
 import { ArrowLeft, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { StreakWidget } from "@/components/streak/StreakWidget";
+import { getBudgetBasePath, isBudgetAddPath } from "@/lib/budget-routes";
 
 interface MobileHeaderProps {
   title?: string;
@@ -35,37 +36,32 @@ export default function MobileHeader({
     return null;
   }
 
+  const budgetBase = getBudgetBasePath(pathname);
+
   // Determine back href if not provided
   const getBackHref = () => {
     if (backHref) return backHref;
-    
-    // Default back navigation logic
-    if (pathname.startsWith('/budget/settings')) return '/budget';
-    if (pathname.startsWith('/history')) return '/budget';
-    
-    return '/budget';
+    if (isBudgetAddPath(pathname)) return budgetBase;
+    if (pathname.startsWith(budgetBase + "/settings")) return budgetBase;
+    if (pathname.startsWith("/history") || pathname.startsWith("/es/history")) return budgetBase;
+    return budgetBase;
   };
 
   // Determine if back button should be shown
   const shouldShowBackButton = () => {
     if (!showBackButton) return false;
-    
-    // Don't show back button on main budget page
-    if (pathname === '/budget') return false;
-    
-    // Show back button on sub-pages
-    return pathname.startsWith('/budget/settings') || pathname.startsWith('/history');
+    if (pathname === budgetBase) return false;
+    return isBudgetAddPath(pathname) || pathname.startsWith(budgetBase + "/settings") || pathname.startsWith("/history") || pathname.startsWith("/es/history");
   };
 
   // Determine title if not provided
   const getTitle = () => {
     if (title) return title;
-    
-    if (pathname.startsWith('/budget/settings')) return t('settings');
-    if (pathname.startsWith('/history')) return t('history');
-    if (pathname === '/budget') return 'Presusimple'; // Main budget page shows app title
-
-    return 'Presusimple';
+    if (isBudgetAddPath(pathname)) return t("addTransaction");
+    if (pathname.startsWith(budgetBase + "/settings")) return t("settings");
+    if (pathname.startsWith("/history")) return t("history");
+    if (pathname === budgetBase) return "Presusimple";
+    return "Presusimple";
   };
 
   return (
@@ -99,11 +95,11 @@ export default function MobileHeader({
         )}
         
         <div className="flex items-center gap-2">
-          {pathname === '/budget' && <StreakWidget />}
+          {pathname === budgetBase && <StreakWidget />}
           {/* Home button for quick access to main budget page */}
-          {pathname !== '/budget' && !pathname.startsWith('/budget/') && (
+          {pathname !== budgetBase && !pathname.startsWith(budgetBase + "/") && (
             <Link
-              href="/budget"
+              href={budgetBase}
               className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
             >
               <Home className="h-4 w-4 text-slate-700 dark:text-slate-300" />

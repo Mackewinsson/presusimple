@@ -46,3 +46,4 @@ export {
 } from "./useCurrencyQueries";
 export { useAccessControl } from "./useAccessControl";
 export { useStreak } from "./useStreak";
+export { useBudgetPageData } from "./useBudgetPageData";

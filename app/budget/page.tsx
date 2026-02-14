@@ -2,7 +2,6 @@
 
 import React from "react";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import BudgetSetupSection from "@/components/budget/BudgetSetupSection";
 import DailySpendingTracker from "@/components/expenses/DailySpendingTracker";
@@ -15,17 +14,9 @@ import { TrialStatus } from "@/components/TrialStatus";
 import { History, AlertTriangle } from "lucide-react";
 import { AppIcon } from "@/components/ui/app-icon";
 import SignOutButton from "@/components/SignOutButton";
-import {
-  useUserId,
-  useBudget,
-  useCategories,
-  useExpenses,
-  useUserSubscription,
-} from "@/lib/hooks";
-import { useAccessControl } from "@/lib/hooks/useAccessControl";
+import { useBudgetPageData } from "@/lib/hooks";
 import { useFeatureFlags as usePlanFeatureFlags } from "@/lib/hooks/useFeatureFlags";
 import { useFeatureFlags as useRemoteFeatureFlags } from "@/hooks/useFeatureFlags";
-import { useUserData } from "@/lib/hooks/useUserData";
 import { AppLoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getSubscriptionStatus } from "@/lib/utils";
@@ -47,27 +38,21 @@ import { toast } from "sonner";
 
 function BudgetAppContent() {
   const { t } = useTranslation();
-  const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const {
+    session,
+    status,
+    userId,
+    user,
+    budget,
+    categories,
+    expenses,
+    subscription,
+    accessControl,
+    isLoading,
+  } = useBudgetPageData();
   const isNewUser = searchParams.get("newUser") === "true" || session?.isNewUser;
-
-  // Get user ID using React Query
-  const { data: userId, isLoading: userIdLoading } = useUserId();
-
-  // Get user data for trial/subscription status
-  const { data: user, isLoading: userLoading } = useUserData();
-
-  // Get data using React Query
-  const { data: budget, isLoading: budgetLoading, isFetching: budgetFetching } = useBudget(userId || "");
-  const { data: categories = [], isLoading: categoriesLoading, isFetching: categoriesFetching } = useCategories(
-    userId || ""
-  );
-  const { data: expenses = [], isLoading: expensesLoading, isFetching: expensesFetching } = useExpenses(
-    userId || ""
-  );
-  const { data: subscription } = useUserSubscription();
-  const accessControl = useAccessControl();
   const planFeatureFlags = usePlanFeatureFlags();
   const remoteFeatureFlags = useRemoteFeatureFlags();
   const isAIFeatureFlagEnabled = remoteFeatureFlags.isFeatureEnabled("aa");
@@ -82,14 +67,6 @@ function BudgetAppContent() {
       console.log('[PWA] Updates detected and loaded in background');
     },
   });
-
-  // Only show loading if we have NO data at all (first load)
-  // If we have cached data, show it immediately even if refetching
-  const hasNoData = !budget && !categories.length && !expenses.length;
-  const isInitialLoad = (budgetLoading || categoriesLoading || expensesLoading) && hasNoData;
-  
-  // Check if any data is loading for initial load only
-  const isLoading = userIdLoading || userLoading || isInitialLoad;
 
   // Only check subscription status after user data has loaded
   const subscriptionStatus = getSubscriptionStatus(subscription || {});
@@ -107,11 +84,11 @@ function BudgetAppContent() {
     // Only redirect if user is new AND hasn't completed onboarding
     const onboardingComplete = localStorage.getItem("onboardingComplete");
     
-    if (session.isNewUser && !userLoading && !onboardingComplete) {
+    if (session.isNewUser && !isLoading && !onboardingComplete) {
       router.replace("/budget/welcome");
       return;
     }
-  }, [session, status, router, userLoading]);
+  }, [session, status, router, isLoading]);
 
   if (status === "loading" || !session) {
     return <AppLoadingSkeleton />;
@@ -130,7 +107,7 @@ function BudgetAppContent() {
   const onboardingComplete = typeof window !== 'undefined' ? localStorage.getItem("onboardingComplete") : null;
   const hasNoTrialData = !user?.trialEnd && !user?.isPaid;
   
-  if (!userLoading && !accessControl.isLoading && (trialExpired || hasNoSubscription) && !hasNoTrialData) {
+  if (!isLoading && !accessControl.isLoading && (trialExpired || hasNoSubscription) && !hasNoTrialData) {
     return (
       <AccessRestricted
         reason={trialExpired ? "trial_expired" : "no_subscription"}
@@ -210,15 +187,17 @@ function BudgetAppContent() {
             )}
           </div>
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
-            {/* Daily Spending Tracker with AI tab controlled by feature flag */}
-            {budget && accessControl.canAccessExpenses && (
-              <DailySpendingTracker
-                budget={budget}
-                categories={categories}
-                expenses={expenses}
-              />
-            )}
-            
+            {/* Daily Spending Tracker: desktop only (mobile uses tab "+" -> /budget/add) */}
+            <div className="hidden md:block">
+              {budget && accessControl.canAccessExpenses && (
+                <DailySpendingTracker
+                  budget={budget}
+                  categories={categories}
+                  expenses={expenses}
+                />
+              )}
+            </div>
+
             {budget && accessControl.canAccessBudget && (
               <Summary
                 budget={budget}

@@ -6,36 +6,53 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useViewport } from "@/hooks/useViewport";
 import { useTranslation } from "@/lib/i18n";
-import { Home, History, Settings } from "lucide-react";
+import { Wallet, Plus, History, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getBudgetBasePath, isBudgetAddPath } from "@/lib/budget-routes";
 
 interface TabItem {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   translationKey: string;
+  isActive?: (pathname: string) => boolean;
 }
 
-const tabItems: TabItem[] = [
-  {
-    href: "/budget",
-    icon: Home,
-    label: "Budget",
-    translationKey: "budget"
-  },
-  {
-    href: "/history",
-    icon: History,
-    label: "History",
-    translationKey: "history"
-  },
-  {
-    href: "/budget/settings",
-    icon: Settings,
-    label: "Settings",
-    translationKey: "settings"
-  }
-];
+function buildTabItems(pathname: string): TabItem[] {
+  const budgetBase = getBudgetBasePath(pathname);
+  return [
+    {
+      href: `${budgetBase}/add`,
+      icon: Plus,
+      label: "Add",
+      translationKey: "add",
+      isActive: isBudgetAddPath,
+    },
+    {
+      href: budgetBase,
+      icon: Wallet,
+      label: "Budget",
+      translationKey: "budget",
+      isActive: (p) =>
+        p === budgetBase ||
+        (p.startsWith(budgetBase + "/") && p !== budgetBase + "/settings" && p !== budgetBase + "/add"),
+    },
+    {
+      href: pathname.startsWith("/es") ? "/es/history" : "/history",
+      icon: History,
+      label: "History",
+      translationKey: "history",
+      isActive: (p) => p === "/history" || p === "/es/history" || p.startsWith("/history/") || p.startsWith("/es/history/"),
+    },
+    {
+      href: `${budgetBase}/settings`,
+      icon: Settings,
+      label: "Settings",
+      translationKey: "settings",
+      isActive: (p) => p === budgetBase + "/settings",
+    },
+  ];
+}
 
 export default function MobileBottomTab() {
   const { isMobile } = useViewport();
@@ -69,12 +86,10 @@ export default function MobileBottomTab() {
       }}
     >
       <div className="flex items-center justify-around px-2 py-2">
-        {tabItems.map((item) => {
+        {buildTabItems(pathname).map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href || 
-            (item.href === "/budget" && pathname.startsWith("/budget") && pathname !== "/budget/settings") ||
-            (item.href === "/history" && pathname.startsWith("/history"));
-          
+          const isActive = item.isActive ? item.isActive(pathname) : pathname === item.href;
+
           return (
             <Link
               key={item.href}
