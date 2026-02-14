@@ -13,11 +13,14 @@ import { useCurrentCurrency, useCurrentDecimalSeparator } from "@/lib/hooks";
 import { useTranslation } from "@/lib/i18n";
 
 import { motion } from "framer-motion";
+import { format, parseISO } from "date-fns";
 import { Button } from "./ui/button";
 import { FileSpreadsheet } from "lucide-react";
 import { utils, writeFile } from "xlsx";
 import { toast } from "sonner";
 import type { Budget } from "@/lib/api";
+
+const EXCEL_SHEET_NAME_MAX_LENGTH = 31;
 
 interface Category {
   _id?: string;
@@ -97,10 +100,15 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
 
   const handleExportToExcel = () => {
     try {
-      // Create workbook
       const wb = utils.book_new();
 
-      // Create Budget Summary worksheet
+      // Excel number format: dot e.g. #,##0.00, comma e.g. #.##0,00; prefix with currency symbol
+      const numFmt =
+        decimalSeparator === "comma"
+          ? `"${currentCurrency.symbol}"#.##0,00`
+          : `"${currentCurrency.symbol}"#,##0.00`;
+
+      // --- Budget Summary sheet ---
       const summaryData = [
         [t('budgetSummary'), ""],
         [t('totalBudgeted'), budget.totalBudgeted],
@@ -121,9 +129,25 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
 
       const summaryWs = utils.aoa_to_sheet(summaryData);
 
-      // Create Expenses worksheet
-      const expensesData = [
-        [t('transactionHistory'), "", "", ""],
+      // Column widths (Summary: 2 cols for key-value, 4 for table)
+      summaryWs["!cols"] = [{ wch: 22 }, { wch: 14 }, { wch: 14 }, { wch: 14 }];
+
+      // Number format for totals (B2, B3, B4) and category table (B7:D7, B8:D8, ...)
+      ["B2", "B3", "B4"].forEach((ref) => {
+        if (summaryWs[ref]) summaryWs[ref].z = numFmt;
+      });
+      const summaryTableStartRow = 7;
+      categoriesWithSpent.forEach((_, i) => {
+        const r = summaryTableStartRow + i;
+        ["B", "C", "D"].forEach((col) => {
+          const ref = `${col}${r}`;
+          if (summaryWs[ref]) summaryWs[ref].z = numFmt;
+        });
+      });
+
+      // --- Expenses sheet (5 columns: date, category, description, amount, type) ---
+      const expensesData: (string | number)[][] = [
+        [t('transactionHistory'), "", "", "", ""],
         [t('date'), t('category'), t('description'), t('amount'), t('type')],
       ];
 
@@ -131,23 +155,43 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
         const category = categories.find(
           (c) => c._id === expense.categoryId || c.id === expense.categoryId
         );
+        const signedAmount =
+          expense.type === "income" ? -expense.amount : expense.amount;
         expensesData.push([
-          new Date(expense.date).toLocaleDateString(),
+          format(parseISO(expense.date), "yyyy-MM-dd"),
           category?.name || t('unknown'),
           expense.description || "-",
-          String(expense.amount),
+          signedAmount,
           expense.type,
         ]);
       });
 
       const expensesWs = utils.aoa_to_sheet(expensesData);
 
-      // Add worksheets to workbook
-      utils.book_append_sheet(wb, summaryWs, t('budgetSummary'));
-      utils.book_append_sheet(wb, expensesWs, t('transactionHistory'));
+      // Column widths (Expenses: date, category, description, amount, type)
+      expensesWs["!cols"] = [
+        { wch: 12 },
+        { wch: 18 },
+        { wch: 30 },
+        { wch: 12 },
+        { wch: 10 },
+      ];
 
-      // Generate Excel file
-      writeFile(wb, "budget-report.xlsx");
+      // Number format for amount column (D3, D4, ...)
+      expenses.forEach((_, i) => {
+        const ref = `D${i + 3}`;
+        if (expensesWs[ref]) expensesWs[ref].z = numFmt;
+      });
+
+      // Sheet names: Excel limit 31 chars
+      const summarySheetName = t('budgetSummary').slice(0, EXCEL_SHEET_NAME_MAX_LENGTH);
+      const expensesSheetName = t('transactionHistory').slice(0, EXCEL_SHEET_NAME_MAX_LENGTH);
+
+      utils.book_append_sheet(wb, summaryWs, summarySheetName);
+      utils.book_append_sheet(wb, expensesWs, expensesSheetName);
+
+      const filename = `budget-report-${format(new Date(), "yyyy-MM-dd")}.xlsx`;
+      writeFile(wb, filename);
       toast.success(t('excelExportSuccess'));
     } catch (error) {
       console.error("Excel export failed:", error);
