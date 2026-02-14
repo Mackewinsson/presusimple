@@ -13,7 +13,7 @@ export default function BudgetLayout({
         <CurrencySelector />
         <Link
           href="/budget/settings"
-          className="flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors"
+          className="flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-accent text-accent-foreground shadow-lg hover:bg-accent/90 transition-colors"
         >
           <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
         </Link>

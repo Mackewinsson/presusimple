@@ -82,7 +82,7 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
           <div className="text-right">
             <div
               className={`text-base sm:text-lg font-medium ${
-                remaining < 0 ? "text-destructive" : ""
+                remaining < 0 ? "text-destructive" : "text-accent-foreground"
               }`}
             >
               {formatMoney(remaining, undefined, decimalSeparator)}
@@ -108,15 +108,15 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
       <CardContent>
         <Tabs defaultValue="add" className="w-full">
           <TabsList className={`grid w-full ${canShowAITransactions ? "grid-cols-3" : "grid-cols-2"} mb-4`}>
-            <TabsTrigger value="add" className="text-xs sm:text-sm">
+            <TabsTrigger value="add" variant="accent" className="text-xs sm:text-sm">
               {t('addTransaction')}
             </TabsTrigger>
             {canShowAITransactions && (
-              <TabsTrigger value="ai" className="text-xs sm:text-sm">
+              <TabsTrigger value="ai" variant="accent" className="text-xs sm:text-sm">
                 {t('aiQuickInput')}
               </TabsTrigger>
             )}
-            <TabsTrigger value="history" className="text-xs sm:text-sm">
+            <TabsTrigger value="history" variant="accent" className="text-xs sm:text-sm">
               {t('transactionHistory')}
             </TabsTrigger>
           </TabsList>

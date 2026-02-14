@@ -212,7 +212,7 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
         type="submit"
         variant="default"
         size="lg"
-        className="w-full font-semibold shadow-md hover:shadow-lg transition-shadow"
+        className="w-full font-semibold shadow-md hover:shadow-lg transition-shadow bg-accent text-accent-foreground hover:bg-accent/90"
         disabled={createExpenseMutation.isPending}
       >
         {createExpenseMutation.isPending ? (

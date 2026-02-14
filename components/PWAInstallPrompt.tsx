@@ -44,8 +44,8 @@ export default function PWAInstallPrompt() {
         <div className="bg-background/95 backdrop-blur-sm border border-border rounded-xl shadow-2xl p-6">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Smartphone className="w-6 h-6 text-primary" />
+            <div className="p-2 bg-accent/10 rounded-lg">
+              <Smartphone className="w-6 h-6 text-accent" />
               </div>
               <div>
                 <h3 className="font-semibold text-foreground text-lg">{t('installPresusimple')}</h3>
@@ -65,7 +65,7 @@ export default function PWAInstallPrompt() {
           <div className="space-y-4 mb-6">
             {pwaStatus.installInstructions.map((instruction) => (
               <div key={instruction.step} className="flex items-center space-x-4 p-3 bg-muted/50 rounded-lg">
-                <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
+                <div className="flex-shrink-0 w-8 h-8 bg-accent text-accent-foreground rounded-full flex items-center justify-center text-sm font-bold">
                   {instruction.step}
                 </div>
                 <div className="flex items-center space-x-2">
@@ -109,8 +109,8 @@ export default function PWAInstallPrompt() {
       <div className="bg-background/95 backdrop-blur-sm border border-border rounded-xl shadow-2xl p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Download className="w-6 h-6 text-primary" />
+            <div className="p-2 bg-accent/10 rounded-lg">
+              <Download className="w-6 h-6 text-accent" />
             </div>
             <div>
               <h3 className="font-semibold text-foreground text-lg">{t('installPresusimple')}</h3>
@@ -158,7 +158,7 @@ export default function PWAInstallPrompt() {
           <Button 
             onClick={handleInstall} 
             size="sm" 
-            className="flex-1"
+            className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90"
           >
             {t('installNow')}
           </Button>

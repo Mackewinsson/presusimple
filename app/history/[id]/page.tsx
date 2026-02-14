@@ -257,7 +257,7 @@ export default function BudgetDetailPage() {
                         selectedBudget.totalBudgeted -
                           selectedBudget.totalSpent >=
                         0
-                          ? "text-primary"
+                          ? "text-accent-foreground"
                           : "text-destructive"
                       }`}
                     >
@@ -284,7 +284,7 @@ export default function BudgetDetailPage() {
                 <CardDescription className="text-base">Total transactions for the month</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-primary">
+                <div className="text-3xl font-bold text-accent-foreground">
                   {selectedBudget.expensesCount}
                 </div>
                 <div className="text-sm text-muted-foreground mt-2">

@@ -38,11 +38,11 @@ function buildTabItems(pathname: string): TabItem[] {
         (p.startsWith(budgetBase + "/") && p !== budgetBase + "/settings" && p !== budgetBase + "/add"),
     },
     {
-      href: pathname.startsWith("/es") ? "/es/history" : "/history",
+      href: "/history",
       icon: History,
       label: "History",
       translationKey: "history",
-      isActive: (p) => p === "/history" || p === "/es/history" || p.startsWith("/history/") || p.startsWith("/es/history/"),
+      isActive: (p) => p === "/history" || p.startsWith("/history/"),
     },
     {
       href: `${budgetBase}/settings`,
@@ -85,7 +85,7 @@ export default function MobileBottomTab() {
         backfaceVisibility: "hidden",
       }}
     >
-      <div className="flex items-center justify-around px-2 py-2">
+      <div className="flex items-center justify-around px-2 pt-0 pb-2">
         {buildTabItems(pathname).map((item) => {
           const Icon = item.icon;
           const isActive = item.isActive ? item.isActive(pathname) : pathname === item.href;
@@ -95,25 +95,29 @@ export default function MobileBottomTab() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 rounded-lg transition-all duration-200",
+                "relative flex flex-col items-center justify-center min-w-0 flex-1 pt-2 pb-1 px-1 rounded-b-lg transition-all duration-200",
                 "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
                 "active:scale-95 active:bg-slate-200/50 dark:active:bg-slate-700/50",
-                isActive 
-                  ? "text-blue-600 dark:text-blue-400" 
-                  : "text-slate-600 dark:text-slate-400"
               )}
             >
+              {/* Active indicator line */}
+              <span
+                className={cn(
+                  "absolute top-0 left-1/2 -translate-x-1/2 h-[2.5px] rounded-full transition-all duration-200",
+                  isActive ? "w-8 bg-accent" : "w-0 bg-transparent"
+                )}
+              />
               <Icon 
                 className={cn(
                   "h-5 w-5 mb-1 transition-colors",
-                  isActive && "text-blue-600 dark:text-blue-400"
+                  isActive ? "text-black dark:text-white" : "text-slate-600 dark:text-slate-400"
                 )} 
               />
               <span 
                 className={cn(
                   "text-xs font-medium truncate max-w-full transition-colors",
                   isActive 
-                    ? "text-blue-600 dark:text-blue-400" 
+                    ? "text-black dark:text-white" 
                     : "text-slate-600 dark:text-slate-400"
                 )}
               >

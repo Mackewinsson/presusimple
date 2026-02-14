@@ -294,7 +294,7 @@ function InsightsContent() {
                           selectedBudget.totalBudgeted -
                             selectedBudget.totalSpent >=
                           0
-                            ? "text-primary"
+                            ? "text-accent-foreground"
                             : "text-destructive"
                         }`}
                       >
@@ -313,13 +313,13 @@ function InsightsContent() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <ArrowDownCircle className="h-5 w-5 text-primary" />
+                    <ArrowDownCircle className="h-5 w-5 text-accent" />
                     Income
                   </CardTitle>
                   <CardDescription>Total income for the month</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-primary">
+                  <div className="text-3xl font-bold text-accent-foreground">
                     {formatMoney(incomeTotal, undefined, decimalSeparator)}
                   </div>
                   <div className="text-sm text-muted-foreground mt-2">

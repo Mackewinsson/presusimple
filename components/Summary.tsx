@@ -246,7 +246,9 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
             </div>
           </div>
 
-          <div className="p-3 sm:p-4 rounded-xl bg-secondary/50 backdrop-blur text-center sm:col-span-2 lg:col-span-1">
+          <div className={`p-3 sm:p-4 rounded-xl backdrop-blur text-center sm:col-span-2 lg:col-span-1 ${
+            calculatedTotalBudgeted - totalSpent < 0 ? "bg-destructive/10" : "bg-accent/10"
+          }`}>
             <div className="text-xs sm:text-sm text-muted-foreground mb-1">
               {t('remaining')}
             </div>
@@ -254,7 +256,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
               className={`text-lg sm:text-xl md:text-2xl font-semibold ${
                 calculatedTotalBudgeted - totalSpent < 0
                   ? "text-destructive"
-                  : ""
+                  : "text-accent-foreground"
               }`}
             >
                               {formatMoney(calculatedTotalBudgeted - totalSpent, currentCurrency, decimalSeparator)}

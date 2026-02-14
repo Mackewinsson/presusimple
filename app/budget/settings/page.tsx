@@ -199,11 +199,11 @@ export default function SettingsPage() {
         <div className="max-w-4xl mx-auto">
           <Tabs defaultValue="profile" className="space-y-6">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="profile" className="flex items-center gap-2">
+              <TabsTrigger value="profile" variant="accent" className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 {t('profile')}
               </TabsTrigger>
-              <TabsTrigger value="settings" className="flex items-center gap-2">
+              <TabsTrigger value="settings" variant="accent" className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
                 {t('settings')}
               </TabsTrigger>

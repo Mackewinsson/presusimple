@@ -105,15 +105,15 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
   return (
     <div className="space-y-6">
       <div className="text-sm text-muted-foreground flex items-center gap-2">
-        <CheckCircle className="h-4 w-4 text-primary animate-pulse" />
+        <CheckCircle className="h-4 w-4 text-accent animate-pulse" />
         <span>AI found {transactions.length} transaction{transactions.length !== 1 ? 's' : ''}!</span>
       </div>
       
       {/* Budget Summary */}
-      <div className="p-4 border border-primary/30 rounded-lg bg-primary/10">
+      <div className="p-4 border border-accent/30 rounded-lg bg-accent/10">
         <div className="flex items-center justify-between mb-3">
-          <span className="font-medium text-primary">{t('availableBudget')}</span>
-          <span className="font-mono text-primary">${availableBudget.toFixed(2)}</span>
+          <span className="font-medium text-accent-foreground">{t('availableBudget')}</span>
+          <span className="font-mono text-accent-foreground">${availableBudget.toFixed(2)}</span>
         </div>
         {newCategoriesToCreate.length > 0 && (
           <div className="flex items-center justify-between text-sm mb-2">
@@ -167,7 +167,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                     onClick={() => handleCategoryToggle(missingCategory.name)}
                     className={`${
                       isSelected 
-                        ? "bg-primary text-primary-foreground border-0 shadow-md" 
+                        ? "bg-accent text-accent-foreground border-0 shadow-md" 
                         : "bg-secondary text-secondary-foreground border-0 hover:bg-secondary/80"
                     } transition-all duration-200 transform hover:scale-105`}
                   >
@@ -272,7 +272,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                         onClick={() => {
                           handleCategoryChange(index, suggestion);
                         }}
-                        className="text-primary hover:text-primary/80 underline mr-2"
+                        className="text-accent hover:text-accent/80 underline mr-2"
                       >
                         {suggestion}
                       </button>
@@ -295,7 +295,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                         onClick={() => {
                           handleCategoryChange(index, cat.name);
                         }}
-                        className="text-primary hover:text-primary/80 underline mr-2"
+                        className="text-accent hover:text-accent/80 underline mr-2"
                       >
                         {cat.name}
                       </button>
@@ -314,7 +314,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
           className={`flex-1 ${
             hasInsufficientBudget 
               ? "bg-destructive text-destructive-foreground opacity-50 cursor-not-allowed" 
-              : "bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg hover:shadow-xl"
+              : "bg-accent text-accent-foreground hover:bg-accent/90 font-semibold shadow-lg hover:shadow-xl"
           } transition-all duration-300 transform hover:scale-[1.02] border-0`}
         >
           {isSaving ? "Saving..." : `Save Transactions${newCategoriesToCreate.length > 0 ? ` & Create ${newCategoriesToCreate.length} Categor${newCategoriesToCreate.length === 1 ? 'y' : 'ies'}` : ''}`}
@@ -803,7 +803,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
             <Button
               onClick={handleParse}
               disabled={!description.trim() || isParsing || isLoadingCategories || categories?.length === 0}
-              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] border-0"
+              className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] border-0"
             >
               {isParsing ? (
                 <>
