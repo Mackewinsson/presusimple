@@ -88,7 +88,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ categories, expenses }) => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Search transactions..."
+            placeholder={t('searchTransactions')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-9"
@@ -97,7 +97,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ categories, expenses }) => {
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="startDate">Start Date</Label>
+            <Label htmlFor="startDate">{t('startDate')}</Label>
             <Input
               id="startDate"
               type="date"
@@ -107,7 +107,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ categories, expenses }) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="endDate">End Date</Label>
+            <Label htmlFor="endDate">{t('endDate')}</Label>
             <Input
               id="endDate"
               type="date"
@@ -130,7 +130,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ categories, expenses }) => {
 
       {filteredExpenses.length === 0 && (
         <div className="text-center py-4 text-muted-foreground">
-          No transactions found matching your search.
+          {t('noTransactionsFound')}
         </div>
       )}
     </div>

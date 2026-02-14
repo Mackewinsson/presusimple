@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { X, Download, Share, Smartphone, ArrowUp, Plus, Check } from 'lucide-react';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { usePWAStatus } from '@/hooks/usePWAStatus';
+import { useTranslation } from '@/lib/i18n';
 
 export default function PWAInstallPrompt() {
+  const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const pwaStatus = usePWAStatus();
   const {
@@ -46,8 +48,8 @@ export default function PWAInstallPrompt() {
                 <Smartphone className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground text-lg">Install Presusimple</h3>
-                <p className="text-sm text-muted-foreground">Get quick access and offline functionality</p>
+                <h3 className="font-semibold text-foreground text-lg">{t('installPresusimple')}</h3>
+                <p className="text-sm text-muted-foreground">{t('getQuickAccess')}</p>
               </div>
             </div>
             <Button
@@ -84,14 +86,14 @@ export default function PWAInstallPrompt() {
               onClick={dismissPrompt}
               className="flex-1"
             >
-              Maybe later
+              {t('maybeLater')}
             </Button>
             <Button 
               size="sm" 
               onClick={dismissPrompt}
               className="flex-1"
             >
-              Got it!
+              {t('gotIt')}
             </Button>
           </div>
         </div>
@@ -111,8 +113,8 @@ export default function PWAInstallPrompt() {
               <Download className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h3 className="font-semibold text-foreground text-lg">Install Presusimple</h3>
-              <p className="text-sm text-muted-foreground">Get quick access and offline functionality</p>
+              <h3 className="font-semibold text-foreground text-lg">{t('installPresusimple')}</h3>
+              <p className="text-sm text-muted-foreground">{t('getQuickAccess')}</p>
             </div>
           </div>
           <Button
@@ -129,7 +131,7 @@ export default function PWAInstallPrompt() {
           <div className="p-4 bg-muted/50 rounded-lg">
             <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-3">
               <ArrowUp className="w-4 h-4" />
-              <span>Install this app on your device for a better experience</span>
+              <span>{t('installAppForBetterExperience')}</span>
             </div>
             <div className="space-y-2">
               {pwaStatus.installBenefits.common.slice(0, 3).map((benefit, index) => (
@@ -151,14 +153,14 @@ export default function PWAInstallPrompt() {
             onClick={dismissPrompt}
             className="flex-1"
           >
-            Not now
+            {t('notNow')}
           </Button>
           <Button 
             onClick={handleInstall} 
             size="sm" 
             className="flex-1"
           >
-            Install
+            {t('installNow')}
           </Button>
         </div>
       </div>

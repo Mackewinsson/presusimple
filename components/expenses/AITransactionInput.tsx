@@ -112,12 +112,12 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
       {/* Budget Summary */}
       <div className="p-4 border border-blue-500/30 rounded-lg bg-blue-500/10">
         <div className="flex items-center justify-between mb-3">
-          <span className="font-medium text-blue-300">Available Budget</span>
+          <span className="font-medium text-blue-300">{t('availableBudget')}</span>
           <span className="font-mono text-blue-300">${availableBudget.toFixed(2)}</span>
         </div>
         {newCategoriesToCreate.length > 0 && (
           <div className="flex items-center justify-between text-sm mb-2">
-            <span className="text-muted-foreground">Budget needed for new categories:</span>
+            <span className="text-muted-foreground">{t('budgetNeededForNewCategories')}</span>
             <span className={`font-mono ${hasInsufficientBudget ? 'text-red-400' : 'text-green-400'}`}>
               ${totalBudgetNeeded.toFixed(2)}
             </span>
@@ -126,7 +126,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
         {hasInsufficientBudget && (
           <div className="flex items-center gap-2 mt-3 text-red-400 text-sm">
             <AlertCircle className="h-4 w-4" />
-            <span>Insufficient budget. Please adjust category allocations or cancel.</span>
+            <span>{t('insufficientBudget')}</span>
           </div>
         )}
       </div>
@@ -136,7 +136,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-amber-300">
             <AlertTriangle className="h-4 w-4" />
-            <span className="font-medium">New Categories Found</span>
+            <span className="font-medium">{t('newCategoriesFound')}</span>
           </div>
           <div className="text-sm text-muted-foreground mb-4">
             The AI suggested categories that don't exist in your budget. Set budget allocations for each:
@@ -208,7 +208,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
       
       {/* Transactions Section */}
       <div className="space-y-4">
-        <div className="text-sm font-medium text-white mb-3">Transactions to Save:</div>
+        <div className="text-sm font-medium text-white mb-3">{t('transactionsToSave')}</div>
         {transactions.map((transaction, index) => {
           const isMissingCategory = missingCategories.some(mc => 
             mc.transactions.some(t => t === transaction)
@@ -230,7 +230,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                 <div className="flex-1 min-w-0">
                   <div className="font-medium mb-2">{transaction.description}</div>
                   <div className="text-sm text-muted-foreground flex flex-col sm:flex-row sm:items-center gap-2">
-                    <span>Category:</span>
+                    <span>{t('category')}:</span>
                     <Select value={currentCategory} onValueChange={(value) => handleCategoryChange(index, value)}>
                       <SelectTrigger className="w-full sm:w-48 h-8 text-xs">
                         <SelectValue />
@@ -263,7 +263,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
               {/* Category Suggestions */}
               {transaction.suggestedCategories && transaction.suggestedCategories.length > 0 && (
                 <div className="text-xs text-muted-foreground mt-2">
-                  <span>Better category options: </span>
+                  <span>{t('betterCategoryOptions')} </span>
                   {transaction.suggestedCategories
                     .filter(suggestion => availableCategories.some(cat => cat.name === suggestion))
                     .map((suggestion, i) => (
@@ -286,7 +286,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                   availableCategories.some(cat => cat.name === suggestion)
                 ).length === 0) && (
                 <div className="text-xs text-muted-foreground mt-2">
-                  <span>Available categories: </span>
+                  <span>{t('availableCategories')} </span>
                   {availableCategories
                     .filter(cat => cat.name !== currentCategory) // Don't suggest current category
                     .map((cat, i) => (
@@ -325,7 +325,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
           disabled={isSaving}
           className="bg-gradient-to-r from-slate-600 to-slate-700 text-white border-0 hover:from-slate-500 hover:to-slate-600 transition-all duration-200 transform hover:scale-105"
         >
-          Cancel
+          {t('cancel')}
         </Button>
       </div>
     </div>
@@ -808,12 +808,12 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
               {isParsing ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  <span className="animate-pulse">AI is working...</span>
+                  <span className="animate-pulse">{t('aiWorking')}</span>
                 </>
               ) : isLoadingCategories ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  <span>Loading categories...</span>
+                  <span>{t('loadingCategories')}</span>
                 </>
               ) : categories?.length === 0 ? (
                 <>
@@ -823,7 +823,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
               ) : (
                 <>
                   <Sparkles className="h-4 w-4 mr-2 animate-pulse" />
-                  <span>Transform with AI</span>
+                  <span>{t('transformWithAI')}</span>
                 </>
               )}
             </Button>
@@ -851,7 +851,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle className="text-lg sm:text-xl">Review Transactions</DialogTitle>
+                <DialogTitle className="text-lg sm:text-xl">{t('reviewTransactions')}</DialogTitle>
                 <DialogDescription className="text-sm sm:text-base">
                   Review the parsed transactions and set budget allocations for new categories.
                 </DialogDescription>

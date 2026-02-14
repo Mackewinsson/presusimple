@@ -60,8 +60,8 @@ export default function MobileHeader({
     if (isBudgetAddPath(pathname)) return t("addTransaction");
     if (pathname.startsWith(budgetBase + "/settings")) return t("settings");
     if (pathname.startsWith("/history")) return t("history");
-    if (pathname === budgetBase) return "Presusimple";
-    return "Presusimple";
+    if (pathname === budgetBase) return t("appName");
+    return t("appName");
   };
 
   return (

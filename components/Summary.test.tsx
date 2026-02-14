@@ -243,6 +243,6 @@ describe('Summary', () => {
     );
 
     // Check if chart title is displayed (matches current component)
-    expect(screen.getByText('Top 2 Spending Categories')).toBeInTheDocument();
+    expect(screen.getByText('Top Spending Categories')).toBeInTheDocument();
   });
 }); 

@@ -101,12 +101,12 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
 
       // Create Budget Summary worksheet
       const summaryData = [
-        ["Budget Summary", ""],
-        ["Total Budgeted", budget.totalBudgeted],
-        ["Total Spent", totalSpent],
-        ["Remaining", budget.totalBudgeted - totalSpent],
+        [t('budgetSummary'), ""],
+        [t('totalBudgeted'), budget.totalBudgeted],
+        [t('totalSpent'), totalSpent],
+        [t('remaining'), budget.totalBudgeted - totalSpent],
         [],
-        ["Category", "Budgeted", "Spent", "Remaining"],
+        [t('category'), t('budgeted'), t('totalSpent'), t('remaining')],
       ];
 
       categoriesWithSpent.forEach((category) => {
@@ -122,8 +122,8 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
 
       // Create Expenses worksheet
       const expensesData = [
-        ["Transactions", "", "", ""],
-        ["Date", "Category", "Description", "Amount", "Type"],
+        [t('transactionHistory'), "", "", ""],
+        [t('date'), t('category'), t('description'), t('amount'), t('type')],
       ];
 
       expenses.forEach((expense) => {
@@ -132,7 +132,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
         );
         expensesData.push([
           new Date(expense.date).toLocaleDateString(),
-          category?.name || "Unknown",
+          category?.name || t('unknown'),
           expense.description || "-",
           String(expense.amount),
           expense.type,
@@ -142,15 +142,15 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
       const expensesWs = utils.aoa_to_sheet(expensesData);
 
       // Add worksheets to workbook
-      utils.book_append_sheet(wb, summaryWs, "Budget Summary");
-      utils.book_append_sheet(wb, expensesWs, "Transactions");
+      utils.book_append_sheet(wb, summaryWs, t('budgetSummary'));
+      utils.book_append_sheet(wb, expensesWs, t('transactionHistory'));
 
       // Generate Excel file
       writeFile(wb, "budget-report.xlsx");
-      toast.success("Excel report exported successfully");
+      toast.success(t('excelExportSuccess'));
     } catch (error) {
       console.error("Excel export failed:", error);
-      toast.error("Failed to export Excel report");
+      toast.error(t('excelExportFailed'));
     }
   };
 
@@ -220,10 +220,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
         {categories.length > 0 ? (
           <div className="mt-6 sm:mt-8">
             <h3 className="text-base sm:text-lg font-medium mb-4 sm:mb-6">
-              {hasSpendingData 
-                ? `Top ${Math.min(chartCategories.length, 8)} Spending Categories`
-                : "Top Spending Categories"
-              }
+              {t('topSpendingCategories')}
             </h3>
             <div className="h-[250px] sm:h-[300px] md:h-[350px] flex flex-col" data-testid="summary-chart">
               {hasSpendingData ? (
@@ -247,14 +244,14 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                   <div className="text-center">
                     <p className="text-sm text-muted-foreground mb-2">
                       {categories.length === 0 
-                        ? "No categories available" 
-                        : "No spending data available"
+                        ? t('noCategoriesAvailable') 
+                        : t('noSpendingDataAvailable')
                       }
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {categories.length === 0 
-                        ? "Add budget categories to see spending data" 
-                        : "Add expenses to see spending patterns"
+                        ? t('addBudgetCategoriesToSee') 
+                        : t('addExpensesToSeePatterns')
                       }
                     </p>
                   </div>

@@ -397,16 +397,16 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     }
   };
 
-  if (!session) return <div>Please sign in to manage your budget.</div>;
+  if (!session) return <div>{t('pleaseSignIn')}</div>;
 
   // Show loading state while fetching userId
   if (userIdLoading) {
     return (
       <Card className="glass-card hover-card max-w-md mx-auto mt-10">
         <CardHeader>
-          <CardTitle>Loading...</CardTitle>
+          <CardTitle>{t('loading')}</CardTitle>
           <CardDescription>
-            Please wait while we load your account information.
+            {t('please')} {t('loading').toLowerCase()}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -423,10 +423,9 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     return (
       <Card className="glass-card hover-card max-w-md mx-auto mt-10">
         <CardHeader>
-          <CardTitle>Error</CardTitle>
+          <CardTitle>{t('error')}</CardTitle>
           <CardDescription>
-            Failed to load your account information. Please try refreshing the
-            page.
+            {t('technicalDifficulties')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -520,10 +519,10 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
               {createBudgetMutation.isPending ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  <span className="animate-pulse">Creating budget...</span>
+                  <span className="animate-pulse">{t('creatingBudget')}</span>
                 </>
               ) : (
-                "Create Budget"
+                t('createBudget')
               )}
             </Button>
           </form>
@@ -556,7 +555,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                 </div>
                 
                 <div className="text-sm text-muted-foreground">
-                  <p className="font-medium mb-2 text-foreground">Examples:</p>
+                  <p className="font-medium mb-2 text-foreground">{t('examples')}:</p>
                   <ul className="list-disc list-inside space-y-1 mt-2 text-muted-foreground">
                     <li>"I make 5000. Rent 2000, food 1000, the rest is savings."</li>
                     <li>"My income is 3000. I spend 1200 on rent, 800 on food, 300 on transport, and save the rest."</li>
@@ -596,7 +595,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                   {isAICreating ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                      <span className="animate-pulse">Creating budget with AI...</span>
+                      <span className="animate-pulse">{t('creatingBudgetWithAI')}</span>
                     </>
                   ) : (
                     <>
@@ -646,18 +645,18 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete Budget</AlertDialogTitle>
+                  <AlertDialogTitle>{t('deleteBudget')}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Are you sure you want to delete this budget? This will remove all categories, sections, and expenses. This action cannot be undone.
+                    {t('areYouSureDeleteBudget')}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDeleteBudget}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
-                    Delete Budget
+                    {t('deleteBudget')}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -693,7 +692,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                     onClick={() => setIsEditingTotal(false)}
                     className="flex-1 sm:flex-none"
                   >
-                    Cancel
+                    {t('cancel')}
                   </Button>
                 </div>
               </div>
@@ -712,7 +711,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                   )}
                 </div>
                 <div className="text-xs sm:text-sm text-slate-600 dark:text-white/60">
-                  Total Budget (clic para editar)
+                  {t('totalBudgeted')} ({t('edit')})
                 </div>
               </div>
             )}

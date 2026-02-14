@@ -16,7 +16,7 @@ export default function Navigation() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
             <Link href="/" className="text-xl font-bold text-gray-800">
-              {t('budget')} App
+              {t('budgetApp')}
             </Link>
           </div>
 
@@ -28,7 +28,7 @@ export default function Navigation() {
                   href="/dashboard"
                   className="text-gray-600 hover:text-gray-900"
                 >
-                  Dashboard
+                  {t('dashboard')}
                 </Link>
                 <SignOutButton
                   variant="default"
@@ -42,7 +42,7 @@ export default function Navigation() {
                 href="/auth/login"
                 className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500"
               >
-                Sign In
+                {t('signIn')}
               </Link>
             )}
           </div>

@@ -5,7 +5,7 @@ describe('AuthStatus', () => {
   it('renders sign in button when user is not authenticated', () => {
     render(<AuthStatus user={null} />);
     
-    expect(screen.getByText('Sign in')).toBeInTheDocument();
+    expect(screen.getByText('Sign In')).toBeInTheDocument();
     expect(screen.getByRole('link')).toHaveAttribute('href', '/auth/login');
   });
 

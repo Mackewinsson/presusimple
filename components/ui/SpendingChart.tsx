@@ -13,6 +13,7 @@ import {
 import { Bar } from 'react-chartjs-2';
 import { useTheme } from "next-themes";
 import { formatMoney } from "@/lib/utils/formatMoney";
+import { useTranslation } from "@/lib/i18n";
 
 // Register Chart.js components
 ChartJS.register(
@@ -47,6 +48,7 @@ export function SpendingChart({
   className = ""
 }: SpendingChartProps) {
   const { theme: currentTheme } = useTheme();
+  const { t } = useTranslation();
 
   // Get high-contrast colors for dark mode
   const getChartColors = (index: number) => {
@@ -96,7 +98,7 @@ export function SpendingChart({
 
     // 1. Spent – colored portion at the bottom of the bar
     datasets.push({
-      label: 'Gastado',
+      label: t('totalSpent'),
       data: chartData.map(item => Math.min(item.spent, item.budgeted)),
       backgroundColor: chartData.map((item, index) =>
         item.overBudget
@@ -114,7 +116,7 @@ export function SpendingChart({
 
     // 2. Remaining – gray portion on top (budget minus spent)
     datasets.push({
-      label: 'Restante',
+      label: t('remaining'),
       data: chartData.map(item => Math.max(0, item.budgeted - item.spent)),
       backgroundColor: currentTheme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.07)',
       borderColor: 'transparent',
@@ -130,7 +132,7 @@ export function SpendingChart({
     const hasOverBudget = chartData.some(item => item.overBudget);
     if (hasOverBudget) {
       datasets.push({
-        label: 'Excedido',
+        label: t('exceeded'),
         data: chartData.map(item => item.overBudget ? item.spent - item.budgeted : 0),
         backgroundColor: 'rgba(239, 68, 68, 0.4)',
         borderColor: 'transparent',
@@ -145,7 +147,7 @@ export function SpendingChart({
   } else {
     // Single bar mode (no budgeted background) – just show spent
     datasets.push({
-      label: 'Gastado',
+      label: t('totalSpent'),
       data: chartData.map(item => item.spent),
       backgroundColor: chartData.map((item, index) =>
         item.overBudget
@@ -207,7 +209,7 @@ export function SpendingChart({
                 // Show a combined tooltip instead of per-dataset
                 label: function(this: unknown, context: TooltipItem<"bar">) {
                   if (!showBudgeted) {
-                    return `Gastado: ${formatMoney(context.parsed.y)}`;
+                    return `${t('totalSpent')}: ${formatMoney(context.parsed.y)}`;
                   }
                   // Only show full info on the first dataset hit
                   if (context.datasetIndex === 0) {
@@ -216,9 +218,9 @@ export function SpendingChart({
                     const budgeted = chartData[idx]?.budgeted || 0;
                     const pct = budgeted > 0 ? Math.round((spent / budgeted) * 100) : 0;
                     return [
-                      `Presupuestado: ${formatMoney(budgeted)}`,
-                      `Gastado: ${formatMoney(spent)}`,
-                      `${pct}% utilizado`,
+                      `${t('budgeted')}: ${formatMoney(budgeted)}`,
+                      `${t('totalSpent')}: ${formatMoney(spent)}`,
+                      `${pct}${t('percentUsed')}`,
                     ];
                   }
                   return [];

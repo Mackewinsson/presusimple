@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { formatMoney } from "@/lib/utils/formatMoney";
 import { useCurrentCurrency } from "@/lib/hooks";
+import { useTranslation } from "@/lib/i18n";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,6 +62,7 @@ interface ExpenseItemProps {
 }
 
 const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
+  const { t } = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const updateExpenseMutation = useUpdateExpense();
   const deleteExpenseMutation = useDeleteExpense();
@@ -129,7 +131,7 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Amount</label>
+              <label className="text-sm font-medium">{t('amount')}</label>
               <Input
                 type="number"
                 value={editedAmount}
@@ -139,7 +141,7 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Type</label>
+              <label className="text-sm font-medium">{t('type')}</label>
               <Select
                 value={editedType}
                 onValueChange={(value: TransactionType) => setEditedType(value)}
@@ -148,15 +150,15 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="expense">Expense</SelectItem>
-                  <SelectItem value="income">Income</SelectItem>
+                  <SelectItem value="expense">{t('expense')}</SelectItem>
+                  <SelectItem value="income">{t('income')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Description</label>
+            <label className="text-sm font-medium">{t('description')}</label>
             <Input
               value={editedDescription}
               onChange={(e) => setEditedDescription(e.target.value)}
@@ -165,7 +167,7 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Category</label>
+              <label className="text-sm font-medium">{t('category')}</label>
               <Select
                 value={editedCategoryId}
                 onValueChange={setEditedCategoryId}
@@ -186,7 +188,7 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Date</label>
+              <label className="text-sm font-medium">{t('date')}</label>
               <Input
                 type="date"
                 value={editedDate}
@@ -198,11 +200,11 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
           <div className="flex gap-2">
             <Button onClick={handleSaveEdit} size="sm">
               <Save className="h-4 w-4 mr-1" />
-              Save
+              {t('save')}
             </Button>
             <Button onClick={handleCancelEdit} variant="outline" size="sm">
               <X className="h-4 w-4 mr-1" />
-              Cancel
+              {t('cancel')}
             </Button>
           </div>
         </div>
@@ -216,12 +218,12 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
         <div className="space-y-1">
           <div className="font-medium">
             {expense.description ||
-              `${expense.type === "expense" ? "Expense" : "Income"} for ${
-                category?.name || "Unknown"
+              `${expense.type === "expense" ? t('expense') : t('income')} ${t('for')} ${
+                category?.name || t('unknown')
               }`}
           </div>
           <div className="text-sm text-muted-foreground">
-            {category?.name || "Unknown"} • {formattedDate}
+            {category?.name || t('unknown')} • {formattedDate}
           </div>
         </div>
         <div className="flex items-start space-x-2">
@@ -262,19 +264,18 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete Transaction</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Are you sure you want to delete this transaction? This
-                    action cannot be undone.
+                <AlertDialogTitle>{t('deleteTransaction')}</AlertDialogTitle>
+                <AlertDialogDescription>
+                    {t('areYouSureDeleteTransaction')}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleRemoveExpense}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
-                    Delete
+                    {t('delete')}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

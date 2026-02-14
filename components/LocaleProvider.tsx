@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, ReactNode } from 'react';
+import { ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import { LocaleContext, Locale } from '@/lib/i18n';
 
 interface LocaleProviderProps {
@@ -9,7 +10,8 @@ interface LocaleProviderProps {
 }
 
 export default function LocaleProvider({ children, initialLocale = 'es' }: LocaleProviderProps) {
-  const [locale, setLocale] = useState<Locale>(initialLocale);
+  const pathname = usePathname();
+  const locale: Locale = pathname?.startsWith('/es') ? 'es' : 'en';
 
   return (
     <LocaleContext.Provider value={locale}>

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/lib/i18n';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -22,10 +23,11 @@ interface AuthStatusProps {
 }
 
 export default function AuthStatus({ user }: AuthStatusProps) {
+  const { t } = useTranslation();
   if (!user) {
     return (
       <Link href="/auth/login">
-        <Button variant="outline">Sign in</Button>
+        <Button variant="outline">{t('signIn')}</Button>
       </Link>
     );
   }
@@ -54,16 +56,16 @@ export default function AuthStatus({ user }: AuthStatusProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <User className="mr-2 h-4 w-4" />
-          <span>Profile</span>
+          <span>{t('profile')}</span>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
+          <span>{t('settings')}</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-destructive">
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
+          <span>{t('signOut')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

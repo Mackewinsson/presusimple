@@ -65,7 +65,7 @@ export default function PWALandingPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <AppIcon size={24} className="h-6 w-6" />
-                <h1 className="text-lg font-bold text-white">Presusimple</h1>
+                <h1 className="text-lg font-bold text-white">{t('appName')}</h1>
               </div>
               <div className="flex items-center gap-2">
                 <LanguageSwitcher />
@@ -94,7 +94,7 @@ export default function PWALandingPage() {
             
             <div className="space-y-2">
               <h1 className="text-2xl font-bold text-white">
-                {t('installApp')} Presusimple
+                {t('installPresusimple')}
               </h1>
               <p className="text-slate-300 text-sm">
                 {t('getTheFullAppExperience')}

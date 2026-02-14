@@ -3,6 +3,7 @@
 import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 interface SignOutButtonProps {
   variant?: "default" | "outline" | "ghost";
@@ -17,6 +18,7 @@ export default function SignOutButton({
   className = "",
   showText = true 
 }: SignOutButtonProps) {
+  const { t } = useTranslation();
   const handleSignOut = async () => {
     await signOut({ callbackUrl: "/" });
   };
@@ -30,7 +32,7 @@ export default function SignOutButton({
     >
       {showText && (
         <span className="text-sm sm:text-base">
-          Sign Out
+          {t('signOut')}
         </span>
       )}
     </Button>
