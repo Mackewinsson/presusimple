@@ -110,8 +110,8 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4" data-testid="expense-form">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="space-y-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-hidden">
+        <div className="space-y-2 min-w-0">
           <Label htmlFor="amount">{t('amount')}</Label>
           <div className="relative">
             <Input
@@ -176,8 +176,8 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="space-y-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-hidden">
+        <div className="space-y-2 min-w-0">
           <Label htmlFor="category">{t('category')}</Label>
           <Select value={categoryId} onValueChange={setCategoryId}>
             <SelectTrigger>
@@ -196,7 +196,7 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
           </Select>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 min-w-0">
           <Label htmlFor="date">{t('date')}</Label>
           <Input
             id="date"
@@ -204,6 +204,7 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
             value={date}
             onChange={(e) => setDate(e.target.value)}
             required
+            className="min-w-0 max-w-full [&::-webkit-calendar-picker-indicator]:opacity-100"
           />
         </div>
       </div>
