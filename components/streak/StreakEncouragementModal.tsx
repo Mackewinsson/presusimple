@@ -85,7 +85,7 @@ export function StreakEncouragementModal({
           <Button
             onClick={handleContinue}
             size="lg"
-            className="bg-warning text-warning-foreground hover:bg-warning/90 font-semibold px-8"
+            className="font-semibold px-8"
           >
             {t("streakCta")}
           </Button>
