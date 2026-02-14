@@ -4,7 +4,7 @@
 
 set -e
 ICONS_DIR="public/icons"
-SOURCE="$ICONS_DIR/SP (3).png"
+SOURCE="$ICONS_DIR/icon.png"
 
 if [ ! -f "$SOURCE" ]; then
   echo "Source image not found: $SOURCE"
