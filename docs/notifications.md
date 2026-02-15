@@ -148,12 +148,14 @@ Navigate to `/dev-tools` to access the comprehensive testing dashboard that incl
 
 ### 3. Development Mode
 
-For testing in development mode, you may need to enable PWA:
+In development, PWA (and the service worker) is disabled by default, so push notifications will not work until you enable it. The app respects the `ENABLE_PWA_DEV` environment variable:
 
 ```bash
-# Enable PWA in development
+# Enable PWA and service worker in development (required for testing notifications)
 ENABLE_PWA_DEV=true npm run dev
 ```
+
+After starting with `ENABLE_PWA_DEV=true`, verify in DevTools → Application → Service Workers that `/sw.js` is registered and active, then try "Enable Notifications" again.
 
 ### 4. Test Scripts
 

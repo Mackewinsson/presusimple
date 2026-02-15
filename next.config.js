@@ -1,10 +1,13 @@
 const isDev = process.env.NODE_ENV === 'development';
+// In development, PWA (and thus the service worker) is disabled unless ENABLE_PWA_DEV=true
+// Use: ENABLE_PWA_DEV=true npm run dev when testing notifications or install prompt
+const pwaDisabled = isDev && process.env.ENABLE_PWA_DEV !== 'true';
 
 const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: isDev,
+  disable: pwaDisabled,
   buildExcludes: [/middleware-manifest\.json$/],
   customWorkerDir: 'worker', // Extend auto-generated SW with custom notification handling
 });
