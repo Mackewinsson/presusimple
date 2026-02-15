@@ -9,7 +9,10 @@ jest.mock('@/lib/utils/formatMoney', () => ({
   },
 }));
 
-
+jest.mock('@/lib/hooks', () => ({
+  useCurrentCurrency: () => ({ code: 'USD', symbol: '$', name: 'US Dollar' }),
+  useCurrentDecimalSeparator: () => '.',
+}));
 
 describe('Summary', () => {
   const mockBudget = {

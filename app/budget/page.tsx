@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import BudgetSetupSection from "@/components/budget/BudgetSetupSection";
 import DailySpendingTracker from "@/components/expenses/DailySpendingTracker";
 import ResetButton from "@/components/ResetButton";
@@ -32,14 +32,17 @@ import MobileHeader from "@/components/MobileHeader";
 import { StreakWidget } from "@/components/streak/StreakWidget";
 import { StreakEncouragementTrigger } from "@/components/streak/StreakEncouragementTrigger";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSilentSync } from "@/hooks/useSilentSync";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 function BudgetAppContent() {
   const { t } = useTranslation();
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const {
     session,
     status,
@@ -56,6 +59,29 @@ function BudgetAppContent() {
   const planFeatureFlags = usePlanFeatureFlags();
   const remoteFeatureFlags = useRemoteFeatureFlags();
   const isAIFeatureFlagEnabled = remoteFeatureFlags.isFeatureEnabled("aa");
+
+  // Handle return from Stripe checkout: verify session, show toast, refresh subscription data, clear URL
+  const sessionId = searchParams.get("session_id");
+  useEffect(() => {
+    if (!sessionId || !session?.user?.email) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/stripe/verify-session?session_id=${encodeURIComponent(sessionId)}`);
+        if (cancelled) return;
+        if (res.ok) {
+          toast.success(t("checkoutSuccess") || "Subscription updated. Welcome to Pro!");
+          await queryClient.invalidateQueries({ queryKey: ["userSubscription", session.user.email] });
+          await queryClient.invalidateQueries({ queryKey: ["userData", session.user.email] });
+          router.replace(pathname || "/budget");
+        }
+      } catch (err) {
+        if (!cancelled) toast.error(t("checkoutVerifyError") || "Could not verify checkout.");
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [sessionId, session?.user?.email, pathname, router, queryClient, t]);
 
   // Silent sync for PWA - checks for updates in background
   useSilentSync({

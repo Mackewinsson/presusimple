@@ -1,7 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,13 +8,12 @@ import { Crown, Clock, AlertTriangle, Sparkles } from "lucide-react";
 import { useUserData } from "@/lib/hooks/useUserData";
 import { calculateTrialDaysLeft } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n";
+import { useCheckout } from "@/hooks/useCheckout";
 
 export function TrialStatus() {
   const { t } = useTranslation();
-  const { data: session } = useSession();
   const { data: user, isLoading } = useUserData();
-  const [loading, setLoading] = useState(false);
-  const [showUpgrade, setShowUpgrade] = useState(false);
+  const { checkout, loading, error } = useCheckout();
 
   // Don't render anything while loading to prevent flashing
   if (isLoading) {
@@ -44,31 +41,6 @@ export function TrialStatus() {
   const trialDaysLeft = calculateTrialDaysLeft(user?.trialEnd || null);
   const isTrialActive = user?.trialEnd && trialDaysLeft > 0;
   const isTrialExpired = user?.trialEnd && trialDaysLeft <= 0;
-  const isPaid = user?.isPaid;
-
-  const handleUpgrade = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: session?.user?.email }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (err) {
-      console.error("Failed to start subscription:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Don't show anything for paid users
-  if (isPaid) {
-    return null;
-  }
 
   // Show trial expired message
   if (isTrialExpired) {
@@ -76,16 +48,17 @@ export function TrialStatus() {
       <Alert className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20 mb-6">
         <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
         <AlertDescription className="text-red-800 dark:text-red-200">
-          Your free trial has expired. Upgrade to continue using Presusimple.
+          {t('trialExpiredUpgradeMessage')}
         </AlertDescription>
         <Button
-          onClick={handleUpgrade}
+          onClick={checkout}
           disabled={loading}
-          className="mt-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white"
+          className="mt-2"
           size="sm"
         >
-          {loading ? "Redirecting..." : t('upgradeNow')}
+          {loading ? t('redirecting') : t('upgradeNow')}
         </Button>
+        {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
       </Alert>
     );
   }
@@ -93,41 +66,41 @@ export function TrialStatus() {
   // Show trial active message
   if (isTrialActive) {
     return (
-      <Card className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-amber-200 dark:border-amber-800 mb-6">
+      <Card className="border-border bg-card mb-6">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Crown className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-              <CardTitle className="text-lg text-amber-800 dark:text-amber-200">
-                Free Trial Active
+              <Crown className="h-5 w-5 text-accent" />
+              <CardTitle className="text-lg text-foreground">
+                {t('freeTrialActive')}
               </CardTitle>
             </div>
-            <Badge variant="outline" className="border-amber-500 text-amber-700 dark:text-amber-300">
+            <Badge variant="outline" className="border-accent text-foreground">
               <Clock className="h-3 w-3 mr-1" />
-              {trialDaysLeft === 1 ? "1 day left" : `${trialDaysLeft} days left`}
+              {trialDaysLeft === 1 ? t('trialDayLeft') : `${trialDaysLeft} ${t('daysLeft')}`}
             </Badge>
           </div>
-          <CardDescription className="text-amber-700 dark:text-amber-300">
-            You have access to all Pro features during your trial period.
+          <CardDescription className="text-muted-foreground">
+            {t('trialProAccessDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="flex items-center justify-between">
-            <div className="text-sm text-amber-600 dark:text-amber-400">
+            <div className="text-sm text-muted-foreground">
               {trialDaysLeft <= 7 
-                ? "Trial ending soon! Upgrade to keep all features."
-                : "Enjoy your trial! You can upgrade anytime."
+                ? t('trialEndingSoon')
+                : t('enjoyTrial')
               }
             </div>
             <Button
-              onClick={handleUpgrade}
+              onClick={checkout}
               disabled={loading}
-              className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white"
               size="sm"
             >
-              {loading ? "Redirecting..." : t('upgradeNow')}
+              {loading ? t('redirecting') : t('upgradeNow')}
             </Button>
           </div>
+          {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
         </CardContent>
       </Card>
     );
@@ -135,27 +108,27 @@ export function TrialStatus() {
 
   // Show upgrade prompt for users without trial
   return (
-    <Card className="bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-950/20 dark:to-gray-950/20 border-slate-200 dark:border-slate-800 mb-6">
+    <Card className="border-border bg-card mb-6">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-          <CardTitle className="text-lg text-slate-800 dark:text-slate-200">
-            Unlock Pro Features
+          <Sparkles className="h-5 w-5 text-accent" />
+          <CardTitle className="text-lg text-foreground">
+            {t('unlockProFeatures')}
           </CardTitle>
         </div>
-        <CardDescription className="text-slate-600 dark:text-slate-400">
-          Start your 30-day free trial to access AI-powered budgeting and advanced features.
+        <CardDescription className="text-muted-foreground">
+          {t('startTrialDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
         <Button
-          onClick={handleUpgrade}
+          onClick={checkout}
           disabled={loading}
-          className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white"
           size="sm"
         >
-          {loading ? "Redirecting..." : "Start Free Trial"}
+          {loading ? t('redirecting') : t('startFreeTrial')}
         </Button>
+        {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
       </CardContent>
     </Card>
   );

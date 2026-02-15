@@ -56,10 +56,12 @@ import { stripe, getPriceId } from "@/lib/stripe";
  */
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json();
+    const { email, locale } = await request.json();
     if (!email) {
       return NextResponse.json({ error: "Missing email" }, { status: 400 });
     }
+
+    const prefix = locale === "es" ? "/es" : "";
 
     // Get the base URL with proper scheme
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -79,8 +81,8 @@ export async function POST(request: NextRequest) {
       subscription_data: {
         trial_period_days: 30,
       },
-      success_url: `${appUrl}/budget?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${appUrl}/budget`,
+      success_url: `${appUrl}${prefix}/budget?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${appUrl}${prefix}/budget`,
     });
 
     return NextResponse.json({ url: session.url });

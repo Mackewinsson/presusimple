@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
+import WebhookEvent from "@/models/WebhookEvent";
 import { stripe, getWebhookSecret } from "@/lib/stripe";
 import Stripe from "stripe";
 
@@ -78,8 +79,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
   }
 
-  // Check for idempotency - prevent duplicate processing
   const eventId = event.id;
+
+  // Idempotency: skip if we already processed this event
+  const existing = await WebhookEvent.findOne({ eventId }).lean();
+  if (existing) {
+    console.log(`Webhook event already processed: ${event.type} (${eventId})`);
+    return NextResponse.json({ received: true });
+  }
+
   console.log(`Processing webhook event: ${event.type} (${eventId})`);
 
   // Handle the event
@@ -177,6 +185,9 @@ export async function POST(request: NextRequest) {
         console.log(`Unhandled event type: ${event.type}`);
         break;
     }
+
+    // Record successful processing for idempotency
+    await WebhookEvent.create({ eventId, processedAt: new Date() });
   } catch (eventError) {
     console.error(`Error processing webhook event ${event.type}:`, eventError);
     return NextResponse.json(

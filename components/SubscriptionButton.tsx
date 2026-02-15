@@ -3,19 +3,16 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useSession } from "next-auth/react";
 import { useUserSubscription } from "@/lib/hooks";
-import { Clock, Crown, CreditCard } from "lucide-react";
+import { Clock, Crown } from "lucide-react";
 import { calculateTrialDaysLeft, getSubscriptionStatus } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n";
+import { useCheckout } from "@/hooks/useCheckout";
 
 const SubscriptionButton = () => {
-  // TODOS LOS HOOKS VAN AL INICIO
   const { t } = useTranslation();
-  const { data: session } = useSession();
   const { data: subscription, isLoading } = useUserSubscription();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const { checkout, loading, error, canCheckout } = useCheckout();
   const [showThankYou, setShowThankYou] = useState(false);
 
   const trialDaysLeft = calculateTrialDaysLeft(subscription?.trialEnd || null);
@@ -30,28 +27,6 @@ const SubscriptionButton = () => {
       return () => clearTimeout(timer);
     }
   }, [subscriptionStatus, showThankYou]);
-
-  const handleSubscribe = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const res = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: session?.user?.email }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        setError(data.error || "Failed to start subscription");
-      }
-    } catch (err) {
-      setError("Failed to start subscription");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // AHORA LOS RETURNS CONDICIONALES
   if (isLoading) {
@@ -90,8 +65,8 @@ const SubscriptionButton = () => {
           </AlertDescription>
         </Alert>
         <Button
-          onClick={handleSubscribe}
-          disabled={loading || !session?.user?.email}
+          onClick={checkout}
+          disabled={loading || !canCheckout}
           className="w-full"
         >
           {loading ? t('redirecting') : t('upgradeNow')}

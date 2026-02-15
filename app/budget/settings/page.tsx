@@ -6,6 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { ArrowLeft, User, Settings } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useUserSubscription, useUserData, useDecimalSeparator, useSetDecimalSeparator } from '@/lib/hooks';
+import { useCheckout } from '@/hooks/useCheckout';
 import { getSubscriptionStatus, calculateTrialDaysLeft } from '@/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -87,11 +88,14 @@ function DecimalSeparatorSetting() {
 }
 
 export default function SettingsPage() {
+  const pathname = usePathname();
   const { data: session } = useSession();
   const { data: subscription, isLoading: subscriptionLoading } = useUserSubscription();
   const { data: user, isLoading: userLoading } = useUserData();
   const { isMobile } = useViewport();
   const { t } = useTranslation();
+  const { checkout, loading: checkoutLoading, canCheckout } = useCheckout();
+  const [portalLoading, setPortalLoading] = useState(false);
 
   // Change password state
   const [passwordForm, setPasswordForm] = useState({
@@ -150,19 +154,27 @@ export default function SettingsPage() {
     }
   };
 
-  const handleUpgrade = async () => {
+  const handleManageSubscription = async () => {
+    if (!session?.user?.email) return;
+    setPortalLoading(true);
+    const locale = pathname?.startsWith("/es") ? "es" : "en";
     try {
-      const res = await fetch("/api/stripe/checkout", {
+      const res = await fetch("/api/stripe/portal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: session?.user?.email }),
+        body: JSON.stringify({ email: session.user.email, locale }),
       });
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
+      } else {
+        toast.error(data.error || t("failedToCreatePortal") || "Could not open billing portal.");
       }
     } catch (err) {
-      console.error("Failed to start subscription:", err);
+      console.error("Failed to open portal:", err);
+      toast.error(t("failedToCreatePortal") || "Could not open billing portal.");
+    } finally {
+      setPortalLoading(false);
     }
   };
 
@@ -304,15 +316,34 @@ export default function SettingsPage() {
                           )}
                         </div>
 
+                        {/* Manage Subscription for paid users */}
+                        {subscriptionStatus === "paid" && subscription?.stripeCustomerId && (
+                          <div className="pt-4">
+                            <Button
+                              variant="outline"
+                              onClick={handleManageSubscription}
+                              disabled={portalLoading}
+                              className="w-full"
+                            >
+                              <CreditCard className="h-4 w-4 mr-2" />
+                              {portalLoading ? t('redirecting') : t('manageSubscription')}
+                            </Button>
+                          </div>
+                        )}
+
                         {/* Trial Information */}
                         {getTrialInfo()}
 
                         {/* Upgrade Button for non-paid users */}
                         {subscriptionStatus !== "paid" && (
                           <div className="pt-4">
-                            <Button onClick={handleUpgrade} className="w-full">
+                            <Button
+                              onClick={checkout}
+                              disabled={checkoutLoading || !canCheckout}
+                              className="w-full"
+                            >
                               <Crown className="h-4 w-4 mr-2" />
-                              {t('upgradeToPro')}
+                              {checkoutLoading ? t('redirecting') : t('upgradeToPro')}
                             </Button>
                           </div>
                         )}

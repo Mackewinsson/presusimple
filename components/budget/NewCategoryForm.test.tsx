@@ -7,6 +7,8 @@ jest.mock('@/lib/hooks', () => ({
     mutateAsync: jest.fn(),
     isLoading: false,
   }),
+  useCurrentCurrency: () => ({ code: 'USD', symbol: '$', name: 'US Dollar' }),
+  useCurrentDecimalSeparator: () => '.',
 }));
 
 jest.mock('sonner', () => ({

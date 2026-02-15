@@ -19,6 +19,7 @@ jest.mock('@/lib/hooks', () => ({
     isLoading: false,
   }),
   useCurrentCurrency: () => ({ code: 'USD', symbol: '$', name: 'US Dollar' }),
+  useCurrentDecimalSeparator: () => '.',
 }));
 
 describe('ExpenseItem', () => {
