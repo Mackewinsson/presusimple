@@ -125,69 +125,70 @@ export default function NotificationPrompt({
 
   return (
     <div className="fixed bottom-4 right-4 z-50 max-w-sm animate-in slide-in-from-bottom-2 duration-300">
-      <Card className="shadow-lg border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
+      <Card className="shadow-lg border-border bg-card">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-blue-600" />
-              <CardTitle className="text-lg text-blue-900">
+              <Bell className="h-5 w-5 text-accent" />
+              <CardTitle className="text-lg text-foreground">
                 {t('stayUpdated')}
               </CardTitle>
             </div>
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               onClick={handleDismiss}
-              className="h-6 w-6 p-0 text-gray-500 hover:text-gray-700"
+              className="h-6 w-6 text-muted-foreground hover:text-foreground"
             >
               <X className="h-4 w-4" />
             </Button>
           </div>
-          <CardDescription className="text-blue-700">
+          <CardDescription className="text-muted-foreground">
             {t('getNotifiedDescription')}
           </CardDescription>
         </CardHeader>
         
         <CardContent className="space-y-4">
           {error && (
-            <div className="p-2 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-sm text-red-600">{error}</p>
-              <Button 
-                onClick={clearError} 
-                variant="outline" 
-                size="sm" 
+            <div className="p-2 rounded-md border border-border bg-destructive/10">
+              <p className="text-sm text-destructive">{error}</p>
+              <Button
+                onClick={clearError}
+                variant="outline"
+                size="sm"
                 className="mt-1"
               >
-{t('clearError')}
+                {t('clearError')}
               </Button>
             </div>
           )}
 
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-blue-800">
-              <CheckCircle className="h-4 w-4 text-green-600" />
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <CheckCircle className="h-4 w-4 text-accent" />
               <span>{t('budgetAlertsWhenApproaching')}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-blue-800">
-              <AlertTriangle className="h-4 w-4 text-orange-600" />
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <AlertTriangle className="h-4 w-4 text-accent" />
               <span>{t('expenseRemindersAndTips')}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-blue-800">
-              <Target className="h-4 w-4 text-purple-600" />
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Target className="h-4 w-4 text-accent" />
               <span>{t('goalAchievementsAndMilestones')}</span>
             </div>
           </div>
 
           <div className="flex gap-2">
-            <Button 
+            <Button
+              variant="default"
               onClick={handleEnableNotifications}
               disabled={isLoading}
-              className="flex-1 bg-blue-600 hover:bg-blue-700"
+              className="flex-1"
             >
               {isLoading ? t('enabling') : t('enableNotifications')}
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleDismiss}
               disabled={isLoading}
             >
@@ -200,7 +201,7 @@ export default function NotificationPrompt({
               variant="ghost"
               size="sm"
               onClick={handleDontAskAgain}
-              className="text-xs text-gray-500 hover:text-gray-700"
+              className="text-xs text-muted-foreground hover:text-foreground"
             >
               {t('dontAskAgain')}
             </Button>
