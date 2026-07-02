@@ -112,8 +112,8 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
       {/* Budget Summary */}
       <div className="p-4 border border-accent/30 rounded-lg bg-accent/10">
         <div className="flex items-center justify-between mb-3">
-          <span className="font-medium text-accent-foreground">{t('availableBudget')}</span>
-          <span className="font-mono text-accent-foreground">${availableBudget.toFixed(2)}</span>
+          <span className="font-medium text-foreground">{t('availableBudget')}</span>
+          <span className="font-mono text-foreground">${availableBudget.toFixed(2)}</span>
         </div>
         {newCategoriesToCreate.length > 0 && (
           <div className="flex items-center justify-between text-sm mb-2">
@@ -780,7 +780,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       <div className="relative group w-full transition-all duration-300 mb-6">
         <div className={`absolute -inset-0.5 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 ${isParsing ? 'bg-gradient-to-r from-accent via-purple-500 to-pink-500 animate-pulse' : 'bg-gradient-to-r from-accent/50 to-purple-500/50'}`}></div>
         
-        <div className="relative flex flex-col sm:flex-row items-center bg-card border border-border/50 rounded-2xl shadow-xl overflow-hidden backdrop-blur-sm">
+        <div className="relative flex flex-col sm:flex-row items-center bg-card text-card-foreground border border-border/50 rounded-2xl shadow-xl overflow-hidden backdrop-blur-sm">
           
           <div className="pl-4 py-3 flex items-center justify-center text-accent hidden sm:flex">
              <Sparkles className={`h-5 w-5 ${isParsing ? 'animate-spin text-purple-400' : 'animate-pulse'}`} />

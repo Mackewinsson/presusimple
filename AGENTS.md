@@ -195,6 +195,14 @@ Expense mutations invalidate: `expenseKeys.lists()`, `["categories"]`, `["budget
 - **Hardcoded strings** – Use `lib/i18n.ts` for user-facing text.
 - **Editing shared modules** – Check usages first; avoid breaking callers.
 
+## UI Theme and Styling
+
+The app uses Tailwind CSS with CSS variables defined in `app/globals.css`.
+
+- **Colors**: Always use CSS variables for colors (e.g., `bg-background`, `text-foreground`, `bg-card`, `text-card-foreground`, `text-muted-foreground`).
+- **Accent Color**: `bg-accent` uses a bright yellow-green (`#d3ff3d`). Text on top of `bg-accent` must be `text-accent-foreground` (which is very dark/black) to ensure readability in both light and dark modes. Do not use `text-accent-foreground` on transparent or non-accent backgrounds in dark mode, as it will be black on black.
+- **Dark Mode**: Avoid hardcoded colors like `text-black`, `bg-white`, `text-gray-900`, etc. Rely exclusively on the semantic CSS variables (`bg-primary`, `text-primary-foreground`, etc.) to support both light and dark themes.
+
 ---
 
 ## Don’t
