@@ -18,8 +18,6 @@ import ExpenseList from "./ExpenseList";
 import { AITransactionInput } from "./AITransactionInput";
 import type { Budget } from "@/lib/api";
 import { useTranslation } from "@/lib/i18n";
-import { useFeatureFlags as usePlanFeatureFlags } from "@/lib/hooks/useFeatureFlags";
-import { useFeatureFlags as useRemoteFeatureFlags } from "@/hooks/useFeatureFlags";
 
 interface Category {
   _id?: string;
@@ -52,16 +50,13 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
 }) => {
   const { t } = useTranslation();
   const decimalSeparator = useCurrentDecimalSeparator();
-  const planFeatureFlags = usePlanFeatureFlags();
-  const remoteFeatureFlags = useRemoteFeatureFlags();
-  const isAIFeatureFlagEnabled = remoteFeatureFlags.isFeatureEnabled("aa");
-  const canShowAITransactions = 
-    planFeatureFlags.hasFeatureAccess("transactionTextInput") && isAIFeatureFlagEnabled;
+  
   const totalSpent = expenses.reduce((sum, expense) => {
     return (
       sum + (expense.type === "expense" ? expense.amount : -expense.amount)
     );
   }, 0);
+  
   // Calculate total budgeted from categories
   const totalBudgeted = categories.reduce((sum, cat) => sum + cat.budgeted, 0);
   const remaining = totalBudgeted - totalSpent;
@@ -73,7 +68,7 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-0">
           <div>
             <CardTitle className="text-xl sm:text-2xl font-semibold">
-              {t('transactionHistory')}
+              {t('dailySpending')}
             </CardTitle>
             <CardDescription className="text-sm sm:text-base">
               {t('trackDailyExpenses')}
@@ -106,20 +101,22 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
         </Button>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="add" className="w-full">
-          <TabsList className={`grid w-full ${canShowAITransactions ? "grid-cols-3" : "grid-cols-2"} mb-4`}>
+        <Tabs defaultValue="ai" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-4">
+            <TabsTrigger value="ai" variant="accent" className="text-xs sm:text-sm">
+              ✨ AI Quick Input
+            </TabsTrigger>
             <TabsTrigger value="add" variant="accent" className="text-xs sm:text-sm">
               {t('addTransaction')}
             </TabsTrigger>
-            {canShowAITransactions && (
-              <TabsTrigger value="ai" variant="accent" className="text-xs sm:text-sm">
-                {t('aiQuickInput')}
-              </TabsTrigger>
-            )}
             <TabsTrigger value="history" variant="accent" className="text-xs sm:text-sm">
               {t('transactionHistory')}
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="ai" className="space-y-4">
+            <AITransactionInput budgetId={budget._id} />
+          </TabsContent>
 
           <TabsContent value="add" className="space-y-4">
             <NewExpenseForm
@@ -128,12 +125,6 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
               expenses={expenses}
             />
           </TabsContent>
-
-          {canShowAITransactions && (
-            <TabsContent value="ai" className="space-y-4">
-              <AITransactionInput budgetId={budget._id} />
-            </TabsContent>
-          )}
 
           <TabsContent value="history">
             <div

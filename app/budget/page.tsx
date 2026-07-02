@@ -195,8 +195,29 @@ function BudgetAppContent() {
         <TrialStatus />
 
         <div className="grid gap-4 sm:gap-6 md:gap-8 grid-cols-1 xl:grid-cols-2">
-          <div className="space-y-4 sm:space-y-6 md:space-y-8">
+          {/* LEFT COLUMN: DailySpendingTracker and Summary goes first */}
+          <div className="space-y-4 sm:space-y-6 md:space-y-8 flex flex-col order-1">
             <SubscriptionButton />
+            
+            {budget && accessControl.canAccessExpenses && (
+              <DailySpendingTracker
+                budget={budget}
+                categories={categories}
+                expenses={expenses}
+              />
+            )}
+
+            {budget && accessControl.canAccessBudget && (
+              <Summary
+                budget={budget}
+                categories={categories}
+                expenses={expenses}
+              />
+            )}
+          </div>
+
+          {/* RIGHT COLUMN: Budget Setup and Reset */}
+          <div className="space-y-4 sm:space-y-6 md:space-y-8 flex flex-col order-2">
             {accessControl.canCreateBudget && (
               <BudgetSetupSection
                 budget={budget || null}
@@ -207,26 +228,6 @@ function BudgetAppContent() {
             {accessControl.canResetBudget && (
               <ResetButton
                 budget={budget || null}
-                categories={categories}
-                expenses={expenses}
-              />
-            )}
-          </div>
-          <div className="space-y-4 sm:space-y-6 md:space-y-8">
-            {/* Daily Spending Tracker: desktop only (mobile uses tab "+" -> /budget/add) */}
-            <div className="hidden md:block">
-              {budget && accessControl.canAccessExpenses && (
-                <DailySpendingTracker
-                  budget={budget}
-                  categories={categories}
-                  expenses={expenses}
-                />
-              )}
-            </div>
-
-            {budget && accessControl.canAccessBudget && (
-              <Summary
-                budget={budget}
                 categories={categories}
                 expenses={expenses}
               />

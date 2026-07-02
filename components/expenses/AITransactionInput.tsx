@@ -765,113 +765,87 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
     setIsOpen(false);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleParse();
+    }
+  };
+
   return (
     <>
       <AITransactionLoading isProcessing={isParsing} currentStep={currentStep} />
-      <Card className="glass-card hover-card group bg-card border border-border shadow-2xl">
-        <CardHeader>
-                  <CardTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl">
-          <div className="relative">
-            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text animate-pulse" />
-            <div className="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-ping" />
-          </div>
-          <span className="text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 bg-clip-text font-bold">
-            {t('aiMagic')}
-          </span>
-          <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-transparent bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text animate-bounce" />
-        </CardTitle>
-          <CardDescription className="text-sm sm:text-base text-muted-foreground">
-            {t('aiDescription')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Textarea
-              placeholder={t('aiExample')}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="min-h-[100px]"
-              disabled={isParsing}
-            />
-            <div className="flex justify-between items-center text-xs text-muted-foreground">
-              <span>{description.length}/500 {t('charactersRemaining')}</span>
-              <span>{description.length < 3 ? 'Need more detail' : 'Ready to parse'}</span>
-            </div>
+      
+      {/* Sleek Command Bar Interface */}
+      <div className="relative group w-full transition-all duration-300 mb-6">
+        <div className={`absolute -inset-0.5 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 ${isParsing ? 'bg-gradient-to-r from-accent via-purple-500 to-pink-500 animate-pulse' : 'bg-gradient-to-r from-accent/50 to-purple-500/50'}`}></div>
+        
+        <div className="relative flex flex-col sm:flex-row items-center bg-card border border-border/50 rounded-2xl shadow-xl overflow-hidden backdrop-blur-sm">
+          
+          <div className="pl-4 py-3 flex items-center justify-center text-accent hidden sm:flex">
+             <Sparkles className={`h-5 w-5 ${isParsing ? 'animate-spin text-purple-400' : 'animate-pulse'}`} />
           </div>
 
-          <div className="flex gap-2">
+          <Textarea
+            placeholder={t('aiExample')}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={isParsing || isLoadingCategories || categories?.length === 0}
+            className="flex-1 border-0 focus-visible:ring-0 resize-none min-h-[60px] max-h-[150px] bg-transparent p-4 text-base shadow-none focus-visible:ring-offset-0 placeholder:text-muted-foreground/70"
+            rows={1}
+            style={{ 
+               fieldSizing: 'content' 
+            } as any}
+          />
+          
+          <div className="p-2 sm:pr-3 sm:pl-1 w-full sm:w-auto flex justify-end bg-card">
             <Button
               onClick={handleParse}
               disabled={!description.trim() || isParsing || isLoadingCategories || categories?.length === 0}
-              className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] border-0"
+              className={`rounded-xl px-6 h-10 transition-all duration-300 ${!description.trim() ? 'bg-secondary text-secondary-foreground' : 'bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_15px_rgba(var(--accent),0.5)] hover:scale-105'}`}
             >
               {isParsing ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  <span className="animate-pulse">{t('aiWorking')}</span>
-                </>
-              ) : isLoadingCategories ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  <span>{t('loadingCategories')}</span>
-                </>
-              ) : categories?.length === 0 ? (
-                <>
-                  <XCircle className="h-4 w-4 mr-2" />
-                  <span>{t('noCategoriesAvailable')}</span>
-                </>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
               ) : (
-                <>
-                  <Sparkles className="h-4 w-4 mr-2 animate-pulse" />
-                  <span>{t('transformWithAI')}</span>
-                </>
+                <span className="font-bold tracking-wide">{t('transformWithAI')}</span>
               )}
             </Button>
           </div>
+        </div>
+      </div>
+      
+      <div className="flex justify-between px-2 -mt-4 mb-4 text-xs text-muted-foreground/60">
+        <span className="flex items-center gap-1"><Zap className="h-3 w-3" /> Press Enter to add magic</span>
+        {categories?.length === 0 && !isLoadingCategories && (
+          <span className="text-destructive/80 font-medium">Categories setup required first!</span>
+        )}
+      </div>
 
-          {categories?.length === 0 && !isLoadingCategories && (
-            <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg">
-              <p className="font-medium mb-1">{t('setupRequired')}</p>
-              <p>{t('setupRequiredMessage')}</p>
-            </div>
-          )}
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto border-accent/20">
+          <DialogHeader>
+            <DialogTitle className="text-lg sm:text-xl flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-accent" /> {t('reviewTransactions')}
+            </DialogTitle>
+            <DialogDescription className="text-sm sm:text-base">
+              Review the parsed transactions and set budget allocations for new categories.
+            </DialogDescription>
+          </DialogHeader>
 
-          <div className="text-xs text-muted-foreground space-y-2">
-            <p className="font-medium flex items-center gap-2">
-              <Sparkles className="h-3 w-3 text-white" />
-              {t('tryExamples')}
-            </p>
-            <ul className="space-y-1">
-              <li className="hover:text-white transition-colors cursor-pointer">• "{t('coffeeExample')}" → Two food expenses</li>
-              <li className="hover:text-white transition-colors cursor-pointer">• "{t('rentExample')}" → Rent and transportation</li>
-              <li className="hover:text-white transition-colors cursor-pointer">• "{t('salaryExample')}" → Two income sources</li>
-            </ul>
+          <div className="mt-4">
+            <TransactionPreview
+              transactions={parsedTransactions}
+              missingCategories={missingCategories}
+              availableBudget={availableBudget}
+              availableCategories={categories || []}
+              onConfirm={handleConfirm}
+              onCancel={handleCancel}
+              isSaving={isSaving}
+            />
           </div>
-
-          <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="text-lg sm:text-xl">{t('reviewTransactions')}</DialogTitle>
-                <DialogDescription className="text-sm sm:text-base">
-                  Review the parsed transactions and set budget allocations for new categories.
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="mt-4">
-                <TransactionPreview
-                  transactions={parsedTransactions}
-                  missingCategories={missingCategories}
-                  availableBudget={availableBudget}
-                  availableCategories={categories || []} // Pass available categories to the preview
-                  onConfirm={handleConfirm}
-                  onCancel={handleCancel}
-                  isSaving={isSaving}
-                />
-              </div>
-            </DialogContent>
-          </Dialog>
-        </CardContent>
-      </Card>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }; 

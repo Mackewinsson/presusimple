@@ -7,7 +7,7 @@ export const FEATURES = {
   transactionTextInput: {
     label: "Text-to-Transaction Input",
     description: "Convert text descriptions into transactions with AI",
-    plans: ["pro"]
+    plans: ["free", "pro"]
   },
   exportCSV: {
     label: "CSV Export",

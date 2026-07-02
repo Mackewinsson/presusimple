@@ -28,7 +28,7 @@ cat > .env.production << 'EOF'
 NODE_ENV=production
 
 # NextAuth Configuration
-NEXTAUTH_URL=https://www.presusimple.pro
+NEXTAUTH_URL=https://www.presusimple.com
 NEXTAUTH_SECRET=your-nextauth-secret-key-here
 
 # Google OAuth (Production)
