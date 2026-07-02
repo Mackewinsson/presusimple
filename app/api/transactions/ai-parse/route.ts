@@ -254,16 +254,15 @@ export async function POST(request: NextRequest) {
         );
       }
       
-      // Validate that the category exists in the available categories
+      // If the AI suggested a category not in the user's list, add suggestions
+      // but DO NOT reject — the frontend review modal handles missing categories gracefully
       if (categories && categories.length > 0) {
         const categoryExists = categories.some((cat: string) => 
           cat.toLowerCase() === transaction.category.toLowerCase()
         );
         if (!categoryExists) {
-          return NextResponse.json(
-            { error: `Category "${transaction.category}" is not available in your budget. Available categories: ${categories.join(', ')}` },
-            { status: 400 }
-          );
+          // Attach suggested alternatives from the available categories
+          transaction.suggestedCategories = categories.slice(0, 5);
         }
       }
     }
