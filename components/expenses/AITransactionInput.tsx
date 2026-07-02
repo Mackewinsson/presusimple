@@ -471,6 +471,14 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       return;
     }
 
+    if (!/\d/.test(description)) {
+      toast({
+        title: "Missing amount",
+        description: "💡 Please include a number for the amount (e.g., 'coffee 5', 'lunch 15')",
+      });
+      return;
+    }
+
     // Check if categories are loaded
     if (categories?.length === 0) {
       toast({
