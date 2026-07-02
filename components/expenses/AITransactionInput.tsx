@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { Sparkles, Zap, XCircle, CheckCircle, AlertCircle, Plus, Minus, AlertTriangle } from "lucide-react";
+import { Sparkles, Zap, XCircle, CheckCircle, AlertCircle, Plus, Minus, AlertTriangle, X } from "lucide-react";
 import { Icon } from "@/components/ui/icon";
 import { formatMoney, parseDecimalInput } from "@/lib/utils/formatMoney";
 import { AITransactionLoading } from "@/components/ui/ai-transaction-loading";
@@ -473,8 +473,8 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
 
     if (!/\d/.test(description)) {
       toast({
-        title: "Missing amount",
-        description: "💡 Please include a number for the amount (e.g., 'coffee 5', 'lunch 15')",
+        title: (t as any)('missingAmount'),
+        description: (t as any)('missingAmountDesc'),
       });
       return;
     }
@@ -795,19 +795,29 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
           </div>
 
           <Textarea
-            placeholder={t('aiExample')}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isParsing || isLoadingCategories || categories?.length === 0}
+            placeholder={t('aiExample')}
+            autoFocus
             className="flex-1 border-0 focus-visible:ring-0 resize-none min-h-[60px] max-h-[150px] bg-transparent p-4 text-base shadow-none focus-visible:ring-offset-0 placeholder:text-muted-foreground/70"
             rows={1}
-            style={{ 
-               fieldSizing: 'content' 
-            } as any}
+            style={{ fieldSizing: 'content' } as any}
           />
           
-          <div className="p-2 sm:pr-3 sm:pl-1 w-full sm:w-auto flex justify-end bg-card">
+          <div className="p-2 sm:pr-3 sm:pl-1 w-full sm:w-auto flex items-center justify-end gap-2 bg-card">
+            {description && !isParsing && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => setDescription('')}
+                className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-full"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
             <Button
               onClick={handleParse}
               disabled={!description.trim() || isParsing || isLoadingCategories || categories?.length === 0}
@@ -824,9 +834,9 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       </div>
       
       <div className="flex justify-between px-2 -mt-4 mb-4 text-xs text-muted-foreground/60">
-        <span className="flex items-center gap-1"><Zap className="h-3 w-3" /> Press Enter to add magic</span>
+        <span className="flex items-center gap-1"><Zap className="h-3 w-3" /> {(t as any)('pressEnterMagic')}</span>
         {categories?.length === 0 && !isLoadingCategories && (
-          <span className="text-destructive/80 font-medium">Categories setup required first!</span>
+          <span className="text-destructive/80 font-medium">{(t as any)('categoriesSetupRequired')}</span>
         )}
       </div>
 
