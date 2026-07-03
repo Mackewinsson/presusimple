@@ -22,12 +22,24 @@ export interface LemonSubscriptionAttributes {
   customer_id: number;
 }
 
-export function isLemonSqueezyConfigured(): boolean {
+export function isLemonSqueezyCheckoutConfigured(): boolean {
   return Boolean(
     process.env.LEMONSQUEEZY_API_KEY &&
       process.env.LEMONSQUEEZY_STORE_ID &&
-      process.env.LEMONSQUEEZY_VARIANT_ID &&
+      process.env.LEMONSQUEEZY_VARIANT_ID
+  );
+}
+
+export function isLemonSqueezyWebhookConfigured(): boolean {
+  return Boolean(
+    process.env.LEMONSQUEEZY_API_KEY &&
       process.env.LEMONSQUEEZY_WEBHOOK_SECRET
+  );
+}
+
+export function isLemonSqueezyConfigured(): boolean {
+  return (
+    isLemonSqueezyCheckoutConfigured() && isLemonSqueezyWebhookConfigured()
   );
 }
 

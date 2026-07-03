@@ -5,12 +5,12 @@ jest.mock("@/lib/lemonsqueezy", () => ({
   getAppUrl: jest.fn(() => "http://localhost:3000"),
   getStoreId: jest.fn(() => "123"),
   getVariantId: jest.fn(() => "456"),
-  isLemonSqueezyConfigured: jest.fn(() => true),
+  isLemonSqueezyCheckoutConfigured: jest.fn(() => true),
   createCheckout: (...args: unknown[]) => mockCreateCheckout(...args),
 }));
 
 import { POST } from "@/app/api/lemonsqueezy/checkout/route";
-import { isLemonSqueezyConfigured } from "@/lib/lemonsqueezy";
+import { isLemonSqueezyCheckoutConfigured } from "@/lib/lemonsqueezy";
 
 const createMockRequest = (body: { email?: string; locale?: string }) =>
   ({
@@ -32,7 +32,7 @@ describe("POST /api/lemonsqueezy/checkout", () => {
   });
 
   it("returns 503 when Lemon Squeezy is not configured", async () => {
-    jest.mocked(isLemonSqueezyConfigured).mockReturnValueOnce(false);
+    jest.mocked(isLemonSqueezyCheckoutConfigured).mockReturnValueOnce(false);
 
     const response = await POST(
       createMockRequest({ email: "user@example.com" })

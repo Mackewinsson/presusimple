@@ -6,7 +6,7 @@ import {
   ensureLemonSqueezySetup,
   getSubscription,
   getWebhookSecret,
-  isLemonSqueezyConfigured,
+  isLemonSqueezyWebhookConfigured,
   mapSubscriptionToUserUpdate,
   verifyWebhookSignature,
   type LemonSubscriptionAttributes,
@@ -72,7 +72,7 @@ async function syncUserFromSubscriptionId(subscriptionId: string) {
  *     tags: [Payments]
  */
 export async function POST(request: NextRequest) {
-  if (!isLemonSqueezyConfigured()) {
+  if (!isLemonSqueezyWebhookConfigured()) {
     return NextResponse.json(
       { error: "Webhook not configured" },
       { status: 503 }

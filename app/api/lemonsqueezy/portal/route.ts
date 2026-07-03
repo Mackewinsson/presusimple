@@ -4,7 +4,7 @@ import User from "@/models/User";
 import {
   ensureLemonSqueezySetup,
   getSubscription,
-  isLemonSqueezyConfigured,
+  isLemonSqueezyCheckoutConfigured,
 } from "@/lib/lemonsqueezy";
 
 /**
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing email" }, { status: 400 });
     }
 
-    if (!isLemonSqueezyConfigured()) {
+    if (!isLemonSqueezyCheckoutConfigured()) {
       return NextResponse.json(
         { error: "Payments are not configured yet. Please try again later." },
         { status: 503 }

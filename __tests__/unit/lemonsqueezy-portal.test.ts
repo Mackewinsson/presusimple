@@ -7,6 +7,7 @@ jest.mock("@/lib/mongoose", () => ({
 jest.mock("@/lib/lemonsqueezy", () => ({
   ensureLemonSqueezySetup: jest.fn(),
   getSubscription: (...args: unknown[]) => mockGetSubscription(...args),
+  isLemonSqueezyCheckoutConfigured: jest.fn(() => true),
 }));
 
 const mockFindOne = jest.fn();
