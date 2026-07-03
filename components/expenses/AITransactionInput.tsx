@@ -869,37 +869,49 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       <div className="relative group w-full transition-all duration-300 mb-6">
         <div className={`absolute -inset-0.5 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 ${isParsing ? 'bg-gradient-to-r from-accent via-purple-500 to-pink-500 animate-pulse' : 'bg-gradient-to-r from-accent/50 to-purple-500/50'}`}></div>
         
-        <div className="relative flex flex-col sm:flex-row items-center bg-card text-card-foreground border border-border/50 rounded-2xl shadow-xl overflow-hidden backdrop-blur-sm">
+        <div className="relative flex flex-col bg-card text-card-foreground border border-border/50 rounded-2xl shadow-xl overflow-hidden backdrop-blur-sm">
           
-          <div className="pl-4 py-3 flex items-center justify-center text-accent hidden sm:flex">
-             <Sparkles className={`h-5 w-5 ${isParsing ? 'animate-spin text-purple-400' : 'animate-pulse'}`} />
-          </div>
-
-          <div className="flex-1 flex flex-row items-center w-full relative">
-            {imageBase64 && (
-              <div className="relative w-16 h-16 ml-4 rounded-lg overflow-hidden border border-border/50 shadow-sm group/img flex-shrink-0">
-                <img src={imageBase64} alt="Receipt preview" className="w-full h-full object-cover" />
-                <button 
-                  onClick={removeImage}
-                  className="absolute top-1 right-1 bg-black/60 text-white p-1 rounded-full opacity-0 group-hover/img:opacity-100 transition-opacity hover:bg-destructive"
-                >
-                  <X className="w-3 h-3" />
-                </button>
+          {/* Image Preview Banner */}
+          {imageBase64 && (
+            <div className="relative w-full border-b border-border/30 bg-muted/30 p-3">
+              <div className="flex items-center gap-3">
+                <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-border/50 shadow-sm group/img flex-shrink-0">
+                  <img src={imageBase64} alt="Receipt preview" className="w-full h-full object-cover" />
+                  <button 
+                    onClick={removeImage}
+                    className="absolute top-1 right-1 bg-black/60 text-white p-1 rounded-full opacity-0 group-hover/img:opacity-100 transition-opacity hover:bg-destructive"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  <p className="font-medium text-foreground">{imageFile?.name || "Pasted image"}</p>
+                  <p className="text-xs">Ready for AI analysis</p>
+                </div>
               </div>
-            )}
-            <Textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onPaste={handlePaste}
-              disabled={isParsing || isLoadingCategories || categories?.length === 0}
-              placeholder={imageBase64 ? "Add optional description..." : t('aiExample')}
-              autoFocus
-              className="w-full border-0 focus-visible:ring-0 resize-none min-h-[60px] max-h-[150px] bg-transparent p-4 text-base shadow-none focus-visible:ring-offset-0 placeholder:text-muted-foreground/70"
-              rows={1}
-              style={{ fieldSizing: 'content' } as any}
-            />
-          </div>
+            </div>
+          )}
+
+          {/* Text Input Row */}
+          <div className="flex flex-col sm:flex-row items-center">
+            <div className="pl-4 py-3 flex items-center justify-center text-accent hidden sm:flex">
+               <Sparkles className={`h-5 w-5 ${isParsing ? 'animate-spin text-purple-400' : 'animate-pulse'}`} />
+            </div>
+
+            <div className="flex-1 w-full">
+              <Textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onPaste={handlePaste}
+                disabled={isParsing || isLoadingCategories || categories?.length === 0}
+                placeholder={imageBase64 ? "Add optional description..." : t('aiExample')}
+                autoFocus
+                className="w-full border-0 focus-visible:ring-0 resize-none min-h-[60px] max-h-[150px] bg-transparent p-4 text-base shadow-none focus-visible:ring-offset-0 placeholder:text-muted-foreground/70"
+                rows={1}
+                style={{ fieldSizing: 'content' } as any}
+              />
+            </div>
           
           <div className="p-2 sm:pr-3 sm:pl-1 w-full sm:w-auto flex items-center justify-end gap-2 bg-card">
             <input 
@@ -942,6 +954,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
                 <span className="font-bold tracking-wide">{t('transformWithAI')}</span>
               )}
             </Button>
+          </div>
           </div>
         </div>
       </div>
