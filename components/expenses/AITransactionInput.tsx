@@ -875,13 +875,13 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
              <Sparkles className={`h-5 w-5 ${isParsing ? 'animate-spin text-purple-400' : 'animate-pulse'}`} />
           </div>
 
-          <div className="flex-1 flex flex-col w-full relative">
+          <div className="flex-1 flex flex-row items-center w-full relative">
             {imageBase64 && (
-              <div className="relative inline-block w-24 h-24 mt-4 ml-4 mb-2 rounded-md overflow-hidden border border-border group/img">
+              <div className="relative w-16 h-16 ml-4 rounded-lg overflow-hidden border border-border/50 shadow-sm group/img flex-shrink-0">
                 <img src={imageBase64} alt="Receipt preview" className="w-full h-full object-cover" />
                 <button 
                   onClick={removeImage}
-                  className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover/img:opacity-100 transition-opacity"
+                  className="absolute top-1 right-1 bg-black/60 text-white p-1 rounded-full opacity-0 group-hover/img:opacity-100 transition-opacity hover:bg-destructive"
                 >
                   <X className="w-3 h-3" />
                 </button>
