@@ -107,25 +107,25 @@ function checkRateLimit(userId: string): boolean {
  */
 export async function POST(request: NextRequest) {
   try {
-    const { description, userId, budgetId, categories } = await request.json();
+    const { description, imageBase64, userId, budgetId, categories } = await request.json();
 
     // Edge case: Validate required fields
-    if (!description || !userId || !budgetId) {
+    if ((!description && !imageBase64) || !userId || !budgetId) {
       return NextResponse.json(
-        { error: "Description, userId, and budgetId are required" },
+        { error: "Description or image, userId, and budgetId are required" },
         { status: 400 }
       );
     }
 
-    // Edge case: Validate description length
-    if (description.trim().length < 3) {
+    // Edge case: Validate description length if provided
+    if (description && description.trim().length > 0 && description.trim().length < 3) {
       return NextResponse.json(
         { error: "Description must be at least 3 characters long" },
         { status: 400 }
       );
     }
 
-    if (description.length > 500) {
+    if (description && description.length > 500) {
       return NextResponse.json(
         { error: "Description is too long. Please keep it under 500 characters." },
         { status: 400 }
@@ -162,12 +162,25 @@ export async function POST(request: NextRequest) {
     // Call OpenAI with function calling
     let completion;
     try {
+      const messages: any[] = [
+        { role: "system", content: enhancedPrompt }
+      ];
+
+      if (imageBase64) {
+        messages.push({
+          role: "user",
+          content: [
+            { type: "text", text: description || "Extract the transactions from this receipt or bank statement screenshot." },
+            { type: "image_url", image_url: { url: imageBase64 } }
+          ]
+        });
+      } else {
+        messages.push({ role: "user", content: description });
+      }
+
       completion = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [
-          { role: "system", content: enhancedPrompt },
-          { role: "user", content: description }
-        ],
+        model: "gpt-4o",
+        messages,
         functions: [transactionFunctionSchema],
         function_call: { name: "extract_transactions" },
       });

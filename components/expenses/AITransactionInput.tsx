@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { Sparkles, Zap, XCircle, CheckCircle, AlertCircle, Plus, Minus, AlertTriangle, X } from "lucide-react";
+import { Sparkles, Zap, XCircle, CheckCircle, AlertCircle, Plus, Minus, AlertTriangle, X, Camera, ImageIcon } from "lucide-react";
 import { Icon } from "@/components/ui/icon";
 import { formatMoney, parseDecimalInput } from "@/lib/utils/formatMoney";
 import { AITransactionLoading } from "@/components/ui/ai-transaction-loading";
@@ -342,6 +342,9 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
   const [isParsing, setIsParsing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [currentStep, setCurrentStep] = useState<"analyzing" | "parsing" | "matching" | "complete">("analyzing");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   
   const { toast } = useToast();
   const userId = useUserId();
@@ -378,6 +381,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           description,
+          imageBase64,
           userId: userId?.data,
           budgetId,
           categories: categoryNames // Pass available categories
@@ -451,12 +455,66 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
     },
   });
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: "Error", description: "Image is too large. Please upload an image under 10MB.", variant: "destructive" });
+      return;
+    }
+
+    setImageFile(file);
+    
+    // Compress and convert to base64
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        
+        // Max dimension
+        const MAX_SIZE = 1024;
+        if (width > height && width > MAX_SIZE) {
+          height = Math.round((height * MAX_SIZE) / width);
+          width = MAX_SIZE;
+        } else if (height > MAX_SIZE) {
+          width = Math.round((width * MAX_SIZE) / height);
+          height = MAX_SIZE;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          setImageBase64(dataUrl);
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+    
+    // Clear the input so the same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeImage = () => {
+    setImageFile(null);
+    setImageBase64(null);
+  };
+
   const handleParse = async () => {
     // Input validation
-    if (!description.trim()) {
+    if (!description.trim() && !imageBase64) {
       toast({
         title: "Error",
-        description: "Please enter a transaction description",
+        description: "Please enter a transaction description or upload an image",
         variant: "destructive",
       });
       return;
@@ -471,7 +529,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       return;
     }
 
-    if (!/\d/.test(description)) {
+    if (!imageBase64 && !/\d/.test(description)) {
       toast({
         title: (t as any)('missingAmount'),
         description: (t as any)('missingAmountDesc'),
@@ -730,6 +788,8 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       
       // Reset form
       setDescription("");
+      setImageFile(null);
+      setImageBase64(null);
       setParsedTransactions([]);
       setMissingCategories([]);
       setIsOpen(false);
@@ -768,6 +828,9 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
   };
 
   const handleCancel = () => {
+    setDescription("");
+    setImageFile(null);
+    setImageBase64(null);
     setParsedTransactions([]);
     setMissingCategories([]);
     setIsOpen(false);
@@ -794,19 +857,50 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
              <Sparkles className={`h-5 w-5 ${isParsing ? 'animate-spin text-purple-400' : 'animate-pulse'}`} />
           </div>
 
-          <Textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={isParsing || isLoadingCategories || categories?.length === 0}
-            placeholder={t('aiExample')}
-            autoFocus
-            className="flex-1 border-0 focus-visible:ring-0 resize-none min-h-[60px] max-h-[150px] bg-transparent p-4 text-base shadow-none focus-visible:ring-offset-0 placeholder:text-muted-foreground/70"
-            rows={1}
-            style={{ fieldSizing: 'content' } as any}
-          />
+          <div className="flex-1 flex flex-col w-full relative">
+            {imageBase64 && (
+              <div className="relative inline-block w-24 h-24 mt-4 ml-4 mb-2 rounded-md overflow-hidden border border-border group/img">
+                <img src={imageBase64} alt="Receipt preview" className="w-full h-full object-cover" />
+                <button 
+                  onClick={removeImage}
+                  className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover/img:opacity-100 transition-opacity"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            )}
+            <Textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={isParsing || isLoadingCategories || categories?.length === 0}
+              placeholder={imageBase64 ? "Add optional description..." : t('aiExample')}
+              autoFocus
+              className="w-full border-0 focus-visible:ring-0 resize-none min-h-[60px] max-h-[150px] bg-transparent p-4 text-base shadow-none focus-visible:ring-offset-0 placeholder:text-muted-foreground/70"
+              rows={1}
+              style={{ fieldSizing: 'content' } as any}
+            />
+          </div>
           
           <div className="p-2 sm:pr-3 sm:pl-1 w-full sm:w-auto flex items-center justify-end gap-2 bg-card">
+            <input 
+              type="file" 
+              accept="image/jpeg, image/png, image/webp" 
+              className="hidden" 
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => fileInputRef.current?.click()}
+              className="h-10 w-10 text-muted-foreground hover:text-foreground rounded-full transition-colors flex-shrink-0"
+              disabled={isParsing}
+              title="Upload Receipt Image"
+            >
+              <ImageIcon className="h-5 w-5" />
+            </Button>
             {description && !isParsing && (
               <Button
                 type="button"
@@ -820,8 +914,8 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
             )}
             <Button
               onClick={handleParse}
-              disabled={!description.trim() || isParsing || isLoadingCategories || categories?.length === 0}
-              className={`rounded-xl px-6 h-10 transition-all duration-300 ${!description.trim() ? 'bg-secondary text-secondary-foreground' : 'bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_15px_rgba(var(--accent),0.5)] hover:scale-105'}`}
+              disabled={(!description.trim() && !imageBase64) || isParsing || isLoadingCategories || categories?.length === 0}
+              className={`rounded-xl px-6 h-10 transition-all duration-300 ${(!description.trim() && !imageBase64) ? 'bg-secondary text-secondary-foreground' : 'bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_15px_rgba(var(--accent),0.5)] hover:scale-105'}`}
             >
               {isParsing ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
