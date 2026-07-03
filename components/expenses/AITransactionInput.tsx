@@ -455,10 +455,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
     },
   });
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const processImageFile = (file: File) => {
     if (file.size > 10 * 1024 * 1024) {
       toast({ title: "Error", description: "Image is too large. Please upload an image under 10MB.", variant: "destructive" });
       return;
@@ -497,10 +494,31 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       img.src = event.target?.result as string;
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    processImageFile(file);
     
     // Clear the input so the same file can be selected again
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile();
+        if (file) {
+          e.preventDefault(); // Prevent pasting the image name as text
+          processImageFile(file);
+          break; // Process only the first image
+        }
+      }
     }
   };
 
@@ -873,6 +891,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               onKeyDown={handleKeyDown}
+              onPaste={handlePaste}
               disabled={isParsing || isLoadingCategories || categories?.length === 0}
               placeholder={imageBase64 ? "Add optional description..." : t('aiExample')}
               autoFocus
