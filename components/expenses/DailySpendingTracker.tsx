@@ -16,6 +16,7 @@ import { ChevronDown, ChevronUp, Sparkles } from "lucide-react";
 import NewExpenseForm from "./NewExpenseForm";
 import ExpenseList from "./ExpenseList";
 import { AITransactionInput } from "./AITransactionInput";
+import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
 import type { Budget } from "@/lib/api";
 import { useTranslation } from "@/lib/i18n";
 
@@ -50,6 +51,8 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
 }) => {
   const { t } = useTranslation();
   const decimalSeparator = useCurrentDecimalSeparator();
+  const { hasFeatureAccess, isLoading: isLoadingPlan } = useFeatureFlags();
+  const canUseAIInput = hasFeatureAccess("transactionTextInput");
 
   const totalSpent = expenses.reduce((sum, expense) => {
     return (
@@ -90,16 +93,26 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
       </CardHeader>
 
       <CardContent className="pt-0">
-        <Tabs defaultValue="ai" className="w-full">
-          <TabsList className="mb-6 grid h-11 w-full grid-cols-3 gap-1 bg-muted/50 p-1">
-            <TabsTrigger
-              value="ai"
-              variant="accent"
-              className="h-9 gap-1.5 text-xs data-[state=active]:shadow-sm sm:text-sm"
-            >
-              <Sparkles className="h-3.5 w-3.5 shrink-0" />
-              <span className="truncate">{t("aiQuickInput")}</span>
-            </TabsTrigger>
+        <Tabs
+          key={isLoadingPlan ? "loading" : canUseAIInput ? "with-ai" : "without-ai"}
+          defaultValue={canUseAIInput ? "ai" : "add"}
+          className="w-full"
+        >
+          <TabsList
+            className={`mb-6 grid h-11 w-full gap-1 bg-muted/50 p-1 ${
+              canUseAIInput ? "grid-cols-3" : "grid-cols-2"
+            }`}
+          >
+            {canUseAIInput && (
+              <TabsTrigger
+                value="ai"
+                variant="accent"
+                className="h-9 gap-1.5 text-xs data-[state=active]:shadow-sm sm:text-sm"
+              >
+                <Sparkles className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{t("aiQuickInput")}</span>
+              </TabsTrigger>
+            )}
             <TabsTrigger
               value="add"
               variant="accent"
@@ -116,9 +129,11 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="ai" className="mt-0 space-y-4">
-            <AITransactionInput budgetId={budget._id} />
-          </TabsContent>
+          {canUseAIInput && (
+            <TabsContent value="ai" className="mt-0 space-y-4">
+              <AITransactionInput budgetId={budget._id} />
+            </TabsContent>
+          )}
 
           <TabsContent value="add" className="mt-0 space-y-4">
             <NewExpenseForm

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { transactionFunctionSchema } from "@/lib/openai-transaction-functions";
 import { transactionSystemPrompt } from "@/lib/openai-transaction-prompts";
+import { dbConnect } from "@/lib/mongoose";
+import User from "@/models/User";
+import { hasAccess } from "@/lib/userAccess";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -145,6 +148,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Too many requests. Please wait a minute before trying again." },
         { status: 429 }
+      );
+    }
+
+    await dbConnect();
+    const user = await User.findById(userId);
+    if (!hasAccess(user, "transactionTextInput")) {
+      return NextResponse.json(
+        { error: "Pro subscription required for AI transaction input" },
+        { status: 403 }
       );
     }
 
