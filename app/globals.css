@@ -402,16 +402,16 @@
 
 .dark .btn-primary,
 .light .btn-primary {
-  @apply bg-primary text-primary-foreground hover:bg-primary/90;
+  @apply bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground;
 }
 
 .btn-accent {
-  @apply font-semibold rounded-xl px-6 py-3 shadow-lg transition-all duration-200 transform hover:scale-105;
+  @apply font-semibold rounded-xl px-6 py-3 shadow-lg border border-black/10 dark:border-transparent transition-all duration-200 transform hover:scale-105;
 }
 
 .dark .btn-accent,
 .light .btn-accent {
-  @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+  @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-secondary-foreground;
 }
 
 .btn-outline {

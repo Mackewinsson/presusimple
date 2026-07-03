@@ -83,7 +83,7 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
             </span>
             <span
               className={`text-xl font-semibold tabular-nums sm:text-2xl ${
-                remaining < 0 ? "text-destructive" : "text-accent"
+                remaining < 0 ? "text-destructive" : "text-emerald-600 dark:text-accent"
               }`}
             >
               {formatMoney(remaining, undefined, decimalSeparator)}
