@@ -11,7 +11,12 @@ import { formatMoney } from "@/lib/utils/formatMoney";
 import { SpendingChart } from "@/components/ui/SpendingChart";
 import { useCurrentCurrency, useCurrentDecimalSeparator } from "@/lib/hooks";
 import { useTranslation } from "@/lib/i18n";
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DistributionChart } from "@/components/ui/DistributionChart";
+import { TrendChart } from "@/components/ui/TrendChart";
+import { BurndownChart } from "@/components/ui/BurndownChart";
+import { CashFlowChart } from "@/components/ui/CashFlowChart";
+import { PieChart, TrendingUp, Activity, BarChart3, BarChart } from "lucide-react";
 import { motion } from "framer-motion";
 import { format, parseISO } from "date-fns";
 import { Button } from "./ui/button";
@@ -90,15 +95,24 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
     spent: Number(cat.spent) || 0,
     budgeted: Number(cat.budgeted) || 0,
     overBudget: (Number(cat.spent) || 0) > (Number(cat.budgeted) || 0),
-  })).filter(item => item.budgeted > 0 || item.spent > 0); // Only show items with data
+  })).filter(item => item.budgeted > 0 || item.spent > 0);
 
+  const trendData = expenses
+    .filter(e => e.type === "expense")
+    .map(e => ({ date: e.date, amount: e.amount }));
 
+  const burndownData = expenses
+    .filter(e => e.type === "expense")
+    .map(e => ({ date: e.date, spent: e.amount }));
 
-
-
-
-
-  const handleExportToExcel = () => {
+  const cashFlowData = expenses.map(e => {
+    const isIncome = e.type?.toLowerCase() === "income";
+    return {
+      date: e.date,
+      income: isIncome ? e.amount : 0,
+      expense: !isIncome ? e.amount : 0,
+    };
+  });  const handleExportToExcel = () => {
     try {
       const wb = utils.book_new();
 
@@ -266,45 +280,108 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
 
         {categories.length > 0 ? (
           <div className="mt-6 sm:mt-8">
-            <h3 className="text-base sm:text-lg font-medium mb-4 sm:mb-6">
-              {t('topSpendingCategories')}
-            </h3>
-            <div className="h-[250px] sm:h-[300px] md:h-[350px] flex flex-col" data-testid="summary-chart">
-              {hasSpendingData ? (
-                <div className="flex-1 overflow-x-auto">
-                  <div className="min-w-full h-full" style={{ minWidth: `${Math.max(chartCategories.length * 120, 400)}px` }}>
-                    <SpendingChart 
-                      data={chartCategories.map(cat => ({
-                        name: cat.name,
-                        spent: cat.spent,
-                        budgeted: cat.budgeted,
-                        overBudget: cat.spent > cat.budgeted,
-                      }))}
-                      showBudgeted={true}
-                      showLegend={false}
-                      height="100%"
-                    />
+            <Tabs defaultValue="categories" className="w-full">
+              <div className="flex justify-between items-center mb-4 sm:mb-6 flex-wrap gap-4">
+                <h3 className="text-base sm:text-lg font-medium">
+                  {t('topSpendingCategories')}
+                </h3>
+                <TabsList className="bg-muted/50 h-9 p-1">
+                  <TabsTrigger value="categories" className="h-7 text-xs px-2 sm:px-3 gap-1.5" title={t('tabCategories')}>
+                    <BarChart className="h-3.5 w-3.5 hidden sm:inline-block" />
+                    <span className="sm:hidden">{t('tabCategoriesShort')}</span>
+                    <span className="hidden sm:inline">{t('tabCategories')}</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="distribution" className="h-7 text-xs px-2 sm:px-3 gap-1.5" title={t('tabDistribution')}>
+                    <PieChart className="h-3.5 w-3.5 hidden sm:inline-block" />
+                    <span className="sm:hidden">{t('tabDistributionShort')}</span>
+                    <span className="hidden sm:inline">{t('tabDistribution')}</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="trend" className="hidden h-7 text-xs px-2 sm:px-3 gap-1.5" title={t('tabTrend')}>
+                    <TrendingUp className="h-3.5 w-3.5 hidden sm:inline-block" />
+                    <span className="sm:hidden">{t('tabTrendShort')}</span>
+                    <span className="hidden sm:inline">{t('tabTrend')}</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="burndown" className="hidden h-7 text-xs px-2 sm:px-3 gap-1.5" title={t('tabBurndown')}>
+                    <Activity className="h-3.5 w-3.5 hidden sm:inline-block" />
+                    <span className="sm:hidden">{t('tabBurndownShort')}</span>
+                    <span className="hidden sm:inline">{t('tabBurndown')}</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="cashflow" className="h-7 text-xs px-2 sm:px-3 gap-1.5" title={t('tabCashFlow')}>
+                    <BarChart3 className="h-3.5 w-3.5 hidden sm:inline-block" />
+                    <span className="sm:hidden">{t('tabCashFlowShort')}</span>
+                    <span className="hidden sm:inline">{t('tabCashFlow')}</span>
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              <div className="h-[250px] sm:h-[300px] md:h-[350px] flex flex-col" data-testid="summary-chart">
+                {hasSpendingData ? (
+                  <>
+                    <TabsContent value="categories" className="flex-1 overflow-x-auto overflow-y-hidden mt-0 h-full border-none p-0 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
+                      <div className="min-w-full h-full" style={{ minWidth: `${Math.max(chartCategories.length * 120, 400)}px` }}>
+                        <SpendingChart 
+                          data={chartData}
+                          showBudgeted={true}
+                          showLegend={false}
+                          currencySymbol={currentCurrency.symbol}
+                          decimalSeparator={decimalSeparator}
+                          height="100%"
+                        />
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="distribution" className="flex-1 mt-0 h-full">
+                      {hasMultipleCategories ? (
+                        <DistributionChart data={chartData} height="100%" />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">{t('noSpendingDataAvailable')}</div>
+                      )}
+                    </TabsContent>
+
+                    <TabsContent value="trend" className="hidden flex-1 mt-0 h-full">
+                      {trendData.length > 0 ? (
+                        <TrendChart data={trendData} height="100%" />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">{t('noSpendingDataAvailable')}</div>
+                      )}
+                    </TabsContent>
+
+                    <TabsContent value="burndown" className="hidden flex-1 mt-0 h-full">
+                      {burndownData.length > 0 ? (
+                        <BurndownChart data={burndownData} totalBudget={calculatedTotalBudgeted} height="100%" />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">{t('noSpendingDataAvailable')}</div>
+                      )}
+                    </TabsContent>
+
+                    <TabsContent value="cashflow" className="flex-1 mt-0 h-full">
+                      {cashFlowData.length > 0 ? (
+                        <CashFlowChart data={cashFlowData} height="100%" />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">{t('noSpendingDataAvailable')}</div>
+                      )}
+                    </TabsContent>
+                  </>
+                ) : (
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {categories.length === 0 
+                          ? t('noCategoriesAvailable') 
+                          : t('noSpendingDataAvailable')
+                        }
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {categories.length === 0 
+                          ? t('addBudgetCategoriesToSee') 
+                          : t('addExpensesToSeePatterns')
+                        }
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="flex-1 flex items-center justify-center">
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {categories.length === 0 
-                        ? t('noCategoriesAvailable') 
-                        : t('noSpendingDataAvailable')
-                      }
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {categories.length === 0 
-                        ? t('addBudgetCategoriesToSee') 
-                        : t('addExpensesToSeePatterns')
-                      }
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            </Tabs>
           </div>
         ) : (
           <div className="text-center py-8 sm:py-12 px-4 rounded-lg bg-muted/30">
