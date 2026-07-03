@@ -12,7 +12,7 @@ import { formatMoney } from "@/lib/utils/formatMoney";
 import { useCurrentDecimalSeparator } from "@/lib/hooks";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronUp, Sparkles, Plus, History } from "lucide-react";
 import NewExpenseForm from "./NewExpenseForm";
 import ExpenseList from "./ExpenseList";
 import { AITransactionInput } from "./AITransactionInput";
@@ -109,23 +109,28 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
                 variant="accent"
                 className="h-9 gap-1.5 text-xs data-[state=active]:shadow-sm sm:text-sm"
               >
-                <Sparkles className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">{t("aiQuickInput")}</span>
+                <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+                <span className="hidden sm:inline truncate">{t("aiQuickInput")}</span>
+                <span className="sm:hidden">{t("aiShort")}</span>
               </TabsTrigger>
             )}
             <TabsTrigger
               value="add"
               variant="accent"
-              className="h-9 text-xs data-[state=active]:shadow-sm sm:text-sm"
+              className="h-9 gap-1.5 text-xs data-[state=active]:shadow-sm sm:text-sm"
             >
-              {t("addTransaction")}
+              <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 hidden sm:block" />
+              <span className="hidden sm:inline truncate">{t("addTransaction")}</span>
+              <span className="sm:hidden">{t("addShort")}</span>
             </TabsTrigger>
             <TabsTrigger
               value="history"
               variant="accent"
-              className="h-9 text-xs data-[state=active]:shadow-sm sm:text-sm"
+              className="h-9 gap-1.5 text-xs data-[state=active]:shadow-sm sm:text-sm"
             >
-              {t("transactionHistory")}
+              <History className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 hidden sm:block" />
+              <span className="hidden sm:inline truncate">{t("transactionHistory")}</span>
+              <span className="sm:hidden">{t("historyShort")}</span>
             </TabsTrigger>
           </TabsList>
 
