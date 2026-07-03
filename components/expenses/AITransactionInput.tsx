@@ -865,105 +865,148 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
     <>
       <AITransactionLoading isProcessing={isParsing} currentStep={currentStep} />
       
-      {/* Sleek Command Bar Interface */}
-      <div className="relative group w-full transition-all duration-300 mb-6">
-        <div className={`absolute -inset-0.5 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 ${isParsing ? 'bg-gradient-to-r from-accent via-purple-500 to-pink-500 animate-pulse' : 'bg-gradient-to-r from-accent/50 to-purple-500/50'}`}></div>
-        
-        <div className="relative flex flex-col bg-card text-card-foreground border border-border/50 rounded-2xl shadow-xl overflow-hidden backdrop-blur-sm">
-          
-          {/* Image Preview Banner */}
+      {/* Command bar */}
+      <div className="group relative mb-2 w-full transition-all duration-300">
+        <div
+          className={`absolute -inset-0.5 rounded-xl blur opacity-20 transition duration-1000 group-hover:opacity-60 group-hover:duration-200 ${
+            isParsing
+              ? "animate-pulse bg-gradient-to-r from-accent via-purple-500 to-pink-500"
+              : "bg-gradient-to-r from-accent/40 to-purple-500/40"
+          }`}
+        />
+
+        <div className="relative flex flex-col overflow-hidden rounded-xl border border-border/60 bg-card text-card-foreground shadow-lg">
           {imageBase64 && (
             <div className="relative w-full border-b border-border/30 bg-muted/30 p-3">
               <div className="flex items-center gap-3">
-                <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-border/50 shadow-sm group/img flex-shrink-0">
-                  <img src={imageBase64} alt="Receipt preview" className="w-full h-full object-cover" />
-                  <button 
+                <div className="group/img relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border border-border/50 shadow-sm">
+                  <img
+                    src={imageBase64}
+                    alt="Receipt preview"
+                    className="h-full w-full object-cover"
+                  />
+                  <button
                     onClick={removeImage}
-                    className="absolute top-1 right-1 bg-black/60 text-white p-1 rounded-full opacity-0 group-hover/img:opacity-100 transition-opacity hover:bg-destructive"
+                    className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity hover:bg-destructive group-hover/img:opacity-100"
                   >
-                    <X className="w-3 h-3" />
+                    <X className="h-3 w-3" />
                   </button>
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  <p className="font-medium text-foreground">{imageFile?.name || "Pasted image"}</p>
+                  <p className="font-medium text-foreground">
+                    {imageFile?.name || "Pasted image"}
+                  </p>
                   <p className="text-xs">Ready for AI analysis</p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Text Input Row */}
-          <div className="flex flex-col sm:flex-row items-center">
-            <div className="pl-4 py-3 flex items-center justify-center text-accent hidden sm:flex">
-               <Sparkles className={`h-5 w-5 ${isParsing ? 'animate-spin text-purple-400' : 'animate-pulse'}`} />
-            </div>
-
-            <div className="flex-1 w-full">
-              <Textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onPaste={handlePaste}
-                disabled={isParsing || isLoadingCategories || categories?.length === 0}
-                placeholder={imageBase64 ? "Add optional description..." : t('aiExample')}
-                autoFocus
-                className="w-full border-0 focus-visible:ring-0 resize-none min-h-[60px] max-h-[150px] bg-transparent p-4 text-base shadow-none focus-visible:ring-offset-0 placeholder:text-muted-foreground/70"
-                rows={1}
-                style={{ fieldSizing: 'content' } as any}
-              />
-            </div>
-          
-          <div className="p-2 sm:pr-3 sm:pl-1 w-full sm:w-auto flex items-center justify-end gap-2 bg-card">
-            <input 
-              type="file" 
-              accept="image/jpeg, image/png, image/webp" 
-              className="hidden" 
-              ref={fileInputRef}
-              onChange={handleImageUpload}
+          <div className="flex items-center gap-3 px-4 py-3">
+            <Sparkles
+              className={`h-5 w-5 flex-shrink-0 text-accent ${
+                isParsing ? "animate-spin text-purple-400" : ""
+              }`}
             />
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => fileInputRef.current?.click()}
-              className="h-10 w-10 text-muted-foreground hover:text-foreground rounded-full transition-colors flex-shrink-0"
-              disabled={isParsing}
-              title="Upload Receipt Image"
-            >
-              <ImageIcon className="h-5 w-5" />
-            </Button>
-            {description && !isParsing && (
+            <Textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onPaste={handlePaste}
+              disabled={
+                isParsing || isLoadingCategories || categories?.length === 0
+              }
+              placeholder={
+                imageBase64 ? "Add optional description..." : t("aiExample")
+              }
+              autoFocus
+              className="min-h-[44px] max-h-[150px] w-full flex-1 resize-none border-0 bg-transparent px-0 py-1.5 text-base shadow-none placeholder:text-muted-foreground/70 focus-visible:ring-0 focus-visible:ring-offset-0"
+              rows={1}
+              style={{ fieldSizing: "content" } as React.CSSProperties}
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-3 border-t border-border/30 bg-muted/20 px-4 py-2.5">
+            <div className="flex min-w-0 flex-1 items-center gap-1">
+              <input
+                type="file"
+                accept="image/jpeg, image/png, image/webp"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={handleImageUpload}
+              />
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => setDescription('')}
-                className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-full"
+                onClick={() => fileInputRef.current?.click()}
+                className="h-9 w-9 flex-shrink-0 rounded-full text-muted-foreground transition-colors hover:text-foreground"
+                disabled={isParsing}
+                title="Upload Receipt Image"
               >
-                <X className="h-4 w-4" />
+                <ImageIcon className="h-5 w-5" />
               </Button>
-            )}
+              {description && !isParsing && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setDescription("")}
+                  className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+              <span className="ml-1 hidden items-center gap-1 text-xs text-muted-foreground sm:flex">
+                <Zap className="h-3 w-3" />
+                {(t as (key: string) => string)("pressEnterMagic")}
+              </span>
+            </div>
+
             <Button
               onClick={handleParse}
-              disabled={(!description.trim() && !imageBase64) || isParsing || isLoadingCategories || categories?.length === 0}
-              className={`rounded-xl px-6 h-10 transition-all duration-300 ${(!description.trim() && !imageBase64) ? 'bg-secondary text-secondary-foreground' : 'bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_15px_rgba(var(--accent),0.5)] hover:scale-105'}`}
+              disabled={
+                (!description.trim() && !imageBase64) ||
+                isParsing ||
+                isLoadingCategories ||
+                categories?.length === 0
+              }
+              className={`h-9 shrink-0 rounded-lg px-5 transition-all duration-300 ${
+                !description.trim() && !imageBase64
+                  ? "bg-secondary text-secondary-foreground"
+                  : "bg-accent text-accent-foreground shadow-sm hover:bg-accent/90 hover:shadow-md"
+              }`}
             >
               {isParsing ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-accent-foreground" />
               ) : (
-                <span className="font-bold tracking-wide">{t('transformWithAI')}</span>
+                <span className="text-sm font-semibold">
+                  {t("transformWithAI")}
+                </span>
               )}
             </Button>
           </div>
+
+          <div className="flex items-center justify-between gap-2 border-t border-border/20 px-4 py-2 sm:hidden">
+            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Zap className="h-3 w-3" />
+              {(t as (key: string) => string)("pressEnterMagic")}
+            </span>
+            {categories?.length === 0 && !isLoadingCategories && (
+              <span className="text-xs font-medium text-destructive/80">
+                {(t as (key: string) => string)("categoriesSetupRequired")}
+              </span>
+            )}
           </div>
+
+          {categories?.length === 0 && !isLoadingCategories && (
+            <div className="hidden border-t border-border/20 px-4 py-2 sm:block">
+              <span className="text-xs font-medium text-destructive/80">
+                {(t as (key: string) => string)("categoriesSetupRequired")}
+              </span>
+            </div>
+          )}
         </div>
-      </div>
-      
-      <div className="flex justify-between px-2 -mt-4 mb-4 text-xs text-muted-foreground/60">
-        <span className="flex items-center gap-1"><Zap className="h-3 w-3" /> {(t as any)('pressEnterMagic')}</span>
-        {categories?.length === 0 && !isLoadingCategories && (
-          <span className="text-destructive/80 font-medium">{(t as any)('categoriesSetupRequired')}</span>
-        )}
       </div>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>

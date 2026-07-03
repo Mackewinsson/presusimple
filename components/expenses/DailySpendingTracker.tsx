@@ -12,7 +12,7 @@ import { formatMoney } from "@/lib/utils/formatMoney";
 import { useCurrentDecimalSeparator } from "@/lib/hooks";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Sparkles } from "lucide-react";
 import NewExpenseForm from "./NewExpenseForm";
 import ExpenseList from "./ExpenseList";
 import { AITransactionInput } from "./AITransactionInput";
@@ -50,75 +50,77 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
 }) => {
   const { t } = useTranslation();
   const decimalSeparator = useCurrentDecimalSeparator();
-  
+
   const totalSpent = expenses.reduce((sum, expense) => {
     return (
       sum + (expense.type === "expense" ? expense.amount : -expense.amount)
     );
   }, 0);
-  
-  // Calculate total budgeted from categories
+
   const totalBudgeted = categories.reduce((sum, cat) => sum + cat.budgeted, 0);
   const remaining = totalBudgeted - totalSpent;
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <Card className="shadow-md">
-      <CardHeader className="relative">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-0">
-          <div>
-            <CardTitle className="text-xl sm:text-2xl font-semibold">
-              {t('dailySpending')}
+    <Card className="border-border/60 bg-card shadow-md ring-1 ring-border/40">
+      <CardHeader className="pb-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <CardTitle className="text-xl font-semibold sm:text-2xl">
+              {t("dailySpending")}
             </CardTitle>
             <CardDescription className="text-sm sm:text-base">
-              {t('trackDailyExpenses')}
+              {t("trackDailyExpenses")}
             </CardDescription>
           </div>
-          <div className="text-right">
-            <div
-              className={`text-base sm:text-lg font-medium ${
-                remaining < 0 ? "text-destructive" : "text-accent-foreground"
+
+          <div className="flex flex-col gap-0.5 rounded-lg border border-border/50 bg-muted/30 px-4 py-2.5 sm:items-end">
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              {t("availableToSpend")}
+            </span>
+            <span
+              className={`text-xl font-semibold tabular-nums sm:text-2xl ${
+                remaining < 0 ? "text-destructive" : "text-accent"
               }`}
             >
               {formatMoney(remaining, undefined, decimalSeparator)}
-            </div>
-            <div className="text-xs sm:text-sm text-muted-foreground">
-              {t('availableToSpend')}
-            </div>
+            </span>
           </div>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="absolute -bottom-4 left-1/2 -translate-x-1/2 h-8 w-8 rounded-full bg-background shadow-sm border"
-        >
-          {isExpanded ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
-        </Button>
       </CardHeader>
-      <CardContent>
+
+      <CardContent className="pt-0">
         <Tabs defaultValue="ai" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-4">
-            <TabsTrigger value="ai" variant="accent" className="text-xs sm:text-sm">
-              ✨ AI Quick Input
+          <TabsList className="mb-6 grid h-11 w-full grid-cols-3 gap-1 bg-muted/50 p-1">
+            <TabsTrigger
+              value="ai"
+              variant="accent"
+              className="h-9 gap-1.5 text-xs data-[state=active]:shadow-sm sm:text-sm"
+            >
+              <Sparkles className="h-3.5 w-3.5 shrink-0" />
+              <span className="truncate">{t("aiQuickInput")}</span>
             </TabsTrigger>
-            <TabsTrigger value="add" variant="accent" className="text-xs sm:text-sm">
-              {t('addTransaction')}
+            <TabsTrigger
+              value="add"
+              variant="accent"
+              className="h-9 text-xs data-[state=active]:shadow-sm sm:text-sm"
+            >
+              {t("addTransaction")}
             </TabsTrigger>
-            <TabsTrigger value="history" variant="accent" className="text-xs sm:text-sm">
-              {t('transactionHistory')}
+            <TabsTrigger
+              value="history"
+              variant="accent"
+              className="h-9 text-xs data-[state=active]:shadow-sm sm:text-sm"
+            >
+              {t("transactionHistory")}
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="ai" className="space-y-4">
+          <TabsContent value="ai" className="mt-0 space-y-4">
             <AITransactionInput budgetId={budget._id} />
           </TabsContent>
 
-          <TabsContent value="add" className="space-y-4">
+          <TabsContent value="add" className="mt-0 space-y-4">
             <NewExpenseForm
               budget={budget}
               categories={categories}
@@ -126,13 +128,36 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
             />
           </TabsContent>
 
-          <TabsContent value="history">
+          <TabsContent value="history" className="mt-0 space-y-3">
+            <div className="flex justify-end">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="h-8 gap-1.5 text-muted-foreground hover:text-foreground"
+                aria-expanded={isExpanded}
+                title={isExpanded ? "Collapse history" : "Expand history"}
+              >
+                {isExpanded ? (
+                  <>
+                    <ChevronUp className="h-4 w-4" />
+                    <span className="text-xs">Collapse</span>
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-4 w-4" />
+                    <span className="text-xs">Expand</span>
+                  </>
+                )}
+              </Button>
+            </div>
+
             <div
-              className={`overflow-hidden transition-all duration-300 ease-in-out ${
+              className={`overflow-hidden rounded-lg border border-border/40 transition-all duration-300 ease-in-out ${
                 isExpanded ? "h-[500px] sm:h-[600px]" : "h-[300px] sm:h-[400px]"
               }`}
             >
-              <div className="h-full overflow-y-auto pr-2 scrollbar-thin">
+              <div className="scrollbar-thin h-full overflow-y-auto p-1 pr-2">
                 <ExpenseList categories={categories} expenses={expenses} />
               </div>
             </div>
