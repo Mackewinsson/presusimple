@@ -38,15 +38,6 @@ export const handleError = (error: any): AppError => {
     return createError('Duplicate field value', 400);
   }
 
-  // Handle Stripe errors
-  if (error.type === 'StripeCardError') {
-    return createError('Payment card error', 400);
-  }
-
-  if (error.type === 'StripeInvalidRequestError') {
-    return createError('Invalid payment request', 400);
-  }
-
   // Default error
   return createError('Internal server error', 500);
 };

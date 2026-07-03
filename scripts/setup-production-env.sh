@@ -41,10 +41,11 @@ MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database?retryWr
 # OpenAI
 OPENAI_API_KEY=sk-your-openai-api-key
 
-# Stripe Configuration (Production)
-STRIPE_SECRET_KEY=sk_live_your-stripe-secret-key
-STRIPE_WEBHOOK_SECRET=whsec_your-webhook-secret
-STRIPE_PRICE_ID=price_your-price-id
+# Lemon Squeezy Configuration (Production)
+LEMONSQUEEZY_API_KEY=your-lemon-squeezy-api-key
+LEMONSQUEEZY_STORE_ID=your-store-id
+LEMONSQUEEZY_VARIANT_ID=your-variant-id
+LEMONSQUEEZY_WEBHOOK_SECRET=your-webhook-secret
 
 # App Configuration
 NEXT_PUBLIC_APP_URL=https://www.presusimple.pro
@@ -65,7 +66,7 @@ echo "   - GOOGLE_CLIENT_ID: From Google Cloud Console"
 echo "   - GOOGLE_CLIENT_SECRET: From Google Cloud Console"
 echo "   - MONGODB_URI: Your production MongoDB connection string"
 echo "   - OPENAI_API_KEY: Your OpenAI API key"
-echo "   - STRIPE_*: Your production Stripe keys"
+echo "   - LEMONSQUEEZY_*: Your production Lemon Squeezy keys"
 echo ""
 echo "🎯 After filling in the values, run:"
 echo "   ./scripts/simulate-production.sh" 

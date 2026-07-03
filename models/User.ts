@@ -4,12 +4,12 @@ export interface IUser extends Document {
   email: string;
   password?: string; // For mobile app authentication
   name?: string;
-  stripeCustomerId?: string;
-  stripeSubscriptionId?: string;
+  lemonSqueezyCustomerId?: string;
+  lemonSqueezySubscriptionId?: string;
   isPaid?: boolean;
   trialStart?: Date;
   trialEnd?: Date;
-  subscriptionType?: string; // "stripe", "manual_paid", "manual_trial", etc.
+  subscriptionType?: string; // "lemon_squeezy", "manual_paid", "manual_trial", etc.
   plan?: "free" | "pro";
   currency?: string; // Currency code (e.g., "USD", "EUR")
   decimalSeparator?: "dot" | "comma"; // Number format: dot (1,234.56) or comma (1.234,56)
@@ -26,8 +26,8 @@ const UserSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },
   password: { type: String }, // For mobile app authentication
   name: { type: String },
-  stripeCustomerId: { type: String },
-  stripeSubscriptionId: { type: String },
+  lemonSqueezyCustomerId: { type: String },
+  lemonSqueezySubscriptionId: { type: String },
   isPaid: { type: Boolean, default: false },
   trialStart: { type: Date },
   trialEnd: { type: Date },

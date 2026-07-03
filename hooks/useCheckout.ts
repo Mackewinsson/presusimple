@@ -18,7 +18,7 @@ export function useCheckout() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/stripe/checkout", {
+      const res = await fetch("/api/lemonsqueezy/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: session?.user?.email, locale }),

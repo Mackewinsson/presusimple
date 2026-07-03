@@ -103,8 +103,8 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const {
       email,
-      stripeCustomerId,
-      stripeSubscriptionId,
+      lemonSqueezyCustomerId,
+      lemonSqueezySubscriptionId,
       isPaid,
       trialStart,
       trialEnd,
@@ -118,8 +118,8 @@ export async function PATCH(request: NextRequest) {
     const updatedUser = await User.findOneAndUpdate(
       { email },
       {
-        ...(stripeCustomerId && { stripeCustomerId }),
-        ...(stripeSubscriptionId && { stripeSubscriptionId }),
+        ...(lemonSqueezyCustomerId && { lemonSqueezyCustomerId }),
+        ...(lemonSqueezySubscriptionId && { lemonSqueezySubscriptionId }),
         ...(typeof isPaid !== "undefined" && { isPaid }),
         ...(trialStart && { trialStart: new Date(trialStart) }),
         ...(trialEnd && { trialEnd: new Date(trialEnd) }),

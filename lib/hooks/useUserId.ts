@@ -63,8 +63,8 @@ export function useUserSubscription() {
             isPaid: user.isPaid || false,
             trialStart: user.trialStart ? new Date(user.trialStart) : null,
             trialEnd: user.trialEnd ? new Date(user.trialEnd) : null,
-            stripeCustomerId: user.stripeCustomerId,
-            stripeSubscriptionId: user.stripeSubscriptionId,
+            lemonSqueezyCustomerId: user.lemonSqueezyCustomerId,
+            lemonSqueezySubscriptionId: user.lemonSqueezySubscriptionId,
           };
         }
 
@@ -72,8 +72,8 @@ export function useUserSubscription() {
           isPaid: false,
           trialStart: null,
           trialEnd: null,
-          stripeCustomerId: null,
-          stripeSubscriptionId: null,
+          lemonSqueezyCustomerId: null,
+          lemonSqueezySubscriptionId: null,
         };
       } catch (error) {
         console.error("Error fetching user subscription:", error);

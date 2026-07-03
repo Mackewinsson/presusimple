@@ -48,9 +48,9 @@
  *                     trialEnd:
  *                       type: string
  *                       format: date-time
- *                     stripeCustomerId:
+ *                     lemonSqueezyCustomerId:
  *                       type: string
- *                     stripeSubscriptionId:
+ *                     lemonSqueezySubscriptionId:
  *                       type: string
  *       400:
  *         description: Bad request - Invalid input data
@@ -284,8 +284,8 @@ export async function GET(request: NextRequest) {
       trialStart: user.trialStart,
       trialEnd: user.trialEnd,
       subscriptionType: user.subscriptionType,
-      stripeCustomerId: user.stripeCustomerId,
-      stripeSubscriptionId: user.stripeSubscriptionId,
+      lemonSqueezyCustomerId: user.lemonSqueezyCustomerId,
+      lemonSqueezySubscriptionId: user.lemonSqueezySubscriptionId,
     });
   } catch (error) {
     console.error("Error fetching user subscription:", error);

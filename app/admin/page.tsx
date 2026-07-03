@@ -1100,14 +1100,14 @@ export default function UnifiedAdminDashboard() {
                           <strong>Trial End:</strong> {new Date(userData.trialEnd).toLocaleDateString()}
                         </div>
                       )}
-                      {userData.stripeCustomerId && (
+                      {userData.lemonSqueezyCustomerId && (
                         <div>
-                          <strong>Stripe Customer:</strong> {userData.stripeCustomerId}
+                          <strong>Lemon Squeezy Customer:</strong> {userData.lemonSqueezyCustomerId}
                         </div>
                       )}
-                      {userData.stripeSubscriptionId && (
+                      {userData.lemonSqueezySubscriptionId && (
                         <div>
-                          <strong>Stripe Subscription:</strong> {userData.stripeSubscriptionId}
+                          <strong>Lemon Squeezy Subscription:</strong> {userData.lemonSqueezySubscriptionId}
                         </div>
                       )}
                     </div>

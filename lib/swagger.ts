@@ -57,7 +57,7 @@ This API supports two authentication methods:
 - **Budget Management**: Create, read, update, delete budgets
 - **Expense Tracking**: Full CRUD operations for expenses
 - **AI Features**: AI-powered budget creation and transaction parsing
-- **Payment Processing**: Stripe integration for subscriptions
+- **Payment Processing**: Lemon Squeezy integration for subscriptions
 - **User Management**: Profile and currency preferences
 - **Monthly Budgets**: Track monthly budget performance
 - **Feature Flags**: Dynamic feature control for web and mobile apps

@@ -60,28 +60,25 @@ function BudgetAppContent() {
   const remoteFeatureFlags = useRemoteFeatureFlags();
   const isAIFeatureFlagEnabled = remoteFeatureFlags.isFeatureEnabled("aa");
 
-  // Handle return from Stripe checkout: verify session, show toast, refresh subscription data, clear URL
-  const sessionId = searchParams.get("session_id");
+  // Handle return from Lemon Squeezy checkout: refresh subscription data, clear URL
+  const checkoutSuccess = searchParams.get("checkout");
   useEffect(() => {
-    if (!sessionId || !session?.user?.email) return;
+    if (checkoutSuccess !== "success" || !session?.user?.email) return;
 
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`/api/stripe/verify-session?session_id=${encodeURIComponent(sessionId)}`);
         if (cancelled) return;
-        if (res.ok) {
-          toast.success(t("checkoutSuccess") || "Subscription updated. Welcome to Pro!");
-          await queryClient.invalidateQueries({ queryKey: ["userSubscription", session.user.email] });
-          await queryClient.invalidateQueries({ queryKey: ["userData", session.user.email] });
-          router.replace(pathname || "/budget");
-        }
+        toast.success(t("checkoutSuccess") || "Subscription updated. Welcome to Pro!");
+        await queryClient.invalidateQueries({ queryKey: ["userSubscription", session.user.email] });
+        await queryClient.invalidateQueries({ queryKey: ["userData", session.user.email] });
+        router.replace(pathname || "/budget");
       } catch (err) {
         if (!cancelled) toast.error(t("checkoutVerifyError") || "Could not verify checkout.");
       }
     })();
     return () => { cancelled = true; };
-  }, [sessionId, session?.user?.email, pathname, router, queryClient, t]);
+  }, [checkoutSuccess, session?.user?.email, pathname, router, queryClient, t]);
 
   // Silent sync for PWA - checks for updates in background
   useSilentSync({

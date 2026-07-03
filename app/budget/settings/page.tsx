@@ -159,7 +159,7 @@ export default function SettingsPage() {
     setPortalLoading(true);
     const locale = pathname?.startsWith("/es") ? "es" : "en";
     try {
-      const res = await fetch("/api/stripe/portal", {
+      const res = await fetch("/api/lemonsqueezy/portal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: session.user.email, locale }),
@@ -298,26 +298,26 @@ export default function SettingsPage() {
                               {subscription?.isPaid ? t('pro') : t('free')}
                             </div>
                           </div>
-                          {subscription?.stripeCustomerId && (
+                          {subscription?.lemonSqueezyCustomerId && (
                             <div>
                               <span className="font-medium">{t('customerId')}:</span>
                               <div className="text-muted-foreground font-mono text-xs">
-                                {subscription.stripeCustomerId}
+                                {subscription.lemonSqueezyCustomerId}
                               </div>
                             </div>
                           )}
-                          {subscription?.stripeSubscriptionId && (
+                          {subscription?.lemonSqueezySubscriptionId && (
                             <div>
                               <span className="font-medium">{t('subscriptionId')}:</span>
                               <div className="text-muted-foreground font-mono text-xs">
-                                {subscription.stripeSubscriptionId}
+                                {subscription.lemonSqueezySubscriptionId}
                               </div>
                             </div>
                           )}
                         </div>
 
                         {/* Manage Subscription for paid users */}
-                        {subscriptionStatus === "paid" && subscription?.stripeCustomerId && (
+                        {subscriptionStatus === "paid" && subscription?.lemonSqueezySubscriptionId && (
                           <div className="pt-4">
                             <Button
                               variant="outline"

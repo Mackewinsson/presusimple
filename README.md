@@ -8,7 +8,7 @@ A modern, full-stack budget management application built with Next.js, TypeScrip
 - 💰 Budget tracking and expense management
 - 📊 Visual insights and analytics
 - 🎯 Savings goals tracking (coming soon)
-- 💳 Stripe subscription integration
+- 💳 Lemon Squeezy subscription integration
 - 📱 Responsive design
 - 🌙 Dark/Light theme support
 
@@ -18,7 +18,7 @@ A modern, full-stack budget management application built with Next.js, TypeScrip
 - **Styling**: Tailwind CSS, Radix UI
 - **Database**: MongoDB with Mongoose
 - **Authentication**: NextAuth.js with Google OAuth
-- **Payments**: Stripe
+- **Payments**: Lemon Squeezy
 - **Deployment**: Vercel
 
 ## Getting Started
@@ -28,7 +28,7 @@ A modern, full-stack budget management application built with Next.js, TypeScrip
 - Node.js 18+ 
 - MongoDB database
 - Google OAuth credentials
-- Stripe account (for payments)
+- Lemon Squeezy account (for payments)
 
 ### Installation
 
@@ -65,9 +65,10 @@ Copy `env.example` to `.env.local` and configure the following variables:
 - `NEXTAUTH_SECRET`: A random secret for NextAuth
 - `GOOGLE_CLIENT_ID`: Google OAuth client ID
 - `GOOGLE_CLIENT_SECRET`: Google OAuth client secret
-- `STRIPE_SECRET_KEY`: Your Stripe secret key
-- `STRIPE_WEBHOOK_SECRET`: Stripe webhook secret
-- `STRIPE_PRICE_ID`: Stripe price ID for subscriptions
+- `LEMONSQUEEZY_API_KEY`: Lemon Squeezy API key
+- `LEMONSQUEEZY_STORE_ID`: Lemon Squeezy store ID
+- `LEMONSQUEEZY_VARIANT_ID`: Pro subscription variant ID
+- `LEMONSQUEEZY_WEBHOOK_SECRET`: Lemon Squeezy webhook signing secret
 
 ### Optional Variables
 - `NEXT_PUBLIC_APP_URL`: Your application URL for client-side use

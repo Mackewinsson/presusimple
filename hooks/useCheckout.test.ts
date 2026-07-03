@@ -28,7 +28,7 @@ describe("useCheckout", () => {
     mockUsePathname.mockReturnValue("/es/budget");
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => ({ url: "https://checkout.stripe.com/session" }),
+      json: async () => ({ url: "https://store.lemonsqueezy.com/checkout/custom/test" }),
     });
 
     const { result } = renderHook(() => useCheckout());
@@ -38,7 +38,7 @@ describe("useCheckout", () => {
 
     expect(global.fetch).toHaveBeenCalledTimes(1);
     expect(global.fetch).toHaveBeenCalledWith(
-      "/api/stripe/checkout",
+      "/api/lemonsqueezy/checkout",
       expect.objectContaining({
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -52,7 +52,7 @@ describe("useCheckout", () => {
     mockUsePathname.mockReturnValue("/budget");
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => ({ url: "https://checkout.stripe.com/session" }),
+      json: async () => ({ url: "https://store.lemonsqueezy.com/checkout/custom/test" }),
     });
 
     const { result } = renderHook(() => useCheckout());

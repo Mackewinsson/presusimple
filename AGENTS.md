@@ -27,7 +27,7 @@ Guidance for AI coding assistants working on the Presusimple codebase.
 - **Auth**: NextAuth.js (Google OAuth, credentials)
 - **Styling**: Tailwind CSS, Radix UI (shadcn/ui)
 - **State/Data**: TanStack React Query
-- **Payments**: Stripe
+- **Payments**: Lemon Squeezy
 - **i18n**: `lib/i18n.ts` (en/es, `useTranslation()`, `useLocale()`)
 - **PWA**: next-pwa, `lib/pwa-utils.ts`, `worker/`
 - **Feature flags**: `lib/features.ts`, `lib/userAccess.ts`
@@ -229,7 +229,8 @@ Add tests for new features and changes to shared logic.
 ## Environment
 
 - Copy `env.example` to `.env.local`
-- Required: `MONGODB_URI`, `NEXTAUTH_*`, `GOOGLE_*`, `STRIPE_*`
+- Required: `MONGODB_URI`, `NEXTAUTH_*`, `GOOGLE_*`
+- Optional until payment is enabled: `LEMONSQUEEZY_*`
 - See `README.md` for full list.
 
 ---

@@ -102,7 +102,7 @@ describe.skip('/api/users', () => {
       const updateData = {
         email: 'test@example.com',
         isPaid: true,
-        stripeCustomerId: 'cus_123',
+        lemonSqueezyCustomerId: 'ls_cust_123',
       };
 
       const request = createMockRequest('http://localhost:3000/api/users', 'PATCH', updateData);

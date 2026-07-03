@@ -220,8 +220,8 @@ export default function ManualSubscriptionPage() {
                     {userData.subscriptionType || "None"}
                   </div>
                   <div>
-                    <span className="font-medium">Stripe Customer ID:</span>{" "}
-                    {userData.stripeCustomerId || "None"}
+                    <span className="font-medium">Lemon Squeezy Customer ID:</span>{" "}
+                    {userData.lemonSqueezyCustomerId || "None"}
                   </div>
                 </div>
               </CardContent>
