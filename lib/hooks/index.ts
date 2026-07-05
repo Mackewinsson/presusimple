@@ -53,3 +53,4 @@ export {
 export { useAccessControl } from "./useAccessControl";
 export { useStreak } from "./useStreak";
 export { useBudgetPageData } from "./useBudgetPageData";
+export { useIsAdmin } from "./useIsAdmin";

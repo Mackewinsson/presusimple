@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,12 +41,7 @@ import {
   KeyRound
 } from "lucide-react";
 import { FEATURES } from "@/lib/features";
-
-// List of authorized admin emails
-const AUTHORIZED_ADMINS = [
-  "mackewinsson@gmail.com", // Your email
-  // Add more admin emails here
-];
+import { getAuthorizedAdminEmails } from "@/lib/auth/admin-config";
 
 // Types
 interface Feature {
@@ -86,9 +81,10 @@ interface NotificationHistory {
 export default function UnifiedAdminDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   
   // Active tab state
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState(() => searchParams.get("tab") || "overview");
   
   // Feature Flags state
   const [features, setFeatures] = useState<Feature[]>([]);
@@ -125,7 +121,7 @@ export default function UnifiedAdminDashboard() {
 
   // Manual Subscription state
   const [subscriptionFormData, setSubscriptionFormData] = useState({
-    email: '',
+    email: searchParams.get("email") || '',
     action: '',
   });
   const [userData, setUserData] = useState<any>(null);
@@ -140,31 +136,32 @@ export default function UnifiedAdminDashboard() {
   // Loading states
   const [loading, setLoading] = useState(false);
 
-  // Check if user is authorized
   useEffect(() => {
     if (status === "loading") return;
 
     if (!session) {
-      router.replace("/auth/login");
-      return;
-    }
-
-    const userEmail = session.user?.email;
-    if (!userEmail || !AUTHORIZED_ADMINS.includes(userEmail)) {
-      toast.error("Access denied. You are not authorized to view this page.");
-      router.replace("/budget");
-      return;
+      router.replace("/auth/login?callbackUrl=/admin");
     }
   }, [session, status, router]);
 
   // Load data when component mounts
   useEffect(() => {
-    if (session?.user?.email && AUTHORIZED_ADMINS.includes(session.user.email)) {
+    if (status === "authenticated") {
       loadFeatureFlags();
       loadNotificationStats();
       loadNotificationHistory();
     }
-  }, [session]);
+  }, [status]);
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    const email = searchParams.get("email");
+    if (tab) setActiveTab(tab);
+    if (email) {
+      setSubscriptionFormData((prev) => ({ ...prev, email }));
+      setUserManagementEmail(email);
+    }
+  }, [searchParams]);
 
   // Feature Flags functions
   const loadFeatureFlags = async () => {
@@ -453,10 +450,8 @@ export default function UnifiedAdminDashboard() {
   const plans = ["free", "pro"] as const;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
-      <div className="container mx-auto px-4 sm:px-6 py-8">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <div className="text-center">
+    <div className="space-y-6">
+      <div className="text-center">
             <h1 className="text-3xl font-bold flex items-center justify-center gap-2">
               <Settings className="h-8 w-8" />
               Admin Dashboard
@@ -572,7 +567,7 @@ export default function UnifiedAdminDashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      {AUTHORIZED_ADMINS.map((email) => (
+                      {getAuthorizedAdminEmails().map((email) => (
                         <div key={email} className="flex items-center justify-between p-2 border rounded">
                           <div>
                             <p className="font-medium">{email}</p>
@@ -1364,8 +1359,6 @@ export default function UnifiedAdminDashboard() {
               </Card>
             </TabsContent>
           </Tabs>
-        </div>
-      </div>
     </div>
   );
 }

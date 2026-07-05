@@ -34,6 +34,7 @@ import {
 } from "@/lib/hooks";
 import { HistoryItemSkeleton } from "@/components/ui/loading-skeleton";
 import MobileHeader from "@/components/MobileHeader";
+import { AdminNavLink } from "@/components/admin/AdminNavLink";
 
 export default function HistoryPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -84,12 +85,15 @@ export default function HistoryPage() {
               <h1 className="text-xl sm:text-2xl font-bold">Budget History</h1>
             </div>
 
-            <Link href="/history/insights">
-              <Button variant="outline" className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" />
-                View Insights
-              </Button>
-            </Link>
+            <div className="flex items-center gap-3">
+              <AdminNavLink />
+              <Link href="/history/insights">
+                <Button variant="outline" className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  View Insights
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </header>

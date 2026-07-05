@@ -1,6 +1,7 @@
 import GoogleProvider from "next-auth/providers/google";
 import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
+import { isAdminEmail } from "@/lib/auth/admin-config";
 
 export const authOptions = {
   providers: [
@@ -76,21 +77,32 @@ export const authOptions = {
     async jwt({ token, user }: any) {
       if (user) {
         token.user = user;
-        // Preserve the isNewUser flag
+        token.email = user.email ?? token.email;
         if (user.isNewUser) {
           token.isNewUser = true;
         }
       }
+
+      const email = token.email ?? token.user?.email;
+      token.isAdmin = email ? isAdminEmail(email) : false;
+
       return token;
     },
     async session({ session, token }: any) {
-      if (token.user) {
-        session.user = token.user;
-      }
-      // Add isNewUser to session
+      const email =
+        token.email ?? token.user?.email ?? session.user?.email ?? null;
+
+      session.user = {
+        ...session.user,
+        ...(token.user ?? {}),
+        email,
+        isAdmin: email ? Boolean(token.isAdmin) : false,
+      };
+
       if (token.isNewUser) {
         session.isNewUser = true;
       }
+
       return session;
     },
     async redirect({ url, baseUrl }: any) {

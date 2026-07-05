@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
+import { requireAdminApi } from "@/lib/auth/admin";
 
 /**
  * @swagger
@@ -44,13 +45,18 @@ export async function GET(request: NextRequest) {
 
     if (email) {
       // Filter by email
-      const user = await User.findOne({ email }).select("-__v");
+      const user = await User.findOne({ email }).select("-__v -password");
       return NextResponse.json(user ? [user] : []);
-    } else {
-      // Get all users
-      const users = await User.find({}).select("-__v");
-      return NextResponse.json(users);
     }
+
+    const auth = await requireAdminApi();
+    if ("error" in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
+    }
+
+    // Admin-only: list all users
+    const users = await User.find({}).select("-__v -password");
+    return NextResponse.json(users);
   } catch (error) {
     console.error("Error fetching users:", error);
     return NextResponse.json(
@@ -95,9 +101,14 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PATCH /api/users - Update user subscription status
+// PATCH /api/users - Update user subscription status (admin only)
 export async function PATCH(request: NextRequest) {
   try {
+    const auth = await requireAdminApi();
+    if ("error" in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
+    }
+
     await dbConnect();
 
     const body = await request.json();
@@ -141,9 +152,14 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
-// DELETE /api/users - Delete user by email
+// DELETE /api/users - Delete user by email (admin only)
 export async function DELETE(request: NextRequest) {
   try {
+    const auth = await requireAdminApi();
+    if ("error" in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
+    }
+
     await dbConnect();
 
     const { searchParams } = new URL(request.url);

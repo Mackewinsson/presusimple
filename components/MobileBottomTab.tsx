@@ -6,9 +6,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useViewport } from "@/hooks/useViewport";
 import { useTranslation } from "@/lib/i18n";
-import { Wallet, Plus, History, Settings } from "lucide-react";
+import { Wallet, Plus, History, Settings, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getBudgetBasePath, isBudgetAddPath } from "@/lib/budget-routes";
+import { useIsAdmin } from "@/lib/hooks";
 
 interface TabItem {
   href: string;
@@ -18,9 +19,9 @@ interface TabItem {
   isActive?: (pathname: string) => boolean;
 }
 
-function buildTabItems(pathname: string): TabItem[] {
+function buildTabItems(pathname: string, includeAdmin: boolean): TabItem[] {
   const budgetBase = getBudgetBasePath(pathname);
-  return [
+  const items: TabItem[] = [
     {
       href: `${budgetBase}/add`,
       icon: Plus,
@@ -52,12 +53,25 @@ function buildTabItems(pathname: string): TabItem[] {
       isActive: (p) => p === budgetBase + "/settings",
     },
   ];
+
+  if (includeAdmin) {
+    items.push({
+      href: "/admin",
+      icon: Shield,
+      label: "Admin",
+      translationKey: "admin",
+      isActive: (p) => p === "/admin" || p.startsWith("/admin/"),
+    });
+  }
+
+  return items;
 }
 
 export default function MobileBottomTab() {
   const { isMobile } = useViewport();
   const pathname = usePathname();
   const { t } = useTranslation();
+  const isAdmin = useIsAdmin();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -86,7 +100,7 @@ export default function MobileBottomTab() {
       }}
     >
       <div className="flex items-center justify-around px-2 pt-0 pb-2">
-        {buildTabItems(pathname).map((item) => {
+        {buildTabItems(pathname, isAdmin).map((item) => {
           const Icon = item.icon;
           const isActive = item.isActive ? item.isActive(pathname) : pathname === item.href;
 

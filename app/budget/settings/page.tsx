@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { ArrowLeft, User, Settings } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { useUserSubscription, useUserData, useDecimalSeparator, useSetDecimalSeparator } from '@/lib/hooks';
+import { useUserSubscription, useUserData, useDecimalSeparator, useSetDecimalSeparator, useIsAdmin } from '@/lib/hooks';
 import { useCheckout } from '@/hooks/useCheckout';
 import { getSubscriptionStatus, calculateTrialDaysLeft } from '@/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,8 +22,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Crown, Clock, CreditCard, Calendar, LogOut, Lock, Eye, EyeOff } from 'lucide-react';
+import { Crown, Clock, CreditCard, Calendar, LogOut, Lock, Eye, EyeOff, Shield } from 'lucide-react';
 import MobileHeader from '@/components/MobileHeader';
+import { AdminNavLink } from '@/components/admin/AdminNavLink';
 import SignOutButton from '@/components/SignOutButton';
 import { useViewport } from '@/hooks/useViewport';
 import { useTranslation, useLocale } from '@/lib/i18n';
@@ -95,6 +96,7 @@ export default function SettingsPage() {
   const { isMobile } = useViewport();
   const { t } = useTranslation();
   const { checkout, loading: checkoutLoading, canCheckout } = useCheckout();
+  const isAdmin = useIsAdmin();
   const [portalLoading, setPortalLoading] = useState(false);
 
   // Change password state
@@ -220,15 +222,18 @@ export default function SettingsPage() {
       {/* Desktop Header */}
       <header className="hidden md:block border-b bg-card/80 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center gap-4">
-            <Link 
-              href="/budget" 
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="h-5 w-5" />
-              {t('backToBudget')}
-            </Link>
-            <h1 className="text-xl sm:text-2xl font-bold">{t('settings')}</h1>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <Link 
+                href="/budget" 
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft className="h-5 w-5" />
+                {t('backToBudget')}
+              </Link>
+              <h1 className="text-xl sm:text-2xl font-bold">{t('settings')}</h1>
+            </div>
+            <AdminNavLink />
           </div>
         </div>
       </header>
@@ -367,6 +372,25 @@ export default function SettingsPage() {
             </TabsContent>
 
             <TabsContent value="settings" className="space-y-6">
+              {isAdmin && (
+                <Card className="border-amber-500/30">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Shield className="h-5 w-5" />
+                      {t('platformAdmin')}
+                    </CardTitle>
+                    <CardDescription>
+                      {t('adminDashboardDescription')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button asChild>
+                      <Link href="/admin">{t('openAdminDashboard')}</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Change Password */}
               <Card>
                 <CardHeader>

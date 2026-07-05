@@ -12,6 +12,7 @@ import SubscriptionButton from "@/components/SubscriptionButton";
 import AccessRestricted from "@/components/AccessRestricted";
 import { TrialStatus } from "@/components/TrialStatus";
 import { History, AlertTriangle } from "lucide-react";
+import { AdminNavLink } from "@/components/admin/AdminNavLink";
 import { AppIcon } from "@/components/ui/app-icon";
 import SignOutButton from "@/components/SignOutButton";
 import { useBudgetPageData } from "@/lib/hooks";
@@ -182,6 +183,7 @@ function BudgetAppContent() {
                     {t('history')}
                   </span>
                 </Link>
+                <AdminNavLink />
               </div>
             </div>
           </div>
