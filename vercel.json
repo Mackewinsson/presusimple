@@ -4,6 +4,12 @@
       "NODE_OPTIONS": "--max_old_space_size=4096"
     }
   },
+  "crons": [
+    {
+      "path": "/api/cron/trial-expiry",
+      "schedule": "0 9 * * *"
+    }
+  ],
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 30

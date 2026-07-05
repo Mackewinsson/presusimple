@@ -3,6 +3,8 @@ import mongoose, { Schema, Document, models } from "mongoose";
 export interface IUser extends Document {
   email: string;
   password?: string; // For mobile app authentication
+  passwordResetToken?: string;
+  passwordResetExpiry?: Date;
   name?: string;
   lemonSqueezyCustomerId?: string;
   lemonSqueezySubscriptionId?: string;
@@ -25,6 +27,8 @@ export interface IUser extends Document {
 const UserSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },
   password: { type: String }, // For mobile app authentication
+  passwordResetToken: { type: String },
+  passwordResetExpiry: { type: Date },
   name: { type: String },
   lemonSqueezyCustomerId: { type: String },
   lemonSqueezySubscriptionId: { type: String },

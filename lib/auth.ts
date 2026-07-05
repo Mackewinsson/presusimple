@@ -6,6 +6,7 @@ import {
   buildGracePeriodUpdate,
   shouldReceiveBillingGracePeriod,
 } from "@/lib/billing/grace-period";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export const authOptions = {
   providers: [
@@ -45,6 +46,10 @@ export const authOptions = {
             });
             
             await newUser.save();
+
+            sendWelcomeEmail(user.email, user.name).catch((err) =>
+              console.error("[auth] Welcome email failed:", err)
+            );
     
             
             // Add a flag to indicate this is a new user

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
 import { hashPassword, validatePassword } from "@/lib/password";
+import { sendWelcomeEmail } from "@/lib/email";
 
 /**
  * @swagger
@@ -127,6 +128,10 @@ export async function POST(request: NextRequest) {
     });
     
     await user.save();
+
+    sendWelcomeEmail(user.email, user.name).catch((err) =>
+      console.error("[mobile-register] Welcome email failed:", err)
+    );
 
     return NextResponse.json({
       message: "User created successfully",
