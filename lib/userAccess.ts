@@ -1,6 +1,7 @@
 import { FEATURES, FeatureKey } from "./features";
 import { IUser } from "@/models/User";
 import { isInTrial } from "@/lib/utils";
+import { hasPermanentProGrant } from "@/lib/billing/grace-period";
 
 export type UserTier = "free" | "pro";
 
@@ -19,8 +20,10 @@ export function getEffectiveUserTier(
   const isPaid = user.isPaid ?? false;
   if (isInTrial(user.trialEnd ?? null, isPaid)) return "pro";
 
-  // Admin/manual Pro without trial dates
-  if (user.plan === "pro" && !user.trialEnd) return "pro";
+  // Admin/manual Pro without trial dates (explicit grants only)
+  if (user.plan === "pro" && !user.trialEnd && hasPermanentProGrant(user)) {
+    return "pro";
+  }
 
   return "free";
 }

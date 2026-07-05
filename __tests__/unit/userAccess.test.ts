@@ -20,7 +20,12 @@ const mockUserActiveTrial = {
   isPaid: false,
   trialEnd: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
 } as any;
-const mockUserManualPro = { plan: "pro", isPaid: false } as any;
+const mockUserManualPro = {
+  plan: "pro",
+  isPaid: false,
+  subscriptionType: "manual_paid",
+} as any;
+const mockUserLegacyPro = { plan: "pro", isPaid: false } as any;
 
 describe("userAccess helpers", () => {
   it("getUserPlan returns effective tier", () => {
@@ -30,6 +35,7 @@ describe("userAccess helpers", () => {
     expect(getUserPlan(mockUserExpiredTrial)).toBe("free");
     expect(getUserPlan(mockUserActiveTrial)).toBe("pro");
     expect(getUserPlan(mockUserManualPro)).toBe("pro");
+    expect(getUserPlan(mockUserLegacyPro)).toBe("free");
   });
 
   it("getEffectiveUserTier downgrades expired trials even when plan is pro", () => {

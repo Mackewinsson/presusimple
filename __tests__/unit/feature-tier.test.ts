@@ -24,4 +24,13 @@ describe("getEffectiveUserTier for feature flags", () => {
       } as any)
     ).toBe("free");
   });
+
+  it("returns free for legacy pro users without trial or payment", () => {
+    expect(
+      getEffectiveUserTier({
+        isPaid: false,
+        plan: "pro",
+      } as any)
+    ).toBe("free");
+  });
 });

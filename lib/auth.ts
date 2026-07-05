@@ -2,6 +2,10 @@ import GoogleProvider from "next-auth/providers/google";
 import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
 import { isAdminEmail } from "@/lib/auth/admin-config";
+import {
+  buildGracePeriodUpdate,
+  shouldReceiveBillingGracePeriod,
+} from "@/lib/billing/grace-period";
 
 export const authOptions = {
   providers: [
@@ -45,25 +49,9 @@ export const authOptions = {
             
             // Add a flag to indicate this is a new user
             user.isNewUser = true;
-          } else {
-            // Only give trials to truly new users who have never had a trial
-            // Don't reset trials for existing users
-            if (!existingUser.trialEnd && !existingUser.isPaid && !existingUser.subscriptionType) {
-              // Give existing users a trial only if they have no trial history
-              const trialEnd = new Date();
-              trialEnd.setTime(trialEnd.getTime() + (30 * 24 * 60 * 60 * 1000)); // Exactly 30 days in milliseconds
-              
-              existingUser.plan = "pro";
-              existingUser.trialStart = new Date();
-              existingUser.trialEnd = trialEnd;
-              existingUser.subscriptionType = "trial_signup";
-              
-              await existingUser.save();
-      
-              
-              // Add a flag to indicate this is a returning user getting trial
-              user.isNewUser = true;
-            }
+          } else if (shouldReceiveBillingGracePeriod(existingUser)) {
+            Object.assign(existingUser, buildGracePeriodUpdate());
+            await existingUser.save();
           }
           
           return true;

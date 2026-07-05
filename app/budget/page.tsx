@@ -20,7 +20,6 @@ import { useFeatureFlags as usePlanFeatureFlags } from "@/lib/hooks/useFeatureFl
 import { useFeatureFlags as useRemoteFeatureFlags } from "@/hooks/useFeatureFlags";
 import { AppLoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { getSubscriptionStatus } from "@/lib/utils";
 import { Budget, Category, Expense } from "@/lib/api";
 import { UpgradeToProCTA } from "@/components/UpgradeToProCTA";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -92,11 +91,6 @@ function BudgetAppContent() {
     },
   });
 
-  // Only check subscription status after user data has loaded
-  const subscriptionStatus = getSubscriptionStatus(subscription || {});
-  const trialExpired = subscriptionStatus === "expired";
-  const hasNoSubscription = subscriptionStatus === "none";
-
   React.useEffect(() => {
     if (status === "loading") return;
     if (!session) {
@@ -125,16 +119,21 @@ function BudgetAppContent() {
 
 
 
-  // Show access restricted for trial expired or no subscription
-  // But only after we've confirmed the user data has loaded and access control is not loading
-  // Don't show for users who are in the onboarding process (no trial data yet)
-  const onboardingComplete = typeof window !== 'undefined' ? localStorage.getItem("onboardingComplete") : null;
-  const hasNoTrialData = !user?.trialEnd && !user?.isPaid;
-  
-  if (!isLoading && !accessControl.isLoading && (trialExpired || hasNoSubscription) && !hasNoTrialData) {
+  const onboardingComplete =
+    typeof window !== "undefined"
+      ? localStorage.getItem("onboardingComplete")
+      : null;
+  const hasProAccess = accessControl.isPaid || accessControl.isInTrial;
+
+  if (
+    !isLoading &&
+    !accessControl.isLoading &&
+    !hasProAccess &&
+    onboardingComplete
+  ) {
     return (
       <AccessRestricted
-        reason={trialExpired ? "trial_expired" : "no_subscription"}
+        reason={accessControl.isTrialExpired ? "trial_expired" : "no_subscription"}
       />
     );
   }
