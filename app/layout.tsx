@@ -8,6 +8,7 @@ import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import NotificationPrompt from "@/components/NotificationPrompt";
 import ViewportOptimizer from "@/components/ViewportOptimizer";
 import MobileBottomTab from "@/components/MobileBottomTab";
+import { rootSeoDefaults } from "@/lib/seo";
 
 // Load Inter font locally instead of from Google Fonts
 const inter = Inter({
@@ -18,6 +19,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  ...rootSeoDefaults,
   title: "Presusimple - Personal Finance Management",
   description: "Track your budget and expenses with this zero-based budgeting app",
   manifest: "/manifest.json",

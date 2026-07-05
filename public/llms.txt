@@ -1,0 +1,44 @@
+# Presusimple
+
+> Presusimple is a personal finance web app for zero-based budgeting, expense tracking, and monthly budget planning. Available in English and Spanish as a Progressive Web App (PWA).
+
+Presusimple helps users assign every dollar (or peso) a job, track spending in real time, and visualize budgets with charts. Free tier includes core budgeting; Pro tier adds AI-powered budget creation and advanced features.
+
+## Key pages
+
+- Home (English): https://www.presusimple.com/
+- Home (Spanish): https://www.presusimple.com/es
+- Blog (English): https://www.presusimple.com/blog
+- Blog (Spanish): https://www.presusimple.com/es/blog
+- Privacy Policy: https://www.presusimple.com/privacy
+- Terms of Service: https://www.presusimple.com/terms
+
+## Features
+
+- Zero-based monthly budgeting
+- Real-time expense tracking by category
+- Spending charts and budget summaries
+- Multi-currency support
+- Progressive Web App (installable, offline-capable)
+- English and Spanish UI
+- Google OAuth and email/password authentication
+- Pro subscription via Lemon Squeezy (AI budgeting, advanced features)
+
+## Tech stack
+
+- Next.js 15 (App Router), React 18, TypeScript
+- MongoDB with Mongoose
+- NextAuth.js
+- Deployed on Vercel at https://www.presusimple.com
+
+## API
+
+REST API under `/api/` for budgets, expenses, categories, features, and billing webhooks. Swagger docs available at `/api-docs`.
+
+## Sitemap
+
+https://www.presusimple.com/sitemap.xml
+
+## Contact
+
+Support: mackewinsson@gmail.com

@@ -366,6 +366,9 @@ export default function PWALandingPage() {
         <footer className="mt-auto py-4 sm:py-8 border-t border-slate-300/50 dark:border-white/10 bg-white/5 dark:bg-white/5 backdrop-blur-sm sticky bottom-0 sm:static">
           <div className="container mx-auto px-4 text-center space-y-2">
             <div className="flex items-center justify-center gap-4 text-xs sm:text-sm">
+              <Link href={`${localePrefix}/blog`} className="text-slate-600 dark:text-white/70 hover:underline">
+                {t('blog')}
+              </Link>
               <Link href={`${localePrefix}/privacy`} className="text-slate-600 dark:text-white/70 hover:underline">
                 {t('privacyPolicy')}
               </Link>
