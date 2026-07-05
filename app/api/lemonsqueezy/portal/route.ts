@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
 import {
@@ -11,11 +13,13 @@ import {
  * POST /api/lemonsqueezy/portal
  * Returns a signed Lemon Squeezy customer portal URL for subscription management.
  */
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
-    const { email } = await request.json();
-    if (!email || typeof email !== "string") {
-      return NextResponse.json({ error: "Missing email" }, { status: 400 });
+    const session = await getServerSession(authOptions);
+    const email = session?.user?.email;
+
+    if (!email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     if (!isLemonSqueezyCheckoutConfigured()) {

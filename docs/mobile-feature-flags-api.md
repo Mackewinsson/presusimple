@@ -194,7 +194,7 @@ class FeatureFlagService {
   }
 }
 
-export default new FeatureFlagService('https://www.presusimple.pro');
+export default new FeatureFlagService('https://www.presusimple.com');
 ```
 
 ### Usage in React Native Components
@@ -267,7 +267,7 @@ import Foundation
 
 class FeatureFlagService {
     static let shared = FeatureFlagService()
-    private let baseURL = "https://www.presusimple.pro"
+    private let baseURL = "https://www.presusimple.com"
     
     private var features: [String: Bool] = [:]
     private var userType: String?
@@ -339,7 +339,7 @@ import java.net.URL
 
 class FeatureFlagService {
     companion object {
-        private const val BASE_URL = "https://www.presusimple.pro"
+        private const val BASE_URL = "https://www.presusimple.com"
         private val json = Json { ignoreUnknownKeys = true }
     }
     

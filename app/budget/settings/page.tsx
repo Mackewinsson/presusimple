@@ -157,12 +157,10 @@ export default function SettingsPage() {
   const handleManageSubscription = async () => {
     if (!session?.user?.email) return;
     setPortalLoading(true);
-    const locale = pathname?.startsWith("/es") ? "es" : "en";
     try {
       const res = await fetch("/api/lemonsqueezy/portal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: session.user.email, locale }),
       });
       const data = await res.json();
       if (data.url) {

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import {
   createCheckout,
   ensureLemonSqueezySetup,
@@ -15,33 +17,39 @@ import {
  *     summary: Create Lemon Squeezy checkout
  *     description: Create a Lemon Squeezy checkout for Pro subscription upgrade
  *     tags: [Payments]
+ *     security:
+ *       - NextAuth: []
  *     requestBody:
- *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required: [email]
  *             properties:
- *               email:
+ *               locale:
  *                 type: string
- *                 format: email
- *                 description: Customer email address
- *                 example: "user@example.com"
+ *                 enum: [en, es]
+ *                 description: Locale for post-checkout redirect
  *     responses:
  *       200:
  *         description: Checkout created successfully
- *       400:
- *         description: Bad request - missing email
+ *       401:
+ *         description: Unauthorized - sign in required
+ *       503:
+ *         description: Payments not configured
  *       500:
  *         description: Internal server error
  */
 export async function POST(request: NextRequest) {
   try {
-    const { email, locale } = await request.json();
+    const session = await getServerSession(authOptions);
+    const email = session?.user?.email;
+
     if (!email) {
-      return NextResponse.json({ error: "Missing email" }, { status: 400 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const body = await request.json().catch(() => ({}));
+    const locale = body?.locale === "es" ? "es" : "en";
 
     if (!isLemonSqueezyCheckoutConfigured()) {
       return NextResponse.json(

@@ -323,8 +323,6 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                           data={chartData}
                           showBudgeted={true}
                           showLegend={false}
-                          currencySymbol={currentCurrency.symbol}
-                          decimalSeparator={decimalSeparator}
                           height="100%"
                         />
                       </div>

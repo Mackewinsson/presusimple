@@ -1,4 +1,13 @@
 const mockCreateCheckout = jest.fn();
+const mockGetServerSession = jest.fn();
+
+jest.mock("next-auth", () => ({
+  getServerSession: (...args: unknown[]) => mockGetServerSession(...args),
+}));
+
+jest.mock("@/lib/auth", () => ({
+  authOptions: {},
+}));
 
 jest.mock("@/lib/lemonsqueezy", () => ({
   ensureLemonSqueezySetup: jest.fn(),
@@ -12,7 +21,7 @@ jest.mock("@/lib/lemonsqueezy", () => ({
 import { POST } from "@/app/api/lemonsqueezy/checkout/route";
 import { isLemonSqueezyCheckoutConfigured } from "@/lib/lemonsqueezy";
 
-const createMockRequest = (body: { email?: string; locale?: string }) =>
+const createMockRequest = (body: { locale?: string } = {}) =>
   ({
     json: async () => body,
   }) as any;
@@ -20,6 +29,9 @@ const createMockRequest = (body: { email?: string; locale?: string }) =>
 describe("POST /api/lemonsqueezy/checkout", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetServerSession.mockResolvedValue({
+      user: { email: "user@example.com" },
+    });
     mockCreateCheckout.mockResolvedValue({
       data: {
         data: {
@@ -31,12 +43,21 @@ describe("POST /api/lemonsqueezy/checkout", () => {
     });
   });
 
+  it("returns 401 when user is not authenticated", async () => {
+    mockGetServerSession.mockResolvedValueOnce(null);
+
+    const response = await POST(createMockRequest({ locale: "en" }));
+    const data = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(data).toEqual({ error: "Unauthorized" });
+    expect(mockCreateCheckout).not.toHaveBeenCalled();
+  });
+
   it("returns 503 when Lemon Squeezy is not configured", async () => {
     jest.mocked(isLemonSqueezyCheckoutConfigured).mockReturnValueOnce(false);
 
-    const response = await POST(
-      createMockRequest({ email: "user@example.com" })
-    );
+    const response = await POST(createMockRequest({ locale: "en" }));
     const data = await response.json();
 
     expect(response.status).toBe(503);
@@ -44,19 +65,8 @@ describe("POST /api/lemonsqueezy/checkout", () => {
     expect(mockCreateCheckout).not.toHaveBeenCalled();
   });
 
-  it("returns 400 when email is missing", async () => {
-    const response = await POST(createMockRequest({}));
-    const data = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(data).toEqual({ error: "Missing email" });
-    expect(mockCreateCheckout).not.toHaveBeenCalled();
-  });
-
   it("includes /es in redirectUrl when locale is es", async () => {
-    await POST(
-      createMockRequest({ email: "user@example.com", locale: "es" })
-    );
+    await POST(createMockRequest({ locale: "es" }));
 
     expect(mockCreateCheckout).toHaveBeenCalledTimes(1);
     const options = mockCreateCheckout.mock.calls[0][2];
@@ -64,20 +74,19 @@ describe("POST /api/lemonsqueezy/checkout", () => {
   });
 
   it("omits /es from redirectUrl when locale is en", async () => {
-    await POST(
-      createMockRequest({ email: "user@example.com", locale: "en" })
-    );
+    await POST(createMockRequest({ locale: "en" }));
 
     const options = mockCreateCheckout.mock.calls[0][2];
     expect(options.productOptions.redirectUrl).not.toContain("/es");
     expect(options.productOptions.redirectUrl).toContain("/budget?checkout=success");
   });
 
-  it("prefills email and skips Lemon Squeezy trial", async () => {
-    await POST(createMockRequest({ email: "user@example.com" }));
+  it("prefills session email and skips Lemon Squeezy trial", async () => {
+    await POST(createMockRequest({}));
 
     const options = mockCreateCheckout.mock.calls[0][2];
     expect(options.checkoutData.email).toBe("user@example.com");
+    expect(options.checkoutData.custom.user_email).toBe("user@example.com");
     expect(options.checkoutOptions.skipTrial).toBe(true);
   });
 });

@@ -8,14 +8,14 @@ import {
   getWebhookSecret,
   isLemonSqueezyWebhookConfigured,
   mapSubscriptionToUserUpdate,
+  resolveWebhookUserEmail,
   verifyWebhookSignature,
   type LemonSubscriptionAttributes,
+  type LemonWebhookMeta,
 } from "@/lib/lemonsqueezy";
 
 interface LemonWebhookPayload {
-  meta?: {
-    event_name?: string;
-  };
+  meta?: LemonWebhookMeta;
   data?: {
     type?: string;
     id?: string;
@@ -42,13 +42,38 @@ const PAYMENT_EVENTS = new Set([
   "subscription_payment_recovered",
 ]);
 
+const REFUND_EVENTS = new Set([
+  "order_refunded",
+  "subscription_payment_refunded",
+]);
+
 async function syncUserFromSubscription(
   subscriptionId: string,
-  attributes: LemonSubscriptionAttributes
-) {
-  const update = mapSubscriptionToUserUpdate(attributes, subscriptionId);
+  attributes: LemonSubscriptionAttributes,
+  meta?: LemonWebhookMeta
+): Promise<boolean> {
+  const email = resolveWebhookUserEmail(attributes, meta);
+  if (!email) {
+    console.warn(
+      `[Lemon Squeezy webhook] No user email for subscription ${subscriptionId}`
+    );
+    return false;
+  }
 
-  await User.findOneAndUpdate({ email: attributes.user_email }, update);
+  const update = mapSubscriptionToUserUpdate(
+    { ...attributes, user_email: email },
+    subscriptionId
+  );
+
+  const result = await User.findOneAndUpdate({ email }, update);
+  if (!result) {
+    console.warn(
+      `[Lemon Squeezy webhook] No user found for email ${email} (subscription ${subscriptionId})`
+    );
+    return false;
+  }
+
+  return true;
 }
 
 async function syncUserFromSubscriptionId(subscriptionId: string) {
@@ -56,11 +81,34 @@ async function syncUserFromSubscriptionId(subscriptionId: string) {
   const subscription = await getSubscription(subscriptionId);
   const data = subscription.data?.data;
 
-  if (!data?.attributes?.user_email) {
-    throw new Error(`Subscription ${subscriptionId} missing user_email`);
+  if (!data?.attributes) {
+    throw new Error(`Subscription ${subscriptionId} missing attributes`);
   }
 
-  await syncUserFromSubscription(data.id, data.attributes);
+  const synced = await syncUserFromSubscription(data.id, data.attributes);
+  if (!synced) {
+    throw new Error(`Subscription ${subscriptionId} could not be synced to a user`);
+  }
+}
+
+async function downgradeUserByEmail(email: string): Promise<boolean> {
+  const result = await User.findOneAndUpdate(
+    { email },
+    {
+      isPaid: false,
+      plan: "free",
+      subscriptionType: "lemon_squeezy",
+    }
+  );
+
+  if (!result) {
+    console.warn(
+      `[Lemon Squeezy webhook] Refund: no user found for email ${email}`
+    );
+    return false;
+  }
+
+  return true;
 }
 
 /**
@@ -125,17 +173,35 @@ export async function POST(request: NextRequest) {
 
   try {
     if (data.type === "subscriptions" && SUBSCRIPTION_EVENTS.has(eventName)) {
-      await syncUserFromSubscription(data.id, data.attributes!);
+      await syncUserFromSubscription(data.id, data.attributes!, payload.meta);
     } else if (PAYMENT_EVENTS.has(eventName)) {
       if (data.type === "subscriptions") {
-        await syncUserFromSubscription(data.id, data.attributes!);
+        await syncUserFromSubscription(data.id, data.attributes!, payload.meta);
       } else if (data.attributes?.subscription_id) {
         await syncUserFromSubscriptionId(String(data.attributes.subscription_id));
-      } else if (data.attributes?.user_email && eventName === "subscription_payment_success") {
-        await User.findOneAndUpdate(
-          { email: data.attributes.user_email },
-          { isPaid: true, plan: "pro", subscriptionType: "lemon_squeezy" }
-        );
+      } else {
+        const email = resolveWebhookUserEmail(data.attributes, payload.meta);
+        if (email && eventName === "subscription_payment_success") {
+          await User.findOneAndUpdate(
+            { email },
+            { isPaid: true, plan: "pro", subscriptionType: "lemon_squeezy" }
+          );
+        }
+      }
+    } else if (REFUND_EVENTS.has(eventName)) {
+      if (data.type === "subscriptions") {
+        await syncUserFromSubscription(data.id, data.attributes!, payload.meta);
+      } else if (data.attributes?.subscription_id) {
+        await syncUserFromSubscriptionId(String(data.attributes.subscription_id));
+      } else {
+        const email = resolveWebhookUserEmail(data.attributes, payload.meta);
+        if (email) {
+          await downgradeUserByEmail(email);
+        } else {
+          console.warn(
+            `[Lemon Squeezy webhook] Refund event ${eventName} missing user email`
+          );
+        }
       }
     }
 

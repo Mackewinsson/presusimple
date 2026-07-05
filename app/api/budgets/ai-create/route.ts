@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { functionSchema } from "@/lib/openai-functions";
 import { systemPrompt } from "@/lib/openai-prompts";
+import { dbConnect } from "@/lib/mongoose";
+import User from "@/models/User";
+import { hasAccess } from "@/lib/userAccess";
 
 // Simple in-memory rate limiting (in production, use Redis or similar)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -144,6 +147,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Too many requests. Please wait a minute before trying again." },
         { status: 429 }
+      );
+    }
+
+    await dbConnect();
+    const user = await User.findById(userId);
+    if (!hasAccess(user, "aiBudgeting")) {
+      return NextResponse.json(
+        { error: "Pro subscription required for AI budget creation" },
+        { status: 403 }
       );
     }
 

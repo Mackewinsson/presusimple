@@ -45,7 +45,7 @@ describe("useCheckout", () => {
       })
     );
     const body = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
-    expect(body).toEqual({ email: "test@example.com", locale: "es" });
+    expect(body).toEqual({ locale: "es" });
   });
 
   it("sends locale 'en' when pathname is English", async () => {

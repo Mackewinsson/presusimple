@@ -22,6 +22,41 @@ export interface LemonSubscriptionAttributes {
   customer_id: number;
 }
 
+export interface LemonWebhookMeta {
+  event_name?: string;
+  custom_data?: Record<string, unknown> | string;
+}
+
+export function resolveWebhookUserEmail(
+  attributes: Partial<LemonSubscriptionAttributes> | undefined,
+  meta?: LemonWebhookMeta
+): string | null {
+  if (attributes?.user_email) {
+    return attributes.user_email;
+  }
+
+  const customData = meta?.custom_data;
+  if (typeof customData === "object" && customData !== null) {
+    const userEmail = customData.user_email;
+    if (typeof userEmail === "string" && userEmail.length > 0) {
+      return userEmail;
+    }
+  }
+
+  if (typeof customData === "string") {
+    try {
+      const parsed = JSON.parse(customData) as { user_email?: string };
+      if (parsed.user_email) {
+        return parsed.user_email;
+      }
+    } catch {
+      // Ignore invalid custom_data JSON
+    }
+  }
+
+  return null;
+}
+
 export function isLemonSqueezyCheckoutConfigured(): boolean {
   return Boolean(
     process.env.LEMONSQUEEZY_API_KEY &&

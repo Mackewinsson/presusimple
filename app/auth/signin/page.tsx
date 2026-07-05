@@ -20,9 +20,13 @@ import {
 } from "lucide-react";
 import { AppIcon } from "@/components/ui/app-icon";
 import { useTranslation } from "@/lib/i18n";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function SignIn() {
   const { t } = useTranslation();
+  const pathname = usePathname();
+  const localePrefix = pathname?.startsWith("/es") ? "/es" : "";
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -242,14 +246,14 @@ export default function SignIn() {
           </div>
           
           <p className="text-slate-400 text-xs">
-            By continuing, you agree to our{" "}
-            <a href="#" className="text-white hover:underline font-medium">
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a href="#" className="text-white hover:underline font-medium">
-              Privacy Policy
-            </a>
+            {t("agreeToTermsPrefix")}{" "}
+            <Link href={`${localePrefix}/terms`} className="text-white hover:underline font-medium">
+              {t("termsOfService")}
+            </Link>{" "}
+            {t("agreeToTermsAnd")}{" "}
+            <Link href={`${localePrefix}/privacy`} className="text-white hover:underline font-medium">
+              {t("privacyPolicy")}
+            </Link>
           </p>
         </div>
       </div>

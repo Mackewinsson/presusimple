@@ -68,7 +68,7 @@ This API supports two authentication methods:
 ## 🔧 Development
 
 - **Base URL**: \`http://localhost:3000\` (development)
-- **Production URL**: \`https://presusimple.vercel.app\`
+- **Production URL**: \`https://www.presusimple.com\`
 - **Rate Limiting**: AI endpoints have rate limits (5-10 requests/minute)
 - **Error Handling**: Comprehensive error responses with details`,
       contact: {
@@ -82,7 +82,7 @@ This API supports two authentication methods:
         description: 'Development server',
       },
       {
-        url: 'https://presusimple.vercel.app',
+        url: 'https://www.presusimple.com',
         description: 'Production server',
       },
     ],

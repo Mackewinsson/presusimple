@@ -59,10 +59,10 @@ export default function AccessRestricted({
         <div className="text-center space-y-4">
           <Crown className="h-16 w-16 text-accent mx-auto" />
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {t('startYourFreeTrial')}
+            {t('unlockProFeatures')}
           </h2>
           <p className="text-gray-600 dark:text-gray-300 max-w-md">
-            {t('unlockAllFeatures')}
+            {t('subscribeToProDescription')}
           </p>
         </div>
 
@@ -70,7 +70,7 @@ export default function AccessRestricted({
           <Alert className="border-border bg-card">
             <Lock className="h-4 w-4 text-muted-foreground" />
             <AlertDescription className="text-foreground">
-              {t('featuresLockedUntilTrial')}
+              {t('subscribeToProLockedMessage')}
             </AlertDescription>
           </Alert>
 
@@ -80,7 +80,7 @@ export default function AccessRestricted({
             className="w-full"
             size="lg"
           >
-            {loading ? t('redirecting') : t('startFreeTrial')}
+            {loading ? t('redirecting') : t('upgradeToPro')}
           </Button>
           {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
         </div>

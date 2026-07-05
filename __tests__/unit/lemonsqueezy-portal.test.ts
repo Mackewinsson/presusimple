@@ -1,4 +1,13 @@
 const mockGetSubscription = jest.fn();
+const mockGetServerSession = jest.fn();
+
+jest.mock("next-auth", () => ({
+  getServerSession: (...args: unknown[]) => mockGetServerSession(...args),
+}));
+
+jest.mock("@/lib/auth", () => ({
+  authOptions: {},
+}));
 
 jest.mock("@/lib/mongoose", () => ({
   dbConnect: jest.fn(),
@@ -20,14 +29,17 @@ jest.mock("@/models/User", () => ({
 
 import { POST } from "@/app/api/lemonsqueezy/portal/route";
 
-const createMockRequest = (body: { email?: string }) =>
+const createMockRequest = () =>
   ({
-    json: async () => body,
+    json: async () => ({}),
   }) as any;
 
 describe("POST /api/lemonsqueezy/portal", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetServerSession.mockResolvedValue({
+      user: { email: "user@example.com" },
+    });
     mockFindOne.mockReturnValue({
       select: () => ({
         lean: () =>
@@ -47,12 +59,14 @@ describe("POST /api/lemonsqueezy/portal", () => {
     });
   });
 
-  it("returns 400 when email is missing", async () => {
-    const response = await POST(createMockRequest({}));
+  it("returns 401 when user is not authenticated", async () => {
+    mockGetServerSession.mockResolvedValueOnce(null);
+
+    const response = await POST(createMockRequest());
     const data = await response.json();
 
-    expect(response.status).toBe(400);
-    expect(data).toEqual({ error: "Missing email" });
+    expect(response.status).toBe(401);
+    expect(data).toEqual({ error: "Unauthorized" });
     expect(mockGetSubscription).not.toHaveBeenCalled();
   });
 
@@ -63,7 +77,7 @@ describe("POST /api/lemonsqueezy/portal", () => {
       }),
     });
 
-    const response = await POST(createMockRequest({ email: "user@example.com" }));
+    const response = await POST(createMockRequest());
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -71,7 +85,7 @@ describe("POST /api/lemonsqueezy/portal", () => {
   });
 
   it("returns signed customer portal url", async () => {
-    const response = await POST(createMockRequest({ email: "user@example.com" }));
+    const response = await POST(createMockRequest());
     const data = await response.json();
 
     expect(response.status).toBe(200);

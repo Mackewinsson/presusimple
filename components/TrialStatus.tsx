@@ -117,7 +117,7 @@ export function TrialStatus() {
           </CardTitle>
         </div>
         <CardDescription className="text-muted-foreground">
-          {t('startTrialDescription')}
+          {t('subscribeToProDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
@@ -126,7 +126,7 @@ export function TrialStatus() {
           disabled={loading}
           size="sm"
         >
-          {loading ? t('redirecting') : t('startFreeTrial')}
+          {loading ? t('redirecting') : t('upgradeToPro')}
         </Button>
         {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
       </CardContent>

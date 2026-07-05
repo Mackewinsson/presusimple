@@ -67,6 +67,7 @@ import { requireAuth } from '@/lib/auth-middleware';
 import { dbConnect } from '@/lib/mongoose';
 import Feature from '@/models/Feature';
 import User from '@/models/User';
+import { getEffectiveUserTier } from '@/lib/userAccess';
 
 // GET /api/features - Get feature flags for the current user
 export async function GET(request: NextRequest) {
@@ -105,10 +106,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    console.log('[Features API] User found:', user._id, 'Plan:', user.subscriptionStatus);
+    console.log('[Features API] User found:', user._id, 'Effective tier:', getEffectiveUserTier(user));
 
-    // Determine user type
-    const userType = user.subscriptionStatus === 'active' ? 'pro' : 'free';
+    const userType = getEffectiveUserTier(user);
     
     // Get platform from query parameter or default to web
     const url = new URL(request.url);

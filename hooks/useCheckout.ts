@@ -21,7 +21,7 @@ export function useCheckout() {
       const res = await fetch("/api/lemonsqueezy/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: session?.user?.email, locale }),
+        body: JSON.stringify({ locale }),
       });
       const data = await res.json();
       if (data.url) {

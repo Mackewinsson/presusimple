@@ -1,5 +1,6 @@
 import {
   mapSubscriptionToUserUpdate,
+  resolveWebhookUserEmail,
   verifyWebhookSignature,
 } from "@/lib/lemonsqueezy";
 import crypto from "node:crypto";
@@ -51,6 +52,37 @@ describe("Lemon Squeezy helpers", () => {
 
       expect(update.plan).toBe("free");
       expect(update.isPaid).toBe(false);
+    });
+  });
+
+  describe("resolveWebhookUserEmail", () => {
+    it("prefers attributes.user_email", () => {
+      expect(
+        resolveWebhookUserEmail(
+          { user_email: "user@example.com", status: "active", customer_id: 1 },
+          { custom_data: { user_email: "other@example.com" } }
+        )
+      ).toBe("user@example.com");
+    });
+
+    it("falls back to meta.custom_data object", () => {
+      expect(
+        resolveWebhookUserEmail(undefined, {
+          custom_data: { user_email: "user@example.com" },
+        })
+      ).toBe("user@example.com");
+    });
+
+    it("falls back to meta.custom_data JSON string", () => {
+      expect(
+        resolveWebhookUserEmail(undefined, {
+          custom_data: JSON.stringify({ user_email: "user@example.com" }),
+        })
+      ).toBe("user@example.com");
+    });
+
+    it("returns null when no email is available", () => {
+      expect(resolveWebhookUserEmail(undefined, {})).toBeNull();
     });
   });
 

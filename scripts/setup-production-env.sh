@@ -48,7 +48,7 @@ LEMONSQUEEZY_VARIANT_ID=your-variant-id
 LEMONSQUEEZY_WEBHOOK_SECRET=your-webhook-secret
 
 # App Configuration
-NEXT_PUBLIC_APP_URL=https://www.presusimple.pro
+NEXT_PUBLIC_APP_URL=https://www.presusimple.com
 EOF
 
 echo "✅ .env.production template created!"
@@ -56,8 +56,8 @@ echo ""
 echo "🔧 Next Steps:"
 echo "1. Edit .env.production and replace placeholder values with your actual production values"
 echo "2. Make sure your Google OAuth configuration includes:"
-echo "   - Authorized redirect URIs: https://www.presusimple.pro/api/auth/callback/google"
-echo "   - Authorized JavaScript origins: https://www.presusimple.pro"
+echo "   - Authorized redirect URIs: https://www.presusimple.com/api/auth/callback/google"
+echo "   - Authorized JavaScript origins: https://www.presusimple.com"
 echo "3. Run: ./scripts/simulate-production.sh"
 echo ""
 echo "📋 Required values to fill in:"

@@ -24,9 +24,12 @@ import { useViewport } from '@/hooks/useViewport';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useTranslation } from '@/lib/i18n';
+import { usePathname } from 'next/navigation';
 
 export default function PWALandingPage() {
   const { t } = useTranslation();
+  const pathname = usePathname();
+  const localePrefix = pathname?.startsWith('/es') ? '/es' : '';
   const { data: session } = useSession();
   const { isMobile } = useViewport();
   const pwaStatus = usePWAStatus();
@@ -242,7 +245,7 @@ export default function PWALandingPage() {
         <section className="py-8 sm:py-12 md:py-20 px-4">
           <div className="container mx-auto text-center">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-gray-200 dark:to-white bg-clip-text text-transparent leading-tight">
-              {t('simpleBudgetingMadeEasy')}
+              {t('presusimpleHeroTitle')}
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-slate-700 dark:text-white/80 max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-10 px-4">
               {t('takeControlOfYourFinances')}
@@ -361,7 +364,15 @@ export default function PWALandingPage() {
 
         {/* Footer */}
         <footer className="mt-auto py-4 sm:py-8 border-t border-slate-300/50 dark:border-white/10 bg-white/5 dark:bg-white/5 backdrop-blur-sm sticky bottom-0 sm:static">
-          <div className="container mx-auto px-4 text-center">
+          <div className="container mx-auto px-4 text-center space-y-2">
+            <div className="flex items-center justify-center gap-4 text-xs sm:text-sm">
+              <Link href={`${localePrefix}/privacy`} className="text-slate-600 dark:text-white/70 hover:underline">
+                {t('privacyPolicy')}
+              </Link>
+              <Link href={`${localePrefix}/terms`} className="text-slate-600 dark:text-white/70 hover:underline">
+                {t('termsOfService')}
+              </Link>
+            </div>
             <p className="text-slate-600 dark:text-white/60 text-xs sm:text-sm">
               © 2025 Presusimple. {t('allRightsReserved')}.
             </p>

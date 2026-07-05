@@ -13,7 +13,8 @@
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage --passWithNoTests",
-    "test:ci": "jest --coverage --watchAll=false --passWithNoTests"
+    "test:ci": "jest --coverage --watchAll=false --passWithNoTests",
+    "setup:lemonsqueezy": "bash scripts/setup-lemon-squeezy.sh"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
