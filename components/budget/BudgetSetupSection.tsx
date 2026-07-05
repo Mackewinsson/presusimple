@@ -46,6 +46,7 @@ import { budgetKeys } from "@/lib/hooks/useBudgetQueries";
 import { categoryKeys } from "@/lib/hooks/useCategoryQueries";
 import BudgetCategoryItem from "./BudgetCategoryItem";
 import NewCategoryForm from "./NewCategoryForm";
+import { hasDuplicateName } from "@/lib/utils/normalizeName";
 import { AILoading } from "@/components/ui/ai-loading";
 import { useFeatureFlags as usePlanFeatureFlags } from "@/lib/hooks/useFeatureFlags";
 import { useFeatureFlags as useRemoteFeatureFlags } from "@/hooks/useFeatureFlags";
@@ -172,12 +173,19 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     0
   );
 
+  const existingCategoryNames = categories.map((category) => category.name);
+
   // Category CRUD handlers
   const handleAddCategory = async (
     name: string,
     budgeted: number
   ) => {
     if (!userId || !budget) return;
+
+    if (hasDuplicateName(name, existingCategoryNames)) {
+      toast.error(t("categoryNameAlreadyExists"));
+      return;
+    }
 
     try {
       await createCategoryMutation.mutateAsync({
@@ -189,6 +197,11 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       // Budget totals are automatically updated by the API
     } catch (error) {
       console.error("Error adding category:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : t("categoryNameAlreadyExists")
+      );
     }
   };
 
@@ -248,6 +261,11 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       );
       if (!category) return;
 
+      if (hasDuplicateName(name, existingCategoryNames, category.name)) {
+        toast.error(t("categoryNameAlreadyExists"));
+        return;
+      }
+
       await updateCategoryMutation.mutateAsync({
         id: categoryId,
         updates: { name, budgeted },
@@ -255,6 +273,11 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       // Budget totals are automatically updated by the API
     } catch (error) {
       console.error("Error updating category:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : t("categoryNameAlreadyExists")
+      );
     }
   };
 
@@ -798,6 +821,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                             onRemove={handleRemoveCategory}
                             onUpdate={handleUpdateCategory}
                             totalAvailable={budget.totalAvailable}
+                            existingCategoryNames={existingCategoryNames}
                             dragHandleProps={draggableProvided.dragHandleProps}
                             draggableProps={draggableProvided.draggableProps}
                             innerRef={draggableProvided.innerRef}
@@ -829,6 +853,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
               }}
               onCancel={() => setShowCategoryForm(false)}
               totalAvailable={budget?.totalAvailable || 0}
+              existingCategoryNames={existingCategoryNames}
             />
           ) : (
             <Button

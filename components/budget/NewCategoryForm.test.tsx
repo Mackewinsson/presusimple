@@ -33,6 +33,7 @@ describe('NewCategoryForm', () => {
         onComplete={mockOnComplete}
         onCancel={mockOnCancel}
         totalAvailable={totalAvailable}
+        existingCategoryNames={[]}
       />
     );
 
@@ -46,6 +47,7 @@ describe('NewCategoryForm', () => {
         onComplete={mockOnComplete}
         onCancel={mockOnCancel}
         totalAvailable={totalAvailable}
+        existingCategoryNames={[]}
       />
     );
     expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
@@ -57,6 +59,7 @@ describe('NewCategoryForm', () => {
         onComplete={mockOnComplete}
         onCancel={mockOnCancel}
         totalAvailable={totalAvailable}
+        existingCategoryNames={[]}
       />
     );
     const submitButton = screen.getByRole('button', { name: /add/i });
@@ -70,6 +73,7 @@ describe('NewCategoryForm', () => {
         onComplete={mockOnComplete}
         onCancel={mockOnCancel}
         totalAvailable={totalAvailable}
+        existingCategoryNames={[]}
       />
     );
     // Check if budgeted amount defaults to empty string

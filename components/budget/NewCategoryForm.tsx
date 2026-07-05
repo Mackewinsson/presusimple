@@ -9,17 +9,20 @@ import { toast } from "sonner";
 import { formatMoney, parseDecimalInput } from "@/lib/utils/formatMoney";
 import { useTranslation } from "@/lib/i18n";
 import { useCurrentCurrency, useCurrentDecimalSeparator } from "@/lib/hooks";
+import { hasDuplicateName } from "@/lib/utils/normalizeName";
 
 interface NewCategoryFormProps {
   onComplete: (name: string, budgeted: number) => void;
   onCancel: () => void;
   totalAvailable: number;
+  existingCategoryNames: string[];
 }
 
 const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
   onComplete,
   onCancel,
   totalAvailable,
+  existingCategoryNames,
 }) => {
   const { t } = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -32,6 +35,11 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
 
     if (name.trim() === "" || budgeted === "") {
       toast.error("Please fill in all required fields");
+      return;
+    }
+
+    if (hasDuplicateName(name.trim(), existingCategoryNames)) {
+      toast.error(t("categoryNameAlreadyExists"));
       return;
     }
 

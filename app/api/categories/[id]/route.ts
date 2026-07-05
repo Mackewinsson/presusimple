@@ -3,6 +3,9 @@ import { dbConnect } from "@/lib/mongoose";
 import Category from "@/models/Category";
 import Expense from "@/models/Expense";
 import Budget from "@/models/Budget";
+import { buildExactNameRegex } from "@/lib/utils/normalizeName";
+
+const DUPLICATE_CATEGORY_NAME_ERROR = "A category with this name already exists";
 
 // PUT /api/categories/[id] - Update a category
 export async function PUT(
@@ -14,8 +17,39 @@ export async function PUT(
     await dbConnect();
     const body = await request.json();
 
+    const existingCategory = await Category.findById(id);
+    if (!existingCategory) {
+      return NextResponse.json(
+        { error: "Category not found" },
+        { status: 404 }
+      );
+    }
+
     const update: { name?: string; budgeted?: number; order?: number } = {};
-    if (body.name !== undefined) update.name = body.name;
+    if (body.name !== undefined) {
+      const trimmedName = body.name.trim();
+      if (!trimmedName) {
+        return NextResponse.json(
+          { error: "Category name cannot be empty" },
+          { status: 400 }
+        );
+      }
+
+      const duplicateCategory = await Category.findOne({
+        budgetId: existingCategory.budgetId,
+        _id: { $ne: id },
+        name: buildExactNameRegex(trimmedName),
+      });
+
+      if (duplicateCategory) {
+        return NextResponse.json(
+          { error: DUPLICATE_CATEGORY_NAME_ERROR },
+          { status: 409 }
+        );
+      }
+
+      update.name = trimmedName;
+    }
     if (body.budgeted !== undefined) update.budgeted = body.budgeted;
     if (body.order !== undefined) update.order = body.order;
 

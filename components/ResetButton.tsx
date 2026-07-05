@@ -18,10 +18,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { useUserId, useResetBudget, useSaveMonthlyBudget } from "@/lib/hooks";
+import { useUserId, useResetBudget, useSaveMonthlyBudget, useMonthlyBudgets } from "@/lib/hooks";
 import { LoadingButton } from "@/components/ui/loading-skeleton";
 import type { Budget } from "@/lib/api";
 import { useTranslation } from "@/lib/i18n";
+import { hasDuplicateName } from "@/lib/utils/normalizeName";
 
 interface Category {
   _id?: string;
@@ -54,6 +55,7 @@ const ResetButton: React.FC<ResetButtonProps> = ({
 }) => {
   const { t } = useTranslation();
   const { data: userId } = useUserId();
+  const { data: savedBudgets = [] } = useMonthlyBudgets(userId || "");
   const resetBudgetMutation = useResetBudget();
   const saveMonthlyBudgetMutation = useSaveMonthlyBudget();
 
@@ -65,6 +67,22 @@ const ResetButton: React.FC<ResetButtonProps> = ({
   const handleReset = async () => {
     if (!budget || !userId) {
       toast.error(t('noBudgetFoundToReset'));
+      return;
+    }
+
+    const trimmedMonthName = monthName.trim();
+    if (!trimmedMonthName) {
+      toast.error(t('enterNameForMonth'));
+      return;
+    }
+
+    if (
+      hasDuplicateName(
+        trimmedMonthName,
+        savedBudgets.map((savedBudget) => savedBudget.name)
+      )
+    ) {
+      toast.error(t('monthlyBudgetNameAlreadyExists'));
       return;
     }
 
@@ -107,7 +125,7 @@ const ResetButton: React.FC<ResetButtonProps> = ({
 
       // First, save the current month's data with calculated spent amounts
       await saveMonthlyBudgetMutation.mutateAsync({
-        name: monthName,
+        name: trimmedMonthName,
         month: monthNameFromNumber,
         year: budget.year,
         categories: categoriesWithSpent.map((cat) => ({
@@ -128,6 +146,13 @@ const ResetButton: React.FC<ResetButtonProps> = ({
       setIsOpen(false); // Close the modal after successful reset
     } catch (error) {
       console.error("Error during reset:", error);
+      if (
+        error instanceof Error &&
+        error.message.toLowerCase().includes("already exists")
+      ) {
+        toast.error(t('monthlyBudgetNameAlreadyExists'));
+        return;
+      }
       toast.error(t('failedToResetBudget'));
     }
   };

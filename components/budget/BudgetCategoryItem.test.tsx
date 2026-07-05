@@ -44,6 +44,7 @@ describe('BudgetCategoryItem', () => {
         onRemove={mockOnRemove}
         onUpdate={mockOnUpdate}
         totalAvailable={totalAvailable}
+        existingCategoryNames={[]}
       />
     );
 
@@ -58,6 +59,7 @@ describe('BudgetCategoryItem', () => {
         onRemove={mockOnRemove}
         onUpdate={mockOnUpdate}
         totalAvailable={totalAvailable}
+        existingCategoryNames={[]}
       />
     );
 
@@ -73,6 +75,7 @@ describe('BudgetCategoryItem', () => {
         onRemove={mockOnRemove}
         onUpdate={mockOnUpdate}
         totalAvailable={totalAvailable}
+        existingCategoryNames={[]}
       />
     );
 
@@ -93,6 +96,7 @@ describe('BudgetCategoryItem', () => {
         onRemove={mockOnRemove}
         onUpdate={mockOnUpdate}
         totalAvailable={totalAvailable}
+        existingCategoryNames={[]}
       />
     );
 
@@ -113,6 +117,7 @@ describe('BudgetCategoryItem', () => {
         onRemove={mockOnRemove}
         onUpdate={mockOnUpdate}
         totalAvailable={totalAvailable}
+        existingCategoryNames={[]}
       />
     );
 
@@ -126,6 +131,7 @@ describe('BudgetCategoryItem', () => {
         onRemove={mockOnRemove}
         onUpdate={mockOnUpdate}
         totalAvailable={totalAvailable}
+        existingCategoryNames={[]}
       />
     );
 
@@ -146,6 +152,7 @@ describe('BudgetCategoryItem', () => {
         onRemove={mockOnRemove}
         onUpdate={mockOnUpdate}
         totalAvailable={totalAvailable}
+        existingCategoryNames={[]}
       />
     );
 
@@ -165,6 +172,7 @@ describe('BudgetCategoryItem', () => {
         onRemove={mockOnRemove}
         onUpdate={mockOnUpdate}
         totalAvailable={totalAvailable}
+        existingCategoryNames={[]}
       />
     );
 
@@ -178,6 +186,7 @@ describe('BudgetCategoryItem', () => {
         onRemove={mockOnRemove}
         onUpdate={mockOnUpdate}
         totalAvailable={totalAvailable}
+        existingCategoryNames={[]}
       />
     );
 

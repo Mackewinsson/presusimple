@@ -209,7 +209,10 @@ export const categoryApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updates),
     });
-    if (!response.ok) throw new Error("Failed to update category");
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || "Failed to update category");
+    }
     return response.json();
   },
 
@@ -315,7 +318,10 @@ export const monthlyBudgetApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(budgetData),
     });
-    if (!response.ok) throw new Error("Failed to save monthly budget");
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || "Failed to save monthly budget");
+    }
     return response.json();
   },
 

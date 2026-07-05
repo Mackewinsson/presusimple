@@ -10,6 +10,7 @@ import { Edit2, Trash2, Check, X, GripVertical } from "lucide-react";
 import { Icon } from "@/components/ui/icon";
 import { toast } from "sonner";
 import { useTranslation } from "@/lib/i18n";
+import { hasDuplicateName } from "@/lib/utils/normalizeName";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +28,7 @@ interface BudgetCategoryItemProps {
   onRemove: (categoryId: string) => void;
   onUpdate: (categoryId: string, name: string, budgeted: number) => void;
   totalAvailable: number;
+  existingCategoryNames: string[];
   dragHandleProps?: any; // DraggableProvidedDragHandleProps from @hello-pangea/dnd
   draggableProps?: any; // DraggableProvidedDraggableProps from @hello-pangea/dnd
   innerRef?: (element: HTMLElement | null) => void;
@@ -37,6 +39,7 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
   onRemove,
   onUpdate,
   totalAvailable,
+  existingCategoryNames,
   dragHandleProps,
   draggableProps,
   innerRef,
@@ -65,6 +68,13 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
     
     if (trimmedName === "") {
       toast.error(t("pleaseEnterCategoryName"));
+      return;
+    }
+
+    if (
+      hasDuplicateName(trimmedName, existingCategoryNames, category.name)
+    ) {
+      toast.error(t("categoryNameAlreadyExists"));
       return;
     }
 

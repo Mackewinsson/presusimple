@@ -33,7 +33,11 @@ export const useSaveMonthlyBudget = () => {
     },
     onError: (error) => {
       console.error("Failed to save monthly budget:", error);
-      toast.error("Failed to save monthly budget");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to save monthly budget"
+      );
     },
   });
 };

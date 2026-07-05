@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongoose";
 import Category from "../../../models/Category";
 import Budget from "../../../models/Budget";
+import { buildExactNameRegex } from "@/lib/utils/normalizeName";
+
+const DUPLICATE_CATEGORY_NAME_ERROR = "A category with this name already exists";
 
 /**
  * @swagger
@@ -110,6 +113,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      return NextResponse.json(
+        { error: "Category name cannot be empty" },
+        { status: 400 }
+      );
+    }
+
+    const duplicateCategory = await Category.findOne({
+      budgetId,
+      name: buildExactNameRegex(trimmedName),
+    });
+
+    if (duplicateCategory) {
+      return NextResponse.json(
+        { error: DUPLICATE_CATEGORY_NAME_ERROR },
+        { status: 409 }
+      );
+    }
+
     const maxOrderCategory = await Category.findOne({ budgetId })
       .sort({ order: -1 })
       .select("order")
@@ -117,7 +140,7 @@ export async function POST(request: NextRequest) {
     const nextOrder = (maxOrderCategory?.order ?? -1) + 1;
 
     const category = new Category({
-      name,
+      name: trimmedName,
       budgeted,
       spent: 0,
       budgetId,

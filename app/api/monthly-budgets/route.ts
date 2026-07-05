@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongoose";
 import MonthlyBudget from "@/models/MonthlyBudget";
 import { getServerSession } from "next-auth";
+import { buildExactNameRegex } from "@/lib/utils/normalizeName";
+
+const DUPLICATE_MONTHLY_BUDGET_NAME_ERROR =
+  "A saved budget with this name already exists";
 
 /**
  * @swagger
@@ -115,6 +119,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    const trimmedName = name?.trim();
+    if (!trimmedName) {
+      return NextResponse.json(
+        { error: "Month name is required" },
+        { status: 400 }
+      );
+    }
+
+    const duplicateMonthlyBudget = await MonthlyBudget.findOne({
+      user: userId,
+      name: buildExactNameRegex(trimmedName),
+    });
+
+    if (duplicateMonthlyBudget) {
+      return NextResponse.json(
+        { error: DUPLICATE_MONTHLY_BUDGET_NAME_ERROR },
+        { status: 409 }
+      );
+    }
+
     // Clamp category budgets to >= 0
     const catArray: any[] = categories || [];
     const safeCategories = catArray.map((cat) => ({
@@ -126,7 +150,7 @@ export async function POST(request: NextRequest) {
 
     const monthlyBudget = new MonthlyBudget({
       user: userId,
-      name,
+      name: trimmedName,
       month,
       year,
       categories: safeCategories,

@@ -176,6 +176,7 @@ const translations = {
     noBudgetFoundToReset: "No budget found to reset",
     currentMonthSavedAndReset: "Current month saved and reset for a new month",
     failedToResetBudget: "Failed to reset budget. Please try again.",
+    monthlyBudgetNameAlreadyExists: "A saved budget with this name already exists",
     // BudgetCategoryItem component
     categoryRemoved: "Category removed",
     pleaseEnterCategoryName: "Please enter a category name",
@@ -183,6 +184,7 @@ const translations = {
     cannotIncreaseBudgetByMore: "Cannot increase budget by more than available amount",
     categoryUpdated: "Category updated",
     categoryName: "Category name",
+    categoryNameAlreadyExists: "A category with this name already exists",
     deleteCategory: "Delete Category",
     areYouSureDeleteCategory: "Are you sure you want to delete this category? This action cannot be undone.",
     delete: "Delete",
@@ -518,6 +520,7 @@ const translations = {
     noBudgetFoundToReset: "No se encontró presupuesto para restablecer",
     currentMonthSavedAndReset: "Mes actual guardado y restablecido para un nuevo mes",
     failedToResetBudget: "Error al restablecer el presupuesto. Por favor, inténtalo de nuevo.",
+    monthlyBudgetNameAlreadyExists: "Ya existe un presupuesto guardado con este nombre",
     // BudgetCategoryItem component
     categoryRemoved: "Categoría eliminada",
     pleaseEnterCategoryName: "Por favor, ingresa un nombre de categoría",
@@ -525,6 +528,7 @@ const translations = {
     cannotIncreaseBudgetByMore: "No se puede aumentar el presupuesto por más de la cantidad disponible",
     categoryUpdated: "Categoría actualizada",
     categoryName: "Nombre de categoría",
+    categoryNameAlreadyExists: "Ya existe una categoría con este nombre",
     deleteCategory: "Eliminar Categoría",
     areYouSureDeleteCategory: "¿Estás seguro de que quieres eliminar esta categoría? Esta acción no se puede deshacer.",
     delete: "Eliminar",
