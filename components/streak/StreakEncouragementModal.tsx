@@ -63,7 +63,7 @@ export function StreakEncouragementModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleContinue()}>
-      <DialogContent className="sm:max-w-md border border-warning/20 shadow-2xl bg-card overflow-hidden">
+      <DialogContent className="bottom-auto top-[50%] max-h-[85dvh] translate-y-[-50%] rounded-2xl border border-warning/20 bg-card shadow-2xl inset-x-4 overflow-hidden sm:max-w-md [&>div:first-child]:hidden data-[state=open]:slide-in-from-top-[48%] data-[state=closed]:slide-out-to-top-[48%]">
         <div className="absolute inset-0 bg-gradient-to-b from-warning/10 to-transparent pointer-events-none" />
         <DialogHeader className="relative flex flex-col items-center pt-4 pb-2">
           <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-warning shadow-lg">

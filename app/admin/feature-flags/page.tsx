@@ -296,7 +296,7 @@ export default function FeatureFlagsAdminPage() {
                 Create Feature Flag
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-h-[92dvh] overflow-y-auto overscroll-contain sm:max-h-[90vh] sm:max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Create New Feature Flag</DialogTitle>
                 <DialogDescription>
@@ -305,7 +305,7 @@ export default function FeatureFlagsAdminPage() {
               </DialogHeader>
               
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
                     <Label htmlFor="key">Feature Key</Label>
                     <Input
@@ -467,7 +467,7 @@ export default function FeatureFlagsAdminPage() {
 
           {/* Edit Feature Dialog */}
           <Dialog open={!!editingFeature} onOpenChange={() => setEditingFeature(null)}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-h-[92dvh] overflow-y-auto overscroll-contain sm:max-h-[90vh] sm:max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Edit Feature Flag</DialogTitle>
                 <DialogDescription>
@@ -476,7 +476,7 @@ export default function FeatureFlagsAdminPage() {
               </DialogHeader>
               
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
                     <Label htmlFor="edit-key">Feature Key</Label>
                     <Input

@@ -624,7 +624,7 @@ export default function UnifiedAdminDashboard() {
                       Create Feature Flag
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogContent className="max-h-[92dvh] overflow-y-auto overscroll-contain sm:max-h-[90vh] sm:max-w-2xl">
                     <DialogHeader>
                       <DialogTitle>Create New Feature Flag</DialogTitle>
                       <DialogDescription>
@@ -633,7 +633,7 @@ export default function UnifiedAdminDashboard() {
                     </DialogHeader>
                     
                     <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                           <Label htmlFor="key">Feature Key</Label>
                           <Input

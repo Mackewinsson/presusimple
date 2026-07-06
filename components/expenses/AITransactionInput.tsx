@@ -308,7 +308,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
       </div>
       </div>
       
-      <div className="shrink-0 flex flex-col gap-2 border-t border-border bg-background pt-3 pb-[max(0.25rem,env(safe-area-inset-bottom))] sm:flex-row sm:gap-3 sm:pt-4">
+      <div className="shrink-0 flex flex-col gap-2 border-t border-border bg-background pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:flex-row sm:gap-3 sm:pb-0 sm:pt-4">
         <Button
           onClick={handleConfirm}
           disabled={isSaving || hasInsufficientBudget}
@@ -921,7 +921,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
                 imageBase64 ? "Add optional description..." : t("aiExample")
               }
               autoFocus
-              className="min-h-[44px] max-h-[150px] w-full flex-1 resize-none border-0 bg-transparent px-0 py-1.5 text-base shadow-none placeholder:text-muted-foreground/70 focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="min-h-[44px] max-h-[150px] w-full flex-1 resize-none border-0 bg-transparent px-0 py-1.5 text-base shadow-none placeholder:text-sm placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:ring-offset-0"
               rows={1}
               style={{ fieldSizing: "content" } as React.CSSProperties}
             />
@@ -1011,8 +1011,8 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       </div>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="gap-0 overflow-hidden border-accent/20 p-0 sm:max-w-4xl">
-          <DialogHeader className="shrink-0 space-y-1 border-b border-border/60 px-4 py-3 pr-12 text-left">
+        <DialogContent className="gap-0 overflow-hidden border-accent/20 p-0 pt-0 sm:max-w-4xl [&>div:first-child]:hidden">
+          <DialogHeader className="shrink-0 space-y-1 border-b border-border/60 px-4 pb-3 pt-1 pr-12 text-left">
             <DialogTitle className="text-base sm:text-xl flex items-center gap-2 leading-snug">
               <Sparkles className="h-5 w-5 shrink-0 text-accent" /> {t('reviewTransactions')}
             </DialogTitle>
@@ -1021,7 +1021,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex min-h-0 flex-1 flex-col px-4">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-4">
             <TransactionPreview
               transactions={parsedTransactions}
               missingCategories={missingCategories}

@@ -22,7 +22,7 @@ export const AILoading = ({ isProcessing, currentStep = "extracting", className 
 
   return (
     <div className={cn(
-      "fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center",
+      "fixed inset-0 bg-black/50 backdrop-blur-sm z-[110] flex items-center justify-center",
       className
     )}>
       <div className="glass-card p-8 max-w-md w-full mx-4 shadow-2xl">

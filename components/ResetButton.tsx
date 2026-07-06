@@ -198,7 +198,7 @@ const ResetButton: React.FC<ResetButtonProps> = ({
           </AlertDialogCancel>
           <LoadingButton
             onClick={handleReset}
-            className="text-sm sm:text-base"
+            className="w-full text-sm sm:w-auto sm:text-base"
             loading={
               resetBudgetMutation.isPending ||
               saveMonthlyBudgetMutation.isPending

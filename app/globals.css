@@ -277,6 +277,13 @@
     border-radius: 0.5rem;
   }
 
+  /* Keep placeholder text visually smaller than input value (inherits 16px on mobile) */
+  input::placeholder,
+  textarea::placeholder {
+    font-size: 0.75rem;
+    line-height: 1.125rem;
+  }
+
   /* Touch-friendly interactive elements */
   button,
   [role="button"],
