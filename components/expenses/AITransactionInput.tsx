@@ -272,7 +272,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                         onClick={() => {
                           handleCategoryChange(index, suggestion);
                         }}
-                        className="text-accent hover:text-accent/80 underline mr-2"
+                        className="font-medium text-primary underline-offset-2 hover:underline mr-2"
                       >
                         {suggestion}
                       </button>
@@ -295,7 +295,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                         onClick={() => {
                           handleCategoryChange(index, cat.name);
                         }}
-                        className="text-accent hover:text-accent/80 underline mr-2"
+                        className="font-medium text-primary underline-offset-2 hover:underline mr-2"
                       >
                         {cat.name}
                       </button>

@@ -571,10 +571,10 @@ select {
   @apply bg-[hsl(var(--destructive))] text-[hsl(var(--destructive-foreground))];
 }
 
-/* Make select item hover/focus visible in light mode */
-.light .radix-select-item[data-state="focused"],
-.light .radix-select-item:focus,
-.light .radix-select-item:hover {
+/* Select item highlight: use readable colors in light mode (accent green fails on white popover) */
+.light .radix-select-item[data-highlighted],
+.light .radix-select-item[data-state="checked"]:focus,
+.light .radix-select-item:focus-visible {
   background-color: hsl(var(--muted)) !important;
   color: hsl(var(--foreground)) !important;
 }
