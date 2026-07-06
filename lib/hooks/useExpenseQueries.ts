@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, type UseQueryResult } from "@tanstack/react-query";
 import { expenseApi, Expense } from "../api";
 import { toast } from "sonner";
 
@@ -12,10 +12,10 @@ export const expenseKeys = {
 };
 
 // Get expenses for a user
-export const useExpenses = (userId: string) => {
+export const useExpenses = (userId: string): UseQueryResult<Expense[]> => {
   return useQuery({
     queryKey: expenseKeys.list(userId),
-    queryFn: () => expenseApi.getExpenses(userId),
+    queryFn: (): Promise<Expense[]> => expenseApi.getExpenses(userId),
     enabled: !!userId,
   });
 };

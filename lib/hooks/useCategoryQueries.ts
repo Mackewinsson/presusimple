@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, type UseQueryResult } from "@tanstack/react-query";
 import { categoryApi, Category } from "../api";
 import { toast } from "sonner";
 
@@ -13,10 +13,10 @@ export const categoryKeys = {
 };
 
 // Get categories for a user
-export const useCategories = (userId: string) => {
+export const useCategories = (userId: string): UseQueryResult<Category[]> => {
   return useQuery({
     queryKey: categoryKeys.list(userId),
-    queryFn: () => categoryApi.getCategories(userId),
+    queryFn: (): Promise<Category[]> => categoryApi.getCategories(userId),
     enabled: !!userId,
   });
 };

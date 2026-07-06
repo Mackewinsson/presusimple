@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, type UseQueryResult } from "@tanstack/react-query";
 import { monthlyBudgetApi, MonthlyBudget } from "../api";
 import { toast } from "sonner";
 
@@ -12,10 +12,10 @@ export const monthlyBudgetKeys = {
 };
 
 // Get monthly budgets for a user
-export const useMonthlyBudgets = (userId: string) => {
+export const useMonthlyBudgets = (userId: string): UseQueryResult<MonthlyBudget[]> => {
   return useQuery({
     queryKey: monthlyBudgetKeys.list(userId),
-    queryFn: () => monthlyBudgetApi.getMonthlyBudgets(userId),
+    queryFn: (): Promise<MonthlyBudget[]> => monthlyBudgetApi.getMonthlyBudgets(userId),
     enabled: !!userId,
   });
 };
