@@ -25,6 +25,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useTranslation } from '@/lib/i18n';
 import { usePathname } from 'next/navigation';
+import { LandingFaq } from '@/components/marketing/LandingFaq';
 
 export default function PWALandingPage() {
   const { t } = useTranslation();
@@ -361,6 +362,8 @@ export default function PWALandingPage() {
             </div>
           </section>
         )}
+
+        <LandingFaq />
 
         {/* Footer */}
         <footer className="mt-auto py-4 sm:py-8 border-t border-slate-300/50 dark:border-white/10 bg-white/5 dark:bg-white/5 backdrop-blur-sm sticky bottom-0 sm:static">

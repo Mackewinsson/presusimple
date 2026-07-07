@@ -4,6 +4,11 @@ import matter from "gray-matter";
 
 export type BlogLocale = "en" | "es";
 
+export interface BlogFaq {
+  question: string;
+  answer: string;
+}
+
 export interface BlogPostMeta {
   slug: string;
   title: string;
@@ -11,6 +16,7 @@ export interface BlogPostMeta {
   date: string;
   author: string;
   tags: string[];
+  faqs?: BlogFaq[];
 }
 
 export interface BlogPost extends BlogPostMeta {
@@ -21,6 +27,29 @@ const CONTENT_DIR = path.join(process.cwd(), "content/blog");
 
 function getLocaleDir(locale: BlogLocale): string {
   return path.join(CONTENT_DIR, locale);
+}
+
+function parseFaqs(data: Record<string, unknown>): BlogFaq[] | undefined {
+  if (!Array.isArray(data.faqs)) {
+    return undefined;
+  }
+
+  const faqs = data.faqs
+    .filter(
+      (item): item is { question: string; answer: string } =>
+        typeof item === "object" &&
+        item !== null &&
+        "question" in item &&
+        "answer" in item &&
+        typeof item.question === "string" &&
+        typeof item.answer === "string"
+    )
+    .map((item) => ({
+      question: item.question,
+      answer: item.answer,
+    }));
+
+  return faqs.length > 0 ? faqs : undefined;
 }
 
 function parsePostFile(filePath: string, slug: string): BlogPost {
@@ -34,6 +63,7 @@ function parsePostFile(filePath: string, slug: string): BlogPost {
     date: String(data.date ?? new Date().toISOString().slice(0, 10)),
     author: String(data.author ?? "Presusimple"),
     tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
+    faqs: parseFaqs(data as Record<string, unknown>),
     content,
   };
 }

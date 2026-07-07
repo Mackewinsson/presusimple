@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
+import { getAlternateBlogSlug } from "@/lib/blog-locale-pairs";
 import { PRODUCTION_APP_URL } from "@/lib/constants/branding";
+import {
+  buildFaqPageJsonLd,
+  LANDING_FAQS,
+  type FaqItem,
+} from "@/lib/seo-faqs";
 
 export const SITE_NAME = "Presusimple";
 
@@ -139,12 +145,31 @@ export function getBlogIndexMetadata(locale: "en" | "es"): Metadata {
   };
 }
 
+function getBlogPostAlternateLanguages(
+  locale: "en" | "es",
+  slug: string
+): Record<string, string> | undefined {
+  const alternateSlug = getAlternateBlogSlug(locale, slug);
+  if (!alternateSlug) {
+    return undefined;
+  }
+
+  const enSlug = locale === "en" ? slug : alternateSlug;
+  const esSlug = locale === "es" ? slug : alternateSlug;
+
+  return {
+    en: `${PRODUCTION_APP_URL}/blog/${enSlug}`,
+    es: `${PRODUCTION_APP_URL}/es/blog/${esSlug}`,
+  };
+}
+
 export function getBlogPostMetadata(
   locale: "en" | "es",
   post: { title: string; description: string; slug: string; date: string; tags?: string[] }
 ): Metadata {
   const basePath = locale === "es" ? "/es/blog" : "/blog";
   const url = `${PRODUCTION_APP_URL}${basePath}/${post.slug}`;
+  const languages = getBlogPostAlternateLanguages(locale, post.slug);
 
   return {
     title: `${post.title} | Presusimple`,
@@ -152,6 +177,7 @@ export function getBlogPostMetadata(
     keywords: post.tags,
     alternates: {
       canonical: url,
+      ...(languages ? { languages } : {}),
     },
     openGraph: {
       ...buildOpenGraph(`${post.title} | Presusimple`, post.description, url, locale),
@@ -189,40 +215,86 @@ export function getLandingJsonLd(locale: "en" | "es") {
         description: isSpanish ? ES_LANDING.description : EN_LANDING.description,
         url,
       },
+      buildFaqPageJsonLd(LANDING_FAQS[locale]),
     ],
   };
 }
 
 export function getBlogPostJsonLd(
   locale: "en" | "es",
-  post: { title: string; description: string; slug: string; date: string; author: string }
+  post: {
+    title: string;
+    description: string;
+    slug: string;
+    date: string;
+    author: string;
+    faqs?: FaqItem[];
+  }
 ) {
   const basePath = locale === "es" ? "/es/blog" : "/blog";
+  const blogIndexPath = locale === "es" ? "/es/blog" : "/blog";
   const url = `${PRODUCTION_APP_URL}${basePath}/${post.slug}`;
+  const blogIndexUrl = `${PRODUCTION_APP_URL}${blogIndexPath}`;
+  const homeUrl = locale === "es" ? `${PRODUCTION_APP_URL}/es` : PRODUCTION_APP_URL;
+  const blogIndexLabel = locale === "es" ? "Blog" : "Blog";
+
+  const graph: Record<string, unknown>[] = [
+    {
+      "@type": "BlogPosting",
+      headline: post.title,
+      description: post.description,
+      datePublished: post.date,
+      inLanguage: locale === "es" ? "es" : "en",
+      author: {
+        "@type": "Organization",
+        name: post.author,
+      },
+      publisher: {
+        "@type": "Organization",
+        name: SITE_NAME,
+        logo: {
+          "@type": "ImageObject",
+          url: `${PRODUCTION_APP_URL}/icons/icon-512x512.png`,
+        },
+      },
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": url,
+      },
+      url,
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Presusimple",
+          item: homeUrl,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: blogIndexLabel,
+          item: blogIndexUrl,
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: post.title,
+          item: url,
+        },
+      ],
+    },
+  ];
+
+  if (post.faqs && post.faqs.length > 0) {
+    graph.push(buildFaqPageJsonLd(post.faqs));
+  }
 
   return {
     "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: post.title,
-    description: post.description,
-    datePublished: post.date,
-    author: {
-      "@type": "Organization",
-      name: post.author,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: SITE_NAME,
-      logo: {
-        "@type": "ImageObject",
-        url: `${PRODUCTION_APP_URL}/icons/icon-512x512.png`,
-      },
-    },
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": url,
-    },
-    url,
+    "@graph": graph,
   };
 }
 
