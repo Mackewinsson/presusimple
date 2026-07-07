@@ -8,6 +8,10 @@ import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import NotificationPrompt from "@/components/NotificationPrompt";
 import ViewportOptimizer from "@/components/ViewportOptimizer";
 import MobileBottomTab from "@/components/MobileBottomTab";
+import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { CookieConsentBanner } from "@/components/analytics/CookieConsentBanner";
+import { CONSENT_MODE_DEFAULTS } from "@/lib/analytics/consent";
+import { GA_MEASUREMENT_ID } from "@/lib/analytics/gtag";
 import { rootSeoDefaults } from "@/lib/seo";
 
 // Load Inter font locally instead of from Google Fonts
@@ -192,6 +196,18 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
         <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-192x192.png" />
 
+        {GA_MEASUREMENT_ID ? (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('consent', 'default', ${JSON.stringify(CONSENT_MODE_DEFAULTS)});
+              `,
+            }}
+          />
+        ) : null}
+
         {/* Additional PWA meta tags for better iOS support */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -202,6 +218,7 @@ export default function RootLayout({
         <meta name="msapplication-tap-highlight" content="no" />
       </head>
       <body className={inter.className}>
+        <GoogleAnalytics />
         <ViewportOptimizer />
         <ThemeProvider>
           <LocaleProvider initialLocale="es">
@@ -210,6 +227,7 @@ export default function RootLayout({
               <PWAInstallPrompt />
               <NotificationPrompt />
               <MobileBottomTab />
+              <CookieConsentBanner />
             </Providers>
           </LocaleProvider>
         </ThemeProvider>

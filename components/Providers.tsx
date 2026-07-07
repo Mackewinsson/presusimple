@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState, useSyncExternalStore } from "react";
+import React, { Suspense, useState, useSyncExternalStore } from "react";
+import { AnalyticsPageView } from "@/components/analytics/AnalyticsPageView";
+import { SignUpTracker } from "@/components/analytics/SignUpTracker";
 import { Toaster } from "sonner";
 import { SessionProvider } from "next-auth/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -65,6 +67,10 @@ export default function Providers({ children }: ProvidersProps) {
 
   const appContent = (
     <>
+      <Suspense fallback={null}>
+        <AnalyticsPageView />
+      </Suspense>
+      <SignUpTracker />
       {children}
       <Toaster richColors />
       <ReactQueryDevtools initialIsOpen={false} />

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslation } from "@/lib/i18n";
+import { trackBeginCheckout } from "@/lib/analytics/events";
+import { isAnalyticsEnabled } from "@/lib/analytics/gtag";
 
 export function useCheckout() {
   const pathname = usePathname();
@@ -25,6 +27,9 @@ export function useCheckout() {
       });
       const data = await res.json();
       if (data.url) {
+        if (isAnalyticsEnabled()) {
+          trackBeginCheckout(locale);
+        }
         window.location.href = data.url;
       } else {
         setError(data.error || t("failedToStartCheckout"));

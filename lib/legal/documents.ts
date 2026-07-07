@@ -17,7 +17,7 @@ const APP_URL = "https://www.presusimple.com";
 
 export const privacyPolicyEn: LegalDocument = {
   title: "Privacy Policy",
-  lastUpdated: "July 5, 2026",
+  lastUpdated: "July 7, 2026",
   intro: `${APP_NAME} ("we", "us", or "our") operates the personal finance web application at ${APP_URL}. This Privacy Policy explains how we collect, use, and protect your information when you use our service.`,
   sections: [
     {
@@ -55,10 +55,17 @@ export const privacyPolicyEn: LegalDocument = {
       ],
       list: [
         "Google — OAuth sign-in (subject to Google's privacy policy).",
+        "Google Analytics — anonymized usage analytics when you accept cookies (Consent Mode v2).",
         "MongoDB Atlas — database hosting for account and budget data.",
         "Vercel — application hosting.",
         "Lemon Squeezy — subscription checkout, billing, and customer portal.",
         "OpenAI — AI budgeting features for eligible Pro users.",
+      ],
+    },
+    {
+      title: "Cookies and analytics",
+      paragraphs: [
+        "We use essential cookies for authentication and session management. Analytics cookies from Google Analytics are only set if you accept them via our cookie banner. We do not send financial details, email addresses, or other personally identifying information to analytics providers.",
       ],
     },
     {
@@ -107,7 +114,7 @@ export const privacyPolicyEn: LegalDocument = {
 
 export const privacyPolicyEs: LegalDocument = {
   title: "Política de Privacidad",
-  lastUpdated: "5 de julio de 2026",
+  lastUpdated: "7 de julio de 2026",
   intro: `${APP_NAME} ("nosotros") opera la aplicación web de finanzas personales en ${APP_URL}. Esta Política de Privacidad explica cómo recopilamos, usamos y protegemos tu información.`,
   sections: [
     {
@@ -140,7 +147,21 @@ export const privacyPolicyEs: LegalDocument = {
     },
     {
       title: "Servicios de terceros",
-      paragraphs: ["Usamos proveedores de confianza, incluidos Google, MongoDB Atlas, Vercel, Lemon Squeezy y OpenAI para funciones de IA."],
+      paragraphs: ["Usamos proveedores de confianza, incluidos:"],
+      list: [
+        "Google — inicio de sesión con OAuth.",
+        "Google Analytics — analítica de uso anonimizada cuando aceptas cookies (Consent Mode v2).",
+        "MongoDB Atlas — alojamiento de base de datos.",
+        "Vercel — alojamiento de la aplicación.",
+        "Lemon Squeezy — pagos y suscripciones.",
+        "OpenAI — funciones de presupuesto con IA para usuarios Pro.",
+      ],
+    },
+    {
+      title: "Cookies y analítica",
+      paragraphs: [
+        "Usamos cookies esenciales para autenticación y sesión. Las cookies de analítica de Google Analytics solo se activan si las aceptas en nuestro banner. No enviamos datos financieros, correos electrónicos ni otra información personal identificable a proveedores de analítica.",
+      ],
     },
     {
       title: "Conservación de datos",
