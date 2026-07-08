@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import LocaleProvider from "@/components/LocaleProvider";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import NotificationPrompt from "@/components/NotificationPrompt";
+import NotificationResync from "@/components/NotificationResync";
 import ViewportOptimizer from "@/components/ViewportOptimizer";
 import MobileBottomTab from "@/components/MobileBottomTab";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
@@ -226,6 +227,7 @@ export default function RootLayout({
               <main>{children}</main>
               <PWAInstallPrompt />
               <NotificationPrompt />
+              <NotificationResync />
               <MobileBottomTab />
               <CookieConsentBanner />
             </Providers>

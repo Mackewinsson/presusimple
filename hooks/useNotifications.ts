@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { ensureServiceWorkerRegistered } from '@/lib/push-subscription';
 
 export interface NotificationState {
   permission: NotificationPermission;
@@ -69,7 +70,13 @@ export function useNotifications(): NotificationHookReturn {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
 
     try {
-      const registration = await navigator.serviceWorker.ready;
+      // Avoid navigator.serviceWorker.ready here: it hangs forever when no
+      // service worker is registered yet
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (!registration) {
+        setState(prev => ({ ...prev, isSubscribed: false, subscription: null }));
+        return;
+      }
       const subscription = await registration.pushManager.getSubscription();
       
       setState(prev => ({
@@ -141,23 +148,14 @@ export function useNotifications(): NotificationHookReturn {
       
       console.log('⏳ Waiting for service worker to be ready...');
       
-      // Get existing registration (next-pwa should handle registration)
-      let registration = await navigator.serviceWorker.getRegistration();
+      // Get existing registration, registering /sw.js manually if next-pwa's
+      // auto-register script has not run yet on this page
+      const registration = await ensureServiceWorkerRegistered();
       
       if (!registration) {
-        console.log('⚠️ No service worker found - next-pwa should have registered it');
-        throw new Error('Service worker not registered. Please refresh the page.');
+        throw new Error('Service worker not available. Please refresh the page.');
       }
       
-      console.log('✅ Service worker found:', registration.scope);
-      
-      // Wait for service worker to be ready with a longer timeout
-      const registrationPromise = navigator.serviceWorker.ready;
-      const timeoutPromise = new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Service worker ready timeout')), 30000)
-      );
-      
-      registration = await Promise.race([registrationPromise, timeoutPromise]);
       console.log('✅ Service worker ready');
       console.log('🔍 Service worker scope:', registration?.scope);
       console.log('🔍 Service worker active:', registration?.active?.state);

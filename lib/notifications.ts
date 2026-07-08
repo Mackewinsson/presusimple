@@ -327,6 +327,10 @@ export async function sendTestNotification(
         title: 'Dismiss',
       },
     ],
+    // Unique tag + renotify so repeated test sends always pop up instead of
+    // silently replacing the previous notification with the same tag
+    tag: `test-${Date.now()}`,
+    renotify: true,
     mutable: true,
   };
 

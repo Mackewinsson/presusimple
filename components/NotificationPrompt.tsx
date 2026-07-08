@@ -43,15 +43,15 @@ export default function NotificationPrompt({
     // - Still loading budget status
     // - User doesn't have a budget
     // - Notifications not supported
-    // - Already granted permission
-    // - Already subscribed
+    // - Permission granted AND browser is subscribed (granted-but-unsubscribed
+    //   users still need the prompt as a recovery path after pruning)
     // - Previously dismissed
     // - Currently loading
     if (
       budgetLoading ||
       !hasBudget ||
       !isSupported ||
-      permission === 'granted' ||
+      (permission === 'granted' && isSubscribed) ||
       isSubscribed ||
       hasBeenDismissed ||
       isLoading

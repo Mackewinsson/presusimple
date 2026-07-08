@@ -44,7 +44,11 @@ export async function POST(request: NextRequest) {
 
     if (!user.pushSubscription) {
       return NextResponse.json(
-        { error: "User not subscribed to notifications" },
+        {
+          error: "User not subscribed to notifications",
+          code: "not_subscribed",
+          needsResubscribe: true,
+        },
         { status: 400 }
       );
     }
