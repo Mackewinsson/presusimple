@@ -101,6 +101,7 @@ export async function POST(request: NextRequest) {
       totalBudgeted,
       totalSpent,
       expensesCount,
+      expenses,
     } = body;
 
     // Get the user ID
@@ -157,6 +158,7 @@ export async function POST(request: NextRequest) {
       totalBudgeted: safeTotalBudgeted,
       totalSpent,
       expensesCount,
+      expenses: expenses || [],
     });
 
     const savedMonthlyBudget = await monthlyBudget.save();

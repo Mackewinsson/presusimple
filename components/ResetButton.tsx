@@ -136,6 +136,17 @@ const ResetButton: React.FC<ResetButtonProps> = ({
         totalBudgeted: budget.totalBudgeted,
         totalSpent: totalSpent,
         expensesCount: expenses.length,
+        expenses: expenses.map((exp) => {
+          const category = categories.find(
+            (c) => c._id === exp.categoryId || c.id === exp.categoryId
+          );
+          return {
+            amount: exp.amount,
+            date: exp.date,
+            type: exp.type,
+            categoryName: category?.name || "Unknown",
+          };
+        }),
         userId,
       });
 

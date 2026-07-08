@@ -29,6 +29,7 @@ export {
 } from "./useExpenseQueries";
 export {
   useMonthlyBudgets,
+  useMonthlyBudget,
   useSaveMonthlyBudget,
   useDeleteMonthlyBudget,
 } from "./useMonthlyBudgetQueries";

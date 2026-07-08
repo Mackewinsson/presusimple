@@ -20,6 +20,15 @@ export const useMonthlyBudgets = (userId: string): UseQueryResult<MonthlyBudget[
   });
 };
 
+// Get a single monthly budget by id
+export const useMonthlyBudget = (id: string): UseQueryResult<MonthlyBudget> => {
+  return useQuery({
+    queryKey: monthlyBudgetKeys.detail(id),
+    queryFn: (): Promise<MonthlyBudget> => monthlyBudgetApi.getMonthlyBudget(id),
+    enabled: !!id,
+  });
+};
+
 // Save monthly budget mutation
 export const useSaveMonthlyBudget = () => {
   const queryClient = useQueryClient();

@@ -38,6 +38,7 @@ import {
 } from "recharts";
 import { useMonthlyBudgets, useUserId, useExpenses, useCategories, useCurrentDecimalSeparator } from "@/lib/hooks";
 import { Skeleton } from "@/components/ui/skeleton";
+import MobileHeader from "@/components/MobileHeader";
 
 function InsightsContent() {
   const { data: userId } = useUserId();
@@ -197,7 +198,8 @@ function InsightsContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
-      <header className="border-b bg-card/80 backdrop-blur-lg sticky top-0 z-50">
+      <MobileHeader />
+      <header className="hidden md:block border-b bg-card/80 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">

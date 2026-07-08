@@ -7,7 +7,7 @@ import { useTranslation } from "@/lib/i18n";
 import { ArrowLeft, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { StreakWidget } from "@/components/streak/StreakWidget";
-import { getBudgetBasePath, isBudgetAddPath } from "@/lib/budget-routes";
+import { getBudgetBasePath, getHistoryBasePath, isBudgetAddPath, isHistoryListPath, isHistorySubPath } from "@/lib/budget-routes";
 
 interface MobileHeaderProps {
   title?: string;
@@ -37,13 +37,15 @@ export default function MobileHeader({
   }
 
   const budgetBase = getBudgetBasePath(pathname);
+  const historyBase = getHistoryBasePath(pathname);
 
   // Determine back href if not provided
   const getBackHref = () => {
     if (backHref) return backHref;
     if (isBudgetAddPath(pathname)) return budgetBase;
     if (pathname.startsWith(budgetBase + "/settings")) return budgetBase;
-    if (pathname.startsWith("/history") || pathname.startsWith("/es/history")) return budgetBase;
+    if (isHistorySubPath(pathname)) return historyBase;
+    if (isHistoryListPath(pathname)) return budgetBase;
     return budgetBase;
   };
 
@@ -51,7 +53,12 @@ export default function MobileHeader({
   const shouldShowBackButton = () => {
     if (!showBackButton) return false;
     if (pathname === budgetBase) return false;
-    return isBudgetAddPath(pathname) || pathname.startsWith(budgetBase + "/settings") || pathname.startsWith("/history") || pathname.startsWith("/es/history");
+    return (
+      isBudgetAddPath(pathname) ||
+      pathname.startsWith(budgetBase + "/settings") ||
+      isHistoryListPath(pathname) ||
+      isHistorySubPath(pathname)
+    );
   };
 
   // Determine title if not provided
@@ -59,7 +66,13 @@ export default function MobileHeader({
     if (title) return title;
     if (isBudgetAddPath(pathname)) return t("addTransaction");
     if (pathname.startsWith(budgetBase + "/settings")) return t("settings");
-    if (pathname.startsWith("/history")) return t("history");
+    if (pathname.startsWith("/history") || pathname.startsWith("/es/history")) {
+      if (isHistorySubPath(pathname) && pathname.includes("/insights")) {
+        return t("viewInsights");
+      }
+      if (isHistorySubPath(pathname)) return t("budgetDetails");
+      return t("budgetHistory");
+    }
     if (pathname === budgetBase) return t("appName");
     return t("appName");
   };

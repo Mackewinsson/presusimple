@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -35,9 +36,12 @@ import {
 import { HistoryItemSkeleton } from "@/components/ui/loading-skeleton";
 import MobileHeader from "@/components/MobileHeader";
 import { AdminNavLink } from "@/components/admin/AdminNavLink";
+import { useTranslation } from "@/lib/i18n";
 
 export default function HistoryPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter();
+  const { t } = useTranslation();
   const { data: userId } = useUserId();
   const { data: budgets = [], isLoading: budgetsLoading } = useMonthlyBudgets(
     userId || ""
@@ -56,21 +60,19 @@ export default function HistoryPage() {
   const handleDelete = (id: string) => {
     deleteBudgetMutation.mutate(id, {
       onSuccess: () => {
-        toast.success("Budget history deleted successfully");
+        toast.success(t("deleteBudgetHistory"));
       },
       onError: (error) => {
         console.error("Error deleting budget:", error);
-        toast.error("Failed to delete budget history");
+        toast.error(t("deleteBudgetHistory"));
       },
     });
   };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Mobile Header */}
-      <MobileHeader title="Budget History" />
-      
-      {/* Desktop Header */}
+      <MobileHeader />
+
       <header className="hidden md:block border-b bg-card/90 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
@@ -80,9 +82,9 @@ export default function HistoryPage() {
                 className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ArrowLeft className="h-5 w-5" />
-                Back to Budget
+                {t("backToBudget")}
               </Link>
-              <h1 className="text-xl sm:text-2xl font-bold">Budget History</h1>
+              <h1 className="text-xl sm:text-2xl font-bold">{t("budgetHistory")}</h1>
             </div>
 
             <div className="flex items-center gap-3">
@@ -90,7 +92,7 @@ export default function HistoryPage() {
               <Link href="/history/insights">
                 <Button variant="outline" className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
-                  View Insights
+                  {t("viewInsights")}
                 </Button>
               </Link>
             </div>
@@ -100,15 +102,23 @@ export default function HistoryPage() {
 
       <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-20 md:pb-8">
         <div className="max-w-4xl mx-auto space-y-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search budget history..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9"
-            />
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder={t("searchBudgetHistory")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <Link href="/history/insights" className="md:hidden">
+              <Button variant="outline" className="w-full flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                {t("viewInsights")}
+              </Button>
+            </Link>
           </div>
 
           {budgetsLoading ? (
@@ -120,11 +130,15 @@ export default function HistoryPage() {
           ) : filteredBudgets.length > 0 ? (
             <div className="grid gap-4">
               {filteredBudgets.map((budget) => (
-                <Card key={budget._id} className="glass-card hover-card cursor-pointer transition-all duration-200 hover:scale-[1.02]" onClick={() => window.location.href = `/history/${budget._id}`}>
+                <Card
+                  key={budget._id}
+                  className="glass-card hover-card cursor-pointer transition-all duration-200 md:hover:scale-[1.02]"
+                  onClick={() => router.push(`/history/${budget._id}`)}
+                >
                   <CardHeader className="pb-3">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle>{budget.name}</CardTitle>
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="min-w-0">
+                        <CardTitle className="truncate">{budget.name}</CardTitle>
                         <CardDescription>
                           {format(parseISO(budget.createdAt), "PPP")}
                         </CardDescription>
@@ -134,7 +148,7 @@ export default function HistoryPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="text-destructive"
+                            className="text-destructive shrink-0"
                             onClick={(e) => e.stopPropagation()}
                             disabled={deleteBudgetMutation.isPending}
                           >
@@ -148,22 +162,21 @@ export default function HistoryPage() {
                         <AlertDialogContent className="sm:max-w-md">
                           <AlertDialogHeader>
                             <AlertDialogTitle className="text-lg sm:text-xl">
-                              Delete Budget History
+                              {t("deleteBudgetHistory")}
                             </AlertDialogTitle>
                             <AlertDialogDescription className="text-sm sm:text-base">
-                              Are you sure you want to delete this budget
-                              history? This action cannot be undone.
+                              {t("areYouSureDeleteSnapshot")}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel className="text-sm sm:text-base">
-                              Cancel
+                              {t("cancel")}
                             </AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => handleDelete(budget._id)}
                               className="text-sm sm:text-base"
                             >
-                              Delete
+                              {t("delete")}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -171,36 +184,36 @@ export default function HistoryPage() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4">
                       <div className="space-y-1">
-                        <div className="text-sm text-muted-foreground">
-                          Total Budgeted
+                        <div className="text-xs sm:text-sm text-muted-foreground">
+                          {t("totalBudgeted")}
                         </div>
-                        <div className="font-medium">
+                        <div className="font-medium text-sm sm:text-base">
                           {formatMoney(budget.totalBudgeted, undefined, decimalSeparator)}
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <div className="text-sm text-muted-foreground">
-                          Total Spent
+                        <div className="text-xs sm:text-sm text-muted-foreground">
+                          {t("totalSpent")}
                         </div>
-                        <div className="font-medium">
+                        <div className="font-medium text-sm sm:text-base">
                           {formatMoney(budget.totalSpent, undefined, decimalSeparator)}
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <div className="text-sm text-muted-foreground">
-                          Categories
+                        <div className="text-xs sm:text-sm text-muted-foreground">
+                          {t("categories")}
                         </div>
-                        <div className="font-medium">
+                        <div className="font-medium text-sm sm:text-base">
                           {budget.categories.length}
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <div className="text-sm text-muted-foreground">
-                          Transactions
+                        <div className="text-xs sm:text-sm text-muted-foreground">
+                          {t("transactions")}
                         </div>
-                        <div className="font-medium">
+                        <div className="font-medium text-sm sm:text-base">
                           {budget.expensesCount}
                         </div>
                       </div>
@@ -217,18 +230,16 @@ export default function HistoryPage() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold mb-2">
-                    {searchTerm ? "No matching budgets found" : "No budget history yet"}
+                    {searchTerm ? t("noMatchingBudgets") : t("noBudgetHistoryYet")}
                   </h3>
                   <p className="text-muted-foreground mb-4">
                     {searchTerm
-                      ? "Try adjusting your search terms."
-                      : "Start by resetting your current month to save your first budget snapshot."}
+                      ? t("searchTransactions")
+                      : t("noBudgetHistoryHint")}
                   </p>
                   {!searchTerm && (
                     <Link href="/budget">
-                      <Button>
-                        Go to Budget
-                      </Button>
+                      <Button>{t("goToBudget")}</Button>
                     </Link>
                   )}
                 </div>

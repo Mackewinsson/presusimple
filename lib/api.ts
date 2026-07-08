@@ -27,6 +27,13 @@ export interface Expense {
   type: "expense" | "income";
 }
 
+export interface MonthlyBudgetExpenseSnapshot {
+  amount: number;
+  date: string;
+  type: "expense" | "income";
+  categoryName: string;
+}
+
 export interface MonthlyBudget {
   _id: string;
   name: string;
@@ -40,6 +47,7 @@ export interface MonthlyBudget {
   totalBudgeted: number;
   totalSpent: number;
   expensesCount: number;
+  expenses?: MonthlyBudgetExpenseSnapshot[];
   createdAt: string;
 }
 
@@ -298,6 +306,18 @@ export const monthlyBudgetApi = {
     return response.json();
   },
 
+  // Get a single monthly budget by id
+  getMonthlyBudget: async (id: string): Promise<MonthlyBudget> => {
+    const response = await fetch(`/api/monthly-budgets/${id}`);
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("Monthly budget not found");
+      }
+      throw new Error("Failed to fetch monthly budget");
+    }
+    return response.json();
+  },
+
   // Save monthly budget snapshot
   saveMonthlyBudget: async (budgetData: {
     name: string;
@@ -311,6 +331,7 @@ export const monthlyBudgetApi = {
     totalBudgeted: number;
     totalSpent: number;
     expensesCount: number;
+    expenses?: MonthlyBudgetExpenseSnapshot[];
     userId: string;
   }): Promise<MonthlyBudget> => {
     const response = await fetch("/api/monthly-budgets", {
