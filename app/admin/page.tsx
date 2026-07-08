@@ -389,7 +389,9 @@ export default function UnifiedAdminDashboard() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+            {/* h-auto lets the fixed h-10 TabsList grow when triggers wrap to
+                multiple rows on small screens */}
+            <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-5">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="feature-flags">Feature Flags</TabsTrigger>
