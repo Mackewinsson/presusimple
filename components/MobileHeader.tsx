@@ -79,7 +79,7 @@ export default function MobileHeader({
 
   return (
     <header className={cn(
-      "sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-700/50",
+      "sticky top-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border",
       "pt-[env(safe-area-inset-top)]",
       className
     )}>
@@ -88,13 +88,13 @@ export default function MobileHeader({
           {shouldShowBackButton() && (
             <Link
               href={getBackHref()}
-              className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-muted hover:bg-muted/80 transition-colors"
             >
-              <ArrowLeft className="h-4 w-4 text-slate-700 dark:text-slate-300" />
+              <ArrowLeft className="h-4 w-4 text-foreground" />
             </Link>
           )}
           {shouldShowBackButton() && (
-            <h1 className="text-lg font-semibold text-slate-900 dark:text-white">
+            <h1 className="text-lg font-semibold text-foreground">
               {getTitle()}
             </h1>
           )}
@@ -102,7 +102,7 @@ export default function MobileHeader({
         
         {/* Centered title for main budget page */}
         {!shouldShowBackButton() && (
-          <h1 className="text-lg font-semibold text-slate-900 dark:text-white text-center flex-1">
+          <h1 className="text-lg font-semibold text-foreground text-center flex-1">
             {getTitle()}
           </h1>
         )}
@@ -113,9 +113,9 @@ export default function MobileHeader({
           {pathname !== budgetBase && !pathname.startsWith(budgetBase + "/") && (
             <Link
               href={budgetBase}
-              className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-muted hover:bg-muted/80 transition-colors"
             >
-              <Home className="h-4 w-4 text-slate-700 dark:text-slate-300" />
+              <Home className="h-4 w-4 text-foreground" />
             </Link>
           )}
         </div>

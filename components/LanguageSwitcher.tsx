@@ -39,9 +39,9 @@ export default function LanguageSwitcher() {
         size="sm"
         onClick={switchToEnglish}
         className={`text-xs ${
-          currentLocale === 'en' 
-            ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' 
-            : 'bg-white/10 text-slate-700 dark:bg-white/10 dark:text-white/70'
+          currentLocale === 'en'
+            ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
+            : 'bg-muted text-muted-foreground hover:bg-muted/80'
         }`}
       >
         EN
@@ -51,9 +51,9 @@ export default function LanguageSwitcher() {
         size="sm"
         onClick={switchToSpanish}
         className={`text-xs ${
-          currentLocale === 'es' 
-            ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' 
-            : 'bg-white/10 text-slate-700 dark:bg-white/10 dark:text-white/70'
+          currentLocale === 'es'
+            ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
+            : 'bg-muted text-muted-foreground hover:bg-muted/80'
         }`}
       >
         ES

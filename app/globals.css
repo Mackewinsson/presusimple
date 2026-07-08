@@ -556,4 +556,34 @@ select {
   .accent-fill {
     @apply bg-accent text-accent-foreground border border-black/10 dark:border-transparent;
   }
+
+  /* AI feature signature — single purple/pink gradient pair */
+  .ai-gradient {
+    @apply bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700;
+  }
+
+  .ai-gradient-text {
+    @apply bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent;
+  }
+
+  .ai-gradient-glow {
+    @apply bg-gradient-to-r from-purple-500/40 to-pink-500/40;
+  }
+
+  .ai-gradient-glow-active {
+    @apply bg-gradient-to-r from-accent via-purple-500 to-pink-500;
+  }
+
+  .ai-tab-trigger {
+    @apply bg-gradient-to-r from-purple-600/20 to-pink-600/20 hover:from-purple-600/30 hover:to-pink-600/30 border-purple-500/30 data-[state=active]:from-purple-600/40 data-[state=active]:to-pink-600/40 data-[state=active]:border-purple-500/50;
+  }
+
+  .ai-card-bg {
+    @apply bg-gradient-to-br from-white via-purple-50/50 to-white dark:from-card dark:via-purple-900/20 dark:to-card border-purple-500/20;
+  }
+
+  /* Theme-aware heading gradient for marketing pages */
+  .heading-gradient {
+    @apply bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent;
+  }
 }

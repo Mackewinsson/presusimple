@@ -870,9 +870,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       <div className="group relative mb-2 w-full transition-all duration-300">
         <div
           className={`absolute -inset-0.5 rounded-xl blur opacity-20 transition duration-1000 group-hover:opacity-60 group-hover:duration-200 ${
-            isParsing
-              ? "animate-pulse bg-gradient-to-r from-accent via-purple-500 to-pink-500"
-              : "bg-gradient-to-r from-accent/40 to-purple-500/40"
+            isParsing ? "animate-pulse ai-gradient-glow-active" : "ai-gradient-glow"
           }`}
         />
 
@@ -906,7 +904,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
           <div className="flex items-center gap-3 px-4 py-3">
             <Sparkles
               className={`h-5 w-5 flex-shrink-0 text-success ${
-                isParsing ? "animate-spin text-purple-400" : ""
+                isParsing ? "animate-spin ai-gradient-text" : ""
               }`}
             />
             <Textarea

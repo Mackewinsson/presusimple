@@ -25,33 +25,33 @@ function ErrorBoundaryDefaultFallback({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center">
-              <AlertTriangle className="h-8 w-8 text-white" />
+            <div className="w-16 h-16 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center">
+              <AlertTriangle className="h-8 w-8" />
             </div>
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white mb-2">
+            <h1 className="text-2xl font-bold text-foreground mb-2">
               {t('somethingWentWrong')}
             </h1>
-            <p className="text-slate-300">
+            <p className="text-muted-foreground">
               {t('technicalDifficulties')}
             </p>
           </div>
         </div>
-        <Alert className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20">
-          <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
-          <AlertDescription className="text-red-800 dark:text-red-200">
+        <Alert className="border-destructive/30 bg-destructive/10">
+          <AlertTriangle className="h-4 w-4 text-destructive" />
+          <AlertDescription className="text-destructive">
             {error?.message || t('unexpectedError')}
           </AlertDescription>
         </Alert>
         <div className="space-y-3">
           <Button
             onClick={resetError}
-            className="w-full bg-white text-slate-900 hover:bg-gray-100 font-semibold py-3"
+            className="w-full font-semibold py-3"
             size="lg"
           >
             <RefreshCw className="h-4 w-4 mr-2" />
@@ -60,7 +60,7 @@ function ErrorBoundaryDefaultFallback({
           <Button
             onClick={() => window.location.reload()}
             variant="outline"
-            className="w-full border-white/20 text-white hover:bg-white/10"
+            className="w-full"
             size="lg"
           >
             {t('reloadPage')}

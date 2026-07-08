@@ -526,17 +526,17 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     return (
       <>
         <AILoading isProcessing={isAICreating} currentStep={currentStep} />
-        <Card className="glass-card hover-card group bg-gradient-to-br from-white via-purple-50/50 to-white dark:from-slate-900/90 dark:via-purple-900/20 dark:to-slate-900/90 border border-purple-500/20 shadow-2xl">
+        <Card className="glass-card hover-card group ai-card-bg shadow-2xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-xl">
             <div className="relative">
-              <Sparkles className="h-6 w-6 text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text animate-pulse" />
-              <div className="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-ping" />
+              <Sparkles className="h-6 w-6 ai-gradient-text animate-pulse" />
+              <div className="absolute -top-1 -right-1 w-2 h-2 ai-gradient rounded-full animate-ping" />
             </div>
-            <span className="text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 bg-clip-text font-bold">
+            <span className="ai-gradient-text font-bold">
               {t("createYourBudget")}
             </span>
-            <Zap className="h-5 w-5 text-transparent bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text animate-bounce" />
+            <Zap className="h-5 w-5 text-success animate-bounce" />
           </CardTitle>
           <CardDescription className="text-base">
             {t("chooseHowToCreate")}
@@ -549,8 +549,8 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                 {t("manualSetup")}
               </TabsTrigger>
               {isAIFeatureFlagEnabled && (
-                <TabsTrigger value="ai" className="flex items-center gap-2 text-sm font-medium bg-gradient-to-r from-purple-600/20 to-pink-600/20 hover:from-purple-600/30 hover:to-pink-600/30 border-purple-500/30 data-[state=active]:from-purple-600/40 data-[state=active]:to-pink-600/40 data-[state=active]:border-purple-500/50 transition-all duration-200">
-                  <Sparkles className="h-4 w-4 flex-shrink-0 text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text" />
+                <TabsTrigger value="ai" className="flex items-center gap-2 text-sm font-medium ai-tab-trigger transition-all duration-200">
+                  <Sparkles className="h-4 w-4 flex-shrink-0 ai-gradient-text" />
                   {t("aiAssistant")}
                 </TabsTrigger>
               )}
@@ -592,7 +592,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
             </div>
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] border-0"
+              className="w-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
               disabled={createBudgetMutation.isPending}
             >
               {createBudgetMutation.isPending ? (
@@ -668,7 +668,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                 
                                                                  <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] border-0"
+                  className="w-full ai-gradient text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] border-0"
                   disabled={!aiDescription.trim() || isAICreating}
                 >
                   {isAICreating ? (
@@ -705,7 +705,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-0">
           <div className="flex items-start justify-between w-full sm:w-auto">
             <div>
-              <CardTitle className="text-xl sm:text-2xl font-semibold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+              <CardTitle className="text-xl sm:text-2xl font-semibold text-foreground">
                 {t('budgetSetup')}
               </CardTitle>
               <CardDescription className="text-sm sm:text-base text-slate-700 dark:text-white/70">
