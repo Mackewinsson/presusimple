@@ -146,6 +146,22 @@ export function buildWebPushPayload(payload: NotificationPayload) {
   };
 }
 
+/**
+ * Status codes from the push service that mean the stored subscription can
+ * never be delivered to again and must be recreated by the client:
+ * - 404/410: subscription expired or unsubscribed
+ * - 403: subscription was created with different VAPID keys (e.g. an
+ *   environment with mismatched keys wrote to the shared database)
+ */
+const STALE_SUBSCRIPTION_STATUS_CODES = [403, 404, 410];
+
+export function isStaleSubscriptionError(statusCode?: number): boolean {
+  return (
+    statusCode !== undefined &&
+    STALE_SUBSCRIPTION_STATUS_CODES.includes(statusCode)
+  );
+}
+
 export interface NotificationResult {
   success: boolean;
   sent: number;
@@ -188,6 +204,13 @@ async function sendRawNotification(
     }
     if (err.statusCode === 404) {
       return { success: false, error: "Subscription not found", statusCode: 404 };
+    }
+    if (err.statusCode === 403) {
+      return {
+        success: false,
+        error: "Subscription created with different VAPID keys",
+        statusCode: 403,
+      };
     }
     if (err.statusCode === 413) {
       return { success: false, error: "Payload too large", statusCode: 413 };

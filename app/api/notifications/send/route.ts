@@ -5,6 +5,7 @@ import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
 import { pruneStalePushSubscriptions } from "@/lib/admin/notification-recipients";
 import {
+  isStaleSubscriptionError,
   sendNotificationToUser,
   sendTestNotification,
   type NotificationPayload,
@@ -12,10 +13,6 @@ import {
 
 const STALE_SUBSCRIPTION_MESSAGE =
   "Your push subscription expired. Open the app and enable notifications again.";
-
-function isStaleSubscriptionStatus(statusCode?: number): boolean {
-  return statusCode === 410 || statusCode === 404;
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -71,7 +68,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (isStaleSubscriptionStatus(result.statusCode)) {
+    if (isStaleSubscriptionError(result.statusCode)) {
       await pruneStalePushSubscriptions([String(user._id)]);
 
       return NextResponse.json(

@@ -7,6 +7,7 @@ import {
 } from "@/lib/admin/notification-recipients";
 import { recordNotificationBroadcast } from "@/lib/admin/notification-broadcast";
 import {
+  isStaleSubscriptionError,
   sendNotificationToRecipients,
   type NotificationPayload,
 } from "@/lib/notifications";
@@ -83,9 +84,7 @@ export async function POST(request: NextRequest) {
     const result = await sendNotificationToRecipients(recipients, payload);
 
     const staleUserIds = result.failures
-      .filter(
-        (failure) => failure.statusCode === 410 || failure.statusCode === 404
-      )
+      .filter((failure) => isStaleSubscriptionError(failure.statusCode))
       .map((failure) => failure.userId);
 
     if (staleUserIds.length > 0) {
