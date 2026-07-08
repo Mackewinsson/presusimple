@@ -1,45 +1,45 @@
-import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { NextResponse } from "next/server";
+import { dbConnect } from "@/lib/mongoose";
+import { requireAdminApi } from "@/lib/auth/admin";
+import { serializeNotificationBroadcast } from "@/lib/admin/notification-broadcast-utils";
+import NotificationBroadcast from "@/models/NotificationBroadcast";
 
-// List of authorized admin emails
-const AUTHORIZED_ADMINS = [
-  "mackewinsson@gmail.com", // Your email
-  // Add more admin emails here
-];
+const HISTORY_LIMIT = 20;
 
 export async function GET() {
+  const auth = await requireAdminApi();
+  if ("error" in auth) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
+  }
+
   try {
-    // Check authentication
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    await dbConnect();
 
-    // Check if user is admin
-    if (!AUTHORIZED_ADMINS.includes(session.user.email)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    const broadcasts = await NotificationBroadcast.find()
+      .sort({ createdAt: -1 })
+      .limit(HISTORY_LIMIT)
+      .select(
+        "title body recipientCount sentCount failedCount createdAt"
+      )
+      .lean<
+        Array<{
+          _id: unknown;
+          title: string;
+          body: string;
+          recipientCount: number;
+          sentCount: number;
+          failedCount: number;
+          createdAt: Date;
+        }>
+      >();
 
-    // For now, return empty history since we don't have a notification history collection
-    // In a real app, you would store notification history in a separate collection
-    const history = [
-      // Example entries (remove in production)
-      {
-        id: '1',
-        title: 'Welcome to Budget App',
-        body: 'Thank you for subscribing to notifications!',
-        sentAt: new Date().toISOString(),
-        recipients: 1,
-        success: true,
-      },
-    ];
-
-    return NextResponse.json(history);
-  } catch (error) {
-    console.error('Error getting notification history:', error);
     return NextResponse.json(
-      { error: 'Failed to get notification history' },
+      broadcasts.map((broadcast) => serializeNotificationBroadcast(broadcast))
+    );
+  } catch (error) {
+    console.error("Error getting notification history:", error);
+    return NextResponse.json(
+      { error: "Failed to get notification history" },
       { status: 500 }
     );
   }

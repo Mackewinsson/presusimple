@@ -71,7 +71,16 @@ interface NotificationHistory {
   body: string;
   sentAt: string;
   recipients: number;
+  sentCount: number;
+  failedCount: number;
   success: boolean;
+}
+
+interface NotificationSendStats {
+  sent: number;
+  failed: number;
+  total: number;
+  pruned?: number;
 }
 
 export default function UnifiedAdminDashboard() {
@@ -114,6 +123,8 @@ export default function UnifiedAdminDashboard() {
     lastNotificationSent: null,
   });
   const [notificationHistory, setNotificationHistory] = useState<NotificationHistory[]>([]);
+  const [lastSendStats, setLastSendStats] = useState<NotificationSendStats | null>(null);
+  const [testSending, setTestSending] = useState(false);
 
   // Loading states
   const [loading, setLoading] = useState(false);
@@ -281,33 +292,78 @@ export default function UnifiedAdminDashboard() {
   const sendNotification = async () => {
     try {
       setLoading(true);
-      
+      setLastSendStats(null);
+
       const response = await fetch('/api/admin/notifications/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(notificationFormData),
       });
 
-      if (response.ok) {
-        toast.success('Notification sent successfully');
-        setNotificationFormData({
-          title: '',
-          body: '',
-          url: '/budget',
-          requireInteraction: false,
-          silent: false,
-        });
+      const data = await response.json();
+
+      if (response.ok || response.status === 207) {
+        if (data.stats) {
+          setLastSendStats(data.stats);
+        }
+
+        if (response.status === 207) {
+          toast.warning(
+            `Sent to ${data.stats?.sent ?? 0} of ${data.stats?.total ?? 0} subscribers (${data.stats?.failed ?? 0} failed)`
+          );
+        } else {
+          toast.success(
+            data.message ||
+              `Notification sent to ${data.stats?.sent ?? 0} subscribers`
+          );
+          setNotificationFormData({
+            title: '',
+            body: '',
+            url: '/budget',
+            requireInteraction: false,
+            silent: false,
+          });
+        }
+
         loadNotificationStats();
         loadNotificationHistory();
       } else {
-        const error = await response.json();
-        toast.error(error.error || 'Failed to send notification');
+        toast.error(data.error || 'Failed to send notification');
       }
     } catch (error) {
       console.error('Error sending notification:', error);
       toast.error('Failed to send notification');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const sendTestNotificationToSelf = async () => {
+    try {
+      setTestSending(true);
+      const response = await fetch('/api/notifications/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'test' }),
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success('Test notification sent to your device');
+      } else if (response.status === 410 || data.needsResubscribe) {
+        toast.error(
+          data.error ||
+            'Your push subscription expired. Open the app and enable notifications again.'
+        );
+        loadNotificationStats();
+      } else {
+        toast.error(data.error || 'Failed to send test notification');
+      }
+    } catch (error) {
+      console.error('Error sending test notification:', error);
+      toast.error('Failed to send test notification');
+    } finally {
+      setTestSending(false);
     }
   };
 
@@ -714,7 +770,9 @@ export default function UnifiedAdminDashboard() {
             <TabsContent value="notifications" className="space-y-6">
               <div>
                 <h2 className="text-2xl font-bold">Notifications</h2>
-                <p className="text-muted-foreground">Send push notifications to users</p>
+                <p className="text-muted-foreground">
+                  Send push notifications to all users with an active subscription
+                </p>
               </div>
 
               <div className="grid gap-4 md:grid-cols-4">
@@ -780,7 +838,9 @@ export default function UnifiedAdminDashboard() {
                 <CardHeader>
                   <CardTitle>Send Notification</CardTitle>
                   <CardDescription>
-                    Send a push notification to all subscribed users
+                    Broadcasts to {notificationStats.activeSubscribers} subscribed user
+                    {notificationStats.activeSubscribers === 1 ? "" : "s"}. Users without
+                    push permission will not receive this message.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -829,10 +889,49 @@ export default function UnifiedAdminDashboard() {
                       <Label htmlFor="silent">Silent</Label>
                     </div>
                   </div>
-                  <Button onClick={sendNotification} disabled={loading || !notificationFormData.title || !notificationFormData.body}>
-                    <Send className="h-4 w-4 mr-2" />
-                    Send Notification
-                  </Button>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button
+                      onClick={sendNotification}
+                      disabled={
+                        loading ||
+                        testSending ||
+                        !notificationFormData.title ||
+                        !notificationFormData.body ||
+                        notificationStats.activeSubscribers === 0
+                      }
+                    >
+                      <Send className="h-4 w-4 mr-2" />
+                      Send to all subscribers
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={sendTestNotificationToSelf}
+                      disabled={loading || testSending}
+                    >
+                      <Bell className="h-4 w-4 mr-2" />
+                      {testSending ? "Sending test..." : "Send test to me"}
+                    </Button>
+                  </div>
+                  {notificationStats.activeSubscribers === 0 && (
+                    <Alert>
+                      <AlertDescription>
+                        No users are currently subscribed to push notifications.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  {lastSendStats && (
+                    <Alert>
+                      <AlertDescription>
+                        Last broadcast: {lastSendStats.sent} sent, {lastSendStats.failed}{" "}
+                        failed, {lastSendStats.total} total
+                        {lastSendStats.pruned
+                          ? ` (${lastSendStats.pruned} stale subscriptions removed)`
+                          : ""}
+                        .
+                      </AlertDescription>
+                    </Alert>
+                  )}
                 </CardContent>
               </Card>
 
@@ -856,11 +955,16 @@ export default function UnifiedAdminDashboard() {
                         </div>
                         <div className="text-right">
                           <Badge variant={notification.success ? "default" : "destructive"}>
-                            {notification.success ? "Success" : "Failed"}
+                            {notification.success ? "Success" : "Partial"}
                           </Badge>
                           <p className="text-xs text-muted-foreground mt-1">
-                            {notification.recipients} recipients
+                            {notification.sentCount}/{notification.recipients} delivered
                           </p>
+                          {notification.failedCount > 0 && (
+                            <p className="text-xs text-muted-foreground">
+                              {notification.failedCount} failed
+                            </p>
+                          )}
                         </div>
                       </div>
                     ))}
