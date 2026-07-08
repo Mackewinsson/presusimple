@@ -145,7 +145,7 @@ export default function ManualSubscriptionPage() {
             <p className="text-muted-foreground mt-2">
               Manage user subscriptions manually (Admin Only)
             </p>
-            <p className="text-sm text-green-600 mt-1">
+            <p className="text-sm text-success mt-1">
               Logged in as: {session.user?.email}
             </p>
             <div className="mt-4">
@@ -210,7 +210,7 @@ export default function ManualSubscriptionPage() {
                   <div>
                     <span className="font-medium">Plan:</span>{" "}
                     <span className={`font-bold ${
-                      userData.plan === "pro" ? "text-green-600" : "text-blue-600"
+                      userData.plan === "pro" ? "text-success" : "text-blue-600"
                     }`}>
                       {userData.plan === "pro" ? "Pro" : "Free"}
                     </span>

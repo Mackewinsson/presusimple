@@ -275,7 +275,7 @@ export default function FeatureFlagsAdminPage() {
             <p className="text-muted-foreground mt-2">
               Manage feature flags for web and mobile applications
             </p>
-            <p className="text-sm text-green-600 mt-1">
+            <p className="text-sm text-success mt-1">
               Logged in as: {session?.user?.email}
             </p>
             <div className="mt-4">

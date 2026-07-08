@@ -45,7 +45,7 @@ export function SnapshotInsights({
           <div
             className={`text-2xl font-bold ${
               savingsRate != null && savingsRate >= 0
-                ? "text-accent-foreground"
+                ? "text-success"
                 : "text-destructive"
             }`}
           >
@@ -68,13 +68,13 @@ export function SnapshotInsights({
           <CardContent>
             <div className="flex items-center gap-2">
               {spentDelta <= 0 ? (
-                <TrendingDown className="h-5 w-5 text-accent-foreground" />
+                <TrendingDown className="h-5 w-5 text-success" />
               ) : (
                 <TrendingUp className="h-5 w-5 text-destructive" />
               )}
               <span
                 className={`text-2xl font-bold ${
-                  spentDelta <= 0 ? "text-accent-foreground" : "text-destructive"
+                  spentDelta <= 0 ? "text-success" : "text-destructive"
                 }`}
               >
                 {spentDelta <= 0 ? "" : "+"}

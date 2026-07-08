@@ -350,7 +350,7 @@ export default function DevToolsPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Browser Support</CardTitle>
-                {isSupported ? <CheckCircle className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-red-500" />}
+                {isSupported ? <CheckCircle className="h-4 w-4 text-success" /> : <XCircle className="h-4 w-4 text-red-500" />}
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -378,7 +378,7 @@ export default function DevToolsPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Subscription</CardTitle>
-                {isSubscribed ? <CheckCircle className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-red-500" />}
+                {isSubscribed ? <CheckCircle className="h-4 w-4 text-success" /> : <XCircle className="h-4 w-4 text-red-500" />}
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -393,7 +393,7 @@ export default function DevToolsPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">PWA Status</CardTitle>
-                {pwaStatus.isInstalled ? <CheckCircle className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-red-500" />}
+                {pwaStatus.isInstalled ? <CheckCircle className="h-4 w-4 text-success" /> : <XCircle className="h-4 w-4 text-red-500" />}
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -408,7 +408,7 @@ export default function DevToolsPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Secure Context</CardTitle>
-                {typeof window !== 'undefined' && window.isSecureContext ? <Shield className="h-4 w-4 text-green-500" /> : <AlertTriangle className="h-4 w-4 text-red-500" />}
+                {typeof window !== 'undefined' && window.isSecureContext ? <Shield className="h-4 w-4 text-success" /> : <AlertTriangle className="h-4 w-4 text-red-500" />}
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -423,7 +423,7 @@ export default function DevToolsPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Service Worker</CardTitle>
-                {debugInfo?.serviceWorkerStatus === 'Registered' ? <CheckCircle className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-red-500" />}
+                {debugInfo?.serviceWorkerStatus === 'Registered' ? <CheckCircle className="h-4 w-4 text-success" /> : <XCircle className="h-4 w-4 text-red-500" />}
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -636,7 +636,7 @@ export default function DevToolsPage() {
                         <div className="text-sm text-muted-foreground">{result.message}</div>
                       </div>
                       {result.success ? (
-                        <CheckCircle className="h-5 w-5 text-green-500" />
+                        <CheckCircle className="h-5 w-5 text-success" />
                       ) : (
                         <XCircle className="h-5 w-5 text-red-500" />
                       )}
@@ -686,7 +686,7 @@ export default function DevToolsPage() {
               </Button>
             </CardHeader>
             <CardContent>
-              <div className="bg-black text-green-400 p-4 rounded-lg font-mono text-sm h-64 overflow-y-auto">
+              <div className="bg-black text-success p-4 rounded-lg font-mono text-sm h-64 overflow-y-auto">
                 {logs.length > 0 ? (
                   logs.map((log, index) => (
                     <div key={index} className="mb-1">

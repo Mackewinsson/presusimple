@@ -250,7 +250,7 @@ export default function BudgetDetailPage() {
                       <span
                         className={`font-medium ${
                           selectedBudget.totalBudgeted - selectedBudget.totalSpent >= 0
-                            ? "text-accent-foreground"
+                            ? "text-success"
                             : "text-destructive"
                         }`}
                       >
@@ -278,7 +278,7 @@ export default function BudgetDetailPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-4">
-                  <div className="text-2xl sm:text-3xl font-bold text-accent-foreground">
+                  <div className="text-2xl sm:text-3xl font-bold text-success">
                     {selectedBudget.expensesCount}
                   </div>
                   <div className="text-sm text-muted-foreground mt-2">

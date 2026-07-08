@@ -383,7 +383,7 @@ export default function UnifiedAdminDashboard() {
             <p className="text-muted-foreground mt-2">
               Unified management for all admin features
             </p>
-            <p className="text-sm text-green-600 mt-1">
+            <p className="text-sm text-success mt-1">
               Logged in as: {session?.user?.email}
             </p>
           </div>
@@ -1014,12 +1014,12 @@ export default function UnifiedAdminDashboard() {
                               <div key={plan} className="flex items-center gap-2">
                                 <div className="flex items-center gap-1">
                                   {hasAccess ? (
-                                    <CheckCircle className="h-4 w-4 text-green-400" />
+                                    <CheckCircle className="h-4 w-4 text-success" />
                                   ) : (
                                     <XCircle className="h-4 w-4 text-red-400" />
                                   )}
                                   <span className={`text-sm font-medium ${
-                                    hasAccess ? 'text-green-400' : 'text-red-400'
+                                    hasAccess ? 'text-success' : 'text-red-400'
                                   }`}>
                                     {plan === "pro" ? (
                                       <span className="flex items-center gap-1">
@@ -1070,7 +1070,7 @@ export default function UnifiedAdminDashboard() {
                             .filter(([_, feature]) => feature.plans.includes(plan as any))
                             .map(([key, feature]) => (
                               <div key={key} className="flex items-center gap-2">
-                                <CheckCircle className="h-4 w-4 text-green-400" />
+                                <CheckCircle className="h-4 w-4 text-success" />
                                 <span className="text-sm">{feature.label}</span>
                               </div>
                             ))}

@@ -41,9 +41,9 @@ const SubscriptionButton = () => {
   if (subscriptionStatus === "paid") {
     if (showThankYou) {
       return (
-        <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20">
-          <Crown className="h-4 w-4 text-green-600 dark:text-green-400" />
-          <AlertDescription className="text-green-800 dark:text-green-200">
+        <Alert className="border-success/30 bg-success/10">
+          <Crown className="h-4 w-4 text-success" />
+          <AlertDescription className="text-success">
             {t('youHaveActiveSubscription')}
           </AlertDescription>
         </Alert>

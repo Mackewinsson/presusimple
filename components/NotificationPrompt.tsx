@@ -129,7 +129,7 @@ export default function NotificationPrompt({
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-accent" />
+              <Bell className="h-5 w-5 text-success" />
               <CardTitle className="text-lg text-foreground">
                 {t('stayUpdated')}
               </CardTitle>
@@ -165,15 +165,15 @@ export default function NotificationPrompt({
 
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <CheckCircle className="h-4 w-4 text-accent" />
+              <CheckCircle className="h-4 w-4 text-success" />
               <span>{t('budgetAlertsWhenApproaching')}</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <AlertTriangle className="h-4 w-4 text-accent" />
+              <AlertTriangle className="h-4 w-4 text-success" />
               <span>{t('expenseRemindersAndTips')}</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Target className="h-4 w-4 text-accent" />
+              <Target className="h-4 w-4 text-success" />
               <span>{t('goalAchievementsAndMilestones')}</span>
             </div>
           </div>

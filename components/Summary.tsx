@@ -186,7 +186,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-0">
           <div>
-            <CardTitle className="text-xl sm:text-2xl font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            <CardTitle className="text-xl sm:text-2xl font-semibold text-foreground">
               {t('budgetSummary')}
             </CardTitle>
             <CardDescription className="text-sm sm:text-base">
@@ -238,7 +238,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
               className={`text-lg sm:text-xl md:text-2xl font-semibold ${
                 calculatedTotalBudgeted - totalSpent < 0
                   ? "text-destructive"
-                  : "text-accent-foreground"
+                  : "text-success"
               }`}
             >
                               {formatMoney(calculatedTotalBudgeted - totalSpent, currentCurrency, decimalSeparator)}

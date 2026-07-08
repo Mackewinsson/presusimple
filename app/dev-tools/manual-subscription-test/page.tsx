@@ -104,7 +104,7 @@ export default function ManualSubscriptionTestPage() {
             <p className="text-muted-foreground mt-2">
               Test the manual subscription management functionality
             </p>
-            <p className="text-sm text-green-600 mt-1">
+            <p className="text-sm text-success mt-1">
               Logged in as: {session?.user?.email}
             </p>
             {isAdmin ? (
@@ -257,7 +257,7 @@ export default function ManualSubscriptionTestPage() {
                     Logged in as: <strong>{session?.user?.email}</strong>
                   </p>
                   {isAdmin ? (
-                    <p className="text-sm text-green-600 mt-1">✅ You have admin access</p>
+                    <p className="text-sm text-success mt-1">✅ You have admin access</p>
                   ) : (
                     <p className="text-sm text-red-600 mt-1">❌ You don't have admin access</p>
                   )}

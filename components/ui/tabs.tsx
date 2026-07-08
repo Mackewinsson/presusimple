@@ -31,7 +31,7 @@ const tabsTriggerVariants = cva(
         default:
           'data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm',
         accent:
-          'data-[state=active]:bg-accent data-[state=active]:text-black data-[state=active]:shadow-sm',
+          'data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:shadow-sm',
       },
     },
     defaultVariants: {

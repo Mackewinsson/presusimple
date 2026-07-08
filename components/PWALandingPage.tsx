@@ -108,7 +108,7 @@ export default function PWALandingPage() {
             <div className="space-y-3">
               {pwaStatus.installBenefits.common.map((benefit, index) => (
                 <div key={index} className="flex items-center gap-3 text-left">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-6 h-6 bg-accent text-accent-foreground rounded-full flex items-center justify-center flex-shrink-0">
                     <Check className="h-3 w-3 text-white" />
                   </div>
                   <span className="text-slate-300 text-sm">{benefit}</span>
@@ -321,7 +321,7 @@ export default function PWALandingPage() {
                         <h3 className="font-semibold text-white">{t('appBenefits')}</h3>
                         {pwaStatus.installBenefits.common.map((benefit, index) => (
                           <div key={index} className="flex items-center gap-3">
-                            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <div className="w-6 h-6 bg-accent text-accent-foreground rounded-full flex items-center justify-center flex-shrink-0">
                               <Check className="h-3 w-3 text-white" />
                             </div>
                             <span className="text-slate-300 text-sm">{benefit}</span>

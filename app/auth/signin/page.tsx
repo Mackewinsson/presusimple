@@ -68,7 +68,7 @@ export default function SignIn() {
       progress: 50
     },
     {
-      icon: <TrendingUp className="h-10 w-10 text-green-400" />,
+      icon: <TrendingUp className="h-10 w-10 text-success" />,
       title: t('smartAutomation'),
       description: t('automatedCategorizationAndTracking'),
       progress: 75
@@ -91,8 +91,8 @@ export default function SignIn() {
               <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-2xl">
                 <Crown className="h-10 w-10 text-white" />
               </div>
-              <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
-                <CheckCircle className="h-5 w-5 text-white" />
+              <div className="absolute -top-2 -right-2 w-8 h-8 bg-accent text-accent-foreground rounded-full flex items-center justify-center shadow-lg">
+                <CheckCircle className="h-5 w-5" />
               </div>
             </div>
           </div>
@@ -114,7 +114,7 @@ export default function SignIn() {
               <Crown className="h-4 w-4 mr-2" />
               {t('thirtyDayFreeTrial')}
             </Badge>
-            <Badge variant="outline" className="border-green-500 text-green-400 px-4 py-2 text-sm font-medium">
+            <Badge variant="outline" className="border-accent text-success px-4 py-2 text-sm font-medium">
               <Shield className="h-4 w-4 mr-2" />
               {t('enterpriseSecurity')}
             </Badge>
@@ -166,8 +166,8 @@ export default function SignIn() {
           <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="h-5 w-5 text-white" />
+                <div className="w-10 h-10 bg-accent text-accent-foreground rounded-lg flex items-center justify-center">
+                  <BarChart3 className="h-5 w-5" />
                 </div>
                 <h3 className="font-semibold text-white text-lg">Advanced Analytics</h3>
               </div>

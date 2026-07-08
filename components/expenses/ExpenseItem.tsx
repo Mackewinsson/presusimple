@@ -215,7 +215,7 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
   }
 
   return (
-    <div className="p-4 border rounded-lg bg-card hover:bg-accent/50 transition-colors">
+    <div className="p-4 border rounded-lg bg-card hover:bg-accent-muted transition-colors">
       <div className="flex justify-between items-start">
         <div className="space-y-1">
           <div className="font-medium">
@@ -234,13 +234,13 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
               className={`font-medium flex items-center gap-1 ${
                 expense.type === "expense"
                   ? "text-destructive"
-                  : "text-green-600 dark:text-green-400"
+                  : "text-success"
               }`}
             >
               {expense.type === "expense" ? (
                 <ArrowUpCircle className="h-4 w-4 text-destructive" />
               ) : (
-                <ArrowDownCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <ArrowDownCircle className="h-4 w-4 text-success" />
               )}
                                 {formatMoney(expense.amount, currentCurrency, decimalSeparator)}
             </div>

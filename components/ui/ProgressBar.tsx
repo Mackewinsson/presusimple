@@ -24,7 +24,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   const getStatusColor = () => {
     switch (status) {
       case "success":
-        return "bg-green-500";
+        return "bg-success";
       case "warning":
         return "bg-amber-500";
       case "danger":

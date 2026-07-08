@@ -25,7 +25,7 @@ export function UpgradeToProCTA({ feature, className = "" }: UpgradeToProCTAProp
         <div className="flex justify-center mb-2">
           <div className="relative">
             <Lock className="h-8 w-8 text-muted-foreground" />
-            <Crown className="h-4 w-4 text-accent absolute -top-1 -right-1" />
+            <Crown className="h-4 w-4 text-success absolute -top-1 -right-1" />
           </div>
         </div>
         <CardTitle className="text-lg text-foreground">

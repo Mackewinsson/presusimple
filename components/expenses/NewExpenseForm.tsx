@@ -150,11 +150,11 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
               </SelectItem>
               <SelectItem
                 value="income"
-                className="[&>span]:text-green-600 [&>span]:dark:text-green-400"
+                className="[&>span]:text-success"
               >
                 <div className="flex items-center gap-2">
-                  <ArrowDownCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-                  <span className="text-green-600 dark:text-green-400">
+                  <ArrowDownCircle className="h-4 w-4 text-success" />
+                  <span className="text-success">
                     {t('income')}
                   </span>
                 </div>
@@ -213,7 +213,7 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
         type="submit"
         variant="default"
         size="lg"
-        className="w-full font-semibold shadow-md hover:shadow-lg transition-shadow bg-accent text-accent-foreground hover:bg-accent/90"
+        className="w-full font-semibold shadow-md hover:shadow-lg transition-shadow accent-fill hover:bg-accent/90"
         disabled={createExpenseMutation.isPending}
       >
         {createExpenseMutation.isPending ? (

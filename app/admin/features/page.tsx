@@ -86,12 +86,12 @@ export default function FeaturesAdminPage() {
                           <div key={plan} className="flex items-center gap-2">
                             <div className="flex items-center gap-1">
                               {hasAccess ? (
-                                <CheckCircle className="h-4 w-4 text-green-400" />
+                                <CheckCircle className="h-4 w-4 text-success" />
                               ) : (
                                 <XCircle className="h-4 w-4 text-red-400" />
                               )}
                               <span className={`text-sm font-medium ${
-                                hasAccess ? 'text-green-400' : 'text-red-400'
+                                hasAccess ? 'text-success' : 'text-red-400'
                               }`}>
                                 {plan === "pro" ? (
                                   <span className="flex items-center gap-1">
@@ -143,7 +143,7 @@ export default function FeaturesAdminPage() {
                          .filter(([_, feature]) => feature.plans.includes(plan as any))
                          .map(([key, feature]) => (
                           <div key={key} className="flex items-center gap-2">
-                            <CheckCircle className="h-4 w-4 text-green-400" />
+                            <CheckCircle className="h-4 w-4 text-success" />
                             <span className="text-sm text-slate-300">{feature.label}</span>
                           </div>
                         ))}
@@ -171,7 +171,7 @@ export default function FeaturesAdminPage() {
                   <div className="text-sm text-slate-300">Total Features</div>
                 </div>
                 <div className="text-center p-4 border border-white/10 rounded-lg">
-                                     <div className="text-2xl font-bold text-green-400">
+                                     <div className="text-2xl font-bold text-success">
                      {Object.entries(FEATURES).filter(([_, feature]) => 
                        feature.plans.includes("free" as any)
                      ).length}

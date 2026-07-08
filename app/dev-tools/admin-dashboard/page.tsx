@@ -211,7 +211,7 @@ export default function AdminDashboardTestPage() {
                     Logged in as: <strong>{session?.user?.email}</strong>
                   </p>
                   {session?.user?.email === 'mackewinsson@gmail.com' ? (
-                    <p className="text-sm text-green-600 mt-1">✅ You have admin access</p>
+                    <p className="text-sm text-success mt-1">✅ You have admin access</p>
                   ) : (
                     <p className="text-sm text-red-600 mt-1">❌ You don't have admin access</p>
                   )}

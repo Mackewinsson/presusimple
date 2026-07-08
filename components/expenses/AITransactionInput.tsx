@@ -106,7 +106,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain sm:space-y-6">
       <div className="text-sm text-muted-foreground flex items-center gap-2">
-        <CheckCircle className="h-4 w-4 text-accent animate-pulse" />
+        <CheckCircle className="h-4 w-4 text-success animate-pulse" />
         <span>{t("aiFound")} {transactions.length} {t("transactionsExclamation")}</span>
       </div>
       
@@ -168,7 +168,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                     onClick={() => handleCategoryToggle(missingCategory.name)}
                     className={`w-full sm:w-auto shrink-0 ${
                       isSelected 
-                        ? "bg-accent text-accent-foreground border-0 shadow-md" 
+                        ? "accent-fill border-0 shadow-md" 
                         : "bg-secondary text-secondary-foreground border-0 hover:bg-secondary/80"
                     } transition-all duration-200`}
                   >
@@ -315,7 +315,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
           className={`w-full sm:flex-1 ${
             hasInsufficientBudget 
               ? "bg-destructive text-destructive-foreground opacity-50 cursor-not-allowed" 
-              : "bg-accent text-accent-foreground hover:bg-accent/90 font-semibold shadow-lg hover:shadow-xl"
+              : "accent-fill hover:bg-accent/90 font-semibold shadow-lg hover:shadow-xl"
           } transition-colors border-0`}
         >
           {isSaving ? t("savingEllipsis") : `${t("saveTransactionsButton")}${newCategoriesToCreate.length > 0 ? ` ${t("andCreateCategories")} (${newCategoriesToCreate.length})` : ''}`}
@@ -905,7 +905,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
 
           <div className="flex items-center gap-3 px-4 py-3">
             <Sparkles
-              className={`h-5 w-5 flex-shrink-0 text-accent ${
+              className={`h-5 w-5 flex-shrink-0 text-success ${
                 isParsing ? "animate-spin text-purple-400" : ""
               }`}
             />
@@ -975,7 +975,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
               className={`h-9 shrink-0 rounded-lg px-5 transition-all duration-300 ${
                 !description.trim() && !imageBase64
                   ? "bg-secondary text-secondary-foreground"
-                  : "bg-accent text-accent-foreground shadow-sm hover:bg-accent/90 hover:shadow-md"
+                  : "accent-fill shadow-sm hover:bg-accent/90 hover:shadow-md"
               }`}
             >
               {isParsing ? (
@@ -1014,7 +1014,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
         <DialogContent className="gap-0 overflow-hidden border-accent/20 p-0 pt-0 sm:max-w-4xl [&>div:first-child]:hidden">
           <DialogHeader className="shrink-0 space-y-1 border-b border-border/60 px-4 pb-3 pt-1 pr-12 text-left">
             <DialogTitle className="text-base sm:text-xl flex items-center gap-2 leading-snug">
-              <Sparkles className="h-5 w-5 shrink-0 text-accent" /> {t('reviewTransactions')}
+              <Sparkles className="h-5 w-5 shrink-0 text-success" /> {t('reviewTransactions')}
             </DialogTitle>
             <DialogDescription className="text-left text-sm">
               {t("reviewParsedTransactions")}

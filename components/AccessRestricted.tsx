@@ -57,7 +57,7 @@ export default function AccessRestricted({
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6 p-8">
         <div className="text-center space-y-4">
-          <Crown className="h-16 w-16 text-accent mx-auto" />
+          <Crown className="h-16 w-16 text-success mx-auto" />
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             {t('unlockProFeatures')}
           </h2>
