@@ -6,7 +6,6 @@ import { Shield } from "lucide-react";
 
 const ADMIN_LINKS: Array<{ href: string; label: string; exact?: boolean }> = [
   { href: "/admin", label: "Dashboard", exact: true },
-  { href: "/admin/users", label: "Users" },
 ];
 
 export function AdminNav() {

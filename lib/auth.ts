@@ -7,6 +7,7 @@ import {
   shouldReceiveBillingGracePeriod,
 } from "@/lib/billing/grace-period";
 import { sendWelcomeEmail } from "@/lib/email";
+import { recordUserLogin } from "@/lib/auth/record-login";
 
 export const authOptions = {
   providers: [
@@ -43,6 +44,7 @@ export const authOptions = {
               trialStart: new Date(),
               trialEnd: trialEnd,
               subscriptionType: "trial_signup",
+              lastLoginAt: new Date(),
             });
             
             await newUser.save();
@@ -58,8 +60,8 @@ export const authOptions = {
             Object.assign(existingUser, buildGracePeriodUpdate());
             await existingUser.save();
           }
-          
-          return true;
+
+          await recordUserLogin(user.email);
         } catch (error) {
           console.error("Error during sign in:", error);
           return false;

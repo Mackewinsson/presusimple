@@ -22,6 +22,9 @@ export interface IUser extends Document {
   // Streak (Duolingo-style)
   streakCount?: number;
   lastActivityDate?: Date;
+  lastLoginAt?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -49,7 +52,10 @@ const UserSchema = new Schema<IUser>({
   lastNotificationUpdate: { type: Date },
   // Streak
   streakCount: { type: Number, default: 0 },
-  lastActivityDate: { type: Date }
+  lastActivityDate: { type: Date },
+  lastLoginAt: { type: Date },
+}, {
+  timestamps: true,
 });
 
 export default models.User || mongoose.model<IUser>("User", UserSchema);

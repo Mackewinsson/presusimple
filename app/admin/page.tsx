@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -32,16 +32,12 @@ import {
   Send,
   BarChart3,
   History,
-  UserCheck,
-  UserX,
-  Lock,
   Eye,
   EyeOff,
-  Search,
-  KeyRound
 } from "lucide-react";
 import { FEATURES } from "@/lib/features";
 import { getAuthorizedAdminEmails } from "@/lib/auth/admin-config";
+import { AdminUsersPanel } from "@/components/admin/AdminUsersPanel";
 
 // Types
 interface Feature {
@@ -119,20 +115,6 @@ export default function UnifiedAdminDashboard() {
   });
   const [notificationHistory, setNotificationHistory] = useState<NotificationHistory[]>([]);
 
-  // Manual Subscription state
-  const [subscriptionFormData, setSubscriptionFormData] = useState({
-    email: searchParams.get("email") || '',
-    action: '',
-  });
-  const [userData, setUserData] = useState<any>(null);
-  const [subscriptionMessage, setSubscriptionMessage] = useState('');
-
-  // User Management state
-  const [userManagementEmail, setUserManagementEmail] = useState('');
-  const [userManagementData, setUserManagementData] = useState<any>(null);
-  const [resetPasswordForm, setResetPasswordForm] = useState({ newPassword: '' });
-  const [showResetPassword, setShowResetPassword] = useState(false);
-
   // Loading states
   const [loading, setLoading] = useState(false);
 
@@ -155,12 +137,11 @@ export default function UnifiedAdminDashboard() {
 
   useEffect(() => {
     const tab = searchParams.get("tab");
-    const email = searchParams.get("email");
-    if (tab) setActiveTab(tab);
-    if (email) {
-      setSubscriptionFormData((prev) => ({ ...prev, email }));
-      setUserManagementEmail(email);
+    if (tab === "subscriptions" || tab === "user-management") {
+      setActiveTab("users");
+      return;
     }
+    if (tab) setActiveTab(tab);
   }, [searchParams]);
 
   // Feature Flags functions
@@ -330,119 +311,6 @@ export default function UnifiedAdminDashboard() {
     }
   };
 
-  // Manual Subscription functions
-  const fetchUserData = async (email: string) => {
-    try {
-      const response = await fetch(`/api/users/manual-subscription?email=${encodeURIComponent(email)}`);
-      if (response.ok) {
-        const userData = await response.json();
-        setUserData(userData);
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
-  };
-
-  const handleSubscriptionAction = async () => {
-    try {
-      setLoading(true);
-      setSubscriptionMessage('');
-
-      const response = await fetch('/api/users/manual-subscription', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(subscriptionFormData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSubscriptionMessage(data.message);
-        toast.success(data.message);
-        // Fetch updated user data after successful action
-        if (subscriptionFormData.action === 'check') {
-          await fetchUserData(subscriptionFormData.email);
-        } else {
-          // For other actions, fetch user data to show updated status
-          await fetchUserData(subscriptionFormData.email);
-        }
-      } else {
-        toast.error(data.error || 'Failed to perform subscription action');
-        setSubscriptionMessage(data.error || 'Failed to perform subscription action');
-      }
-    } catch (error) {
-      console.error('Error performing subscription action:', error);
-      toast.error('Failed to perform subscription action');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // User Management functions
-  const lookupUser = async () => {
-    if (!userManagementEmail) {
-      toast.error('Por favor ingresa un correo electrónico');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/users/manual-subscription?email=${encodeURIComponent(userManagementEmail)}`);
-      if (response.ok) {
-        const data = await response.json();
-        setUserManagementData(data);
-        setResetPasswordForm({ newPassword: '' });
-      } else {
-        toast.error('Usuario no encontrado');
-        setUserManagementData(null);
-      }
-    } catch (error) {
-      console.error('Error looking up user:', error);
-      toast.error('Error al buscar usuario');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAdminResetPassword = async () => {
-    if (!resetPasswordForm.newPassword) {
-      toast.error('Por favor ingresa una nueva contraseña');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await fetch('/api/admin/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: userManagementEmail,
-          newPassword: resetPasswordForm.newPassword,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success(data.message || 'Contraseña restablecida exitosamente');
-        setResetPasswordForm({ newPassword: '' });
-        setShowResetPassword(false);
-        // Refresh user data to show updated hasPassword status
-        await lookupUser();
-      } else {
-        const errorMsg = data.details
-          ? data.details.join(', ')
-          : data.error || 'Error al restablecer contraseña';
-        toast.error(errorMsg);
-      }
-    } catch (error) {
-      console.error('Error resetting password:', error);
-      toast.error('Error al restablecer contraseña');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   if (status === "loading") {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
@@ -465,13 +333,12 @@ export default function UnifiedAdminDashboard() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
               <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="feature-flags">Feature Flags</TabsTrigger>
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
-              <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
-              <TabsTrigger value="user-management">Usuarios</TabsTrigger>
-              <TabsTrigger value="static-features">Funciones</TabsTrigger>
+              <TabsTrigger value="static-features">Features</TabsTrigger>
             </TabsList>
 
             {/* Overview Tab */}
@@ -608,6 +475,19 @@ export default function UnifiedAdminDashboard() {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Users Tab */}
+            <TabsContent value="users" className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold">Users</h2>
+                <p className="text-muted-foreground">
+                  Search users, open a profile, and manage subscription or password settings
+                </p>
+              </div>
+              <Suspense fallback={<p className="text-muted-foreground">Loading users...</p>}>
+                <AdminUsersPanel />
+              </Suspense>
             </TabsContent>
 
             {/* Feature Flags Tab */}
@@ -992,269 +872,6 @@ export default function UnifiedAdminDashboard() {
               </Card>
             </TabsContent>
 
-            {/* Subscriptions Tab */}
-            <TabsContent value="subscriptions" className="space-y-6">
-              <div>
-                <h2 className="text-2xl font-bold">Manual Subscription Management</h2>
-                <p className="text-muted-foreground">Manually manage user subscriptions</p>
-              </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Subscription Actions</CardTitle>
-                  <CardDescription>
-                    Grant or revoke Pro subscriptions for specific users
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="email">User Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={subscriptionFormData.email}
-                      onChange={(e) => setSubscriptionFormData({ ...subscriptionFormData, email: e.target.value })}
-                      placeholder="user@example.com"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="action">Action</Label>
-                    <Select value={subscriptionFormData.action} onValueChange={(value) => setSubscriptionFormData({ ...subscriptionFormData, action: value })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select an action" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="activate_paid">Activate Paid Subscription</SelectItem>
-                        <SelectItem value="activate_trial">Activate Trial (30 days)</SelectItem>
-                        <SelectItem value="deactivate">Deactivate Subscription</SelectItem>
-                        <SelectItem value="set_pro_plan">Set Pro Plan Only</SelectItem>
-                        <SelectItem value="set_free_plan">Set Free Plan Only</SelectItem>
-                        <SelectItem value="extend_trial">Extend Trial</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button 
-                    onClick={handleSubscriptionAction} 
-                    disabled={loading || !subscriptionFormData.email || !subscriptionFormData.action}
-                  >
-                    {subscriptionFormData.action === 'activate_paid' && <UserCheck className="h-4 w-4 mr-2" />}
-                    {subscriptionFormData.action === 'activate_trial' && <UserCheck className="h-4 w-4 mr-2" />}
-                    {subscriptionFormData.action === 'deactivate' && <UserX className="h-4 w-4 mr-2" />}
-                    {subscriptionFormData.action === 'set_pro_plan' && <UserCheck className="h-4 w-4 mr-2" />}
-                    {subscriptionFormData.action === 'set_free_plan' && <UserX className="h-4 w-4 mr-2" />}
-                    {subscriptionFormData.action === 'extend_trial' && <Users className="h-4 w-4 mr-2" />}
-                    {subscriptionFormData.action === 'activate_paid' && 'Activate Paid'}
-                    {subscriptionFormData.action === 'activate_trial' && 'Activate Trial'}
-                    {subscriptionFormData.action === 'deactivate' && 'Deactivate'}
-                    {subscriptionFormData.action === 'set_pro_plan' && 'Set Pro Plan'}
-                    {subscriptionFormData.action === 'set_free_plan' && 'Set Free Plan'}
-                    {subscriptionFormData.action === 'extend_trial' && 'Extend Trial'}
-                    {!subscriptionFormData.action && 'Select Action'}
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {subscriptionMessage && (
-                <Alert>
-                  <AlertDescription>{subscriptionMessage}</AlertDescription>
-                </Alert>
-              )}
-
-              {userData && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>User Information</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <strong>Email:</strong> {userData.email}
-                      </div>
-                      <div>
-                        <strong>Plan:</strong> 
-                        <Badge variant={userData.plan === 'pro' ? "default" : "secondary"} className="ml-2">
-                          {userData.plan}
-                        </Badge>
-                      </div>
-                      <div>
-                        <strong>Is Paid:</strong> 
-                        <Badge variant={userData.isPaid ? "default" : "secondary"} className="ml-2">
-                          {userData.isPaid ? "Yes" : "No"}
-                        </Badge>
-                      </div>
-                      <div>
-                        <strong>Subscription Type:</strong> {userData.subscriptionType || "None"}
-                      </div>
-                      {userData.trialStart && (
-                        <div>
-                          <strong>Trial Start:</strong> {new Date(userData.trialStart).toLocaleDateString()}
-                        </div>
-                      )}
-                      {userData.trialEnd && (
-                        <div>
-                          <strong>Trial End:</strong> {new Date(userData.trialEnd).toLocaleDateString()}
-                        </div>
-                      )}
-                      {userData.lemonSqueezyCustomerId && (
-                        <div>
-                          <strong>Lemon Squeezy Customer:</strong> {userData.lemonSqueezyCustomerId}
-                        </div>
-                      )}
-                      {userData.lemonSqueezySubscriptionId && (
-                        <div>
-                          <strong>Lemon Squeezy Subscription:</strong> {userData.lemonSqueezySubscriptionId}
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </TabsContent>
-
-            {/* User Management Tab */}
-            <TabsContent value="user-management" className="space-y-6">
-              <div>
-                <h2 className="text-2xl font-bold">Gestión de Usuarios</h2>
-                <p className="text-muted-foreground">Buscar usuarios y gestionar sus contraseñas</p>
-              </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Search className="h-5 w-5" />
-                    Buscar Usuario
-                  </CardTitle>
-                  <CardDescription>
-                    Busca un usuario por correo electrónico para ver su información y gestionar su contraseña
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex gap-2">
-                    <Input
-                      type="email"
-                      value={userManagementEmail}
-                      onChange={(e) => setUserManagementEmail(e.target.value)}
-                      placeholder="usuario@ejemplo.com"
-                      onKeyDown={(e) => e.key === 'Enter' && lookupUser()}
-                    />
-                    <Button onClick={lookupUser} disabled={loading || !userManagementEmail}>
-                      <Search className="h-4 w-4 mr-2" />
-                      Buscar
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {userManagementData && (
-                <>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Información del Usuario</CardTitle>
-                      <CardDescription>{userManagementData.email}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                        <div>
-                          <strong>Nombre:</strong>
-                          <div className="text-muted-foreground">{userManagementData.name || 'N/A'}</div>
-                        </div>
-                        <div>
-                          <strong>Correo:</strong>
-                          <div className="text-muted-foreground">{userManagementData.email}</div>
-                        </div>
-                        <div>
-                          <strong>Plan:</strong>
-                          <Badge variant={userManagementData.plan === 'pro' ? "default" : "secondary"} className="ml-1">
-                            {userManagementData.plan || 'gratuito'}
-                          </Badge>
-                        </div>
-                        <div>
-                          <strong>Es Pago:</strong>
-                          <Badge variant={userManagementData.isPaid ? "default" : "secondary"} className="ml-1">
-                            {userManagementData.isPaid ? "Sí" : "No"}
-                          </Badge>
-                        </div>
-                        <div>
-                          <strong>Tipo de Suscripción:</strong>
-                          <div className="text-muted-foreground">{userManagementData.subscriptionType || 'Ninguno'}</div>
-                        </div>
-                        <div>
-                          <strong>Tiene Contraseña:</strong>
-                          <Badge variant={userManagementData.password ? "default" : "secondary"} className="ml-1">
-                            {userManagementData.password ? "Sí" : "No"}
-                          </Badge>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <KeyRound className="h-5 w-5" />
-                        Restablecer Contraseña
-                      </CardTitle>
-                      <CardDescription>
-                        Establecer o restablecer la contraseña de este usuario (no requiere su contraseña actual)
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {!showResetPassword ? (
-                        <Button
-                          variant="outline"
-                          onClick={() => setShowResetPassword(true)}
-                        >
-                          <Lock className="h-4 w-4 mr-2" />
-                          Restablecer Contraseña del Usuario
-                        </Button>
-                      ) : (
-                        <>
-                          <div className="space-y-2">
-                            <Label htmlFor="adminNewPassword">Nueva Contraseña</Label>
-                            <Input
-                              id="adminNewPassword"
-                              type="text"
-                              value={resetPasswordForm.newPassword}
-                              onChange={(e) => setResetPasswordForm({ newPassword: e.target.value })}
-                              placeholder="Ingresa la nueva contraseña para el usuario"
-                            />
-                          </div>
-
-                          <div className="text-xs text-muted-foreground space-y-1">
-                            <p>Requisitos de contraseña:</p>
-                            <ul className="list-disc list-inside">
-                              <li>Al menos 8 caracteres</li>
-                              <li>Al menos una letra mayúscula</li>
-                              <li>Al menos una letra minúscula</li>
-                              <li>Al menos un número</li>
-                            </ul>
-                          </div>
-
-                          <div className="flex gap-2">
-                            <Button
-                              onClick={handleAdminResetPassword}
-                              disabled={loading || !resetPasswordForm.newPassword}
-                            >
-                              <KeyRound className="h-4 w-4 mr-2" />
-                              {loading ? 'Restableciendo...' : 'Confirmar Restablecimiento'}
-                            </Button>
-                            <Button
-                              variant="outline"
-                              onClick={() => {
-                                setShowResetPassword(false);
-                                setResetPasswordForm({ newPassword: '' });
-                              }}
-                            >
-                              Cancelar
-                            </Button>
-                          </div>
-                        </>
-                      )}
-                    </CardContent>
-                  </Card>
-                </>
-              )}
-            </TabsContent>
 
             {/* Static Features Tab */}
             <TabsContent value="static-features" className="space-y-6">
