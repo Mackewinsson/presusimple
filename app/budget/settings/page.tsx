@@ -29,6 +29,7 @@ import SignOutButton from '@/components/SignOutButton';
 import { useViewport } from '@/hooks/useViewport';
 import { useTranslation, useLocale } from '@/lib/i18n';
 import { toast } from 'sonner';
+import { getBudgetBasePath } from '@/lib/budget-routes';
 // import BudgetTemplateSelector from '@/components/budget/BudgetTemplateSelector';
 // import SavingsGoalList from '@/components/savings/SavingsGoalList';
 
@@ -62,6 +63,7 @@ function LanguageSetting() {
 function DecimalSeparatorSetting() {
   const { data: decimalSeparator, isLoading } = useDecimalSeparator();
   const setDecimalSeparator = useSetDecimalSeparator();
+  const { t } = useTranslation();
 
   const value = decimalSeparator ?? 'dot';
 
@@ -77,12 +79,12 @@ function DecimalSeparatorSetting() {
 
   return (
     <Select value={value} onValueChange={handleChange}>
-      <SelectTrigger className="w-full max-w-[240px]" aria-label="Decimal separator">
+      <SelectTrigger className="w-full max-w-[240px]" aria-label={t('decimalSeparatorLabel')}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent position="popper" sideOffset={4}>
-        <SelectItem value="dot">Dot — 1,234.56</SelectItem>
-        <SelectItem value="comma">Comma — 1.234,56</SelectItem>
+        <SelectItem value="dot">{t('decimalSeparatorDot')}</SelectItem>
+        <SelectItem value="comma">{t('decimalSeparatorComma')}</SelectItem>
       </SelectContent>
     </Select>
   );
@@ -140,13 +142,19 @@ export default function SettingsPage() {
       const data = await res.json();
 
       if (res.ok) {
-        toast.success(data.message || t('passwordChangedSuccess'));
+        toast.success(t('passwordChangedSuccess'));
         setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
       } else {
-        const errorMsg = data.details
-          ? data.details.join(', ')
-          : data.error || t('failedToChangePassword');
-        toast.error(errorMsg);
+        const codeMessages: Record<string, string> = {
+          missing_fields: t('allPasswordFieldsRequired'),
+          passwords_mismatch: t('passwordsDoNotMatch'),
+          weak_password: data.details
+            ? `${t('passwordValidationFailed')}: ${data.details.join(', ')}`
+            : t('passwordValidationFailed'),
+          no_password_set: t('noPasswordSet'),
+          current_password_incorrect: t('currentPasswordIncorrect'),
+        };
+        toast.error(codeMessages[data.code] || t('failedToChangePassword'));
       }
     } catch (err) {
       console.error('Failed to change password:', err);
@@ -225,7 +233,7 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <Link 
-                href="/budget" 
+                href={getBudgetBasePath(pathname)} 
                 className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ArrowLeft className="h-5 w-5" />
@@ -293,7 +301,15 @@ export default function SettingsPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                           <div>
                             <span className="font-medium">{t('status')}:</span>
-                            <div className="text-muted-foreground capitalize">{subscriptionStatus}</div>
+                            <div className="text-muted-foreground">
+                              {subscriptionStatus === 'paid'
+                                ? t('statusPaid')
+                                : subscriptionStatus === 'trial'
+                                ? t('trial')
+                                : subscriptionStatus === 'expired'
+                                ? t('expired')
+                                : t('free')}
+                            </div>
                           </div>
                           <div>
                             <span className="font-medium">{t('plan')}:</span>

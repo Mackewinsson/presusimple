@@ -93,7 +93,7 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
     const newAmount = parseDecimalInput(editedAmount);
 
     if (newAmount <= 0) {
-      toast.error("Please enter a valid amount");
+      toast.error(t("enterValidAmount"));
       return;
     }
 

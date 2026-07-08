@@ -8,7 +8,7 @@ import { useViewport } from "@/hooks/useViewport";
 import { useTranslation } from "@/lib/i18n";
 import { Wallet, Plus, History, Settings, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getBudgetBasePath, isBudgetAddPath } from "@/lib/budget-routes";
+import { getBudgetBasePath, getHistoryBasePath, isBudgetAddPath } from "@/lib/budget-routes";
 import { useIsAdmin } from "@/lib/hooks";
 
 interface TabItem {
@@ -21,6 +21,7 @@ interface TabItem {
 
 function buildTabItems(pathname: string, includeAdmin: boolean): TabItem[] {
   const budgetBase = getBudgetBasePath(pathname);
+  const historyBase = getHistoryBasePath(pathname);
   const items: TabItem[] = [
     {
       href: `${budgetBase}/add`,
@@ -39,11 +40,11 @@ function buildTabItems(pathname: string, includeAdmin: boolean): TabItem[] {
         (p.startsWith(budgetBase + "/") && p !== budgetBase + "/settings" && p !== budgetBase + "/add"),
     },
     {
-      href: "/history",
+      href: historyBase,
       icon: History,
       label: "History",
       translationKey: "history",
-      isActive: (p) => p === "/history" || p.startsWith("/history/"),
+      isActive: (p) => p === historyBase || p.startsWith(historyBase + "/"),
     },
     {
       href: `${budgetBase}/settings`,

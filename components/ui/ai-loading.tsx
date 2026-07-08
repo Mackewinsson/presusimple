@@ -2,6 +2,7 @@
 
 import { Sparkles, Brain, Zap, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n";
 
 interface AILoadingProps {
   isProcessing: boolean;
@@ -10,12 +11,14 @@ interface AILoadingProps {
 }
 
 export const AILoading = ({ isProcessing, currentStep = "extracting", className }: AILoadingProps) => {
+  const { t } = useTranslation();
+
   if (!isProcessing) return null;
 
   const steps = [
-    { key: "extracting", label: "Analyzing your description...", icon: Brain },
-    { key: "creating", label: "Creating budget structure...", icon: Zap },
-    { key: "saving", label: "Saving to database...", icon: CheckCircle },
+    { key: "extracting", label: t("stepAnalyzingDescription"), icon: Brain },
+    { key: "creating", label: t("stepCreatingBudgetStructure"), icon: Zap },
+    { key: "saving", label: t("stepSavingToDatabase"), icon: CheckCircle },
   ];
 
   const currentStepIndex = steps.findIndex(step => step.key === currentStep);
@@ -43,10 +46,10 @@ export const AILoading = ({ isProcessing, currentStep = "extracting", className 
             </div>
           </div>
           <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-            AI Assistant Working
+            {t("aiAssistantWorking")}
           </h3>
           <p className="text-sm text-slate-700 dark:text-white/70 animate-pulse">
-            Creating your perfect budget...
+            {t("creatingYourPerfectBudget")}
           </p>
         </div>
 

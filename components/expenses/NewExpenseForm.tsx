@@ -71,18 +71,18 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
     e.preventDefault();
 
     if (!amount || !description || !categoryId) {
-      toast.error("Please fill in all required fields");
+      toast.error(t("fillAllFields"));
       return;
     }
 
     const numAmount = parseDecimalInput(amount);
     if (numAmount <= 0) {
-      toast.error("Please enter a valid amount");
+      toast.error(t("enterValidAmount"));
       return;
     }
 
     if (!userId) {
-      toast.error("You must be signed in to add transactions");
+      toast.error(t("mustBeSignedIn"));
       return;
     }
 

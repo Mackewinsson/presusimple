@@ -107,7 +107,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain sm:space-y-6">
       <div className="text-sm text-muted-foreground flex items-center gap-2">
         <CheckCircle className="h-4 w-4 text-accent animate-pulse" />
-        <span>AI found {transactions.length} transaction{transactions.length !== 1 ? 's' : ''}!</span>
+        <span>{t("aiFound")} {transactions.length} {t("transactionsExclamation")}</span>
       </div>
       
       {/* Budget Summary */}
@@ -140,7 +140,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
             <span className="font-medium">{t('newCategoriesFound')}</span>
           </div>
           <div className="text-sm text-muted-foreground mb-4">
-            The AI suggested categories that don't exist in your budget. Set budget allocations for each:
+            {t("aiSuggestedCategoriesHint")}
           </div>
           {missingCategories.map((missingCategory, index) => {
             const isSelected = newCategoriesToCreate.some(cat => cat.name === missingCategory.name);
@@ -159,7 +159,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                   <div className="min-w-0">
                     <span className="font-medium text-warning">{missingCategory.name}</span>
                     <div className="text-xs text-muted-foreground">
-                      {missingCategory.transactions.length} transaction{missingCategory.transactions.length !== 1 ? 's' : ''} • Total: ${missingCategory.totalAmount.toFixed(2)}
+                      {missingCategory.transactions.length} {t("transactionsWord")} • {t("totalLabel")}: ${missingCategory.totalAmount.toFixed(2)}
                     </div>
                   </div>
                   <Button
@@ -180,7 +180,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                   <div className="space-y-2">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                       <Label htmlFor={`budget-${index}`} className="text-sm text-muted-foreground shrink-0">
-                        Budget Allocation:
+                        {t("budgetAllocation")}
                       </Label>
                       <div className="relative w-full sm:w-auto">
                         <Icon size={16} className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -197,7 +197,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                       </div>
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      Recommended: ${missingCategory.totalAmount.toFixed(2)} (based on transaction total)
+                      {t("recommendedLabel")}: ${missingCategory.totalAmount.toFixed(2)} {t("basedOnTransactionTotal")}
                     </div>
                   </div>
                 )}
@@ -254,7 +254,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                   </Select>
                   {isMissingCategory && (
                     <Badge variant="outline" className="text-warning border-warning w-fit">
-                      New Category
+                      {t("newCategoryBadge")}
                     </Badge>
                   )}
                 </div>
@@ -318,7 +318,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
               : "bg-accent text-accent-foreground hover:bg-accent/90 font-semibold shadow-lg hover:shadow-xl"
           } transition-colors border-0`}
         >
-          {isSaving ? "Saving..." : `Save Transactions${newCategoriesToCreate.length > 0 ? ` & Create ${newCategoriesToCreate.length} Categor${newCategoriesToCreate.length === 1 ? 'y' : 'ies'}` : ''}`}
+          {isSaving ? t("savingEllipsis") : `${t("saveTransactionsButton")}${newCategoriesToCreate.length > 0 ? ` ${t("andCreateCategories")} (${newCategoriesToCreate.length})` : ''}`}
         </Button>
         <Button
           variant="outline"
@@ -458,7 +458,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
 
   const processImageFile = (file: File) => {
     if (file.size > 10 * 1024 * 1024) {
-      toast({ title: "Error", description: "Image is too large. Please upload an image under 10MB.", variant: "destructive" });
+      toast({ title: t("error"), description: t("imageTooLarge"), variant: "destructive" });
       return;
     }
 
@@ -532,8 +532,8 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
     // Input validation
     if (!description.trim() && !imageBase64) {
       toast({
-        title: "Error",
-        description: "Please enter a transaction description or upload an image",
+        title: t("error"),
+        description: t("enterDescriptionOrImage"),
         variant: "destructive",
       });
       return;
@@ -541,8 +541,8 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
 
     if (description.length > 500) {
       toast({
-        title: "Error",
-        description: "Description is too long. Please keep it under 500 characters.",
+        title: t("error"),
+        description: t("descriptionTooLong"),
         variant: "destructive",
       });
       return;
@@ -559,8 +559,8 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
     // Check if categories are loaded
     if (categories?.length === 0) {
       toast({
-        title: "Error",
-        description: "No categories available. Please set up your budget categories first.",
+        title: t("error"),
+        description: t("noCategoriesSetup"),
         variant: "destructive",
       });
       return;
@@ -570,8 +570,8 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
 
     if (!userId?.data) {
       toast({
-        title: "Error",
-        description: "You must be signed in to add transactions",
+        title: t("error"),
+        description: t("mustBeSignedIn"),
         variant: "destructive",
       });
       return;
@@ -579,8 +579,8 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
 
     if (!budgetId) {
       toast({
-        title: "Error",
-        description: "No budget selected. Please create a budget first.",
+        title: t("error"),
+        description: t("noBudgetSelected"),
         variant: "destructive",
       });
       return;
@@ -588,8 +588,8 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
 
     if (categories?.length === 0) {
       toast({
-        title: "Error",
-        description: "No categories found. Please set up budget categories first.",
+        title: t("error"),
+        description: t("noCategoriesSetup"),
         variant: "destructive",
       });
       return;
@@ -612,8 +612,8 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
 
       if (!result.transactions || result.transactions.length === 0) {
         toast({
-          title: "No transactions found",
-          description: "Try describing your transactions more clearly",
+          title: t("aiNoTransactionsFound"),
+          description: t("tryDescribingClearly"),
           variant: "destructive",
         });
         return;
@@ -635,8 +635,8 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
 
       if (validTransactions.length === 0) {
         toast({
-          title: "Invalid transactions",
-          description: "Could not parse any valid transactions from your description",
+          title: t("invalidTransactions"),
+          description: t("couldNotParseValid"),
           variant: "destructive",
         });
         return;
@@ -674,21 +674,21 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       
     } catch (error) {
       console.error("Failed to parse transactions:", error);
-      let errorMessage = "Failed to parse transactions";
+      let errorMessage = t("failedToParseTransactions");
       if (error instanceof Error) {
         if (error.message.includes("rate limit")) {
-          errorMessage = "Too many requests. Please wait a moment and try again.";
+          errorMessage = t("tooManyRequests");
         } else if (error.message.includes("network")) {
-          errorMessage = "Network error. Please check your connection and try again.";
+          errorMessage = t("networkError");
         } else if (error.message.includes("401")) {
-          errorMessage = "Authentication error. Please sign in again.";
+          errorMessage = t("authError");
         } else if (error.message.includes("500")) {
-          errorMessage = "Server error. Please try again later.";
+          errorMessage = t("serverError");
         } else {
           errorMessage = error.message;
         }
       }
-      toast({ title: "Error", description: errorMessage, variant: "destructive", });
+      toast({ title: t("error"), description: errorMessage, variant: "destructive", });
     } finally {
       setIsParsing(false);
     }
@@ -697,8 +697,8 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
   const handleConfirm = async (transactions: ParsedTransaction[], newCategoriesToCreate: CategoryBudget[]) => {
     if (transactions.length === 0) {
       toast({
-        title: "Error",
-        description: "No transactions to save",
+        title: t("error"),
+        description: t("noTransactionsToSave"),
         variant: "destructive",
       });
       return;
@@ -708,8 +708,8 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
     const totalBudgetNeeded = newCategoriesToCreate.reduce((sum, cat) => sum + cat.budgeted, 0);
     if (totalBudgetNeeded > availableBudget) {
       toast({
-        title: "Insufficient Budget",
-        description: `You need $${totalBudgetNeeded.toFixed(2)} but only have $${availableBudget.toFixed(2)} available. Please adjust your category allocations.`,
+        title: t("insufficientBudgetTitle"),
+        description: `${t("insufficientBudgetDesc")} ($${totalBudgetNeeded.toFixed(2)} > $${availableBudget.toFixed(2)})`,
         variant: "destructive",
       });
       return;
@@ -722,8 +722,8 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       
       if (newCategoriesToCreate.length > 0) {
         toast({
-          title: "Creating categories...",
-          description: `Creating ${newCategoriesToCreate.length} new categor${newCategoriesToCreate.length === 1 ? 'y' : 'ies'} with budget allocations...`,
+          title: t("creatingCategories"),
+          description: t("creatingCategoriesDesc"),
         });
 
         for (const categoryData of newCategoriesToCreate) {
@@ -733,8 +733,8 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
           } catch (error) {
             console.error(`Failed to create category ${categoryData.name}:`, error);
             toast({
-              title: "Error",
-              description: `Failed to create category "${categoryData.name}"`,
+              title: t("error"),
+              description: `${t("failedToCreateCategory")}: "${categoryData.name}"`,
               variant: "destructive",
             });
             return;
@@ -793,13 +793,13 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       
       if (successful > 0) {
         toast({
-          title: "Success",
-          description: `Saved ${successful} transaction(s)${failed > 0 ? `, ${failed} failed` : ''}${newCategoriesToCreate.length > 0 ? ` and created ${newCategoriesToCreate.length} categor${newCategoriesToCreate.length === 1 ? 'y' : 'ies'}` : ''}`,
+          title: t("success"),
+          description: `${successful} ${t("transactionsSaved")}${failed > 0 ? `, ${failed} ${t("transactionsFailed")}` : ''}${newCategoriesToCreate.length > 0 ? `, ${newCategoriesToCreate.length} ${t("categoriesCreated")}` : ''}`,
         });
       } else {
         toast({
-          title: "Error",
-          description: "Failed to save any transactions. Please try again.",
+          title: t("error"),
+          description: t("failedToSaveAny"),
           variant: "destructive",
         });
         return;
@@ -821,23 +821,23 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
     } catch (error) {
       console.error("Failed to save transactions:", error);
       
-      let errorMessage = "Failed to save transactions";
+      let errorMessage = t("failedToSaveTransactions");
       if (error instanceof Error) {
         if (error.message.includes("network")) {
-          errorMessage = "Network error. Please check your connection and try again.";
+          errorMessage = t("networkError");
         } else if (error.message.includes("401")) {
-          errorMessage = "Authentication error. Please sign in again.";
+          errorMessage = t("authError");
         } else if (error.message.includes("500")) {
-          errorMessage = "Server error. Please try again later.";
+          errorMessage = t("serverError");
         } else if (error.message.includes("category")) {
-          errorMessage = "Category not found. Please check your budget categories.";
+          errorMessage = t("categoryNotFoundCheck");
         } else {
           errorMessage = error.message;
         }
       }
       
       toast({
-        title: "Error",
+        title: t("error"),
         description: errorMessage,
         variant: "destructive",
       });
@@ -895,9 +895,9 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
                 </div>
                 <div className="text-sm text-muted-foreground">
                   <p className="font-medium text-foreground">
-                    {imageFile?.name || "Pasted image"}
+                    {imageFile?.name || t("pastedImage")}
                   </p>
-                  <p className="text-xs">Ready for AI analysis</p>
+                  <p className="text-xs">{t("readyForAI")}</p>
                 </div>
               </div>
             </div>
@@ -918,7 +918,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
                 isParsing || isLoadingCategories || categories?.length === 0
               }
               placeholder={
-                imageBase64 ? "Add optional description..." : t("aiExample")
+                imageBase64 ? t("addOptionalDescription") : t("aiExample")
               }
               autoFocus
               className="min-h-[44px] max-h-[150px] w-full flex-1 resize-none border-0 bg-transparent px-0 py-1.5 text-base shadow-none placeholder:text-sm placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:ring-offset-0"
@@ -943,7 +943,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
                 onClick={() => fileInputRef.current?.click()}
                 className="h-9 w-9 flex-shrink-0 rounded-full text-muted-foreground transition-colors hover:text-foreground"
                 disabled={isParsing}
-                title="Upload Receipt Image"
+                title={t("uploadReceiptImage")}
               >
                 <ImageIcon className="h-5 w-5" />
               </Button>
@@ -1017,7 +1017,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
               <Sparkles className="h-5 w-5 shrink-0 text-accent" /> {t('reviewTransactions')}
             </DialogTitle>
             <DialogDescription className="text-left text-sm">
-              Review the parsed transactions and set budget allocations for new categories.
+              {t("reviewParsedTransactions")}
             </DialogDescription>
           </DialogHeader>
 

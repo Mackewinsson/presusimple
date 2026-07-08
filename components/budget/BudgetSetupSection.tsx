@@ -134,7 +134,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   // Notification prompt for first budget creation
   const [showFirstBudgetNotificationPrompt, setShowFirstBudgetNotificationPrompt] = useState(false);
 
-  // Month names array
+  // Internal month values stay English; display labels are localized via t()
   const months = [
     "January",
     "February",
@@ -149,6 +149,26 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     "November",
     "December",
   ];
+
+  const monthTranslationKeys = [
+    "january",
+    "february",
+    "march",
+    "april",
+    "may",
+    "june",
+    "july",
+    "august",
+    "september",
+    "october",
+    "november",
+    "december",
+  ] as const;
+
+  const getMonthLabel = (monthName: string) => {
+    const index = months.indexOf(monthName);
+    return index >= 0 ? t(monthTranslationKeys[index]) : monthName;
+  };
 
   // Convert month name to number
   const getMonthNumber = (monthName: string) => {
@@ -289,14 +309,14 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     
     const amount = parseDecimalInput(totalBudget);
     if (amount < 0) {
-      toast.error("Please enter a valid amount");
+      toast.error(t("enterValidAmount"));
       return;
     }
 
     const currentlyBudgeted = budget.totalBudgeted || 0;
 
     if (amount < currentlyBudgeted) {
-      toast.error("New total cannot be less than currently budgeted amount");
+      toast.error(t("newTotalCannotBeLess"));
       return;
     }
 
@@ -315,7 +335,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       setTotalBudget("");
     } catch (error) {
       console.error("Failed to update budget:", error);
-      toast.error("Failed to update budget. Please try again.");
+      toast.error(t("failedToUpdateBudget"));
     }
   };
 
@@ -325,7 +345,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     e.preventDefault();
     const total = parseDecimalInput(newTotal);
     if (isNaN(total) || total <= 0) {
-      toast.error("Please enter a valid total budget");
+      toast.error(t("enterValidTotalBudget"));
       return;
     }
     if (!userId) {
@@ -335,7 +355,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
         userIdLoading,
         userIdError,
       });
-      toast.error("You must be signed in to create a budget");
+      toast.error(t("mustBeSignedInToCreateBudget"));
       return;
     }
 
@@ -376,7 +396,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       }
     } catch (error) {
       console.error("Failed to create budget:", error);
-      toast.error("Failed to create budget. Please try again.");
+      toast.error(t("failedToCreateBudget"));
     }
   };
 
@@ -385,36 +405,36 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
     
     // Edge case: Validate description length
     if (!aiDescription.trim()) {
-      toast.error("Please enter a budget description");
+      toast.error(t("enterBudgetDescription"));
       return;
     }
 
     if (aiDescription.trim().length < 10) {
-      toast.error("Please provide a more detailed description (at least 10 characters)");
+      toast.error(t("provideDetailedDescription"));
       return;
     }
 
     if (!userId) {
-      toast.error("You must be signed in to create a budget");
+      toast.error(t("mustBeSignedInToCreateBudget"));
       return;
     }
 
     // Edge case: Validate month and year
     const monthNumber = getMonthNumber(newMonth);
     if (monthNumber < 1 || monthNumber > 12) {
-      toast.error("Please select a valid month");
+      toast.error(t("selectValidMonth"));
       return;
     }
 
     if (newYear < 2020 || newYear > 2030) {
-      toast.error("Please select a valid year (2020-2030)");
+      toast.error(t("selectValidYear"));
       return;
     }
 
     try {
       await createBudgetFromAI(aiDescription, monthNumber, newYear);
       
-      toast.success("Budget created successfully with AI!");
+      toast.success(t("budgetCreatedWithAI"));
       setAiDescription("");
       
       // Force refetch budget data to show the new budget
@@ -439,7 +459,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       if (error instanceof Error) {
         toast.error(error.message);
       } else {
-        toast.error("Failed to create budget with AI. Please try again.");
+        toast.error(t("failedToCreateBudgetAI"));
       }
     }
   };
@@ -452,7 +472,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
 
     } catch (error) {
       console.error("Failed to delete budget:", error);
-      toast.error("Failed to delete budget. Please try again.");
+      toast.error(t("failedToDeleteBudget"));
     }
   };
 
@@ -514,24 +534,24 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
               <div className="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-ping" />
             </div>
             <span className="text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 bg-clip-text font-bold">
-              Create Your Budget
+              {t("createYourBudget")}
             </span>
             <Zap className="h-5 w-5 text-transparent bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text animate-bounce" />
           </CardTitle>
           <CardDescription className="text-base">
-            Choose how you'd like to create your budget - manually or with AI assistance.
+            {t("chooseHowToCreate")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="manual" className="w-full">
             <TabsList className={`grid w-full ${isAIFeatureFlagEnabled ? "grid-cols-2" : "grid-cols-1"}`}>
               <TabsTrigger value="manual" className="text-sm font-medium">
-                Manual Setup
+                {t("manualSetup")}
               </TabsTrigger>
               {isAIFeatureFlagEnabled && (
                 <TabsTrigger value="ai" className="flex items-center gap-2 text-sm font-medium bg-gradient-to-r from-purple-600/20 to-pink-600/20 hover:from-purple-600/30 hover:to-pink-600/30 border-purple-500/30 data-[state=active]:from-purple-600/40 data-[state=active]:to-pink-600/40 data-[state=active]:border-purple-500/50 transition-all duration-200">
                   <Sparkles className="h-4 w-4 flex-shrink-0 text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text" />
-                  AI Assistant
+                  {t("aiAssistant")}
                 </TabsTrigger>
               )}
             </TabsList>
@@ -540,7 +560,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
           <form onSubmit={handleCreateBudget} className="space-y-4">
             <Input
               type="number"
-              placeholder="Total Budget"
+              placeholder={t("totalBudgetPlaceholder")}
               value={newTotal}
               onChange={(e) => setNewTotal(e.target.value)}
               min={0}
@@ -550,19 +570,19 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
             <div className="flex gap-2">
               <Select value={newMonth} onValueChange={setNewMonth}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select month" />
+                  <SelectValue placeholder={t("selectMonthPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {months.map((month) => (
                     <SelectItem key={month} value={month}>
-                      {month}
+                      {getMonthLabel(month)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               <Input
                 type="number"
-                placeholder="Year"
+                placeholder={t("yearPlaceholder")}
                 value={newYear}
                 onChange={(e) => setNewYear(Number(e.target.value))}
                 min={2000}
@@ -593,7 +613,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                 <form onSubmit={handleCreateBudgetWithAI} className="space-y-4">
                 <div className="space-y-2">
                   <label htmlFor="aiDescription" className="text-sm font-medium text-foreground">
-                    Describe your budget
+                    {t("describeYourBudget")}
                   </label>
                                                      <Textarea
                                      id="aiDescription"
@@ -608,7 +628,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                                        {aiDescription.length}/1000 characters
                                      </span>
                                      <span>
-                                       {aiDescription.length < 10 ? 'Need more detail' : 'Good description'}
+                                       {aiDescription.length < 10 ? t("needMoreDetail") : t("goodDescription")}
                                      </span>
                                    </div>
                 </div>
@@ -625,19 +645,19 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                 <div className="flex gap-2">
                   <Select value={newMonth} onValueChange={setNewMonth}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select month" />
+                      <SelectValue placeholder={t("selectMonthPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
                       {months.map((month) => (
                         <SelectItem key={month} value={month}>
-                          {month}
+                          {getMonthLabel(month)}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                   <Input
                     type="number"
-                    placeholder="Year"
+                    placeholder={t("yearPlaceholder")}
                     value={newYear}
                     onChange={(e) => setNewYear(Number(e.target.value))}
                     min={2000}
@@ -659,7 +679,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                   ) : (
                     <>
                       <Sparkles className="h-5 w-5 mr-2 flex-shrink-0" />
-                      Create Budget with AI
+                      {t("createBudgetWithAIButton")}
                     </>
                   )}
                 </Button>
@@ -730,7 +750,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                     type="number"
                     value={totalBudget}
                     onChange={(e) => setTotalBudget(e.target.value)}
-                    placeholder="Total budget"
+                    placeholder={t("totalBudgetPlaceholder")}
                     className="w-full sm:w-40 pl-9"
                     min={budget?.totalBudgeted}
                     step="0.01"
@@ -743,7 +763,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                     className="flex-1 sm:flex-none"
                     loading={updateBudgetMutation.isPending}
                   >
-                    Set
+                    {t("setLabel")}
                   </LoadingButton>
                   <Button
                     size="sm"

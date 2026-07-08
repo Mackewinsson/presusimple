@@ -2,6 +2,7 @@
 
 import { Sparkles, Brain, Zap, CheckCircle, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n";
 
 interface AITransactionLoadingProps {
   isProcessing: boolean;
@@ -10,12 +11,14 @@ interface AITransactionLoadingProps {
 }
 
 export const AITransactionLoading = ({ isProcessing, currentStep = "analyzing", className }: AITransactionLoadingProps) => {
+  const { t } = useTranslation();
+
   if (!isProcessing) return null;
 
   const steps = [
-    { key: "analyzing", label: "Analyzing your description...", icon: Brain },
-    { key: "parsing", label: "Extracting transactions...", icon: MessageSquare },
-    { key: "matching", label: "Matching categories...", icon: Zap },
+    { key: "analyzing", label: t("stepAnalyzingDescription"), icon: Brain },
+    { key: "parsing", label: t("stepExtractingTransactions"), icon: MessageSquare },
+    { key: "matching", label: t("stepMatchingCategories"), icon: Zap },
   ];
 
   const currentStepIndex = steps.findIndex(step => step.key === currentStep);
@@ -43,10 +46,10 @@ export const AITransactionLoading = ({ isProcessing, currentStep = "analyzing", 
             </div>
           </div>
           <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-            AI Transaction Processing
+            {t("aiTransactionProcessing")}
           </h3>
           <p className="text-sm text-slate-700 dark:text-white/70 animate-pulse">
-            Converting your text into perfect budget entries...
+            {t("convertingTextToEntries")}
           </p>
         </div>
 

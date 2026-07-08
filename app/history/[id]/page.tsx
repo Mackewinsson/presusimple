@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -35,6 +35,7 @@ import { BudgetChartsPanel } from "@/components/budget/BudgetChartsPanel";
 import { SnapshotInsights } from "@/components/budget/SnapshotInsights";
 import { useTranslation } from "@/lib/i18n";
 import type { BudgetExpenseInput } from "@/lib/budget-chart-data";
+import { getHistoryBasePath } from "@/lib/budget-routes";
 
 import {
   AlertDialog,
@@ -81,6 +82,8 @@ function DetailSkeleton() {
 export default function BudgetDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const pathname = usePathname();
+  const historyBase = getHistoryBasePath(pathname);
   const budgetId = params.id as string;
   const { t } = useTranslation();
 
@@ -123,7 +126,7 @@ export default function BudgetDetailPage() {
   const handleDelete = async () => {
     try {
       await deleteBudgetMutation.mutateAsync(budgetId);
-      router.push("/history");
+      router.push(historyBase);
     } catch (error) {
       console.error("Error deleting budget:", error);
     }
@@ -138,7 +141,7 @@ export default function BudgetDetailPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link
-                href="/history"
+                href={historyBase}
                 className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ArrowLeft className="h-5 w-5" />
@@ -182,7 +185,7 @@ export default function BudgetDetailPage() {
         ) : !selectedBudget ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">{t("snapshotNotFound")}</p>
-            <Button onClick={() => router.push("/history")} className="mt-4">
+            <Button onClick={() => router.push(historyBase)} className="mt-4">
               {t("backToHistory")}
             </Button>
           </div>

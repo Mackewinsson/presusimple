@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -39,8 +39,13 @@ import {
 import { useMonthlyBudgets, useUserId, useExpenses, useCategories, useCurrentDecimalSeparator } from "@/lib/hooks";
 import { Skeleton } from "@/components/ui/skeleton";
 import MobileHeader from "@/components/MobileHeader";
+import { useTranslation } from "@/lib/i18n";
+import { getHistoryBasePath } from "@/lib/budget-routes";
 
 function InsightsContent() {
+  const { t } = useTranslation();
+  const pathname = usePathname();
+  const historyBase = getHistoryBasePath(pathname);
   const { data: userId } = useUserId();
   const decimalSeparator = useCurrentDecimalSeparator();
   const { data: budgets = [], isLoading: budgetsLoading, refetch: refetchBudgets } = useMonthlyBudgets(
@@ -204,13 +209,13 @@ function InsightsContent() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link
-                href="/history"
+                href={historyBase}
                 className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ArrowLeft className="h-5 w-5" />
-                Back to History
+                {t("backToHistory")}
               </Link>
-              <h1 className="text-xl sm:text-2xl font-bold">Budget Insights</h1>
+              <h1 className="text-xl sm:text-2xl font-bold">{t("budgetInsights")}</h1>
             </div>
 
             <Select
@@ -218,7 +223,7 @@ function InsightsContent() {
               onValueChange={setSelectedBudgetId}
             >
               <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Select a month" />
+                <SelectValue placeholder={t("selectAMonth")} />
               </SelectTrigger>
               <SelectContent>
                 {budgets.map((budget) => (
@@ -267,7 +272,7 @@ function InsightsContent() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="h-5 w-5 text-primary" />
-                    Budget Overview
+                    {t("budgetOverview")}
                   </CardTitle>
                   <CardDescription>
                     {format(parseISO(selectedBudget.createdAt), "MMMM yyyy")}
@@ -277,20 +282,20 @@ function InsightsContent() {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">
-                        Total Budgeted
+                        {t("totalBudgeted")}
                       </span>
                       <span className="font-medium">
                         {formatMoney(selectedBudget.totalBudgeted, undefined, decimalSeparator)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Total Spent</span>
+                      <span className="text-muted-foreground">{t("totalSpent")}</span>
                       <span className="font-medium">
                         {formatMoney(selectedBudget.totalSpent, undefined, decimalSeparator)}
                       </span>
                     </div>
                     <div className="flex justify-between pt-2 border-t">
-                      <span className="text-muted-foreground">Difference</span>
+                      <span className="text-muted-foreground">{t("difference")}</span>
                       <span
                         className={`font-medium ${
                           selectedBudget.totalBudgeted -
@@ -316,16 +321,16 @@ function InsightsContent() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <ArrowDownCircle className="h-5 w-5 text-accent" />
-                    Income
+                    {t("income")}
                   </CardTitle>
-                  <CardDescription>Total income for the month</CardDescription>
+                  <CardDescription>{t("totalIncomeForMonth")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-accent-foreground">
                     {formatMoney(incomeTotal, undefined, decimalSeparator)}
                   </div>
                   <div className="text-sm text-muted-foreground mt-2">
-                    Total income for {format(parseISO(selectedBudget.createdAt), "MMMM yyyy")}
+                    {t("totalIncomeForMonth")} — {format(parseISO(selectedBudget.createdAt), "MMMM yyyy")}
                   </div>
                 </CardContent>
               </Card>
@@ -334,10 +339,10 @@ function InsightsContent() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <ArrowUpCircle className="h-5 w-5 text-destructive" />
-                    Expenses
+                    {t("expenses")}
                   </CardTitle>
                   <CardDescription>
-                    Total expenses for the month
+                    {t("totalExpensesForMonth")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -345,7 +350,7 @@ function InsightsContent() {
                     {formatMoney(finalExpenseTotal, undefined, decimalSeparator)}
                   </div>
                   <div className="text-sm text-muted-foreground mt-2">
-                    Total expenses for {format(parseISO(selectedBudget.createdAt), "MMMM yyyy")}
+                    {t("totalExpensesForMonth")} — {format(parseISO(selectedBudget.createdAt), "MMMM yyyy")}
                   </div>
                 </CardContent>
               </Card>
@@ -356,10 +361,10 @@ function InsightsContent() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <PieChart className="h-5 w-5 text-primary" />
-                  Category Spending
+                  {t("categorySpending")}
                 </CardTitle>
                 <CardDescription>
-                  Comparison of budgeted vs actual spending by category
+                  {t("categorySpendingDescription")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -438,9 +443,9 @@ function InsightsContent() {
             {/* Top Categories */}
             <Card>
               <CardHeader>
-                <CardTitle>Top Spending Categories</CardTitle>
+                <CardTitle>{t("topSpendingCategories")}</CardTitle>
                 <CardDescription>
-                  Categories where you spent the most
+                  {t("topCategoriesDescription")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -475,12 +480,12 @@ function InsightsContent() {
                         />
                       </div>
                       <div className="flex justify-between text-sm text-muted-foreground">
-                        <span>Budgeted: {formatMoney(category.budgeted, undefined, decimalSeparator)}</span>
+                        <span>{t("budgeted")}: {formatMoney(category.budgeted, undefined, decimalSeparator)}</span>
                         <span>
                           {Math.round(
                             (category.spent / category.budgeted) * 100
                           )}
-                          % spent
+                          {t("percentSpent")}
                         </span>
                       </div>
                     </div>
@@ -492,7 +497,7 @@ function InsightsContent() {
         ) : (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              No budget history available. Save a month to see insights.
+              {t("noInsightsYet")}
             </p>
           </div>
         )}

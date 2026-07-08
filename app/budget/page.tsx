@@ -31,6 +31,7 @@ import { useTranslation } from "@/lib/i18n";
 import MobileHeader from "@/components/MobileHeader";
 import { StreakWidget } from "@/components/streak/StreakWidget";
 import { StreakEncouragementTrigger } from "@/components/streak/StreakEncouragementTrigger";
+import { getHistoryBasePath } from "@/lib/budget-routes";
 
 import { useState, useEffect } from "react";
 import { useSilentSync } from "@/hooks/useSilentSync";
@@ -174,7 +175,7 @@ function BudgetAppContent() {
                   className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground hover:text-foreground border-border bg-card/50 backdrop-blur-sm"
                 />
                 <Link
-                  href="/history"
+                  href={getHistoryBasePath(pathname || "/budget")}
                   className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <History className="h-4 w-4 sm:h-5 sm:w-5" />

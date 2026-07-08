@@ -34,7 +34,7 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
     e.preventDefault();
 
     if (name.trim() === "" || budgeted === "") {
-      toast.error("Please fill in all required fields");
+      toast.error(t("fillAllFields"));
       return;
     }
 
@@ -46,17 +46,13 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
     const budgetAmount = parseDecimalInput(budgeted);
 
     if (budgetAmount <= 0) {
-      toast.error("Please enter a valid amount");
-      return;
-    }
-    if (budgetAmount < 0) {
-      toast.error("Budgeted amount cannot be negative");
+      toast.error(t("enterValidAmount"));
       return;
     }
 
     if (budgetAmount > totalAvailable) {
       toast.error(
-        `Cannot budget more than available amount (${formatMoney(
+        `${t("cannotBudgetMoreThanAvailable")} (${formatMoney(
           totalAvailable,
           currentCurrency,
           decimalSeparator
@@ -69,7 +65,7 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
     setBudgeted("");
     onComplete(name.trim(), budgetAmount);
 
-    toast.success(t("category") + " " + t("submit").toLowerCase() + " successfully");
+    toast.success(t("categoryCreatedSuccess"));
   };
 
   return (
@@ -80,7 +76,7 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder={t("category") + " name (e.g., Rent, Groceries)"}
+            placeholder={t("categoryNamePlaceholder")}
             className="w-full h-9 sm:h-8 text-sm sm:text-base"
             autoFocus
           />
@@ -90,14 +86,14 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
               type="number"
               value={budgeted}
               onChange={(e) => setBudgeted(e.target.value)}
-              placeholder="Budget amount"
+              placeholder={t("budgetAmountPlaceholder")}
               min="0"
               max={totalAvailable}
               step="0.01"
               className="w-full h-9 sm:h-8 text-sm sm:text-base"
             />
             <div className="absolute right-0 top-0 h-9 sm:h-8 px-2 flex items-center text-xs sm:text-sm text-muted-foreground pointer-events-none">
-              Available: {formatMoney(totalAvailable, currentCurrency, decimalSeparator)}
+              {t("availableLabel")}: {formatMoney(totalAvailable, currentCurrency, decimalSeparator)}
             </div>
           </div>
         </div>

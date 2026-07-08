@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -37,10 +37,14 @@ import { HistoryItemSkeleton } from "@/components/ui/loading-skeleton";
 import MobileHeader from "@/components/MobileHeader";
 import { AdminNavLink } from "@/components/admin/AdminNavLink";
 import { useTranslation } from "@/lib/i18n";
+import { getBudgetBasePath, getHistoryBasePath } from "@/lib/budget-routes";
 
 export default function HistoryPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter();
+  const pathname = usePathname();
+  const budgetBase = getBudgetBasePath(pathname);
+  const historyBase = getHistoryBasePath(pathname);
   const { t } = useTranslation();
   const { data: userId } = useUserId();
   const { data: budgets = [], isLoading: budgetsLoading } = useMonthlyBudgets(
@@ -78,7 +82,7 @@ export default function HistoryPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link
-                href="/budget"
+                href={budgetBase}
                 className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ArrowLeft className="h-5 w-5" />
@@ -89,7 +93,7 @@ export default function HistoryPage() {
 
             <div className="flex items-center gap-3">
               <AdminNavLink />
-              <Link href="/history/insights">
+              <Link href={`${historyBase}/insights`}>
                 <Button variant="outline" className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
                   {t("viewInsights")}
@@ -113,7 +117,7 @@ export default function HistoryPage() {
                 className="pl-9"
               />
             </div>
-            <Link href="/history/insights" className="md:hidden">
+            <Link href={`${historyBase}/insights`} className="md:hidden">
               <Button variant="outline" className="w-full flex items-center gap-2">
                 <TrendingUp className="h-4 w-4" />
                 {t("viewInsights")}
@@ -133,7 +137,7 @@ export default function HistoryPage() {
                 <Card
                   key={budget._id}
                   className="glass-card hover-card cursor-pointer transition-all duration-200 md:hover:scale-[1.02]"
-                  onClick={() => router.push(`/history/${budget._id}`)}
+                  onClick={() => router.push(`${historyBase}/${budget._id}`)}
                 >
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start gap-2">
@@ -238,7 +242,7 @@ export default function HistoryPage() {
                       : t("noBudgetHistoryHint")}
                   </p>
                   {!searchTerm && (
-                    <Link href="/budget">
+                    <Link href={budgetBase}>
                       <Button>{t("goToBudget")}</Button>
                     </Link>
                   )}
