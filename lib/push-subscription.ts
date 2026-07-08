@@ -11,7 +11,7 @@ const VAPID_KEY_ENDPOINT = "/api/notifications/vapid-public-key";
 const SUBSCRIBE_ENDPOINT = "/api/notifications/subscribe";
 const STATUS_ENDPOINT = "/api/notifications/subscription-status";
 const SERVICE_WORKER_URL = "/sw.js";
-const SERVICE_WORKER_READY_TIMEOUT_MS = 15000;
+const SERVICE_WORKER_ACTIVATION_TIMEOUT_MS = 30000;
 
 export function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -36,9 +36,45 @@ export function isPushSupported(): boolean {
 }
 
 /**
- * Returns an active service worker registration, registering /sw.js manually
- * if next-pwa's auto-register script has not run yet (e.g. right after the
- * dev server was restarted with PWA newly enabled, or a stale cached page).
+ * Waits for the registration's pending worker (installing or waiting) to reach
+ * the "activated" state. On first visit after a deploy the install phase can
+ * take a while because workbox precaches every build asset before activating.
+ * Resolves null on timeout or if the worker becomes redundant (install failed).
+ */
+function waitForActiveWorker(
+  registration: ServiceWorkerRegistration,
+  timeoutMs: number
+): Promise<ServiceWorker | null> {
+  if (registration.active) return Promise.resolve(registration.active);
+
+  const pending = registration.installing ?? registration.waiting;
+  if (!pending) return Promise.resolve(null);
+
+  return new Promise((resolve) => {
+    const finish = (worker: ServiceWorker | null) => {
+      clearTimeout(timer);
+      pending.removeEventListener("statechange", onStateChange);
+      resolve(worker);
+    };
+
+    const timer = setTimeout(() => finish(null), timeoutMs);
+
+    const onStateChange = () => {
+      if (pending.state === "activated") finish(pending);
+      else if (pending.state === "redundant") finish(null);
+    };
+
+    pending.addEventListener("statechange", onStateChange);
+    // State may have changed between the sync check above and the listener
+    onStateChange();
+  });
+}
+
+/**
+ * Returns a registration with an ACTIVE service worker, registering /sw.js
+ * manually if next-pwa's auto-register script has not run yet, and waiting for
+ * a freshly installed worker to activate. Returns null if no worker becomes
+ * active (push subscription requires an active worker).
  */
 export async function ensureServiceWorkerRegistered(): Promise<ServiceWorkerRegistration | null> {
   if (!("serviceWorker" in navigator)) return null;
@@ -49,16 +85,16 @@ export async function ensureServiceWorkerRegistered(): Promise<ServiceWorkerRegi
       registration = await navigator.serviceWorker.register(SERVICE_WORKER_URL);
     }
 
-    // navigator.serviceWorker.ready never rejects; guard with a timeout so we
-    // don't hang forever if the worker fails to activate.
-    const ready = await Promise.race([
-      navigator.serviceWorker.ready,
-      new Promise<null>((resolve) =>
-        setTimeout(() => resolve(null), SERVICE_WORKER_READY_TIMEOUT_MS)
-      ),
-    ]);
+    const activeWorker = await waitForActiveWorker(
+      registration,
+      SERVICE_WORKER_ACTIVATION_TIMEOUT_MS
+    );
+    if (!activeWorker) {
+      console.warn("[push] Service worker did not activate in time");
+      return null;
+    }
 
-    return ready ?? registration;
+    return registration;
   } catch (error) {
     console.error("[push] Failed to register service worker:", error);
     return null;

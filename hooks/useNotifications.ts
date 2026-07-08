@@ -163,13 +163,11 @@ export function useNotifications(): NotificationHookReturn {
       console.log('🔍 Service worker waiting:', registration?.waiting?.state);
       console.log('🔍 Push manager available:', !!registration?.pushManager);
       
-      // Ensure we have an active service worker
+      // ensureServiceWorkerRegistered only resolves with an active worker,
+      // so we can subscribe immediately
       if (!registration.active) {
         throw new Error('No active service worker found');
       }
-      
-      // Wait a bit more for the service worker to be fully ready
-      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Get VAPID public key
       console.log('🔑 Getting VAPID public key...');
