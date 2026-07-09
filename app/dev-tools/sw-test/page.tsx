@@ -48,9 +48,9 @@ export default function ServiceWorkerTestPage() {
         detail: `Unregistered ${existingRegs.length} service worker(s)`,
       });
 
-      // Wait for cleanup
+      // Brief wait for cleanup (short to stress-test race conditions)
       setPhase('Waiting for cleanup...');
-      await new Promise((r) => setTimeout(r, 1500));
+      await new Promise((r) => setTimeout(r, 500));
 
       // Verify no SW is registered
       const postCleanup = await navigator.serviceWorker.getRegistration();
@@ -125,7 +125,7 @@ export default function ServiceWorkerTestPage() {
       // Unregister again to test our helper from scratch
       const regs2 = await navigator.serviceWorker.getRegistrations();
       for (const reg of regs2) await reg.unregister();
-      await new Promise((r) => setTimeout(r, 1500));
+      await new Promise((r) => setTimeout(r, 500));
 
       // Dynamically import to avoid SSR issues
       const { ensureServiceWorkerRegistered } = await import(
@@ -177,6 +177,31 @@ export default function ServiceWorkerTestPage() {
         detail: secondResult?.active
           ? `Active: ${secondResult.active.state}`
           : 'FAIL: Second call failed',
+      });
+
+      // ─── Phase 7: Rapid-fire stress test (the actual bug scenario) ───
+      // Unregister everything and IMMEDIATELY call ensureServiceWorkerRegistered
+      // 3 times in quick succession. This is the scenario that triggers the
+      // skipWaiting race condition.
+      setPhase('Stress test: rapid-fire after unregister...');
+      const regs3 = await navigator.serviceWorker.getRegistrations();
+      for (const reg of regs3) await reg.unregister();
+      // NO wait — call immediately to maximize race condition chance
+      const rapidResults = await Promise.all([
+        ensureServiceWorkerRegistered(),
+        ensureServiceWorkerRegistered(),
+        ensureServiceWorkerRegistered(),
+      ]);
+      const allRapidPassed = rapidResults.every((r) => !!r?.active);
+      steps.push({
+        name: 'Stress test: 3x rapid-fire after unregister',
+        passed: allRapidPassed,
+        detail: rapidResults
+          .map(
+            (r, i) =>
+              `Call ${i + 1}: ${r?.active ? 'active=' + r.active.state : 'FAILED (null)'}`
+          )
+          .join(' | '),
       });
     } catch (e: unknown) {
       steps.push({

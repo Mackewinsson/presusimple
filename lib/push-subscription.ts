@@ -36,68 +36,42 @@ export function isPushSupported(): boolean {
 }
 
 /**
- * Waits for the registration's pending worker (installing or waiting) to reach
- * the "activated" state. On first visit after a deploy the install phase can
- * take a while because workbox precaches every build asset before activating.
- * Resolves null on timeout or if the worker becomes redundant (install failed).
- */
-function waitForActiveWorker(
-  registration: ServiceWorkerRegistration,
-  timeoutMs: number
-): Promise<ServiceWorker | null> {
-  if (registration.active) return Promise.resolve(registration.active);
-
-  const pending = registration.installing ?? registration.waiting;
-  if (!pending) return Promise.resolve(null);
-
-  return new Promise((resolve) => {
-    const finish = (worker: ServiceWorker | null) => {
-      clearTimeout(timer);
-      pending.removeEventListener("statechange", onStateChange);
-      resolve(worker);
-    };
-
-    const timer = setTimeout(() => finish(null), timeoutMs);
-
-    const onStateChange = () => {
-      if (pending.state === "activated") finish(pending);
-      else if (pending.state === "redundant") finish(null);
-    };
-
-    pending.addEventListener("statechange", onStateChange);
-    // State may have changed between the sync check above and the listener
-    onStateChange();
-  });
-}
-
-/**
  * Returns a registration with an ACTIVE service worker, registering /sw.js
  * manually if next-pwa's auto-register script has not run yet, and waiting for
- * a freshly installed worker to activate. Returns null if no worker becomes
- * active (push subscription requires an active worker).
+ * the worker to activate. Returns null only on timeout or fatal error.
+ *
+ * Previous implementation used a custom `waitForActiveWorker` that checked
+ * `registration.installing ?? registration.waiting`. With `skipWaiting()` the
+ * worker can race through installing→activated so fast that `.installing`,
+ * `.waiting`, AND `.active` are all null at the same instant, causing a
+ * spurious null return.
+ *
+ * `navigator.serviceWorker.ready` is the browser's canonical, gap-free signal
+ * that a registration has an active worker. We race it against a timeout.
  */
 export async function ensureServiceWorkerRegistered(): Promise<ServiceWorkerRegistration | null> {
   if (!("serviceWorker" in navigator)) return null;
 
   try {
-    let registration = await navigator.serviceWorker.getRegistration();
-    if (!registration) {
-      registration = await navigator.serviceWorker.register(SERVICE_WORKER_URL);
+    // Ensure there is at least one registration (kick off install if needed).
+    const existing = await navigator.serviceWorker.getRegistration();
+    if (!existing) {
+      await navigator.serviceWorker.register(SERVICE_WORKER_URL);
     }
 
-    const activeWorker = await waitForActiveWorker(
-      registration,
-      SERVICE_WORKER_ACTIVATION_TIMEOUT_MS
-    );
-    if (!activeWorker) {
-      console.warn("[push] Service worker did not activate in time");
-      return null;
-    }
+    // navigator.serviceWorker.ready never rejects — it resolves once *any*
+    // registration has an active worker. Race it against a timeout so we don't
+    // hang forever if the worker fails to install.
+    const readyRegistration = await Promise.race([
+      navigator.serviceWorker.ready,
+      new Promise<null>((resolve) =>
+        setTimeout(() => {
+          console.warn("[push] Service worker did not activate in time");
+          resolve(null);
+        }, SERVICE_WORKER_ACTIVATION_TIMEOUT_MS)
+      ),
+    ]);
 
-    // navigator.serviceWorker.ready resolves once a registration has an active
-    // worker. This guarantees that registration.active is populated, which
-    // callers (e.g. pushManager.subscribe) depend on.
-    const readyRegistration = await navigator.serviceWorker.ready;
     return readyRegistration;
   } catch (error) {
     console.error("[push] Failed to register service worker:", error);
