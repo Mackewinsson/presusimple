@@ -817,6 +817,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       queryClient.invalidateQueries({ queryKey: ['categories'] });
       queryClient.invalidateQueries({ queryKey: ['budgets'] });
+      queryClient.invalidateQueries({ queryKey: ['streak'] });
       
     } catch (error) {
       console.error("Failed to save transactions:", error);

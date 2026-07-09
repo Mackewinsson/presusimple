@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongoose";
 import Expense from "../../../models/Expense";
+import User from "../../../models/User";
 import mongoose from "mongoose";
+import { startOfDay, differenceInDays } from "date-fns";
 
 /**
  * @swagger
@@ -201,6 +203,45 @@ export async function POST(request: NextRequest) {
     });
 
     const savedExpense = await expense.save();
+
+    // Update user streak on transaction addition
+    try {
+      const userObj = await User.findById(userObjectId);
+      if (userObj) {
+        const today = startOfDay(new Date());
+        const lastActivity = userObj.lastActivityDate
+          ? startOfDay(new Date(userObj.lastActivityDate))
+          : null;
+
+        if (lastActivity) {
+          const daysSince = differenceInDays(today, lastActivity);
+          if (daysSince === 1) {
+            // Consecutive day! Increment streak.
+            const newStreak = (userObj.streakCount ?? 0) + 1;
+            await User.updateOne(
+              { _id: userObjectId },
+              { streakCount: newStreak, lastActivityDate: today }
+            );
+          } else if (daysSince > 1) {
+            // Broken streak, reset to 1
+            await User.updateOne(
+              { _id: userObjectId },
+              { streakCount: 1, lastActivityDate: today }
+            );
+          }
+          // If daysSince === 0 (already active today), keep the current streak.
+        } else {
+          // First activity ever
+          await User.updateOne(
+            { _id: userObjectId },
+            { streakCount: 1, lastActivityDate: today }
+          );
+        }
+      }
+    } catch (streakError) {
+      console.error("Failed to update user streak on transaction creation:", streakError);
+    }
+
     return NextResponse.json(savedExpense, { status: 201 });
   } catch (error) {
     console.error("Error creating expense:", error);
