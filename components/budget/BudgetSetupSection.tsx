@@ -39,7 +39,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAIBudgetCreation } from "@/lib/hooks/useAIBudgetCreation";
 import { LoadingButton } from "@/components/ui/loading-skeleton";
 import { useExpenses } from "@/lib/hooks/useExpenseQueries";
-import NotificationPrompt from "@/components/NotificationPrompt";
 import type { Budget } from "@/lib/api";
 import { budgetApi } from "@/lib/api";
 import { budgetKeys } from "@/lib/hooks/useBudgetQueries";
@@ -130,9 +129,6 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   // AI Budget Creation
   const [aiDescription, setAiDescription] = useState("");
   const { createBudgetFromAI, isProcessing: isAICreating, currentStep } = useAIBudgetCreation();
-  
-  // Notification prompt for first budget creation
-  const [showFirstBudgetNotificationPrompt, setShowFirstBudgetNotificationPrompt] = useState(false);
 
   // Internal month values stay English; display labels are localized via t()
   const months = [
@@ -382,18 +378,6 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       // Force refetch budget data to show the new budget
       queryClient.invalidateQueries({ queryKey: ["budgets"] });
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-      
-      // Show notification prompt for first budget creation
-      // Check if this is the user's first budget by checking if they had any budgets before
-      const existingBudgets = queryClient.getQueryData(["budgets"]);
-      const isFirstBudget = !existingBudgets || (Array.isArray(existingBudgets) && existingBudgets.length === 0);
-      
-      if (isFirstBudget) {
-        // Show notification prompt after a short delay
-        setTimeout(() => {
-          setShowFirstBudgetNotificationPrompt(true);
-        }, 1500);
-      }
     } catch (error) {
       console.error("Failed to create budget:", error);
       toast.error(t("failedToCreateBudget"));
@@ -440,18 +424,6 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
       // Force refetch budget data to show the new budget
       queryClient.invalidateQueries({ queryKey: ["budgets"] });
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-      
-      // Show notification prompt for first budget creation
-      // Check if this is the user's first budget by checking if they had any budgets before
-      const existingBudgets = queryClient.getQueryData(["budgets"]);
-      const isFirstBudget = !existingBudgets || (Array.isArray(existingBudgets) && existingBudgets.length === 0);
-      
-      if (isFirstBudget) {
-        // Show notification prompt after a short delay
-        setTimeout(() => {
-          setShowFirstBudgetNotificationPrompt(true);
-        }, 1500);
-      }
     } catch (error) {
       console.error("Failed to create budget with AI:", error);
       
@@ -888,14 +860,6 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
         </div>
       </CardContent>
     </Card>
-    
-    {/* Notification prompt for first budget creation */}
-    {showFirstBudgetNotificationPrompt && (
-      <NotificationPrompt 
-        onDismiss={() => setShowFirstBudgetNotificationPrompt(false)}
-        showForExistingUsers={false}
-      />
-    )}
     </>
   );
 };

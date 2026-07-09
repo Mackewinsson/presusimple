@@ -153,6 +153,7 @@ const translations = {
     goalAchievementsAndMilestones: "Goal achievements and milestones",
     enabling: "Enabling...",
     enableNotifications: "Enable Notifications",
+    notificationEnableFailed: "Could not enable notifications. Please try again.",
     later: "Later",
     dontAskAgain: "Don't ask again",
     // SubscriptionButton component
@@ -658,6 +659,7 @@ const translations = {
     goalAchievementsAndMilestones: "Logros de objetivos y metas",
     enabling: "Habilitando...",
     enableNotifications: "Habilitar Notificaciones",
+    notificationEnableFailed: "No se pudieron habilitar las notificaciones. Inténtalo de nuevo.",
     later: "Más tarde",
     dontAskAgain: "No preguntar de nuevo",
     // SubscriptionButton component
