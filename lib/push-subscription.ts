@@ -94,7 +94,11 @@ export async function ensureServiceWorkerRegistered(): Promise<ServiceWorkerRegi
       return null;
     }
 
-    return registration;
+    // navigator.serviceWorker.ready resolves once a registration has an active
+    // worker. This guarantees that registration.active is populated, which
+    // callers (e.g. pushManager.subscribe) depend on.
+    const readyRegistration = await navigator.serviceWorker.ready;
+    return readyRegistration;
   } catch (error) {
     console.error("[push] Failed to register service worker:", error);
     return null;

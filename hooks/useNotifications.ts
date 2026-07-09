@@ -122,9 +122,13 @@ export function useNotifications(): NotificationHookReturn {
     try {
       const registration = await ensureServiceWorkerRegistered();
 
-      if (!registration?.active) {
+      if (!registration) {
         throw new Error('Service worker not available. Please refresh the page.');
       }
+
+      // Ensure the worker is fully active before subscribing to push.
+      // navigator.serviceWorker.ready is the most reliable signal.
+      await navigator.serviceWorker.ready;
 
       const response = await fetch('/api/notifications/vapid-public-key');
       if (!response.ok) {
