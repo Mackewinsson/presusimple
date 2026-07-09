@@ -126,6 +126,8 @@ export function useNotifications(): NotificationHookReturn {
       return false;
     }
 
+    setState(prev => ({ ...prev, isLoading: true, error: null }));
+
     try {
       // Use cached registration if available (pre-warmed on mount).
       // Only fall back to a fresh call if cache is empty.
@@ -139,12 +141,10 @@ export function useNotifications(): NotificationHookReturn {
         setState(prev => ({
           ...prev,
           error: 'Service worker not available. Please refresh the page.',
+          isLoading: false,
         }));
         return false;
       }
-
-      // From here everything is fast — show loading only for the network calls.
-      setState(prev => ({ ...prev, isLoading: true, error: null }));
 
       const response = await fetch('/api/notifications/vapid-public-key');
       if (!response.ok) {

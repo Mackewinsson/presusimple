@@ -154,6 +154,7 @@ const translations = {
     enabling: "Enabling...",
     enableNotifications: "Enable Notifications",
     notificationEnableFailed: "Could not enable notifications. Please try again.",
+    retry: "Retry",
     later: "Later",
     dontAskAgain: "Don't ask again",
     // SubscriptionButton component
@@ -660,6 +661,7 @@ const translations = {
     enabling: "Habilitando...",
     enableNotifications: "Habilitar Notificaciones",
     notificationEnableFailed: "No se pudieron habilitar las notificaciones. Inténtalo de nuevo.",
+    retry: "Reintentar",
     later: "Más tarde",
     dontAskAgain: "No preguntar de nuevo",
     // SubscriptionButton component

@@ -170,7 +170,7 @@ export default function NotificationPrompt({
               disabled={isLoading}
               className="flex-1"
             >
-              {isLoading ? t('enabling') : t('enableNotifications')}
+              {isLoading ? t('enabling') : error ? t('retry') : t('enableNotifications')}
             </Button>
             <Button
               variant="outline"
