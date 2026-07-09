@@ -331,6 +331,30 @@ const translations = {
     getQuickAccess: "Get quick access and offline functionality",
     installAppForBetterExperience: "Install this app on your device for a better experience",
     welcomeToPresusimpleExclaim: "Welcome to Presusimple!",
+    zbbTutorialTitle: "How Zero-Based Budgeting Works",
+    zbbTutorialStepOf: "{{current}} of {{total}}",
+    zbbTutorialPrevious: "Previous",
+    zbbTutorialNext: "Next",
+    zbbTutorialViewTutorial: "View tutorial",
+    zbbTutorialViewTutorialDescription:
+      "Learn how zero-based budgeting works and how to use it in Presusimple.",
+    zbbTutorialSlide1Title: "Every dollar has a job",
+    zbbTutorialSlide1Body:
+      "Zero-based budgeting means income minus allocated amounts equals zero. You decide where every unit of money goes before you spend it.",
+    zbbTutorialSlide2Title: "Set your monthly total",
+    zbbTutorialSlide2Body:
+      "When you create a budget in Presusimple, enter your total monthly income. That number is the pool you will assign across categories.",
+    zbbTutorialSlide3Title: "Allocate every section",
+    zbbTutorialSlide3Body:
+      "Create categories such as rent, food, and savings until the full total is assigned. Savings counts too — leave nothing unassigned.",
+    zbbTutorialSlide4Title: "Log your spending",
+    zbbTutorialSlide4Body:
+      "Add expenses manually or with AI. Each transaction deducts from its category so you always see what is left.",
+    zbbTutorialSlide5Title: "Review and repeat monthly",
+    zbbTutorialSlide5Body:
+      "Check History for past months, adjust categories as needed, and start each new month from zero with a fresh plan.",
+    zbbTutorialReadFullGuide: "Read the full guide on zero-based budgeting",
+    zbbTutorialReadFullGuideHint: "Step-by-step walkthrough with examples",
     startDate: "Start Date",
     endDate: "End Date",
     deleteTransaction: "Delete Transaction",
@@ -812,6 +836,30 @@ const translations = {
     getQuickAccess: "Acceso rápido y funcionalidad offline",
     installAppForBetterExperience: "Instala esta app para una mejor experiencia",
     welcomeToPresusimpleExclaim: "¡Bienvenido a Presusimple!",
+    zbbTutorialTitle: "Cómo funciona el presupuesto base cero",
+    zbbTutorialStepOf: "{{current}} de {{total}}",
+    zbbTutorialPrevious: "Anterior",
+    zbbTutorialNext: "Siguiente",
+    zbbTutorialViewTutorial: "Ver tutorial",
+    zbbTutorialViewTutorialDescription:
+      "Aprende cómo funciona el presupuesto base cero y cómo usarlo en Presusimple.",
+    zbbTutorialSlide1Title: "Cada peso tiene un destino",
+    zbbTutorialSlide1Body:
+      "El presupuesto base cero significa que ingresos menos lo asignado es igual a cero. Decides a dónde va cada unidad de dinero antes de gastarla.",
+    zbbTutorialSlide2Title: "Define tu total mensual",
+    zbbTutorialSlide2Body:
+      "Al crear tu presupuesto en Presusimple, ingresa tu ingreso mensual total. Ese número es el monto que repartirás entre categorías.",
+    zbbTutorialSlide3Title: "Reparte todo en secciones",
+    zbbTutorialSlide3Body:
+      "Crea categorías como renta, comida y ahorro hasta asignar el total completo. El ahorro también cuenta: no dejes nada sin asignar.",
+    zbbTutorialSlide4Title: "Registra tus gastos",
+    zbbTutorialSlide4Body:
+      "Añade gastos manualmente o con IA. Cada transacción descuenta de su categoría para que siempre veas lo que queda.",
+    zbbTutorialSlide5Title: "Revisa y repite cada mes",
+    zbbTutorialSlide5Body:
+      "Consulta el Historial de meses anteriores, ajusta categorías y empieza cada mes nuevo desde cero con un plan fresco.",
+    zbbTutorialReadFullGuide: "Lee la guía completa sobre presupuesto base cero",
+    zbbTutorialReadFullGuideHint: "Guía paso a paso con ejemplos",
     startDate: "Fecha de Inicio",
     endDate: "Fecha Fin",
     deleteTransaction: "Eliminar Transacción",

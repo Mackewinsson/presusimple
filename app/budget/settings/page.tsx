@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Crown, Clock, CreditCard, Calendar, LogOut, Lock, Eye, EyeOff, Shield } from 'lucide-react';
+import { Crown, Clock, CreditCard, Calendar, LogOut, Lock, Eye, EyeOff, Shield, BookOpen } from 'lucide-react';
 import MobileHeader from '@/components/MobileHeader';
 import { AdminNavLink } from '@/components/admin/AdminNavLink';
 import SignOutButton from '@/components/SignOutButton';
@@ -30,6 +30,8 @@ import { useViewport } from '@/hooks/useViewport';
 import { useTranslation, useLocale } from '@/lib/i18n';
 import { toast } from 'sonner';
 import { getBudgetBasePath } from '@/lib/budget-routes';
+import { useZbbTutorial } from '@/hooks/useZbbTutorial';
+import { ZeroBasedBudgetTutorial } from '@/components/onboarding/ZeroBasedBudgetTutorial';
 // import BudgetTemplateSelector from '@/components/budget/BudgetTemplateSelector';
 // import SavingsGoalList from '@/components/savings/SavingsGoalList';
 
@@ -100,6 +102,8 @@ export default function SettingsPage() {
   const { checkout, loading: checkoutLoading, canCheckout } = useCheckout();
   const isAdmin = useIsAdmin();
   const [portalLoading, setPortalLoading] = useState(false);
+  const { isOpen: isTutorialOpen, openTutorial, onOpenChange: onTutorialOpenChange } =
+    useZbbTutorial();
 
   // Change password state
   const [passwordForm, setPasswordForm] = useState({
@@ -533,6 +537,29 @@ export default function SettingsPage() {
                     </p>
                     <DecimalSeparatorSetting />
                   </div>
+
+                  <div className="space-y-4 pt-2 border-t border-border">
+                    <Label className="text-base font-medium">
+                      {t("zbbTutorialViewTutorial")}
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {t("zbbTutorialViewTutorialDescription")}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={openTutorial}
+                      className="w-full sm:w-auto"
+                    >
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      {t("zbbTutorialViewTutorial")}
+                    </Button>
+                  </div>
+
+                  <ZeroBasedBudgetTutorial
+                    open={isTutorialOpen}
+                    onOpenChange={onTutorialOpenChange}
+                  />
 
                   {/* Mobile Sign Out - Alternative Access */}
                   {isMobile && (

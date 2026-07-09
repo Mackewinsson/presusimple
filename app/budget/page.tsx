@@ -31,6 +31,7 @@ import { useTranslation } from "@/lib/i18n";
 import MobileHeader from "@/components/MobileHeader";
 import { StreakWidget } from "@/components/streak/StreakWidget";
 import { StreakEncouragementTrigger } from "@/components/streak/StreakEncouragementTrigger";
+import { ZbbTutorialTrigger } from "@/components/onboarding/ZbbTutorialTrigger";
 import { getHistoryBasePath } from "@/lib/budget-routes";
 
 import { useState, useEffect } from "react";
@@ -142,6 +143,7 @@ function BudgetAppContent() {
   return (
     <ErrorBoundary>
       <StreakEncouragementTrigger />
+      <ZbbTutorialTrigger />
       <div className="min-h-screen gradient-bg-dark flex flex-col">
         {/* Mobile Header */}
         <MobileHeader />
