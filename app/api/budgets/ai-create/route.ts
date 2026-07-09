@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
-import { functionSchema } from "@/lib/openai-functions";
-import { systemPrompt } from "@/lib/openai-prompts";
+import { extractBudgetFromDescription } from "@/lib/ai/budget-extract";
+import { isGeminiConfigured } from "@/lib/ai/config";
+import { AIServiceError } from "@/lib/ai/errors";
+import { aiServiceErrorResponse } from "@/lib/ai/route-errors";
 import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
 import { hasAccess } from "@/lib/userAccess";
@@ -26,16 +27,12 @@ function checkRateLimit(userId: string): boolean {
   return true;
 }
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 /**
  * @swagger
  * /api/budgets/ai-create:
  *   post:
  *     summary: Create budget using AI
- *     description: Generate a personalized budget using OpenAI based on user's financial situation and goals
+ *     description: Generate a personalized budget using Google Gemini based on user's financial situation and goals
  *     tags: [Budgets, AI]
  *     requestBody:
  *       required: true
@@ -134,8 +131,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Edge case: Check for OpenAI API key
-    if (!process.env.OPENAI_API_KEY) {
+    if (!isGeminiConfigured()) {
       return NextResponse.json(
         { error: "AI service is not configured. Please contact support." },
         { status: 500 }
@@ -159,61 +155,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Call OpenAI with function calling
-    let completion;
+    let budgetData;
     try {
-      completion = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: description }
-        ],
-        functions: [functionSchema],
-        function_call: { name: "extract_budget_data" },
-      });
-    } catch (openaiError) {
-      console.error("OpenAI API error:", openaiError);
-      if (openaiError instanceof Error) {
-        if (openaiError.message.includes('401')) {
+      budgetData = await extractBudgetFromDescription(description);
+    } catch (error) {
+      console.error("Gemini API error:", error);
+      if (error instanceof AIServiceError) {
+        if (error.code === "parse") {
           return NextResponse.json(
-            { error: "AI service authentication failed. Please contact support." },
+            {
+              error:
+                "Unable to understand your budget description. Please try being more specific about your income and expenses.",
+            },
             { status: 500 }
           );
         }
-        if (openaiError.message.includes('429')) {
-          return NextResponse.json(
-            { error: "AI service is busy. Please try again in a moment." },
-            { status: 429 }
-          );
-        }
-        if (openaiError.message.includes('timeout')) {
-          return NextResponse.json(
-            { error: "AI service is taking too long to respond. Please try again." },
-            { status: 408 }
-          );
-        }
+        return aiServiceErrorResponse(error);
       }
       return NextResponse.json(
-        { error: "AI service is temporarily unavailable. Please try again later." },
-        { status: 500 }
-      );
-    }
-
-    const functionCall = completion.choices[0]?.message?.function_call;
-    
-    if (!functionCall) {
-      return NextResponse.json(
-        { error: "Unable to understand your budget description. Please try being more specific about your income and expenses." },
-        { status: 500 }
-      );
-    }
-
-    let budgetData;
-    try {
-      budgetData = JSON.parse(functionCall.arguments);
-    } catch (parseError) {
-      return NextResponse.json(
-        { error: "Failed to parse AI response. Please try again." },
+        {
+          error: "AI service is temporarily unavailable. Please try again later.",
+        },
         { status: 500 }
       );
     }

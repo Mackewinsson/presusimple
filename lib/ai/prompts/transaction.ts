@@ -45,4 +45,4 @@ SUGGESTION RULES:
 - For transportation expenses, suggest categories that might be more appropriate
 - For food/dining expenses, suggest categories that might be more appropriate
 
-CRITICAL: You can ONLY use the categories provided in the available categories list. Do not assume any specific categories exist - only use what's provided.`; 
+CRITICAL: You can ONLY use the categories provided in the available categories list. Do not assume any specific categories exist - only use what's provided.`;

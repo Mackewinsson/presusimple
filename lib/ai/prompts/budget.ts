@@ -1,4 +1,4 @@
-export const systemPrompt = `You are a financial assistant that extracts structured budgeting data from natural language.
+export const budgetSystemPrompt = `You are a financial assistant that extracts structured budgeting data from natural language.
 
 Example input:
 "I make $4000. I spend 1500 on rent, 600 on food, and the rest I save."
@@ -21,4 +21,4 @@ CRITICAL RULES:
 - Capitalize category names properly.
 - Always ensure the total categories sum equals the income.
 
-Example: If income is 3000 and user mentions 1200 rent + 800 food + "save the rest", then add 1000 as "Savings" (3000 - 1200 - 800 = 1000).`; 
+Example: If income is 3000 and user mentions 1200 rent + 800 food + "save the rest", then add 1000 as "Savings" (3000 - 1200 - 800 = 1000).`;

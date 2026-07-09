@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
-import { transactionFunctionSchema } from "@/lib/openai-transaction-functions";
-import { transactionSystemPrompt } from "@/lib/openai-transaction-prompts";
+import { isGeminiConfigured } from "@/lib/ai/config";
+import { AIServiceError } from "@/lib/ai/errors";
+import { aiServiceErrorResponse } from "@/lib/ai/route-errors";
+import { extractTransactionsFromInput } from "@/lib/ai/transaction-extract";
 import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
 import { hasAccess } from "@/lib/userAccess";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 // Simple in-memory rate limiting
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -16,16 +13,17 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 function checkRateLimit(userId: string): boolean {
   const now = Date.now();
   const userLimit = rateLimitMap.get(userId);
-  
+
   if (!userLimit || now > userLimit.resetTime) {
     rateLimitMap.set(userId, { count: 1, resetTime: now + 60000 }); // 1 minute window
     return true;
   }
-  
-  if (userLimit.count >= 10) { // Max 10 requests per minute
+
+  if (userLimit.count >= 10) {
+    // Max 10 requests per minute
     return false;
   }
-  
+
   userLimit.count++;
   return true;
 }
@@ -35,7 +33,7 @@ function checkRateLimit(userId: string): boolean {
  * /api/transactions/ai-parse:
  *   post:
  *     summary: Parse transaction using AI
- *     description: Use OpenAI to intelligently parse and categorize transaction descriptions
+ *     description: Use Google Gemini to intelligently parse and categorize transaction descriptions
  *     tags: [AI, Transactions]
  *     requestBody:
  *       required: true
@@ -135,8 +133,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Edge case: Check for OpenAI API key
-    if (!process.env.OPENAI_API_KEY) {
+    if (!isGeminiConfigured()) {
       return NextResponse.json(
         { error: "AI service is not configured. Please contact support." },
         { status: 500 }
@@ -160,86 +157,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create enhanced system prompt with available categories
-    const availableCategories = categories && categories.length > 0 
-      ? `\n\nAVAILABLE CATEGORIES (you MUST use ONLY these): ${categories.join(', ')}`
-      : '';
-    
-    const enhancedPrompt = transactionSystemPrompt + availableCategories + 
-      '\n\nCRITICAL: You MUST use ONLY the available categories listed above. NEVER create new categories. If no exact match exists, choose the closest available category from the list provided.\n\nWhen categorizing transactions:\n- For food/dining: prefer categories like "Food", "Groceries", "Dining"\n- For transportation: prefer categories like "Transport", "Gas", "Transportation"\n- For housing: prefer categories like "Rent", "Housing", "Utilities"\n- For entertainment: prefer categories like "Entertainment", "Leisure", "Fun"\n- For income: prefer categories like "Income", "Salary", "Savings"\n\nIf the best category is not available, suggest the next best alternative from the available list.';
-
-    // Debug logging
-
-
-    // Call OpenAI with function calling
-    let completion;
+    let transactionData;
     try {
-      const messages: any[] = [
-        { role: "system", content: enhancedPrompt }
-      ];
-
-      if (imageBase64) {
-        messages.push({
-          role: "user",
-          content: [
-            { type: "text", text: description || "Extract the transactions from this receipt or bank statement screenshot." },
-            { type: "image_url", image_url: { url: imageBase64 } }
-          ]
-        });
-      } else {
-        messages.push({ role: "user", content: description });
-      }
-
-      completion = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages,
-        functions: [transactionFunctionSchema],
-        function_call: { name: "extract_transactions" },
+      transactionData = await extractTransactionsFromInput({
+        description,
+        imageBase64,
+        categories,
       });
-    } catch (openaiError) {
-      console.error("OpenAI API error:", openaiError);
-      if (openaiError instanceof Error) {
-        if (openaiError.message.includes('401')) {
+    } catch (error) {
+      console.error("Gemini API error:", error);
+      if (error instanceof AIServiceError) {
+        if (error.code === "parse") {
           return NextResponse.json(
-            { error: "AI service authentication failed. Please contact support." },
+            {
+              error:
+                "Unable to understand your transaction description. Please try being more specific.",
+            },
             { status: 500 }
           );
         }
-        if (openaiError.message.includes('429')) {
-          return NextResponse.json(
-            { error: "AI service is busy. Please try again in a moment." },
-            { status: 429 }
-          );
-        }
+        return aiServiceErrorResponse(error);
       }
       return NextResponse.json(
-        { error: "AI service is temporarily unavailable. Please try again later." },
-        { status: 500 }
-      );
-    }
-
-    const functionCall = completion.choices[0]?.message?.function_call;
-    
-    if (!functionCall) {
-      return NextResponse.json(
-        { error: "Unable to understand your transaction description. Please try being more specific." },
-        { status: 500 }
-      );
-    }
-
-    let transactionData;
-    try {
-      transactionData = JSON.parse(functionCall.arguments);
-      // Debug logging
-      
-      if (transactionData.transactions && transactionData.transactions.length > 0) {
-        transactionData.transactions.forEach((tx: any, index: number) => {
-          // Transaction processing
-        });
-      }
-    } catch (parseError) {
-      return NextResponse.json(
-        { error: "Failed to parse AI response. Please try again." },
+        {
+          error: "AI service is temporarily unavailable. Please try again later.",
+        },
         { status: 500 }
       );
     }

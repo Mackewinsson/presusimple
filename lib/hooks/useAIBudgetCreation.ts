@@ -224,7 +224,7 @@ export const useAIBudgetCreation = () => {
         if (error.message.includes('Failed to fetch')) {
           throw new Error('Network error. Please check your connection and try again.');
         }
-        if (error.message.includes('OpenAI')) {
+        if (error.message.includes('AI service')) {
           throw new Error('AI service temporarily unavailable. Please try again in a moment.');
         }
         if (error.message.includes('401') || error.message.includes('403')) {

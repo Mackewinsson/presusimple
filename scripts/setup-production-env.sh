@@ -38,8 +38,9 @@ GOOGLE_CLIENT_SECRET=your-production-google-client-secret
 # Database (Production)
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority
 
-# OpenAI
-OPENAI_API_KEY=sk-your-openai-api-key
+# Google AI (Gemini)
+GEMINI_API_KEY=your-gemini-api-key
+GEMINI_MODEL=gemini-2.0-flash
 
 # Lemon Squeezy Configuration (Production)
 LEMONSQUEEZY_API_KEY=your-lemon-squeezy-api-key
@@ -65,7 +66,7 @@ echo "   - NEXTAUTH_SECRET: Generate with: openssl rand -base64 32"
 echo "   - GOOGLE_CLIENT_ID: From Google Cloud Console"
 echo "   - GOOGLE_CLIENT_SECRET: From Google Cloud Console"
 echo "   - MONGODB_URI: Your production MongoDB connection string"
-echo "   - OPENAI_API_KEY: Your OpenAI API key"
+echo "   - GEMINI_API_KEY: Your Google AI Studio API key"
 echo "   - LEMONSQUEEZY_*: Your production Lemon Squeezy keys"
 echo ""
 echo "🎯 After filling in the values, run:"
