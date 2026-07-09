@@ -93,11 +93,9 @@ export default function MobileBottomTab() {
   // position bug where the tab bar drifts to the middle of the screen when scrolling.
   const navContent = (
     <nav
-      className="fixed inset-x-0 bottom-0 z-[100] bg-background/95 backdrop-blur-xl border-t border-border pb-[env(safe-area-inset-bottom)]"
+      className="fixed left-0 right-0 bottom-0 z-[100] bg-background/95 backdrop-blur-xl border-t border-border pb-[env(safe-area-inset-bottom)]"
       style={{
-        transform: "translateZ(0)",
-        WebkitBackfaceVisibility: "hidden",
-        backfaceVisibility: "hidden",
+        willChange: "transform",
       }}
     >
       <div className="flex items-center justify-around px-2 pt-0 pb-2">
