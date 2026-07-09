@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { ensureServiceWorkerRegistered } from '@/lib/push-subscription';
 
 export interface NotificationState {
@@ -82,6 +82,10 @@ export function useNotifications(): NotificationHookReturn {
     }
   }, []);
 
+  // Cache the SW registration so the user never waits for activation.
+  // Pre-warmed silently on mount; used instantly when subscribe is called.
+  const swRegistrationRef = useRef<ServiceWorkerRegistration | null>(null);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -95,6 +99,11 @@ export function useNotifications(): NotificationHookReturn {
 
     if (isSupported) {
       checkSubscription();
+      // Pre-warm service worker registration silently in background.
+      // By the time the user clicks "Enable", the SW will already be active.
+      ensureServiceWorkerRegistered().then((reg) => {
+        swRegistrationRef.current = reg;
+      });
     }
   }, [checkSubscription]);
 
@@ -117,18 +126,25 @@ export function useNotifications(): NotificationHookReturn {
       return false;
     }
 
-    setState(prev => ({ ...prev, isLoading: true, error: null }));
-
     try {
-      const registration = await ensureServiceWorkerRegistered();
-
+      // Use cached registration if available (pre-warmed on mount).
+      // Only fall back to a fresh call if cache is empty.
+      let registration = swRegistrationRef.current;
       if (!registration) {
-        throw new Error('Service worker not available. Please refresh the page.');
+        registration = await ensureServiceWorkerRegistered();
+        swRegistrationRef.current = registration;
       }
 
-      // Ensure the worker is fully active before subscribing to push.
-      // navigator.serviceWorker.ready is the most reliable signal.
-      await navigator.serviceWorker.ready;
+      if (!registration) {
+        setState(prev => ({
+          ...prev,
+          error: 'Service worker not available. Please refresh the page.',
+        }));
+        return false;
+      }
+
+      // From here everything is fast — show loading only for the network calls.
+      setState(prev => ({ ...prev, isLoading: true, error: null }));
 
       const response = await fetch('/api/notifications/vapid-public-key');
       if (!response.ok) {
@@ -208,7 +224,7 @@ export function useNotifications(): NotificationHookReturn {
       return false;
     }
 
-    setState(prev => ({ ...prev, isLoading: true, error: null }));
+    setState(prev => ({ ...prev, error: null }));
 
     try {
       if (Notification.permission !== 'granted') {
@@ -218,7 +234,6 @@ export function useNotifications(): NotificationHookReturn {
         if (permission !== 'granted') {
           setState(prev => ({
             ...prev,
-            isLoading: false,
             error: 'Permission not granted',
           }));
           return false;

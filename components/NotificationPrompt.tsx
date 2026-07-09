@@ -14,7 +14,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useBudgetStatus } from '@/hooks/useBudgetStatus';
 import { useSession } from 'next-auth/react';
 import { useTranslation } from '@/lib/i18n';
-import { ensureServiceWorkerRegistered } from '@/lib/push-subscription';
+
 
 interface NotificationPromptProps {
   onDismiss?: () => void;
@@ -79,10 +79,7 @@ export default function NotificationPrompt({
     showForExistingUsers,
   ]);
 
-  useEffect(() => {
-    if (!isVisible || !isSupported) return;
-    void ensureServiceWorkerRegistered();
-  }, [isVisible, isSupported]);
+
 
   const handleEnableNotifications = async () => {
     clearError();
