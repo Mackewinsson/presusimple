@@ -27,6 +27,9 @@ yarn-error.log*
 .env
 .env.production
 
+# secrets (service accounts, API keys)
+secrets/*.json
+
 # vercel
 .vercel
 
