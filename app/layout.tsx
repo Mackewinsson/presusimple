@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Providers from "@/components/Providers";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { PrivateModeProvider } from "@/components/PrivateModeProvider";
 import LocaleProvider from "@/components/LocaleProvider";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import NotificationPrompt from "@/components/NotificationPrompt";
@@ -222,6 +223,7 @@ export default function RootLayout({
         <GoogleAnalytics />
         <ViewportOptimizer />
         <ThemeProvider>
+          <PrivateModeProvider>
           <LocaleProvider initialLocale="es">
             <Providers>
               <main>{children}</main>
@@ -232,6 +234,7 @@ export default function RootLayout({
               <CookieConsentBanner />
             </Providers>
           </LocaleProvider>
+          </PrivateModeProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -8,8 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { formatMoney } from "@/lib/utils/formatMoney";
+import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
 import { useCurrentDecimalSeparator } from "@/lib/hooks";
+import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, Sparkles, Plus, History } from "lucide-react";
@@ -50,6 +51,7 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
   expenses,
 }) => {
   const { t } = useTranslation();
+  const { formatAmount, isPrivateMode } = useFormatMoney();
   const decimalSeparator = useCurrentDecimalSeparator();
   const { hasFeatureAccess, isLoading: isLoadingPlan } = useFeatureFlags();
   const canUseAIInput = hasFeatureAccess("transactionTextInput");
@@ -82,11 +84,13 @@ const DailySpendingTracker: React.FC<DailySpendingTrackerProps> = ({
               {t("availableToSpend")}
             </span>
             <span
-              className={`text-xl font-semibold tabular-nums sm:text-2xl ${
-                remaining < 0 ? "text-destructive" : "text-success"
-              }`}
+              className={cn(
+                "text-xl font-semibold tabular-nums sm:text-2xl",
+                remaining < 0 ? "text-destructive" : "text-success",
+                isPrivateMode && "sensitive-amount"
+              )}
             >
-              {formatMoney(remaining, undefined, decimalSeparator)}
+              {formatAmount(remaining, undefined, decimalSeparator)}
             </span>
           </div>
         </div>

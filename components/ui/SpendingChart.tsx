@@ -12,7 +12,7 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { useTheme } from "next-themes";
-import { formatMoney } from "@/lib/utils/formatMoney";
+import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
 import { useTranslation } from "@/lib/i18n";
 import { useCurrentDecimalSeparator } from "@/lib/hooks";
 import { theme, getChartColor } from "@/lib/theme";
@@ -51,6 +51,7 @@ export function SpendingChart({
 }: SpendingChartProps) {
   const { theme: currentTheme } = useTheme();
   const decimalSeparator = useCurrentDecimalSeparator();
+  const { formatAmount } = useFormatMoney();
   const { t } = useTranslation();
 
   const chartColor = (index: number) => getChartColor(index).hex;
@@ -189,7 +190,7 @@ export function SpendingChart({
                 // Show a combined tooltip instead of per-dataset
                 label: function(this: unknown, context: TooltipItem<"bar">) {
                   if (!showBudgeted) {
-                    return `${t('totalSpent')}: ${formatMoney(context.parsed.y, undefined, decimalSeparator)}`;
+                    return `${t('totalSpent')}: ${formatAmount(context.parsed.y, undefined, decimalSeparator)}`;
                   }
                   // Only show full info on the first dataset hit
                   if (context.datasetIndex === 0) {
@@ -198,8 +199,8 @@ export function SpendingChart({
                     const budgeted = chartData[idx]?.budgeted || 0;
                     const pct = budgeted > 0 ? Math.round((spent / budgeted) * 100) : 0;
                     return [
-                      `${t('budgeted')}: ${formatMoney(budgeted, undefined, decimalSeparator)}`,
-                      `${t('totalSpent')}: ${formatMoney(spent, undefined, decimalSeparator)}`,
+                      `${t('budgeted')}: ${formatAmount(budgeted, undefined, decimalSeparator)}`,
+                      `${t('totalSpent')}: ${formatAmount(spent, undefined, decimalSeparator)}`,
                       `${pct}${t('percentUsed')}`,
                     ];
                   }
@@ -248,7 +249,7 @@ export function SpendingChart({
                   weight: 'normal',
                 },
                 callback: function(value) {
-                  return formatMoney(value as number, undefined, decimalSeparator);
+                  return formatAmount(value as number, undefined, decimalSeparator);
                 },
               },
             },

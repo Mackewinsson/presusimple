@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatMoney } from "@/lib/utils/formatMoney";
+import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
+import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import Link from "next/link";
 import { ArrowLeft, Search, Trash2, TrendingUp } from "lucide-react";
@@ -52,6 +53,7 @@ export default function HistoryPage() {
   );
   const deleteBudgetMutation = useDeleteMonthlyBudget();
   const decimalSeparator = useCurrentDecimalSeparator();
+  const { formatAmount, isPrivateMode } = useFormatMoney();
 
   const sortedBudgets = [...budgets].sort(
     (a, b) => parseISO(b.createdAt).getTime() - parseISO(a.createdAt).getTime()
@@ -194,7 +196,9 @@ export default function HistoryPage() {
                           {t("totalBudgeted")}
                         </div>
                         <div className="font-medium text-sm sm:text-base">
-                          {formatMoney(budget.totalBudgeted, undefined, decimalSeparator)}
+                          <span className={cn(isPrivateMode && "sensitive-amount")}>
+                            {formatAmount(budget.totalBudgeted, undefined, decimalSeparator)}
+                          </span>
                         </div>
                       </div>
                       <div className="space-y-1">
@@ -202,7 +206,9 @@ export default function HistoryPage() {
                           {t("totalSpent")}
                         </div>
                         <div className="font-medium text-sm sm:text-base">
-                          {formatMoney(budget.totalSpent, undefined, decimalSeparator)}
+                          <span className={cn(isPrivateMode && "sensitive-amount")}>
+                            {formatAmount(budget.totalSpent, undefined, decimalSeparator)}
+                          </span>
                         </div>
                       </div>
                       <div className="space-y-1">

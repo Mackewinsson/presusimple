@@ -4,8 +4,10 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatMoney, parseDecimalInput } from "@/lib/utils/formatMoney";
+import { parseDecimalInput } from "@/lib/utils/formatMoney";
+import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
 import { useCurrentCurrency, useCurrentDecimalSeparator } from "@/lib/hooks";
+import { cn } from "@/lib/utils";
 import { Edit2, Trash2, Check, X, GripVertical } from "lucide-react";
 import { Icon } from "@/components/ui/icon";
 import { toast } from "sonner";
@@ -47,6 +49,7 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
   const { t } = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const decimalSeparator = useCurrentDecimalSeparator();
+  const { formatAmount, formatPercent, isPrivateMode } = useFormatMoney();
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(category.name);
   const [editBudgeted, setEditBudgeted] = useState(category.budgeted.toString());
@@ -86,7 +89,7 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
     const budgetDiff = budgetAmount - category.budgeted;
     if (budgetDiff > totalAvailable) {
       toast.error(
-        `${t('cannotIncreaseBudgetByMore')} (${formatMoney(
+        `${t('cannotIncreaseBudgetByMore')} (${formatAmount(
           totalAvailable,
           currentCurrency,
           decimalSeparator
@@ -234,8 +237,10 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
           </div>
           <div className="flex justify-between text-sm mb-1">
             <span className="text-muted-foreground">
-              {formatMoney(category.spent, currentCurrency, decimalSeparator)} of{" "}
-              {formatMoney(category.budgeted, currentCurrency, decimalSeparator)}
+            <span className={cn(isPrivateMode && "sensitive-amount")}>
+              {formatAmount(category.spent, currentCurrency, decimalSeparator)} of{" "}
+              {formatAmount(category.budgeted, currentCurrency, decimalSeparator)}
+            </span>
             </span>
             <span
               className={
@@ -247,12 +252,12 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
               }
             >
               {category.spent >= category.budgeted
-                ? `${((category.spent / category.budgeted - 1) * 100).toFixed(
-                    0
-                  )}% ${t('over')}`
-                : `${((category.spent / category.budgeted) * 100).toFixed(
-                    0
-                  )}%`}
+                ? isPrivateMode
+                  ? `${formatPercent(category.spent, category.budgeted)} ${t('over')}`
+                  : `${((category.spent / category.budgeted - 1) * 100).toFixed(0)}% ${t('over')}`
+                : isPrivateMode
+                  ? formatPercent(category.spent, category.budgeted)
+                  : `${((category.spent / category.budgeted) * 100).toFixed(0)}%`}
             </span>
           </div>
           <div className="budget-progress">

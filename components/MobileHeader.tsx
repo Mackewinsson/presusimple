@@ -7,6 +7,7 @@ import { useTranslation } from "@/lib/i18n";
 import { ArrowLeft, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { StreakWidget } from "@/components/streak/StreakWidget";
+import PrivateModeToggle from "@/components/PrivateModeToggle";
 import { getBudgetBasePath, getHistoryBasePath, isBudgetAddPath, isHistoryListPath, isHistorySubPath } from "@/lib/budget-routes";
 
 interface MobileHeaderProps {
@@ -109,6 +110,7 @@ export default function MobileHeader({
         
         <div className="flex items-center gap-2">
           {pathname === budgetBase && <StreakWidget />}
+          <PrivateModeToggle />
           {/* Home button for quick access to main budget page */}
           {pathname !== budgetBase && !pathname.startsWith(budgetBase + "/") && (
             <Link

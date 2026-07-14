@@ -8,6 +8,7 @@ import DailySpendingTracker from "@/components/expenses/DailySpendingTracker";
 import ResetButton from "@/components/ResetButton";
 import Summary from "@/components/Summary";
 import ThemeToggle from "@/components/ThemeToggle";
+import PrivateModeToggle from "@/components/PrivateModeToggle";
 import SubscriptionButton from "@/components/SubscriptionButton";
 import AccessRestricted from "@/components/AccessRestricted";
 import { TrialStatus } from "@/components/TrialStatus";
@@ -169,6 +170,7 @@ function BudgetAppContent() {
               <div className="flex items-center gap-2 sm:gap-4">
                 <StreakWidget />
                 <LanguageSwitcher />
+                <PrivateModeToggle />
                 <ThemeToggle />
                 <SignOutButton
                   variant="outline"

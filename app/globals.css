@@ -586,4 +586,10 @@ select {
   .heading-gradient {
     @apply bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent;
   }
+
+  .private-mode .sensitive-amount {
+    filter: blur(4px);
+    user-select: none;
+    transition: filter 200ms ease;
+  }
 }

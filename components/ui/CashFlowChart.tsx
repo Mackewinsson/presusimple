@@ -12,7 +12,7 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { useTheme } from "next-themes";
-import { formatMoney } from "@/lib/utils/formatMoney";
+import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
 import { useTranslation } from "@/lib/i18n";
 import { useCurrentDecimalSeparator } from "@/lib/hooks";
 import { theme } from "@/lib/theme";
@@ -47,6 +47,7 @@ export function CashFlowChart({
 }: CashFlowChartProps) {
   const { theme: currentTheme } = useTheme();
   const decimalSeparator = useCurrentDecimalSeparator();
+  const { formatAmount } = useFormatMoney();
   const { t } = useTranslation();
 
   const palette = currentTheme === 'dark' ? theme.dark : theme.light;
@@ -130,7 +131,7 @@ export function CashFlowChart({
               callbacks: {
                 label: function(context: TooltipItem<"bar">) {
                   const value = context.parsed.y;
-                  return ` ${context.dataset.label}: ${formatMoney(value, undefined, decimalSeparator)}`;
+                  return ` ${context.dataset.label}: ${formatAmount(value, undefined, decimalSeparator)}`;
                 },
               },
             },
@@ -169,7 +170,7 @@ export function CashFlowChart({
                   size: 10,
                 },
                 callback: function(value) {
-                  return formatMoney(value as number, undefined, decimalSeparator);
+                  return formatAmount(value as number, undefined, decimalSeparator);
                 },
               },
             },

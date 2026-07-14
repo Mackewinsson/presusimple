@@ -9,7 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { formatMoney } from "@/lib/utils/formatMoney";
+import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
+import { cn } from "@/lib/utils";
 import { getChartColor } from "@/lib/theme";
 import { parseISO } from "date-fns";
 import Link from "next/link";
@@ -89,6 +90,7 @@ export default function BudgetDetailPage() {
 
   const { data: userId } = useUserId();
   const decimalSeparator = useCurrentDecimalSeparator();
+  const { formatAmount, formatPercent, isPrivateMode } = useFormatMoney();
   const {
     data: selectedBudget,
     isLoading: budgetLoading,
@@ -236,13 +238,13 @@ export default function BudgetDetailPage() {
                     <div className="flex justify-between gap-2">
                       <span className="text-muted-foreground">{t("totalBudgeted")}</span>
                       <span className="font-medium">
-                        {formatMoney(selectedBudget.totalBudgeted, undefined, decimalSeparator)}
+                        {formatAmount(selectedBudget.totalBudgeted, undefined, decimalSeparator)}
                       </span>
                     </div>
                     <div className="flex justify-between gap-2">
                       <span className="text-muted-foreground">{t("totalSpent")}</span>
                       <span className="font-medium">
-                        {formatMoney(selectedBudget.totalSpent, undefined, decimalSeparator)}
+                        {formatAmount(selectedBudget.totalSpent, undefined, decimalSeparator)}
                       </span>
                     </div>
                     <div className="flex justify-between pt-2 border-t gap-2">
@@ -254,7 +256,7 @@ export default function BudgetDetailPage() {
                             : "text-destructive"
                         }`}
                       >
-                        {formatMoney(
+                        {formatAmount(
                           selectedBudget.totalBudgeted - selectedBudget.totalSpent,
                           undefined,
                           decimalSeparator
@@ -379,11 +381,11 @@ export default function BudgetDetailPage() {
                                 : "text-primary"
                             }`}
                           >
-                            {formatMoney(category.spent, undefined, decimalSeparator)}
+                            {formatAmount(category.spent, undefined, decimalSeparator)}
                           </div>
                           <div className="text-xs sm:text-sm text-muted-foreground">
                             {t("remainingOf")}{" "}
-                            {formatMoney(category.budgeted, undefined, decimalSeparator)}{" "}
+                            {formatAmount(category.budgeted, undefined, decimalSeparator)}{" "}
                             {t("budgeted")}
                           </div>
                         </div>
@@ -421,8 +423,8 @@ export default function BudgetDetailPage() {
                             }`}
                           >
                             {category.spent > category.budgeted
-                              ? `+${formatMoney(category.spent - category.budgeted, undefined, decimalSeparator)} ${t("over")}`
-                              : formatMoney(
+                              ? `+${formatAmount(category.spent - category.budgeted, undefined, decimalSeparator)} ${t("over")}`
+                              : formatAmount(
                                   category.budgeted - category.spent,
                                   undefined,
                                   decimalSeparator

@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { X } from "lucide-react";
 import { toast } from "sonner";
-import { formatMoney, parseDecimalInput } from "@/lib/utils/formatMoney";
+import { parseDecimalInput } from "@/lib/utils/formatMoney";
+import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
 import { useTranslation } from "@/lib/i18n";
 import { useCurrentCurrency, useCurrentDecimalSeparator } from "@/lib/hooks";
 import { hasDuplicateName } from "@/lib/utils/normalizeName";
@@ -27,6 +28,7 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
   const { t } = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const decimalSeparator = useCurrentDecimalSeparator();
+  const { formatAmount, isPrivateMode } = useFormatMoney();
   const [name, setName] = useState("");
   const [budgeted, setBudgeted] = useState("");
 
@@ -52,7 +54,7 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
 
     if (budgetAmount > totalAvailable) {
       toast.error(
-        `${t("cannotBudgetMoreThanAvailable")} (${formatMoney(
+        `${t("cannotBudgetMoreThanAvailable")} (${formatAmount(
           totalAvailable,
           currentCurrency,
           decimalSeparator
@@ -93,7 +95,7 @@ const NewCategoryForm: React.FC<NewCategoryFormProps> = ({
               className="w-full h-9 sm:h-8 text-sm sm:text-base"
             />
             <div className="absolute right-0 top-0 h-9 sm:h-8 px-2 flex items-center text-xs sm:text-sm text-muted-foreground pointer-events-none">
-              {t("availableLabel")}: {formatMoney(totalAvailable, currentCurrency, decimalSeparator)}
+              {t("availableLabel")}: {formatAmount(totalAvailable, currentCurrency, decimalSeparator)}
             </div>
           </div>
         </div>

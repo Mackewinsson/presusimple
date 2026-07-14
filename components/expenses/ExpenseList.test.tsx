@@ -3,8 +3,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ExpenseList from './ExpenseList';
 
 // Mock the dependencies
-jest.mock('@/lib/utils/formatMoney', () => ({
-  formatMoney: (amount: number) => `$${amount.toFixed(2)}`,
+jest.mock('@/lib/hooks/useFormatMoney', () => ({
+  useFormatMoney: () => ({
+    formatAmount: (amount: number) => `$${amount.toFixed(2)}`,
+    formatPercent: () => '0%',
+    isPrivateMode: false,
+  }),
 }));
 
 describe('ExpenseList', () => {
