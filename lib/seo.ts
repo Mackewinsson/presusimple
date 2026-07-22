@@ -80,6 +80,7 @@ export function getEnglishLandingMetadata(): Metadata {
       languages: {
         en: PRODUCTION_APP_URL,
         es: `${PRODUCTION_APP_URL}/es`,
+        "x-default": PRODUCTION_APP_URL,
       },
     },
     openGraph: buildOpenGraph(
@@ -102,6 +103,7 @@ export function getSpanishLandingMetadata(): Metadata {
       languages: {
         en: PRODUCTION_APP_URL,
         es: `${PRODUCTION_APP_URL}/es`,
+        "x-default": PRODUCTION_APP_URL,
       },
     },
     openGraph: buildOpenGraph(
@@ -132,6 +134,7 @@ export function getBlogIndexMetadata(locale: "en" | "es"): Metadata {
       languages: {
         en: `${PRODUCTION_APP_URL}/blog`,
         es: `${PRODUCTION_APP_URL}/es/blog`,
+        "x-default": `${PRODUCTION_APP_URL}/blog`,
       },
     },
     openGraph: buildOpenGraph(title, description, url, locale),
@@ -141,10 +144,29 @@ export function getBlogIndexMetadata(locale: "en" | "es"): Metadata {
 
 export function getBlogPostMetadata(
   locale: "en" | "es",
-  post: { title: string; description: string; slug: string; date: string; tags?: string[] }
+  post: {
+    title: string;
+    description: string;
+    slug: string;
+    date: string;
+    tags?: string[];
+    translationSlug?: string;
+  }
 ): Metadata {
   const basePath = locale === "es" ? "/es/blog" : "/blog";
   const url = `${PRODUCTION_APP_URL}${basePath}/${post.slug}`;
+
+  // Build cross-language alternates if a translation slug is provided
+  const enSlug = locale === "en" ? post.slug : post.translationSlug;
+  const esSlug = locale === "es" ? post.slug : post.translationSlug;
+  const languages: Record<string, string> = {};
+  if (enSlug) {
+    languages.en = `${PRODUCTION_APP_URL}/blog/${enSlug}`;
+    languages["x-default"] = `${PRODUCTION_APP_URL}/blog/${enSlug}`;
+  }
+  if (esSlug) {
+    languages.es = `${PRODUCTION_APP_URL}/es/blog/${esSlug}`;
+  }
 
   return {
     title: `${post.title} | Presusimple`,
@@ -152,6 +174,7 @@ export function getBlogPostMetadata(
     keywords: post.tags,
     alternates: {
       canonical: url,
+      ...(Object.keys(languages).length > 0 ? { languages } : {}),
     },
     openGraph: {
       ...buildOpenGraph(`${post.title} | Presusimple`, post.description, url, locale),
@@ -159,6 +182,52 @@ export function getBlogPostMetadata(
       publishedTime: post.date,
     },
     twitter: buildTwitter(`${post.title} | Presusimple`, post.description),
+  };
+}
+
+/** Metadata for the Privacy Policy page with cross-language alternates. */
+export function getPrivacyMetadata(locale: "en" | "es"): Metadata {
+  const isSpanish = locale === "es";
+  const title = isSpanish ? "Política de Privacidad | Presusimple" : "Privacy Policy | Presusimple";
+  const description = isSpanish
+    ? "Cómo Presusimple recopila, usa y protege tus datos personales."
+    : "How Presusimple collects, uses, and protects your personal data.";
+  const url = isSpanish ? `${PRODUCTION_APP_URL}/es/privacy` : `${PRODUCTION_APP_URL}/privacy`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: url,
+      languages: {
+        en: `${PRODUCTION_APP_URL}/privacy`,
+        es: `${PRODUCTION_APP_URL}/es/privacy`,
+        "x-default": `${PRODUCTION_APP_URL}/privacy`,
+      },
+    },
+  };
+}
+
+/** Metadata for the Terms of Service page with cross-language alternates. */
+export function getTermsMetadata(locale: "en" | "es"): Metadata {
+  const isSpanish = locale === "es";
+  const title = isSpanish ? "Términos de Servicio | Presusimple" : "Terms of Service | Presusimple";
+  const description = isSpanish
+    ? "Términos de Servicio para usar Presusimple."
+    : "Terms of Service for using Presusimple personal finance software.";
+  const url = isSpanish ? `${PRODUCTION_APP_URL}/es/terms` : `${PRODUCTION_APP_URL}/terms`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: url,
+      languages: {
+        en: `${PRODUCTION_APP_URL}/terms`,
+        es: `${PRODUCTION_APP_URL}/es/terms`,
+        "x-default": `${PRODUCTION_APP_URL}/terms`,
+      },
+    },
   };
 }
 
@@ -195,7 +264,14 @@ export function getLandingJsonLd(locale: "en" | "es") {
 
 export function getBlogPostJsonLd(
   locale: "en" | "es",
-  post: { title: string; description: string; slug: string; date: string; author: string }
+  post: {
+    title: string;
+    description: string;
+    slug: string;
+    date: string;
+    author: string;
+    dateModified?: string;
+  }
 ) {
   const basePath = locale === "es" ? "/es/blog" : "/blog";
   const url = `${PRODUCTION_APP_URL}${basePath}/${post.slug}`;
@@ -206,6 +282,7 @@ export function getBlogPostJsonLd(
     headline: post.title,
     description: post.description,
     datePublished: post.date,
+    ...(post.dateModified ? { dateModified: post.dateModified } : {}),
     author: {
       "@type": "Organization",
       name: post.author,

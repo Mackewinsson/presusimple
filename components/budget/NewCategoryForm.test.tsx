@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import NewCategoryForm from './NewCategoryForm';
+import { PrivateModeProvider } from '@/components/PrivateModeProvider';
 
 // Mock the dependencies
 jest.mock('@/lib/hooks', () => ({
@@ -27,55 +28,39 @@ describe('NewCategoryForm', () => {
     jest.clearAllMocks();
   });
 
-  it('renders form fields correctly', () => {
+  const renderForm = () =>
     render(
-      <NewCategoryForm
-        onComplete={mockOnComplete}
-        onCancel={mockOnCancel}
-        totalAvailable={totalAvailable}
-        existingCategoryNames={[]}
-      />
+      <PrivateModeProvider>
+        <NewCategoryForm
+          onComplete={mockOnComplete}
+          onCancel={mockOnCancel}
+          totalAvailable={totalAvailable}
+          existingCategoryNames={[]}
+        />
+      </PrivateModeProvider>
     );
+
+  it('renders form fields correctly', () => {
+    renderForm();
 
     expect(screen.getByPlaceholderText(/category name/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/budget amount/i)).toBeInTheDocument();
   });
 
   it('has submit button', () => {
-    render(
-      <NewCategoryForm
-        onComplete={mockOnComplete}
-        onCancel={mockOnCancel}
-        totalAvailable={totalAvailable}
-        existingCategoryNames={[]}
-      />
-    );
+    renderForm();
     expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
   });
 
   it('validates required fields', () => {
-    render(
-      <NewCategoryForm
-        onComplete={mockOnComplete}
-        onCancel={mockOnCancel}
-        totalAvailable={totalAvailable}
-        existingCategoryNames={[]}
-      />
-    );
+    renderForm();
     const submitButton = screen.getByRole('button', { name: /add/i });
     fireEvent.click(submitButton);
     // Should show validation errors or prevent submission (implementation dependent)
   });
 
   it('sets default values correctly', () => {
-    render(
-      <NewCategoryForm
-        onComplete={mockOnComplete}
-        onCancel={mockOnCancel}
-        totalAvailable={totalAvailable}
-        existingCategoryNames={[]}
-      />
-    );
+    renderForm();
     // Check if budgeted amount defaults to empty string
     const budgetInput = screen.getByPlaceholderText(/budget amount/i) as HTMLInputElement;
     expect(budgetInput.value).toBe('');

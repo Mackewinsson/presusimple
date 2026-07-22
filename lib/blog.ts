@@ -11,6 +11,8 @@ export interface BlogPostMeta {
   date: string;
   author: string;
   tags: string[];
+  /** Slug of the translated counterpart in the other locale (optional). */
+  translationSlug?: string;
 }
 
 export interface BlogPost extends BlogPostMeta {
@@ -34,6 +36,7 @@ function parsePostFile(filePath: string, slug: string): BlogPost {
     date: String(data.date ?? new Date().toISOString().slice(0, 10)),
     author: String(data.author ?? "Presusimple"),
     tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
+    translationSlug: data.translationSlug ? String(data.translationSlug) : undefined,
     content,
   };
 }
@@ -68,3 +71,4 @@ export function getPostBySlug(locale: BlogLocale, slug: string): BlogPost | null
 export function getAllSlugs(locale: BlogLocale): string[] {
   return getAllPosts(locale).map((post) => post.slug);
 }
+
