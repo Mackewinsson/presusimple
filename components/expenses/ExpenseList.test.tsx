@@ -101,4 +101,15 @@ describe('ExpenseList', () => {
     expect(screen.getByText('Grocery shopping')).toBeInTheDocument();
     expect(screen.getByText('Gas')).toBeInTheDocument();
   });
+
+  it('renders category filter label', () => {
+    renderWithProviders(
+      <ExpenseList
+        expenses={mockExpenses}
+        categories={mockCategories}
+      />
+    );
+
+    expect(screen.getByLabelText(/Filter by category/i)).toBeInTheDocument();
+  });
 }); 

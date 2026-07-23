@@ -88,6 +88,8 @@ const translations = {
     yourFreeTrialEnds: "Your free trial ends in",
     days: "days",
     noTransactionsYet: "No transactions yet. Add one to get started.",
+    allCategories: "All categories",
+    filterByCategory: "Filter by category",
     upgradeNow: "Upgrade Now",
     // Landing page translations
     signIn: "Sign In",
@@ -602,6 +604,8 @@ const translations = {
     yourFreeTrialEnds: "Tu prueba gratuita termina en",
     days: "días",
     noTransactionsYet: "Aún no hay transacciones. Agrega una para comenzar.",
+    allCategories: "Todas las categorías",
+    filterByCategory: "Filtrar por categoría",
     upgradeNow: "Actualizar Ahora",
     // Landing page translations
     signIn: "Iniciar Sesión",
