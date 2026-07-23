@@ -43,6 +43,16 @@ export const FEATURES = {
     label: "Priority Support",
     description: "Get priority customer support",
     plans: ["pro"]
+  },
+  sharedBudgets: {
+    label: "Shared & Couple Budgets",
+    description: "Collaborate on full monthly budgets with partners or roommates",
+    plans: ["pro"]
+  },
+  categorySharing: {
+    label: "Category-Level Sharing",
+    description: "Share specific budget categories with collaborators",
+    plans: ["pro"]
   }
 } as const;
 

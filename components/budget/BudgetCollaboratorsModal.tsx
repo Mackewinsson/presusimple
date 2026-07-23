@@ -16,6 +16,7 @@ import { Users, UserPlus, Mail, Check, AlertCircle } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { useFeature } from "@/hooks/useFeatureFlags";
 
 interface Collaborator {
   email: string;
@@ -29,10 +30,15 @@ interface BudgetCollaboratorsModalProps {
 
 export function BudgetCollaboratorsModal({ budgetId }: BudgetCollaboratorsModalProps) {
   const { t } = useTranslation();
+  const isEnabled = useFeature("sharedBudgets");
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  if (!isEnabled) {
+    return null;
+  }
 
   useEffect(() => {
     if (!open || !budgetId) return;

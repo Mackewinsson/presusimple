@@ -16,6 +16,7 @@ import { Share2, UserPlus, Mail, UserX } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { useFeature } from "@/hooks/useFeatureFlags";
 
 interface Collaborator {
   email: string;
@@ -35,10 +36,15 @@ export function CategoryCollaboratorsModal({
   collaboratorsCount = 0,
 }: CategoryCollaboratorsModalProps) {
   const { t } = useTranslation();
+  const isEnabled = useFeature("categorySharing");
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  if (!isEnabled) {
+    return null;
+  }
 
   useEffect(() => {
     if (!open || !categoryId) return;
