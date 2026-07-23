@@ -21,6 +21,7 @@ import { parseDecimalInput } from "@/lib/utils/formatMoney";
 import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
 import { AITransactionLoading } from "@/components/ui/ai-transaction-loading";
 import { cn } from "@/lib/utils";
+import { QuickPresetChips } from "./QuickPresetChips";
 
 interface ParsedTransaction {
   description: string;
@@ -965,6 +966,15 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
               </div>
             </div>
           )}
+
+          <div className="px-4 pt-3 pb-1 border-b border-border/20">
+            <QuickPresetChips
+              categories={categories || []}
+              onSelectPreset={(preset) => {
+                setDescription(`${preset.description} ${preset.amount}`);
+              }}
+            />
+          </div>
 
           <div className="flex items-center gap-3 px-4 py-3">
             <Sparkles
