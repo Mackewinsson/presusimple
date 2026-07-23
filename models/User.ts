@@ -19,6 +19,9 @@ export interface IUser extends Document {
   pushSubscription?: any; // Push subscription object
   notificationEnabled?: boolean;
   lastNotificationUpdate?: Date;
+  // Referral fields
+  referralCode?: string;
+  referredBy?: string;
   // Streak (Duolingo-style)
   streakCount?: number;
   lastActivityDate?: Date;
@@ -50,6 +53,9 @@ const UserSchema = new Schema<IUser>({
   pushSubscription: { type: Schema.Types.Mixed }, // Push subscription object
   notificationEnabled: { type: Boolean, default: false },
   lastNotificationUpdate: { type: Date },
+  // Referral fields
+  referralCode: { type: String, sparse: true },
+  referredBy: { type: String },
   // Streak
   streakCount: { type: Number, default: 0 },
   lastActivityDate: { type: Date },
