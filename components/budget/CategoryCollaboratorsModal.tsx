@@ -17,6 +17,7 @@ import { useTranslation } from "@/lib/i18n";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { useFeature } from "@/hooks/useFeatureFlags";
+import { PartnerActivityCard } from "./PartnerActivityCard";
 
 interface Collaborator {
   email: string;
@@ -167,6 +168,10 @@ export function CategoryCollaboratorsModal({
             </div>
           </div>
         </form>
+
+        {collaborators.length > 0 && (
+          <PartnerActivityCard collaborators={collaborators} categoryName={categoryName} />
+        )}
 
         <div className="space-y-2 pt-3 border-t">
           <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">

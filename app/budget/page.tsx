@@ -35,6 +35,7 @@ import { StreakEncouragementTrigger } from "@/components/streak/StreakEncouragem
 import { ZbbTutorialTrigger } from "@/components/onboarding/ZbbTutorialTrigger";
 import { BudgetCollaboratorsModal } from "@/components/budget/BudgetCollaboratorsModal";
 import { ReferralCard } from "@/components/referral/ReferralCard";
+import { PartnerActivityCard } from "@/components/budget/PartnerActivityCard";
 import { getHistoryBasePath } from "@/lib/budget-routes";
 
 import { useState, useEffect } from "react";
@@ -222,8 +223,15 @@ function BudgetAppContent() {
             )}
           </div>
 
-          {/* RIGHT COLUMN: Budget Setup, Referrals, and Reset */}
+          {/* RIGHT COLUMN: Partner Activity, Budget Setup, Referrals, and Reset */}
           <div className="space-y-4 sm:space-y-6 md:space-y-8 flex flex-col order-2">
+            {budget?.collaborators && budget.collaborators.length > 0 && (
+              <PartnerActivityCard
+                expenses={expenses}
+                currentUserId={userId}
+                collaborators={budget.collaborators}
+              />
+            )}
             <ReferralCard />
 
             {accessControl.canCreateBudget && (

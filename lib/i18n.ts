@@ -112,6 +112,11 @@ const translations = {
     invited: "Invited",
     shareCategory: "Share Category",
     shareCategoryDesc: "Invite someone to view and log expenses for ONLY this category.",
+    partnerActivity: "Partner Activity & Contributions",
+    partnerSpent: "Partner Spent",
+    youSpent: "You Spent",
+    loggedBy: "Logged by",
+    sharedContributions: "Shared Contributions Breakdown",
     upgradeNow: "Upgrade Now",
     // Landing page translations
     signIn: "Sign In",
@@ -650,6 +655,11 @@ const translations = {
     invited: "Invitado",
     shareCategory: "Compartir Categoría",
     shareCategoryDesc: "Invita a alguien a ver y registrar gastos SOLO para esta categoría.",
+    partnerActivity: "Actividad y Aportes de la Pareja",
+    partnerSpent: "Gastado por la Pareja",
+    youSpent: "Gastado por Ti",
+    loggedBy: "Registrado por",
+    sharedContributions: "Desglose de Aportes Compartidos",
     upgradeNow: "Actualizar Ahora",
     // Landing page translations
     signIn: "Iniciar Sesión",
