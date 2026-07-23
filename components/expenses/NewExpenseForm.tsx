@@ -18,6 +18,7 @@ import { useSession } from "next-auth/react";
 import { useUserId, useCreateExpense } from "@/lib/hooks";
 import { useTranslation } from "@/lib/i18n";
 import { parseDecimalInput } from "@/lib/utils/formatMoney";
+import { QuickPresetChips } from "./QuickPresetChips";
 
 interface Budget {
   _id: string;
@@ -67,6 +68,18 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [type, setType] = useState<TransactionType>("expense");
 
+  const handleSelectPreset = (preset: {
+    description: string;
+    amount: string;
+    categoryId: string;
+  }) => {
+    setDescription(preset.description);
+    setAmount(preset.amount);
+    if (preset.categoryId) {
+      setCategoryId(preset.categoryId);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -110,6 +123,11 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4" data-testid="expense-form">
+      <QuickPresetChips
+        categories={categories}
+        onSelectPreset={handleSelectPreset}
+      />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-hidden">
         <div className="space-y-2 min-w-0">
           <Label htmlFor="amount">{t('amount')}</Label>
