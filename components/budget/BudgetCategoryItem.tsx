@@ -24,6 +24,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { CategoryCollaboratorsModal } from "./CategoryCollaboratorsModal";
 
 interface BudgetCategoryItemProps {
   category: any;
@@ -192,10 +193,17 @@ const BudgetCategoryItem: React.FC<BudgetCategoryItemProps> = ({
             ) : (
               <div className="flex items-center gap-2 flex-1">
                 <span className="font-medium">{category.name}</span>
+                <CategoryCollaboratorsModal
+                  categoryId={category._id || category.id}
+                  categoryName={category.name}
+                  collaboratorsCount={category.collaborators?.length || 0}
+                />
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleStartEdit}
+                  title="Edit category"
+                  aria-label="Edit category"
                   className="h-8 w-8 p-0"
                 >
                   <Edit2 className="h-4 w-4" />

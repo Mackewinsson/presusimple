@@ -110,6 +110,8 @@ const translations = {
     collaboratorEmailPlaceholder: "partner@example.com",
     addCollaborator: "Add Collaborator",
     invited: "Invited",
+    shareCategory: "Share Category",
+    shareCategoryDesc: "Invite someone to view and log expenses for ONLY this category.",
     upgradeNow: "Upgrade Now",
     // Landing page translations
     signIn: "Sign In",
@@ -646,6 +648,8 @@ const translations = {
     collaboratorEmailPlaceholder: "pareja@ejemplo.com",
     addCollaborator: "Agregar Colaborador",
     invited: "Invitado",
+    shareCategory: "Compartir Categoría",
+    shareCategoryDesc: "Invita a alguien a ver y registrar gastos SOLO para esta categoría.",
     upgradeNow: "Actualizar Ahora",
     // Landing page translations
     signIn: "Iniciar Sesión",
