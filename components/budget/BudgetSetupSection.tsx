@@ -47,6 +47,7 @@ import { budgetKeys } from "@/lib/hooks/useBudgetQueries";
 import { categoryKeys } from "@/lib/hooks/useCategoryQueries";
 import BudgetCategoryItem from "./BudgetCategoryItem";
 import NewCategoryForm from "./NewCategoryForm";
+import { StarterBudgetTemplates } from "@/components/onboarding/StarterBudgetTemplates";
 import { hasDuplicateName } from "@/lib/utils/normalizeName";
 import { AILoading } from "@/components/ui/ai-loading";
 import { useFeatureFlags as usePlanFeatureFlags } from "@/lib/hooks/useFeatureFlags";
@@ -532,7 +533,13 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
             </TabsList>
             
             <TabsContent value="manual" className="space-y-4 mt-4">
-          <form onSubmit={handleCreateBudget} className="space-y-4">
+              <StarterBudgetTemplates
+                onSelectTemplate={(template) => {
+                  setNewTotal("1000");
+                  toast.success(`Selected ${template.title} template!`);
+                }}
+              />
+              <form onSubmit={handleCreateBudget} className="space-y-4">
             <Input
               type="number"
               placeholder={t("totalBudgetPlaceholder")}

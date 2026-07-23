@@ -33,6 +33,8 @@ import MobileHeader from "@/components/MobileHeader";
 import { StreakWidget } from "@/components/streak/StreakWidget";
 import { StreakEncouragementTrigger } from "@/components/streak/StreakEncouragementTrigger";
 import { ZbbTutorialTrigger } from "@/components/onboarding/ZbbTutorialTrigger";
+import { BudgetCollaboratorsModal } from "@/components/budget/BudgetCollaboratorsModal";
+import { ReferralCard } from "@/components/referral/ReferralCard";
 import { getHistoryBasePath } from "@/lib/budget-routes";
 
 import { useState, useEffect } from "react";
@@ -168,6 +170,7 @@ function BudgetAppContent() {
                 </span>
               </div>
               <div className="flex items-center gap-2 sm:gap-4">
+                {budget && <BudgetCollaboratorsModal budgetId={budget._id} />}
                 <StreakWidget />
                 <LanguageSwitcher />
                 <PrivateModeToggle />
@@ -219,8 +222,10 @@ function BudgetAppContent() {
             )}
           </div>
 
-          {/* RIGHT COLUMN: Budget Setup and Reset */}
+          {/* RIGHT COLUMN: Budget Setup, Referrals, and Reset */}
           <div className="space-y-4 sm:space-y-6 md:space-y-8 flex flex-col order-2">
+            <ReferralCard />
+
             {accessControl.canCreateBudget && (
               <BudgetSetupSection
                 budget={budget || null}
