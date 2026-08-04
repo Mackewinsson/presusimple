@@ -23,7 +23,6 @@ const nextConfig = {
   // Production optimizations
   compress: true,
   poweredByHeader: false,
-  generateEtags: false,
   // Security headers
   async headers() {
     return [

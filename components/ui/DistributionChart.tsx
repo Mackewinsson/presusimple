@@ -9,7 +9,7 @@ import {
 } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import { useTheme } from "next-themes";
-import { formatMoney } from "@/lib/utils/formatMoney";
+import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
 import { useTranslation } from "@/lib/i18n";
 import { useCurrentDecimalSeparator } from "@/lib/hooks";
 import { theme, getChartColor } from "@/lib/theme";
@@ -35,6 +35,7 @@ export function DistributionChart({
 }: DistributionChartProps) {
   const { theme: currentTheme } = useTheme();
   const decimalSeparator = useCurrentDecimalSeparator();
+  const { formatAmount } = useFormatMoney();
   const { t } = useTranslation();
 
   const chartColor = (index: number) => getChartColor(index).hex;
@@ -92,7 +93,7 @@ export function DistributionChart({
                 label: function(context: TooltipItem<"doughnut">) {
                   const value = context.parsed;
                   const pct = totalSpent > 0 ? Math.round((value / totalSpent) * 100) : 0;
-                  return ` ${formatMoney(value, undefined, decimalSeparator)} (${pct}%)`;
+                  return ` ${formatAmount(value, undefined, decimalSeparator)} (${pct}%)`;
                 },
               },
             },

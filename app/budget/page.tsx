@@ -8,6 +8,7 @@ import DailySpendingTracker from "@/components/expenses/DailySpendingTracker";
 import ResetButton from "@/components/ResetButton";
 import Summary from "@/components/Summary";
 import ThemeToggle from "@/components/ThemeToggle";
+import PrivateModeToggle from "@/components/PrivateModeToggle";
 import SubscriptionButton from "@/components/SubscriptionButton";
 import AccessRestricted from "@/components/AccessRestricted";
 import { TrialStatus } from "@/components/TrialStatus";
@@ -32,6 +33,9 @@ import MobileHeader from "@/components/MobileHeader";
 import { StreakWidget } from "@/components/streak/StreakWidget";
 import { StreakEncouragementTrigger } from "@/components/streak/StreakEncouragementTrigger";
 import { ZbbTutorialTrigger } from "@/components/onboarding/ZbbTutorialTrigger";
+import { BudgetCollaboratorsModal } from "@/components/budget/BudgetCollaboratorsModal";
+import { ReferralCard } from "@/components/referral/ReferralCard";
+import { PartnerActivityCard } from "@/components/budget/PartnerActivityCard";
 import { getHistoryBasePath } from "@/lib/budget-routes";
 
 import { useState, useEffect } from "react";
@@ -167,8 +171,10 @@ function BudgetAppContent() {
                 </span>
               </div>
               <div className="flex items-center gap-2 sm:gap-4">
+                {budget && <BudgetCollaboratorsModal budgetId={budget._id} />}
                 <StreakWidget />
                 <LanguageSwitcher />
+                <PrivateModeToggle />
                 <ThemeToggle />
                 <SignOutButton
                   variant="outline"
@@ -217,8 +223,17 @@ function BudgetAppContent() {
             )}
           </div>
 
-          {/* RIGHT COLUMN: Budget Setup and Reset */}
+          {/* RIGHT COLUMN: Partner Activity, Budget Setup, Referrals, and Reset */}
           <div className="space-y-4 sm:space-y-6 md:space-y-8 flex flex-col order-2">
+            {budget?.collaborators && budget.collaborators.length > 0 && (
+              <PartnerActivityCard
+                expenses={expenses}
+                currentUserId={userId}
+                collaborators={budget.collaborators}
+              />
+            )}
+            <ReferralCard />
+
             {accessControl.canCreateBudget && (
               <BudgetSetupSection
                 budget={budget || null}

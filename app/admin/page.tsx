@@ -38,6 +38,8 @@ import {
 import { FEATURES } from "@/lib/features";
 import { getAuthorizedAdminEmails } from "@/lib/auth/admin-config";
 import { AdminUsersPanel } from "@/components/admin/AdminUsersPanel";
+import { AdminReferralsPanel } from "@/components/admin/AdminReferralsPanel";
+import { AdminSharedBudgetsPanel } from "@/components/admin/AdminSharedBudgetsPanel";
 
 // Types
 interface Feature {
@@ -391,9 +393,11 @@ export default function UnifiedAdminDashboard() {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             {/* h-auto lets the fixed h-10 TabsList grow when triggers wrap to
                 multiple rows on small screens */}
-            <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-5">
+            <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:grid-cols-4 lg:grid-cols-7">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
+              <TabsTrigger value="referrals">Referrals</TabsTrigger>
+              <TabsTrigger value="shared-budgets">Shared Budgets</TabsTrigger>
               <TabsTrigger value="feature-flags">Feature Flags</TabsTrigger>
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="static-features">Features</TabsTrigger>
@@ -546,6 +550,16 @@ export default function UnifiedAdminDashboard() {
               <Suspense fallback={<p className="text-muted-foreground">Loading users...</p>}>
                 <AdminUsersPanel />
               </Suspense>
+            </TabsContent>
+
+            {/* Referrals Tab */}
+            <TabsContent value="referrals" className="space-y-6">
+              <AdminReferralsPanel />
+            </TabsContent>
+
+            {/* Shared Budgets Tab */}
+            <TabsContent value="shared-budgets" className="space-y-6">
+              <AdminSharedBudgetsPanel />
             </TabsContent>
 
             {/* Feature Flags Tab */}

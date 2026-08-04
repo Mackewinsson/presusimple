@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Providers from "@/components/Providers";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { PrivateModeProvider } from "@/components/PrivateModeProvider";
 import LocaleProvider from "@/components/LocaleProvider";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import NotificationPrompt from "@/components/NotificationPrompt";
@@ -14,6 +15,7 @@ import { CookieConsentBanner } from "@/components/analytics/CookieConsentBanner"
 import { CONSENT_MODE_DEFAULTS } from "@/lib/analytics/consent";
 import { GA_MEASUREMENT_ID } from "@/lib/analytics/gtag";
 import { rootSeoDefaults } from "@/lib/seo";
+import { HtmlLangSetter } from "@/components/HtmlLangSetter";
 
 // Load Inter font locally instead of from Google Fonts
 const inter = Inter({
@@ -162,9 +164,6 @@ export const metadata: Metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  minimumScale: 1,
-  userScalable: false,
   viewportFit: "cover",
   themeColor: "#0f172a",
   colorScheme: "dark light",
@@ -208,20 +207,13 @@ export default function RootLayout({
             }}
           />
         ) : null}
-
-        {/* Additional PWA meta tags for better iOS support */}
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Presusimple" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="application-name" content="Presusimple" />
-        <meta name="msapplication-TileColor" content="#0f172a" />
-        <meta name="msapplication-tap-highlight" content="no" />
       </head>
       <body className={inter.className}>
+        <HtmlLangSetter />
         <GoogleAnalytics />
         <ViewportOptimizer />
         <ThemeProvider>
+          <PrivateModeProvider>
           <LocaleProvider initialLocale="es">
             <Providers>
               <main>{children}</main>
@@ -232,6 +224,7 @@ export default function RootLayout({
               <CookieConsentBanner />
             </Providers>
           </LocaleProvider>
+          </PrivateModeProvider>
         </ThemeProvider>
       </body>
     </html>

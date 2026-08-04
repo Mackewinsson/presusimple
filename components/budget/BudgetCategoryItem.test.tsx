@@ -2,8 +2,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import BudgetCategoryItem from './BudgetCategoryItem';
 
 // Mock the dependencies
-jest.mock('@/lib/utils/formatMoney', () => ({
-  formatMoney: (amount: number) => `$${amount.toFixed(2)}`,
+jest.mock('@/lib/hooks/useFormatMoney', () => ({
+  useFormatMoney: () => ({
+    formatAmount: (amount: number) => `$${amount.toFixed(2)}`,
+    formatPercent: () => '0%',
+    isPrivateMode: false,
+  }),
 }));
 
 jest.mock('@/lib/hooks', () => ({
@@ -191,8 +195,7 @@ describe('BudgetCategoryItem', () => {
     );
 
     // Click edit button
-    const buttons = screen.getAllByRole('button');
-    const editButton = buttons[0]; // First button is edit
+    const editButton = screen.getByLabelText(/edit category/i);
     fireEvent.click(editButton);
 
     // Should show edit form

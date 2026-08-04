@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { formatMoney } from "@/lib/utils/formatMoney";
+import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
 import { useCurrentCurrency, useCurrentDecimalSeparator } from "@/lib/hooks";
 import { useTranslation } from "@/lib/i18n";
 import { BudgetChartsPanel } from "@/components/budget/BudgetChartsPanel";
@@ -16,6 +16,7 @@ import { FileSpreadsheet } from "lucide-react";
 import { utils, writeFile } from "xlsx";
 import { toast } from "sonner";
 import { format, parseISO } from "date-fns";
+import { cn } from "@/lib/utils";
 import type { Budget } from "@/lib/api";
 
 const EXCEL_SHEET_NAME_MAX_LENGTH = 31;
@@ -46,6 +47,7 @@ interface SummaryProps {
 
 const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
   const { t } = useTranslation();
+  const { formatAmount, isPrivateMode } = useFormatMoney();
   const currentCurrency = useCurrentCurrency();
   const decimalSeparator = useCurrentDecimalSeparator();
   // Calculate total spent from expenses
@@ -90,12 +92,15 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
           ? `"${currentCurrency.symbol}"#.##0,00`
           : `"${currentCurrency.symbol}"#,##0.00`;
 
+      const maskedValue = isPrivateMode ? formatAmount(0) : undefined;
+      const amountCell = (value: number) => (isPrivateMode ? maskedValue! : value);
+
       // --- Budget Summary sheet ---
       const summaryData = [
         [t('budgetSummary'), ""],
-        [t('totalBudgeted'), budget.totalBudgeted],
-        [t('totalSpent'), totalSpent],
-        [t('remaining'), budget.totalBudgeted - totalSpent],
+        [t('totalBudgeted'), amountCell(budget.totalBudgeted)],
+        [t('totalSpent'), amountCell(totalSpent)],
+        [t('remaining'), amountCell(budget.totalBudgeted - totalSpent)],
         [],
         [t('category'), t('budgeted'), t('totalSpent'), t('remaining')],
       ];
@@ -103,9 +108,9 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
       categoriesWithSpent.forEach((category) => {
         summaryData.push([
           category.name,
-          category.budgeted,
-          category.spent,
-          category.budgeted - category.spent,
+          amountCell(category.budgeted),
+          amountCell(category.spent),
+          amountCell(category.budgeted - category.spent),
         ]);
       });
 
@@ -143,7 +148,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
           format(parseISO(expense.date), "yyyy-MM-dd"),
           category?.name || t('unknown'),
           expense.description || "-",
-          signedAmount,
+          isPrivateMode ? maskedValue! : signedAmount,
           expense.type,
         ]);
       });
@@ -215,7 +220,9 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
               {t('totalBudgeted')}
             </div>
             <div className="text-lg sm:text-xl md:text-2xl font-semibold">
-                              {formatMoney(calculatedTotalBudgeted, currentCurrency, decimalSeparator)}
+                              <span className={cn(isPrivateMode && "sensitive-amount")}>
+                                {formatAmount(calculatedTotalBudgeted, currentCurrency, decimalSeparator)}
+                              </span>
             </div>
           </div>
 
@@ -224,7 +231,9 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
               {t('totalSpent')}
             </div>
             <div className="text-lg sm:text-xl md:text-2xl font-semibold">
-                              {formatMoney(totalSpent, currentCurrency, decimalSeparator)}
+                              <span className={cn(isPrivateMode && "sensitive-amount")}>
+                                {formatAmount(totalSpent, currentCurrency, decimalSeparator)}
+                              </span>
             </div>
           </div>
 
@@ -241,7 +250,9 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
                   : "text-success"
               }`}
             >
-                              {formatMoney(calculatedTotalBudgeted - totalSpent, currentCurrency, decimalSeparator)}
+                              <span className={cn(isPrivateMode && "sensitive-amount")}>
+                                {formatAmount(calculatedTotalBudgeted - totalSpent, currentCurrency, decimalSeparator)}
+                              </span>
             </div>
           </div>
         </div>

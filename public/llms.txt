@@ -13,6 +13,24 @@ Presusimple helps users assign every dollar (or peso) a job, track spending in r
 - Privacy Policy: https://www.presusimple.com/privacy
 - Terms of Service: https://www.presusimple.com/terms
 
+## Blog articles (English)
+
+- Getting Started with Zero-Based Budgeting: https://www.presusimple.com/blog/getting-started-zero-based-budgeting
+- How to Make a Monthly Budget: https://www.presusimple.com/blog/how-to-make-a-monthly-budget
+- 50/30/20 vs Zero-Based Budgeting: https://www.presusimple.com/blog/50-30-20-vs-zero-based-budgeting
+- How to Track Expenses Daily: https://www.presusimple.com/blog/how-to-track-expenses-daily
+- Emergency Fund — How Much to Save: https://www.presusimple.com/blog/emergency-fund-how-much-to-save
+- How to Stop Overspending: https://www.presusimple.com/blog/how-to-stop-overspending
+
+## Blog articles (Spanish)
+
+- Cómo Empezar con el Presupuesto Base Cero: https://www.presusimple.com/es/blog/comenzar-presupuesto-base-cero
+- Cómo Hacer un Presupuesto Mensual: https://www.presusimple.com/es/blog/como-hacer-un-presupuesto-mensual
+- Regla 50/30/20 vs Presupuesto Base Cero: https://www.presusimple.com/es/blog/regla-50-30-20-vs-presupuesto-base-cero
+- Cómo Controlar Gastos Diarios: https://www.presusimple.com/es/blog/como-controlar-gastos-diarios
+- Fondo de Emergencia — Cuánto Ahorrar: https://www.presusimple.com/es/blog/fondo-de-emergencia-cuanto-ahorrar
+- Cómo Dejar de Gastar de Más: https://www.presusimple.com/es/blog/como-dejar-de-gastar-de-mas
+
 ## Features
 
 - Zero-based monthly budgeting

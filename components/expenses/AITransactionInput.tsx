@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useUserId, useCategoriesByBudget, useBudget } from "@/lib/hooks";
@@ -14,12 +14,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Sparkles, Zap, XCircle, CheckCircle, AlertCircle, Plus, Minus, AlertTriangle, X, Camera, ImageIcon } from "lucide-react";
 import { Icon } from "@/components/ui/icon";
-import { formatMoney, parseDecimalInput } from "@/lib/utils/formatMoney";
+import { parseDecimalInput } from "@/lib/utils/formatMoney";
+import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
 import { AITransactionLoading } from "@/components/ui/ai-transaction-loading";
-import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { QuickPresetChips } from "./QuickPresetChips";
 
 interface ParsedTransaction {
   description: string;
@@ -41,21 +43,74 @@ interface CategoryBudget {
   budgeted: number;
 }
 
+function buildMissingCategories(
+  txs: ParsedTransaction[],
+  availableCategories: { name: string }[],
+  categoryChanges: Record<number, string> = {}
+): MissingCategory[] {
+  const missingCategoriesMap = new Map<string, ParsedTransaction[]>();
+
+  txs.forEach((transaction, index) => {
+    const effectiveCategory = categoryChanges[index] || transaction.category;
+    const matchingCategory = availableCategories.find(
+      (cat) => cat.name.toLowerCase() === effectiveCategory.toLowerCase()
+    );
+
+    if (!matchingCategory) {
+      if (!missingCategoriesMap.has(effectiveCategory)) {
+        missingCategoriesMap.set(effectiveCategory, []);
+      }
+      missingCategoriesMap.get(effectiveCategory)!.push(transaction);
+    }
+  });
+
+  return Array.from(missingCategoriesMap.entries()).map(([name, categoryTransactions]) => ({
+    name,
+    transactions: categoryTransactions,
+    totalAmount: categoryTransactions.reduce((sum, t) => sum + t.amount, 0),
+  }));
+}
+
 interface TransactionPreviewProps {
   transactions: ParsedTransaction[];
-  missingCategories: MissingCategory[];
   availableBudget: number;
-  availableCategories: any[]; // New: Available categories for selection
+  availableCategories: any[];
   onConfirm: (transactions: ParsedTransaction[], newCategoriesToCreate: CategoryBudget[]) => void;
   onCancel: () => void;
   isSaving: boolean;
 }
 
-const TransactionPreview = ({ transactions, missingCategories, availableBudget, availableCategories, onConfirm, onCancel, isSaving }: TransactionPreviewProps) => {
+const TransactionPreview = ({ transactions, availableBudget, availableCategories, onConfirm, onCancel, isSaving }: TransactionPreviewProps) => {
   const { t } = useTranslation();
+  const { formatAmount, isPrivateMode } = useFormatMoney();
+  const [reviewTransactions, setReviewTransactions] = useState(transactions);
   const [newCategoriesToCreate, setNewCategoriesToCreate] = useState<CategoryBudget[]>([]);
   const [budgetInputs, setBudgetInputs] = useState<Record<string, number>>({});
   const [categoryChanges, setCategoryChanges] = useState<Record<number, string>>({});
+
+  useEffect(() => {
+    setReviewTransactions(transactions);
+    setCategoryChanges({});
+    setNewCategoriesToCreate([]);
+    setBudgetInputs({});
+  }, [transactions]);
+
+  const reviewMissingCategories = useMemo(
+    () => buildMissingCategories(reviewTransactions, availableCategories, categoryChanges),
+    [reviewTransactions, availableCategories, categoryChanges]
+  );
+
+  useEffect(() => {
+    const missingNames = new Set(reviewMissingCategories.map((mc) => mc.name));
+    setNewCategoriesToCreate((prev) => prev.filter((cat) => missingNames.has(cat.name)));
+    setBudgetInputs((prev) => {
+      const next: Record<string, number> = {};
+      Array.from(missingNames).forEach((name) => {
+        if (name in prev) next[name] = prev[name];
+      });
+      return next;
+    });
+  }, [reviewMissingCategories]);
 
   const handleCategoryToggle = (categoryName: string) => {
     setNewCategoriesToCreate(prev => {
@@ -90,9 +145,21 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
     });
   };
 
+  const handleRemoveTransaction = (index: number) => {
+    setReviewTransactions((prev) => prev.filter((_, i) => i !== index));
+    setCategoryChanges((prev) => {
+      const next: Record<number, string> = {};
+      Object.entries(prev).forEach(([key, value]) => {
+        const oldIdx = Number(key);
+        if (oldIdx < index) next[oldIdx] = value;
+        else if (oldIdx > index) next[oldIdx - 1] = value;
+      });
+      return next;
+    });
+  };
+
   const handleConfirm = () => {
-    // Apply category changes to transactions
-    const updatedTransactions = transactions.map((transaction, index) => ({
+    const updatedTransactions = reviewTransactions.map((transaction, index) => ({
       ...transaction,
       category: categoryChanges[index] || transaction.category
     }));
@@ -107,20 +174,22 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain sm:space-y-6">
       <div className="text-sm text-muted-foreground flex items-center gap-2">
         <CheckCircle className="h-4 w-4 text-success animate-pulse" />
-        <span>{t("aiFound")} {transactions.length} {t("transactionsExclamation")}</span>
+        <span>{t("aiFound")} {reviewTransactions.length} {t("transactionsExclamation")}</span>
       </div>
       
       {/* Budget Summary */}
       <div className="p-3 sm:p-4 border border-accent/30 rounded-lg bg-accent/10">
         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3 mb-3">
           <span className="font-medium text-foreground">{t('availableBudget')}</span>
-          <span className="font-mono text-foreground">${availableBudget.toFixed(2)}</span>
+          <span className={cn("font-mono text-foreground", isPrivateMode && "sensitive-amount")}>
+            {formatAmount(availableBudget)}
+          </span>
         </div>
         {newCategoriesToCreate.length > 0 && (
           <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-sm mb-2">
             <span className="text-muted-foreground">{t('budgetNeededForNewCategories')}</span>
-            <span className={`font-mono ${hasInsufficientBudget ? 'text-destructive' : 'text-success'}`}>
-              ${totalBudgetNeeded.toFixed(2)}
+            <span className={cn(`font-mono ${hasInsufficientBudget ? 'text-destructive' : 'text-success'}`, isPrivateMode && "sensitive-amount")}>
+              {formatAmount(totalBudgetNeeded)}
             </span>
           </div>
         )}
@@ -133,7 +202,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
       </div>
       
       {/* Missing Categories Section */}
-      {missingCategories.length > 0 && (
+      {reviewMissingCategories.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-warning">
             <AlertTriangle className="h-4 w-4" />
@@ -142,7 +211,7 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
           <div className="text-sm text-muted-foreground mb-4">
             {t("aiSuggestedCategoriesHint")}
           </div>
-          {missingCategories.map((missingCategory, index) => {
+          {reviewMissingCategories.map((missingCategory, index) => {
             const isSelected = newCategoriesToCreate.some(cat => cat.name === missingCategory.name);
             const budgetAmount = budgetInputs[missingCategory.name] || 0;
             
@@ -159,7 +228,10 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                   <div className="min-w-0">
                     <span className="font-medium text-warning">{missingCategory.name}</span>
                     <div className="text-xs text-muted-foreground">
-                      {missingCategory.transactions.length} {t("transactionsWord")} • {t("totalLabel")}: ${missingCategory.totalAmount.toFixed(2)}
+                      {missingCategory.transactions.length} {t("transactionsWord")} • {t("totalLabel")}:{" "}
+                      <span className={cn(isPrivateMode && "sensitive-amount")}>
+                        {formatAmount(missingCategory.totalAmount)}
+                      </span>
                     </div>
                   </div>
                   <Button
@@ -197,7 +269,11 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                       </div>
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {t("recommendedLabel")}: ${missingCategory.totalAmount.toFixed(2)} {t("basedOnTransactionTotal")}
+                      {t("recommendedLabel")}:{" "}
+                      <span className={cn(isPrivateMode && "sensitive-amount")}>
+                        {formatAmount(missingCategory.totalAmount)}
+                      </span>{" "}
+                      {t("basedOnTransactionTotal")}
                     </div>
                   </div>
                 )}
@@ -210,14 +286,14 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
       {/* Transactions Section */}
       <div className="space-y-4">
         <div className="text-sm font-medium text-foreground mb-3">{t('transactionsToSave')}</div>
-        {transactions.map((transaction, index) => {
-          const isMissingCategory = missingCategories.some(mc => 
-            mc.transactions.some(t => t === transaction)
-          );
-          const missingCategory = missingCategories.find(mc => 
-            mc.transactions.some(t => t === transaction)
-          );
+        {reviewTransactions.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{t("noTransactionsToReview")}</p>
+        ) : (
+        reviewTransactions.map((transaction, index) => {
           const currentCategory = categoryChanges[index] || transaction.category;
+          const isMissingCategory = !availableCategories.some(
+            (cat) => cat.name.toLowerCase() === currentCategory.toLowerCase()
+          );
           
           return (
             <div 
@@ -234,8 +310,21 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
                       {transaction.type}
                     </Badge>
                     <span className="font-mono font-medium whitespace-nowrap">
-                      ${transaction.amount.toFixed(2)}
+                      <span className={cn(isPrivateMode && "sensitive-amount")}>
+                        {formatAmount(transaction.amount)}
+                      </span>
                     </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveTransaction(index)}
+                      className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
+                      aria-label={t("removeTransaction")}
+                      title={t("removeTransaction")}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
                 <div className="text-sm text-muted-foreground space-y-2">
@@ -304,14 +393,15 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
               )}
             </div>
           );
-        })}
+        })
+        )}
       </div>
       </div>
       
       <div className="shrink-0 flex flex-col gap-2 border-t border-border bg-background pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:flex-row sm:gap-3 sm:pb-0 sm:pt-4">
         <Button
           onClick={handleConfirm}
-          disabled={isSaving || hasInsufficientBudget}
+          disabled={isSaving || hasInsufficientBudget || reviewTransactions.length === 0}
           className={`w-full sm:flex-1 ${
             hasInsufficientBudget 
               ? "bg-destructive text-destructive-foreground opacity-50 cursor-not-allowed" 
@@ -335,10 +425,10 @@ const TransactionPreview = ({ transactions, missingCategories, availableBudget, 
 
 export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
   const { t } = useTranslation();
+  const { formatAmount } = useFormatMoney();
   const [isOpen, setIsOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [parsedTransactions, setParsedTransactions] = useState<ParsedTransaction[]>([]);
-  const [missingCategories, setMissingCategories] = useState<MissingCategory[]>([]);
   const [availableBudget, setAvailableBudget] = useState(0);
   const [isParsing, setIsParsing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -646,29 +736,6 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       setCurrentStep("complete");
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Check for missing categories and calculate totals
-      const missingCategoriesMap = new Map<string, ParsedTransaction[]>();
-      
-      validTransactions.forEach((transaction: ParsedTransaction) => {
-        const matchingCategory = (categories || []).find((cat: any) => 
-          cat.name.toLowerCase() === transaction.category.toLowerCase()
-        );
-        
-        if (!matchingCategory) {
-          if (!missingCategoriesMap.has(transaction.category)) {
-            missingCategoriesMap.set(transaction.category, []);
-          }
-          missingCategoriesMap.get(transaction.category)!.push(transaction);
-        }
-      });
-
-      const missingCategoriesArray = Array.from(missingCategoriesMap.entries()).map(([name, transactions]) => ({
-        name,
-        transactions,
-        totalAmount: transactions.reduce((sum, t) => sum + t.amount, 0)
-      }));
-
-      setMissingCategories(missingCategoriesArray);
       setParsedTransactions(validTransactions);
       setIsOpen(true);
       
@@ -709,7 +776,7 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
     if (totalBudgetNeeded > availableBudget) {
       toast({
         title: t("insufficientBudgetTitle"),
-        description: `${t("insufficientBudgetDesc")} ($${totalBudgetNeeded.toFixed(2)} > $${availableBudget.toFixed(2)})`,
+        description: `${t("insufficientBudgetDesc")} (${formatAmount(totalBudgetNeeded)} > ${formatAmount(availableBudget)})`,
         variant: "destructive",
       });
       return;
@@ -810,7 +877,6 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
       setImageFile(null);
       setImageBase64(null);
       setParsedTransactions([]);
-      setMissingCategories([]);
       setIsOpen(false);
       
       // Refresh data
@@ -852,7 +918,6 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
     setImageFile(null);
     setImageBase64(null);
     setParsedTransactions([]);
-    setMissingCategories([]);
     setIsOpen(false);
   };
 
@@ -901,6 +966,15 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
               </div>
             </div>
           )}
+
+          <div className="px-4 pt-3 pb-1 border-b border-border/20">
+            <QuickPresetChips
+              categories={categories || []}
+              onSelectPreset={(preset) => {
+                setDescription(`${preset.description} ${preset.amount}`);
+              }}
+            />
+          </div>
 
           <div className="flex items-center gap-3 px-4 py-3">
             <Sparkles
@@ -1023,7 +1097,6 @@ export const AITransactionInput = ({ budgetId }: { budgetId: string }) => {
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-4">
             <TransactionPreview
               transactions={parsedTransactions}
-              missingCategories={missingCategories}
               availableBudget={availableBudget}
               availableCategories={categories || []}
               onConfirm={handleConfirm}

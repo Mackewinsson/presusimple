@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { formatMoney } from "@/lib/utils/formatMoney";
+import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
 import { format, parseISO } from "date-fns";
 import Link from "next/link";
 import {
@@ -48,6 +48,7 @@ function InsightsContent() {
   const historyBase = getHistoryBasePath(pathname);
   const { data: userId } = useUserId();
   const decimalSeparator = useCurrentDecimalSeparator();
+  const { formatAmount, isPrivateMode } = useFormatMoney();
   const { data: budgets = [], isLoading: budgetsLoading, refetch: refetchBudgets } = useMonthlyBudgets(
     userId || ""
   );
@@ -186,13 +187,13 @@ function InsightsContent() {
           <p className="text-sm text-muted-foreground">
             Spent:{" "}
             <span className="font-medium text-foreground">
-              {formatMoney(data.spent, undefined, decimalSeparator)}
+              {formatAmount(data.spent, undefined, decimalSeparator)}
             </span>
           </p>
           <p className="text-sm text-muted-foreground">
             Budgeted:{" "}
             <span className="font-medium text-foreground">
-              {formatMoney(data.budgeted, undefined, decimalSeparator)}
+              {formatAmount(data.budgeted, undefined, decimalSeparator)}
             </span>
           </p>
         </div>
@@ -285,13 +286,13 @@ function InsightsContent() {
                         {t("totalBudgeted")}
                       </span>
                       <span className="font-medium">
-                        {formatMoney(selectedBudget.totalBudgeted, undefined, decimalSeparator)}
+                        {formatAmount(selectedBudget.totalBudgeted, undefined, decimalSeparator)}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">{t("totalSpent")}</span>
                       <span className="font-medium">
-                        {formatMoney(selectedBudget.totalSpent, undefined, decimalSeparator)}
+                        {formatAmount(selectedBudget.totalSpent, undefined, decimalSeparator)}
                       </span>
                     </div>
                     <div className="flex justify-between pt-2 border-t">
@@ -305,7 +306,7 @@ function InsightsContent() {
                             : "text-destructive"
                         }`}
                       >
-                        {formatMoney(
+                        {formatAmount(
                           selectedBudget.totalBudgeted -
                             selectedBudget.totalSpent,
                           undefined,
@@ -327,7 +328,7 @@ function InsightsContent() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-success">
-                    {formatMoney(incomeTotal, undefined, decimalSeparator)}
+                    {formatAmount(incomeTotal, undefined, decimalSeparator)}
                   </div>
                   <div className="text-sm text-muted-foreground mt-2">
                     {t("totalIncomeForMonth")} — {format(parseISO(selectedBudget.createdAt), "MMMM yyyy")}
@@ -347,7 +348,7 @@ function InsightsContent() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-destructive">
-                    {formatMoney(finalExpenseTotal, undefined, decimalSeparator)}
+                    {formatAmount(finalExpenseTotal, undefined, decimalSeparator)}
                   </div>
                   <div className="text-sm text-muted-foreground mt-2">
                     {t("totalExpensesForMonth")} — {format(parseISO(selectedBudget.createdAt), "MMMM yyyy")}
@@ -399,7 +400,7 @@ function InsightsContent() {
                         textAnchor="middle"
                       />
                       <YAxis
-                        tickFormatter={(value) => formatMoney(value, undefined, decimalSeparator)}
+                        tickFormatter={(value) => formatAmount(value, undefined, decimalSeparator)}
                         tick={{
                           fill: "hsl(var(--muted-foreground))",
                           fontSize: 12,
@@ -461,7 +462,7 @@ function InsightsContent() {
                               : ""
                           }
                         >
-                          {formatMoney(category.spent, undefined, decimalSeparator)}
+                          {formatAmount(category.spent, undefined, decimalSeparator)}
                         </span>
                       </div>
                       <div className="h-2 rounded-full bg-secondary overflow-hidden">
@@ -480,7 +481,7 @@ function InsightsContent() {
                         />
                       </div>
                       <div className="flex justify-between text-sm text-muted-foreground">
-                        <span>{t("budgeted")}: {formatMoney(category.budgeted, undefined, decimalSeparator)}</span>
+                        <span>{t("budgeted")}: {formatAmount(category.budgeted, undefined, decimalSeparator)}</span>
                         <span>
                           {Math.round(
                             (category.spent / category.budgeted) * 100

@@ -1,4 +1,5 @@
-import { formatMoney } from './formatMoney';
+import { formatMoney, maskMoney, maskPercent } from './formatMoney';
+import { currencies } from '@/lib/hooks/useCurrencyQueries';
 
 describe('formatMoney', () => {
   it('formats positive numbers correctly', () => {
@@ -56,4 +57,29 @@ describe('formatMoney', () => {
     expect(formatMoney(100.125)).toBe('$100.13'); // rounds up
     expect(formatMoney(100.126)).toBe('$100.13'); // rounds up
   });
-}); 
+});
+
+describe('maskMoney', () => {
+  const usd = currencies[0];
+
+  it('masks USD with dot decimal separator', () => {
+    expect(maskMoney(usd, 'dot')).toBe('$••••.••');
+  });
+
+  it('masks USD with comma decimal separator (de-DE places symbol after amount)', () => {
+    expect(maskMoney(usd, 'comma')).toBe('••••,••\u00a0$');
+  });
+
+  it('masks EUR with comma decimal separator', () => {
+    const eur = currencies.find((c) => c.code === 'EUR') ?? usd;
+    const masked = maskMoney(eur, 'comma');
+    expect(masked).toContain('••••');
+    expect(masked).toContain(',••');
+  });
+});
+
+describe('maskPercent', () => {
+  it('returns masked percent placeholder', () => {
+    expect(maskPercent()).toBe('••%');
+  });
+});

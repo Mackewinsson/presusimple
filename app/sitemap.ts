@@ -4,6 +4,7 @@ import { getAllPosts } from "@/lib/blog";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
+  const staticDate = new Date("2026-07-15T00:00:00.000Z");
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
@@ -20,25 +21,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${PRODUCTION_APP_URL}/privacy`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: "monthly",
       priority: 0.5,
     },
     {
       url: `${PRODUCTION_APP_URL}/terms`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: "monthly",
       priority: 0.5,
     },
     {
       url: `${PRODUCTION_APP_URL}/es/privacy`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: "monthly",
       priority: 0.5,
     },
     {
       url: `${PRODUCTION_APP_URL}/es/terms`,
-      lastModified: now,
+      lastModified: staticDate,
       changeFrequency: "monthly",
       priority: 0.5,
     },
@@ -53,6 +54,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.8,
+    },
+    {
+      url: `${PRODUCTION_APP_URL}/developers`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${PRODUCTION_APP_URL}/es/developers`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${PRODUCTION_APP_URL}/api-docs`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
     },
   ];
 
@@ -72,3 +91,4 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [...staticRoutes, ...englishPosts, ...spanishPosts];
 }
+

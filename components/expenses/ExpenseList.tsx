@@ -9,6 +9,13 @@ import {
   endOfDay,
   parseISO,
 } from "date-fns";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Search, Calendar } from "lucide-react";
 import { Label } from "@/components/ui/label";
@@ -40,6 +47,7 @@ interface ExpenseListProps {
 const ExpenseList: React.FC<ExpenseListProps> = ({ categories, expenses }) => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
@@ -48,7 +56,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ categories, expenses }) => {
     compareDesc(new Date(a.date), new Date(b.date))
   );
 
-  // Filter expenses based on search term and date range
+  // Filter expenses based on search term, category and date range
   const filteredExpenses = sortedExpenses.filter((expense) => {
     const category = categories.find(
       (cat) => cat._id === expense.categoryId || cat.id === expense.categoryId
@@ -60,6 +68,13 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ categories, expenses }) => {
       expense.description.toLowerCase().includes(searchLower) ||
       category?.name.toLowerCase().includes(searchLower);
 
+    // Category filter
+    const matchesCategory =
+      selectedCategory === "all" ||
+      expense.categoryId === selectedCategory ||
+      category?._id === selectedCategory ||
+      category?.id === selectedCategory;
+
     // Date range filter
     let matchesDateRange = true;
     if (startDate && endDate) {
@@ -70,7 +85,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ categories, expenses }) => {
       });
     }
 
-    return matchesSearch && matchesDateRange;
+    return matchesSearch && matchesCategory && matchesDateRange;
   });
 
   if (expenses.length === 0) {
@@ -95,7 +110,28 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ categories, expenses }) => {
           />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="space-y-2 min-w-0">
+            <Label htmlFor="categoryFilter">{t('filterByCategory')}</Label>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger id="categoryFilter" className="w-full">
+                <SelectValue placeholder={t('allCategories')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('allCategories')}</SelectItem>
+                {categories.map((cat) => {
+                  const id = cat._id || cat.id;
+                  if (!id) return null;
+                  return (
+                    <SelectItem key={id} value={id}>
+                      {cat.name}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="space-y-2 min-w-0">
             <Label htmlFor="startDate">{t('startDate')}</Label>
             <Input

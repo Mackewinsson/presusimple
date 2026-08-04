@@ -1,8 +1,9 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatMoney } from "@/lib/utils/formatMoney";
+import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
 import { useCurrentDecimalSeparator } from "@/lib/hooks";
+import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n";
 import {
   calculateSavingsRate,
@@ -25,6 +26,7 @@ export function SnapshotInsights({
   previousTotalSpent,
 }: SnapshotInsightsProps) {
   const { t } = useTranslation();
+  const { formatAmount, formatPercent, isPrivateMode } = useFormatMoney();
   const decimalSeparator = useCurrentDecimalSeparator();
 
   const savingsRate = calculateSavingsRate(totalBudgeted, totalSpent);
@@ -49,10 +51,16 @@ export function SnapshotInsights({
                 : "text-destructive"
             }`}
           >
-            {savingsRate != null ? `${savingsRate.toFixed(1)}%` : "—"}
+            {savingsRate != null
+              ? isPrivateMode
+                ? formatPercent(totalBudgeted - totalSpent, totalBudgeted)
+                : `${savingsRate.toFixed(1)}%`
+              : "—"}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            {formatMoney(totalBudgeted - totalSpent, undefined, decimalSeparator)}{" "}
+            <span className={cn(isPrivateMode && "sensitive-amount")}>
+              {formatAmount(totalBudgeted - totalSpent, undefined, decimalSeparator)}
+            </span>{" "}
             {t("remaining").toLowerCase()}
           </p>
         </CardContent>
@@ -78,12 +86,16 @@ export function SnapshotInsights({
                 }`}
               >
                 {spentDelta <= 0 ? "" : "+"}
-                {formatMoney(spentDelta, undefined, decimalSeparator)}
+                <span className={cn(isPrivateMode && "sensitive-amount")}>
+                  {formatAmount(spentDelta, undefined, decimalSeparator)}
+                </span>
               </span>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               {t("totalSpent")}:{" "}
-              {formatMoney(totalSpent, undefined, decimalSeparator)}
+              <span className={cn(isPrivateMode && "sensitive-amount")}>
+                {formatAmount(totalSpent, undefined, decimalSeparator)}
+              </span>
             </p>
           </CardContent>
         </Card>
@@ -107,8 +119,8 @@ export function SnapshotInsights({
                   className="flex justify-between text-sm gap-2"
                 >
                   <span className="truncate">{cat.name}</span>
-                  <span className="text-destructive font-medium shrink-0">
-                    +{formatMoney(cat.overBy, undefined, decimalSeparator)}
+                  <span className={cn("text-destructive font-medium shrink-0", isPrivateMode && "sensitive-amount")}>
+                    +{formatAmount(cat.overBy, undefined, decimalSeparator)}
                   </span>
                 </li>
               ))}

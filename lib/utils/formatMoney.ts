@@ -22,6 +22,53 @@ export const formatMoney = (
 };
 
 /**
+ * Masked placeholder for private mode — preserves currency symbol position.
+ */
+export const maskMoney = (
+  currency: Currency = DEFAULT_CURRENCY,
+  decimalSeparator: DecimalSeparator = "dot"
+): string => {
+  const locale = decimalSeparator === "comma" ? "de-DE" : "en-US";
+  const decimalSep = decimalSeparator === "comma" ? "," : ".";
+  const parts = new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: currency?.code || DEFAULT_CURRENCY.code,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).formatToParts(1234.56);
+
+  let integerMasked = false;
+
+  return parts
+    .map((part) => {
+      if (part.type === "currency" || part.type === "minusSign") {
+        return part.value;
+      }
+      if (part.type === "literal") {
+        return part.value;
+      }
+      if (part.type === "group") {
+        return "";
+      }
+      if (part.type === "integer") {
+        if (integerMasked) return "";
+        integerMasked = true;
+        return "••••";
+      }
+      if (part.type === "decimal") {
+        return decimalSep;
+      }
+      if (part.type === "fraction") {
+        return "••";
+      }
+      return "";
+    })
+    .join("");
+};
+
+export const maskPercent = (): string => "••%";
+
+/**
  * Parse user-typed amount string (accepts both comma and dot as decimal separator).
  */
 export const parseDecimalInput = (value: string): number => {

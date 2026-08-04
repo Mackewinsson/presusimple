@@ -14,7 +14,11 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage --passWithNoTests",
     "test:ci": "jest --coverage --watchAll=false --passWithNoTests",
-    "fetch:gsc": "node scripts/fetch-gsc-data.mjs",
+    "setup:lemonsqueezy": "bash scripts/setup-lemon-squeezy.sh",
+    "setup:gsc": "bash scripts/setup-gsc-credentials.sh",
+    "blog:seo-audit": "node scripts/blog-seo-audit.js",
+    "gsc:fetch": "node scripts/fetch-gsc.js",
+    "fetch:gsc": "node scripts/fetch-gsc-data.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

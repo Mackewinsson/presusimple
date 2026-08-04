@@ -32,6 +32,8 @@ import { toast } from 'sonner';
 import { getBudgetBasePath } from '@/lib/budget-routes';
 import { useZbbTutorial } from '@/hooks/useZbbTutorial';
 import { ZeroBasedBudgetTutorial } from '@/components/onboarding/ZeroBasedBudgetTutorial';
+import { usePrivateMode } from '@/components/PrivateModeProvider';
+import { Switch } from '@/components/ui/switch';
 // import BudgetTemplateSelector from '@/components/budget/BudgetTemplateSelector';
 // import SavingsGoalList from '@/components/savings/SavingsGoalList';
 
@@ -59,6 +61,27 @@ function LanguageSetting() {
         <SelectItem value="es">{t('spanish')}</SelectItem>
       </SelectContent>
     </Select>
+  );
+}
+
+function PrivateModeSetting() {
+  const { isPrivateMode, setPrivateMode } = usePrivateMode();
+  const { t } = useTranslation();
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-4">
+        <div className="space-y-1">
+          <Label className="text-base font-medium">{t('privateMode')}</Label>
+          <p className="text-sm text-muted-foreground">{t('privateModeDescription')}</p>
+        </div>
+        <Switch
+          checked={isPrivateMode}
+          onCheckedChange={setPrivateMode}
+          aria-label={t('privateMode')}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -537,6 +560,8 @@ export default function SettingsPage() {
                     </p>
                     <DecimalSeparatorSetting />
                   </div>
+
+                  <PrivateModeSetting />
 
                   <div className="space-y-4 pt-2 border-t border-border">
                     <Label className="text-base font-medium">

@@ -20,9 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { formatMoney, parseDecimalInput } from "@/lib/utils/formatMoney";
+import { parseDecimalInput } from "@/lib/utils/formatMoney";
+import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
 import { toast } from "sonner";
 import { currencies, type Currency, useCurrentCurrency, useCurrentDecimalSeparator } from "@/lib/hooks";
+import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useTranslation } from "@/lib/i18n";
 import {
@@ -45,6 +47,7 @@ import { budgetKeys } from "@/lib/hooks/useBudgetQueries";
 import { categoryKeys } from "@/lib/hooks/useCategoryQueries";
 import BudgetCategoryItem from "./BudgetCategoryItem";
 import NewCategoryForm from "./NewCategoryForm";
+import { StarterBudgetTemplates } from "@/components/onboarding/StarterBudgetTemplates";
 import { hasDuplicateName } from "@/lib/utils/normalizeName";
 import { AILoading } from "@/components/ui/ai-loading";
 import { useFeatureFlags as usePlanFeatureFlags } from "@/lib/hooks/useFeatureFlags";
@@ -94,6 +97,7 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
   const { data: session } = useSession();
   const currentCurrency = useCurrentCurrency();
   const decimalSeparator = useCurrentDecimalSeparator();
+  const { formatAmount, isPrivateMode } = useFormatMoney();
   const {
     data: userId,
     isLoading: userIdLoading,
@@ -529,7 +533,13 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
             </TabsList>
             
             <TabsContent value="manual" className="space-y-4 mt-4">
-          <form onSubmit={handleCreateBudget} className="space-y-4">
+              <StarterBudgetTemplates
+                onSelectTemplate={(template) => {
+                  setNewTotal("1000");
+                  toast.success(`Selected ${template.title} template!`);
+                }}
+              />
+              <form onSubmit={handleCreateBudget} className="space-y-4">
             <Input
               type="number"
               placeholder={t("totalBudgetPlaceholder")}
@@ -755,8 +765,8 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
                 }}
                 className="p-3 rounded-lg bg-slate-900/10 dark:bg-white/10 hover:bg-slate-900/20 dark:hover:bg-white/20 transition-all duration-200 cursor-pointer border border-slate-900/20 dark:border-white/20"
               >
-                <div className="text-base sm:text-lg font-medium text-slate-900 dark:text-white">
-                  {formatMoney(
+                <div className={cn("text-base sm:text-lg font-medium text-slate-900 dark:text-white", isPrivateMode && "sensitive-amount")}>
+                  {formatAmount(
                     calculatedTotalBudgeted + (budget?.totalAvailable || 0),
                     currency,
                     decimalSeparator
@@ -775,16 +785,16 @@ const BudgetSetupSection: React.FC<BudgetSetupSectionProps> = ({
             <div className="text-xs sm:text-sm text-slate-600 dark:text-white/60">
               {t('budgeted')}
             </div>
-            <div className="text-base sm:text-lg font-medium mt-1 text-slate-900 dark:text-white">
-              {formatMoney(calculatedTotalBudgeted, currency, decimalSeparator)}
+            <div className={cn("text-base sm:text-lg font-medium mt-1 text-slate-900 dark:text-white", isPrivateMode && "sensitive-amount")}>
+              {formatAmount(calculatedTotalBudgeted, currency, decimalSeparator)}
             </div>
           </div>
           <div className="p-3 sm:p-4 rounded-xl bg-slate-900/10 dark:bg-white/10 backdrop-blur-sm border border-slate-900/20 dark:border-white/20">
             <div className="text-xs sm:text-sm text-slate-600 dark:text-white/60">
               {t('availableToBudget')}
             </div>
-            <div className="text-base sm:text-lg font-medium mt-1 text-slate-900 dark:text-white">
-              {formatMoney(budget?.totalAvailable || 0, currency, decimalSeparator)}
+            <div className={cn("text-base sm:text-lg font-medium mt-1 text-slate-900 dark:text-white", isPrivateMode && "sensitive-amount")}>
+              {formatAmount(budget?.totalAvailable || 0, currency, decimalSeparator)}
             </div>
           </div>
         </div>

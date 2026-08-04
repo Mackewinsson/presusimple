@@ -3,8 +3,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ExpenseList from './ExpenseList';
 
 // Mock the dependencies
-jest.mock('@/lib/utils/formatMoney', () => ({
-  formatMoney: (amount: number) => `$${amount.toFixed(2)}`,
+jest.mock('@/lib/hooks/useFormatMoney', () => ({
+  useFormatMoney: () => ({
+    formatAmount: (amount: number) => `$${amount.toFixed(2)}`,
+    formatPercent: () => '0%',
+    isPrivateMode: false,
+  }),
 }));
 
 describe('ExpenseList', () => {
@@ -96,5 +100,16 @@ describe('ExpenseList', () => {
     // Should show both expenses
     expect(screen.getByText('Grocery shopping')).toBeInTheDocument();
     expect(screen.getByText('Gas')).toBeInTheDocument();
+  });
+
+  it('renders category filter label', () => {
+    renderWithProviders(
+      <ExpenseList
+        expenses={mockExpenses}
+        categories={mockCategories}
+      />
+    );
+
+    expect(screen.getByLabelText(/Filter by category/i)).toBeInTheDocument();
   });
 }); 
