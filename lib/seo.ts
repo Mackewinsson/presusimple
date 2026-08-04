@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
+import { getAlternateBlogSlug } from "@/lib/blog-locale-pairs";
 import { getBlogSeoEnrichment } from "@/lib/blog-seo-enrichment";
 import { PRODUCTION_APP_URL } from "@/lib/constants/branding";
+import {
+  buildFaqPageJsonLd,
+  LANDING_FAQS,
+  type FaqItem,
+} from "@/lib/seo-faqs";
 
 export const SITE_NAME = "Presusimple";
 
@@ -201,9 +207,11 @@ export function getBlogPostMetadata(
   const basePath = locale === "es" ? "/es/blog" : "/blog";
   const url = `${PRODUCTION_APP_URL}${basePath}/${post.slug}`;
 
-  // Build cross-language alternates if a translation slug is provided
-  const enSlug = locale === "en" ? post.slug : post.translationSlug;
-  const esSlug = locale === "es" ? post.slug : post.translationSlug;
+  // Prefer frontmatter translationSlug; fall back to locale-pairs map
+  const alternateSlug =
+    post.translationSlug ?? getAlternateBlogSlug(locale, post.slug);
+  const enSlug = locale === "en" ? post.slug : alternateSlug;
+  const esSlug = locale === "es" ? post.slug : alternateSlug;
   const languages: Record<string, string> = {};
   if (enSlug) {
     languages.en = `${PRODUCTION_APP_URL}/blog/${enSlug}`;
@@ -301,6 +309,40 @@ function softwareApplicationNode(locale: "en" | "es", url: string) {
   };
 }
 
+function buildBlogBreadcrumbJsonLd(
+  locale: "en" | "es",
+  postTitle: string,
+  postUrl: string
+) {
+  const blogIndexPath = locale === "es" ? "/es/blog" : "/blog";
+  const blogIndexUrl = `${PRODUCTION_APP_URL}${blogIndexPath}`;
+  const homeUrl = locale === "es" ? `${PRODUCTION_APP_URL}/es` : PRODUCTION_APP_URL;
+
+  return {
+    "@type": "BreadcrumbList" as const,
+    itemListElement: [
+      {
+        "@type": "ListItem" as const,
+        position: 1,
+        name: "Presusimple",
+        item: homeUrl,
+      },
+      {
+        "@type": "ListItem" as const,
+        position: 2,
+        name: "Blog",
+        item: blogIndexUrl,
+      },
+      {
+        "@type": "ListItem" as const,
+        position: 3,
+        name: postTitle,
+        item: postUrl,
+      },
+    ],
+  };
+}
+
 export function getLandingJsonLd(locale: "en" | "es") {
   const isSpanish = locale === "es";
   const url = isSpanish ? `${PRODUCTION_APP_URL}/es` : PRODUCTION_APP_URL;
@@ -327,6 +369,7 @@ export function getLandingJsonLd(locale: "en" | "es") {
           priceCurrency: isSpanish ? "EUR" : "USD",
         },
       },
+      buildFaqPageJsonLd(LANDING_FAQS[locale]),
     ],
   };
 }
@@ -340,12 +383,14 @@ export function getBlogPostJsonLd(
     date: string;
     author: string;
     dateModified?: string;
+    faqs?: FaqItem[];
   }
 ) {
   const basePath = locale === "es" ? "/es/blog" : "/blog";
   const url = `${PRODUCTION_APP_URL}${basePath}/${post.slug}`;
   const enrichment = getBlogSeoEnrichment(locale, post.slug);
   const landingUrl = locale === "es" ? `${PRODUCTION_APP_URL}/es` : PRODUCTION_APP_URL;
+  const breadcrumb = buildBlogBreadcrumbJsonLd(locale, post.title, url);
 
   const blogPosting = {
     "@type": "BlogPosting" as const,
@@ -374,14 +419,19 @@ export function getBlogPostJsonLd(
   };
 
   if (!enrichment) {
+    const graph: Record<string, unknown>[] = [blogPosting, breadcrumb];
+    if (post.faqs && post.faqs.length > 0) {
+      graph.push(buildFaqPageJsonLd(post.faqs));
+    }
     return {
       "@context": "https://schema.org",
-      ...blogPosting,
+      "@graph": graph,
     };
   }
 
   const graph: Record<string, unknown>[] = [
     blogPosting,
+    breadcrumb,
     softwareApplicationNode(locale, landingUrl),
     {
       "@type": "FAQPage",
