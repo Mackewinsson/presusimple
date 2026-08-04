@@ -11,25 +11,21 @@ interface NewUserOnboardingProps {
 export function NewUserOnboarding({ onComplete }: NewUserOnboardingProps) {
   const { t } = useTranslation();
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md mx-auto text-center space-y-8 p-8 bg-white/5 border border-white/10 rounded-2xl shadow-xl backdrop-blur-sm">
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 flex items-center justify-center p-4">
+      <div className="w-full max-w-md mx-auto text-center space-y-8 p-8 bg-card border border-border rounded-2xl shadow-xl">
         <div className="flex justify-center mb-4">
-          <span className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
-            <Crown className="h-8 w-8 text-white" />
+          <span className="w-16 h-16 bg-accent text-accent-foreground rounded-full flex items-center justify-center">
+            <Crown className="h-8 w-8" />
           </span>
         </div>
-        <h1 className="text-3xl font-bold text-white mb-2">{t('welcomeToPresusimpleExclaim')}</h1>
-        <p className="text-lg text-slate-300 mb-6">
-          {t('unlockAllFeatures')}
-        </p>
-        <Button
-          onClick={onComplete}
-          className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold px-8 py-3 text-lg"
-          size="lg"
-        >
-          {t('startBudgetingNow')}
+        <h1 className="text-3xl font-bold text-foreground mb-2">
+          {t("welcomeToPresusimpleExclaim")}
+        </h1>
+        <p className="text-lg text-muted-foreground mb-6">{t("unlockAllFeatures")}</p>
+        <Button onClick={onComplete} className="font-semibold px-8 py-3 text-lg" size="lg">
+          {t("startBudgetingNow")}
         </Button>
       </div>
     </div>
   );
-} 
+}

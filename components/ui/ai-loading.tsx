@@ -2,6 +2,7 @@
 
 import { Sparkles, Brain, Zap, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n";
 
 interface AILoadingProps {
   isProcessing: boolean;
@@ -10,12 +11,14 @@ interface AILoadingProps {
 }
 
 export const AILoading = ({ isProcessing, currentStep = "extracting", className }: AILoadingProps) => {
+  const { t } = useTranslation();
+
   if (!isProcessing) return null;
 
   const steps = [
-    { key: "extracting", label: "Analyzing your description...", icon: Brain },
-    { key: "creating", label: "Creating budget structure...", icon: Zap },
-    { key: "saving", label: "Saving to database...", icon: CheckCircle },
+    { key: "extracting", label: t("stepAnalyzingDescription"), icon: Brain },
+    { key: "creating", label: t("stepCreatingBudgetStructure"), icon: Zap },
+    { key: "saving", label: t("stepSavingToDatabase"), icon: CheckCircle },
   ];
 
   const currentStepIndex = steps.findIndex(step => step.key === currentStep);
@@ -43,10 +46,10 @@ export const AILoading = ({ isProcessing, currentStep = "extracting", className 
             </div>
           </div>
           <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-            AI Assistant Working
+            {t("aiAssistantWorking")}
           </h3>
           <p className="text-sm text-slate-700 dark:text-white/70 animate-pulse">
-            Creating your perfect budget...
+            {t("creatingYourPerfectBudget")}
           </p>
         </div>
 
@@ -63,14 +66,14 @@ export const AILoading = ({ isProcessing, currentStep = "extracting", className 
                 className={cn(
                   "flex items-center space-x-3 p-3 rounded-lg transition-all duration-300",
                   isActive && "bg-slate-100 dark:bg-white/20 border border-slate-200 dark:border-white/30",
-                  isCompleted && "bg-emerald-100 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/30",
+                  isCompleted && "bg-success/15 dark:bg-success/20 border border-success/30",
                   !isActive && !isCompleted && "bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10"
                 )}
               >
                 <div className={cn(
                   "flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300",
                   isActive && "bg-slate-900 dark:bg-white text-white dark:text-slate-900 animate-pulse",
-                  isCompleted && "bg-emerald-500 text-white",
+                  isCompleted && "bg-success text-success-foreground",
                   !isActive && !isCompleted && "bg-slate-200 dark:bg-white/20 text-slate-600 dark:text-white/50"
                 )}>
                   {isCompleted ? (
@@ -83,7 +86,7 @@ export const AILoading = ({ isProcessing, currentStep = "extracting", className 
                   <p className={cn(
                     "text-sm font-medium transition-colors duration-300",
                     isActive && "text-slate-900 dark:text-white",
-                    isCompleted && "text-emerald-700 dark:text-emerald-300",
+                    isCompleted && "text-success",
                     !isActive && !isCompleted && "text-slate-600 dark:text-white/50"
                   )}>
                     {step.label}

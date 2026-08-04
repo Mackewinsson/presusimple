@@ -22,13 +22,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Crown, Clock, CreditCard, Calendar, LogOut, Lock, Eye, EyeOff, Shield } from 'lucide-react';
+import { Crown, Clock, CreditCard, Calendar, LogOut, Lock, Eye, EyeOff, Shield, BookOpen } from 'lucide-react';
 import MobileHeader from '@/components/MobileHeader';
 import { AdminNavLink } from '@/components/admin/AdminNavLink';
 import SignOutButton from '@/components/SignOutButton';
 import { useViewport } from '@/hooks/useViewport';
 import { useTranslation, useLocale } from '@/lib/i18n';
 import { toast } from 'sonner';
+import { getBudgetBasePath } from '@/lib/budget-routes';
+import { useZbbTutorial } from '@/hooks/useZbbTutorial';
+import { ZeroBasedBudgetTutorial } from '@/components/onboarding/ZeroBasedBudgetTutorial';
+import { usePrivateMode } from '@/components/PrivateModeProvider';
+import { Switch } from '@/components/ui/switch';
 // import BudgetTemplateSelector from '@/components/budget/BudgetTemplateSelector';
 // import SavingsGoalList from '@/components/savings/SavingsGoalList';
 
@@ -59,9 +64,31 @@ function LanguageSetting() {
   );
 }
 
+function PrivateModeSetting() {
+  const { isPrivateMode, setPrivateMode } = usePrivateMode();
+  const { t } = useTranslation();
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-4">
+        <div className="space-y-1">
+          <Label className="text-base font-medium">{t('privateMode')}</Label>
+          <p className="text-sm text-muted-foreground">{t('privateModeDescription')}</p>
+        </div>
+        <Switch
+          checked={isPrivateMode}
+          onCheckedChange={setPrivateMode}
+          aria-label={t('privateMode')}
+        />
+      </div>
+    </div>
+  );
+}
+
 function DecimalSeparatorSetting() {
   const { data: decimalSeparator, isLoading } = useDecimalSeparator();
   const setDecimalSeparator = useSetDecimalSeparator();
+  const { t } = useTranslation();
 
   const value = decimalSeparator ?? 'dot';
 
@@ -77,12 +104,12 @@ function DecimalSeparatorSetting() {
 
   return (
     <Select value={value} onValueChange={handleChange}>
-      <SelectTrigger className="w-full max-w-[240px]" aria-label="Decimal separator">
+      <SelectTrigger className="w-full max-w-[240px]" aria-label={t('decimalSeparatorLabel')}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent position="popper" sideOffset={4}>
-        <SelectItem value="dot">Dot — 1,234.56</SelectItem>
-        <SelectItem value="comma">Comma — 1.234,56</SelectItem>
+        <SelectItem value="dot">{t('decimalSeparatorDot')}</SelectItem>
+        <SelectItem value="comma">{t('decimalSeparatorComma')}</SelectItem>
       </SelectContent>
     </Select>
   );
@@ -98,6 +125,8 @@ export default function SettingsPage() {
   const { checkout, loading: checkoutLoading, canCheckout } = useCheckout();
   const isAdmin = useIsAdmin();
   const [portalLoading, setPortalLoading] = useState(false);
+  const { isOpen: isTutorialOpen, openTutorial, onOpenChange: onTutorialOpenChange } =
+    useZbbTutorial();
 
   // Change password state
   const [passwordForm, setPasswordForm] = useState({
@@ -140,13 +169,19 @@ export default function SettingsPage() {
       const data = await res.json();
 
       if (res.ok) {
-        toast.success(data.message || t('passwordChangedSuccess'));
+        toast.success(t('passwordChangedSuccess'));
         setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
       } else {
-        const errorMsg = data.details
-          ? data.details.join(', ')
-          : data.error || t('failedToChangePassword');
-        toast.error(errorMsg);
+        const codeMessages: Record<string, string> = {
+          missing_fields: t('allPasswordFieldsRequired'),
+          passwords_mismatch: t('passwordsDoNotMatch'),
+          weak_password: data.details
+            ? `${t('passwordValidationFailed')}: ${data.details.join(', ')}`
+            : t('passwordValidationFailed'),
+          no_password_set: t('noPasswordSet'),
+          current_password_incorrect: t('currentPasswordIncorrect'),
+        };
+        toast.error(codeMessages[data.code] || t('failedToChangePassword'));
       }
     } catch (err) {
       console.error('Failed to change password:', err);
@@ -225,7 +260,7 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <Link 
-                href="/budget" 
+                href={getBudgetBasePath(pathname)} 
                 className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ArrowLeft className="h-5 w-5" />
@@ -293,7 +328,15 @@ export default function SettingsPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                           <div>
                             <span className="font-medium">{t('status')}:</span>
-                            <div className="text-muted-foreground capitalize">{subscriptionStatus}</div>
+                            <div className="text-muted-foreground">
+                              {subscriptionStatus === 'paid'
+                                ? t('statusPaid')
+                                : subscriptionStatus === 'trial'
+                                ? t('trial')
+                                : subscriptionStatus === 'expired'
+                                ? t('expired')
+                                : t('free')}
+                            </div>
                           </div>
                           <div>
                             <span className="font-medium">{t('plan')}:</span>
@@ -517,6 +560,31 @@ export default function SettingsPage() {
                     </p>
                     <DecimalSeparatorSetting />
                   </div>
+
+                  <PrivateModeSetting />
+
+                  <div className="space-y-4 pt-2 border-t border-border">
+                    <Label className="text-base font-medium">
+                      {t("zbbTutorialViewTutorial")}
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {t("zbbTutorialViewTutorialDescription")}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={openTutorial}
+                      className="w-full sm:w-auto"
+                    >
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      {t("zbbTutorialViewTutorial")}
+                    </Button>
+                  </div>
+
+                  <ZeroBasedBudgetTutorial
+                    open={isTutorialOpen}
+                    onOpenChange={onTutorialOpenChange}
+                  />
 
                   {/* Mobile Sign Out - Alternative Access */}
                   {isMobile && (

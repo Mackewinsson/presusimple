@@ -107,7 +107,7 @@ const InlineEdit: React.FC<InlineEditProps> = ({
           size="sm"
           variant="ghost"
           onClick={handleSave}
-          className="h-8 w-8 p-0 text-green-600 hover:text-green-700"
+          className="h-8 w-8 p-0 text-success hover:text-success/80"
         >
           <Check className="h-4 w-4" />
         </Button>

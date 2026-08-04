@@ -70,7 +70,7 @@ export function TrialStatus() {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Crown className="h-5 w-5 text-accent" />
+              <Crown className="h-5 w-5 text-success" />
               <CardTitle className="text-lg text-foreground">
                 {t('freeTrialActive')}
               </CardTitle>
@@ -111,7 +111,7 @@ export function TrialStatus() {
     <Card className="border-border bg-card mb-6">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-accent" />
+          <Sparkles className="h-5 w-5 text-success" />
           <CardTitle className="text-lg text-foreground">
             {t('unlockProFeatures')}
           </CardTitle>

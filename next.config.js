@@ -8,7 +8,10 @@ const withPWA = require('next-pwa')({
   register: true,
   skipWaiting: true,
   disable: pwaDisabled,
-  buildExcludes: [/middleware-manifest\.json$/],
+  // app-build-manifest.json is emitted by the App Router build but returns 404
+  // on Vercel; if workbox tries to precache it the service worker install
+  // fails and push notifications break ("no active Service Worker").
+  buildExcludes: [/middleware-manifest\.json$/, /app-build-manifest\.json$/],
   customWorkerDir: 'worker', // Extend auto-generated SW with custom notification handling
 });
 
@@ -20,7 +23,6 @@ const nextConfig = {
   // Production optimizations
   compress: true,
   poweredByHeader: false,
-  generateEtags: false,
   // Security headers
   async headers() {
     return [

@@ -11,15 +11,8 @@ jest.mock("@/models/User", () => ({
   },
 }));
 
-jest.mock("openai", () => ({
-  __esModule: true,
-  default: jest.fn().mockImplementation(() => ({
-    chat: {
-      completions: {
-        create: jest.fn(),
-      },
-    },
-  })),
+jest.mock("@/lib/ai/budget-extract", () => ({
+  extractBudgetFromDescription: jest.fn(),
 }));
 
 import { POST } from "@/app/api/budgets/ai-create/route";
@@ -30,16 +23,16 @@ const createMockRequest = (body: Record<string, unknown>) =>
   }) as any;
 
 describe("POST /api/budgets/ai-create", () => {
-  const originalOpenAiKey = process.env.OPENAI_API_KEY;
+  const originalGeminiKey = process.env.GEMINI_API_KEY;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.OPENAI_API_KEY = "test-key";
+    process.env.GEMINI_API_KEY = "test-key";
     mockFindById.mockResolvedValue({ plan: "free", isPaid: false });
   });
 
   afterAll(() => {
-    process.env.OPENAI_API_KEY = originalOpenAiKey;
+    process.env.GEMINI_API_KEY = originalGeminiKey;
   });
 
   it("returns 403 when user lacks aiBudgeting access", async () => {

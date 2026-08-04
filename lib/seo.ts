@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getAlternateBlogSlug } from "@/lib/blog-locale-pairs";
+import { getBlogSeoEnrichment } from "@/lib/blog-seo-enrichment";
 import { PRODUCTION_APP_URL } from "@/lib/constants/branding";
 import {
   buildFaqPageJsonLd,
@@ -12,35 +13,79 @@ export const SITE_NAME = "Presusimple";
 /** Served by app/opengraph-image.tsx */
 export const DEFAULT_OG_IMAGE = "/opengraph-image";
 
+const SOFTWARE_FEATURE_LIST_EN = [
+  "Monthly online budget planner",
+  "Daily expense tracking",
+  "Zero-based budgeting",
+  "Category limits",
+  "PWA offline support",
+] as const;
+
+const SOFTWARE_FEATURE_LIST_ES = [
+  "Presupuesto mensual online",
+  "Control de gastos diarios",
+  "Presupuesto base cero",
+  "Categorías y límites",
+  "PWA",
+] as const;
+
 const EN_KEYWORDS = [
   "budgeting app",
   "personal finance",
   "zero-based budget",
   "expense tracker",
+  "tracking daily spending",
+  "free online budget planner",
   "monthly budget planner",
   "PWA finance app",
   "Presusimple",
 ];
 
 const ES_KEYWORDS = [
+  "presupuesto online gratis",
   "app de presupuesto",
   "finanzas personales",
   "presupuesto base cero",
+  "gastos diarios",
   "control de gastos",
   "planificador de presupuesto mensual",
   "Presusimple",
 ];
 
 const EN_LANDING = {
-  title: "Presusimple – Budgeting Made Easy",
+  title: "Free Online Budget Planner | Presusimple",
   description:
-    "Zero-based budgeting app that tracks every expense. Plan monthly budgets, visualize spending, and take control of your finances with Presusimple.",
+    "Make a monthly budget online for free. Track expenses, set category limits, zero-based planning. Start your 30-day trial with Presusimple.",
 };
 
 const ES_LANDING = {
-  title: "Presusimple – Presupuestos Fáciles",
+  title: "Presupuesto online gratis | Presusimple",
   description:
-    "App de presupuesto base cero que rastrea cada gasto. Planifica presupuestos mensuales, visualiza tus finanzas y toma el control con Presusimple.",
+    "Crea tu presupuesto mensual online gratis. Control de gastos, categorías y base cero. Prueba Presusimple 30 días sin tarjeta.",
+};
+
+const EN_DEVELOPERS = {
+  title: "Budget & Expense Tracker API | Presusimple Developers",
+  description:
+    "REST API for budgets, expenses, and categories. JWT auth, OpenAPI/Swagger docs, ready for mobile and integrations. Build with Presusimple.",
+};
+
+const ES_DEVELOPERS = {
+  title: "API de presupuestos y gastos | Presusimple Developers",
+  description:
+    "API REST para presupuestos, gastos y categorías. Auth JWT, docs OpenAPI/Swagger, lista para móvil e integraciones. Construye con Presusimple.",
+};
+
+const EN_API_DOCS = {
+  title: "Presusimple API Docs (OpenAPI / Swagger)",
+  description:
+    "Interactive OpenAPI reference for the Presusimple budgeting API. Authenticate with JWT, try endpoints, and integrate expense tracking.",
+};
+
+const ES_API_DOCS = {
+  title: "Documentación API Presusimple (OpenAPI / Swagger)",
+  description:
+    "Referencia OpenAPI interactiva de la API de presupuestos de Presusimple. Autentica con JWT, prueba endpoints e integra el control de gastos.",
 };
 
 function buildOpenGraph(
@@ -86,6 +131,7 @@ export function getEnglishLandingMetadata(): Metadata {
       languages: {
         en: PRODUCTION_APP_URL,
         es: `${PRODUCTION_APP_URL}/es`,
+        "x-default": PRODUCTION_APP_URL,
       },
     },
     openGraph: buildOpenGraph(
@@ -108,6 +154,7 @@ export function getSpanishLandingMetadata(): Metadata {
       languages: {
         en: PRODUCTION_APP_URL,
         es: `${PRODUCTION_APP_URL}/es`,
+        "x-default": PRODUCTION_APP_URL,
       },
     },
     openGraph: buildOpenGraph(
@@ -138,6 +185,7 @@ export function getBlogIndexMetadata(locale: "en" | "es"): Metadata {
       languages: {
         en: `${PRODUCTION_APP_URL}/blog`,
         es: `${PRODUCTION_APP_URL}/es/blog`,
+        "x-default": `${PRODUCTION_APP_URL}/blog`,
       },
     },
     openGraph: buildOpenGraph(title, description, url, locale),
@@ -145,31 +193,33 @@ export function getBlogIndexMetadata(locale: "en" | "es"): Metadata {
   };
 }
 
-function getBlogPostAlternateLanguages(
-  locale: "en" | "es",
-  slug: string
-): Record<string, string> | undefined {
-  const alternateSlug = getAlternateBlogSlug(locale, slug);
-  if (!alternateSlug) {
-    return undefined;
-  }
-
-  const enSlug = locale === "en" ? slug : alternateSlug;
-  const esSlug = locale === "es" ? slug : alternateSlug;
-
-  return {
-    en: `${PRODUCTION_APP_URL}/blog/${enSlug}`,
-    es: `${PRODUCTION_APP_URL}/es/blog/${esSlug}`,
-  };
-}
-
 export function getBlogPostMetadata(
   locale: "en" | "es",
-  post: { title: string; description: string; slug: string; date: string; tags?: string[] }
+  post: {
+    title: string;
+    description: string;
+    slug: string;
+    date: string;
+    tags?: string[];
+    translationSlug?: string;
+  }
 ): Metadata {
   const basePath = locale === "es" ? "/es/blog" : "/blog";
   const url = `${PRODUCTION_APP_URL}${basePath}/${post.slug}`;
-  const languages = getBlogPostAlternateLanguages(locale, post.slug);
+
+  // Prefer frontmatter translationSlug; fall back to locale-pairs map
+  const alternateSlug =
+    post.translationSlug ?? getAlternateBlogSlug(locale, post.slug);
+  const enSlug = locale === "en" ? post.slug : alternateSlug;
+  const esSlug = locale === "es" ? post.slug : alternateSlug;
+  const languages: Record<string, string> = {};
+  if (enSlug) {
+    languages.en = `${PRODUCTION_APP_URL}/blog/${enSlug}`;
+    languages["x-default"] = `${PRODUCTION_APP_URL}/blog/${enSlug}`;
+  }
+  if (esSlug) {
+    languages.es = `${PRODUCTION_APP_URL}/es/blog/${esSlug}`;
+  }
 
   return {
     title: `${post.title} | Presusimple`,
@@ -177,7 +227,7 @@ export function getBlogPostMetadata(
     keywords: post.tags,
     alternates: {
       canonical: url,
-      ...(languages ? { languages } : {}),
+      ...(Object.keys(languages).length > 0 ? { languages } : {}),
     },
     openGraph: {
       ...buildOpenGraph(`${post.title} | Presusimple`, post.description, url, locale),
@@ -185,6 +235,111 @@ export function getBlogPostMetadata(
       publishedTime: post.date,
     },
     twitter: buildTwitter(`${post.title} | Presusimple`, post.description),
+  };
+}
+
+/** Metadata for the Privacy Policy page with cross-language alternates. */
+export function getPrivacyMetadata(locale: "en" | "es"): Metadata {
+  const isSpanish = locale === "es";
+  const title = isSpanish ? "Política de Privacidad | Presusimple" : "Privacy Policy | Presusimple";
+  const description = isSpanish
+    ? "Cómo Presusimple recopila, usa y protege tus datos personales."
+    : "How Presusimple collects, uses, and protects your personal data.";
+  const url = isSpanish ? `${PRODUCTION_APP_URL}/es/privacy` : `${PRODUCTION_APP_URL}/privacy`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: url,
+      languages: {
+        en: `${PRODUCTION_APP_URL}/privacy`,
+        es: `${PRODUCTION_APP_URL}/es/privacy`,
+        "x-default": `${PRODUCTION_APP_URL}/privacy`,
+      },
+    },
+  };
+}
+
+/** Metadata for the Terms of Service page with cross-language alternates. */
+export function getTermsMetadata(locale: "en" | "es"): Metadata {
+  const isSpanish = locale === "es";
+  const title = isSpanish ? "Términos de Servicio | Presusimple" : "Terms of Service | Presusimple";
+  const description = isSpanish
+    ? "Términos de Servicio para usar Presusimple."
+    : "Terms of Service for using Presusimple personal finance software.";
+  const url = isSpanish ? `${PRODUCTION_APP_URL}/es/terms` : `${PRODUCTION_APP_URL}/terms`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: url,
+      languages: {
+        en: `${PRODUCTION_APP_URL}/terms`,
+        es: `${PRODUCTION_APP_URL}/es/terms`,
+        "x-default": `${PRODUCTION_APP_URL}/terms`,
+      },
+    },
+  };
+}
+
+function softwareApplicationNode(locale: "en" | "es", url: string) {
+  const isSpanish = locale === "es";
+  return {
+    "@type": "SoftwareApplication" as const,
+    name: SITE_NAME,
+    applicationCategory: "FinanceApplication",
+    applicationSubCategory: "Budgeting",
+    operatingSystem: "Web, iOS, Android",
+    isAccessibleForFree: true,
+    featureList: isSpanish
+      ? [...SOFTWARE_FEATURE_LIST_ES]
+      : [...SOFTWARE_FEATURE_LIST_EN],
+    offers: {
+      "@type": "Offer" as const,
+      price: "0",
+      priceCurrency: isSpanish ? "EUR" : "USD",
+      description: isSpanish
+        ? "Plan gratuito de prueba 30 días; luego Pro opcional"
+        : "Free 30-day trial; Pro plan optional afterward",
+    },
+    description: isSpanish ? ES_LANDING.description : EN_LANDING.description,
+    url,
+  };
+}
+
+function buildBlogBreadcrumbJsonLd(
+  locale: "en" | "es",
+  postTitle: string,
+  postUrl: string
+) {
+  const blogIndexPath = locale === "es" ? "/es/blog" : "/blog";
+  const blogIndexUrl = `${PRODUCTION_APP_URL}${blogIndexPath}`;
+  const homeUrl = locale === "es" ? `${PRODUCTION_APP_URL}/es` : PRODUCTION_APP_URL;
+
+  return {
+    "@type": "BreadcrumbList" as const,
+    itemListElement: [
+      {
+        "@type": "ListItem" as const,
+        position: 1,
+        name: "Presusimple",
+        item: homeUrl,
+      },
+      {
+        "@type": "ListItem" as const,
+        position: 2,
+        name: "Blog",
+        item: blogIndexUrl,
+      },
+      {
+        "@type": "ListItem" as const,
+        position: 3,
+        name: postTitle,
+        item: postUrl,
+      },
+    ],
   };
 }
 
@@ -202,18 +357,17 @@ export function getLandingJsonLd(locale: "en" | "es") {
         logo: `${PRODUCTION_APP_URL}/icons/icon-512x512.png`,
         sameAs: [PRODUCTION_APP_URL],
       },
+      softwareApplicationNode(locale, url),
       {
-        "@type": "SoftwareApplication",
+        "@type": "WebApplication",
         name: SITE_NAME,
-        applicationCategory: "FinanceApplication",
-        operatingSystem: "Web, iOS, Android",
+        browserRequirements: "Requires JavaScript",
+        url,
         offers: {
           "@type": "Offer",
           price: "0",
-          priceCurrency: "USD",
+          priceCurrency: isSpanish ? "EUR" : "USD",
         },
-        description: isSpanish ? ES_LANDING.description : EN_LANDING.description,
-        url,
       },
       buildFaqPageJsonLd(LANDING_FAQS[locale]),
     ],
@@ -228,73 +382,239 @@ export function getBlogPostJsonLd(
     slug: string;
     date: string;
     author: string;
+    dateModified?: string;
     faqs?: FaqItem[];
   }
 ) {
   const basePath = locale === "es" ? "/es/blog" : "/blog";
-  const blogIndexPath = locale === "es" ? "/es/blog" : "/blog";
   const url = `${PRODUCTION_APP_URL}${basePath}/${post.slug}`;
-  const blogIndexUrl = `${PRODUCTION_APP_URL}${blogIndexPath}`;
-  const homeUrl = locale === "es" ? `${PRODUCTION_APP_URL}/es` : PRODUCTION_APP_URL;
-  const blogIndexLabel = locale === "es" ? "Blog" : "Blog";
+  const enrichment = getBlogSeoEnrichment(locale, post.slug);
+  const landingUrl = locale === "es" ? `${PRODUCTION_APP_URL}/es` : PRODUCTION_APP_URL;
+  const breadcrumb = buildBlogBreadcrumbJsonLd(locale, post.title, url);
+
+  const blogPosting = {
+    "@type": "BlogPosting" as const,
+    headline: post.title,
+    description: post.description,
+    datePublished: post.date,
+    ...(post.dateModified ? { dateModified: post.dateModified } : {}),
+    inLanguage: locale === "es" ? "es" : "en",
+    author: {
+      "@type": "Organization" as const,
+      name: post.author,
+    },
+    publisher: {
+      "@type": "Organization" as const,
+      name: SITE_NAME,
+      logo: {
+        "@type": "ImageObject" as const,
+        url: `${PRODUCTION_APP_URL}/icons/icon-512x512.png`,
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage" as const,
+      "@id": url,
+    },
+    url,
+  };
+
+  if (!enrichment) {
+    const graph: Record<string, unknown>[] = [blogPosting, breadcrumb];
+    if (post.faqs && post.faqs.length > 0) {
+      graph.push(buildFaqPageJsonLd(post.faqs));
+    }
+    return {
+      "@context": "https://schema.org",
+      "@graph": graph,
+    };
+  }
 
   const graph: Record<string, unknown>[] = [
+    blogPosting,
+    breadcrumb,
+    softwareApplicationNode(locale, landingUrl),
     {
-      "@type": "BlogPosting",
-      headline: post.title,
-      description: post.description,
-      datePublished: post.date,
-      inLanguage: locale === "es" ? "es" : "en",
-      author: {
-        "@type": "Organization",
-        name: post.author,
-      },
-      publisher: {
-        "@type": "Organization",
-        name: SITE_NAME,
-        logo: {
-          "@type": "ImageObject",
-          url: `${PRODUCTION_APP_URL}/icons/icon-512x512.png`,
+      "@type": "FAQPage",
+      mainEntity: enrichment.faqs.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.answer,
         },
-      },
-      mainEntityOfPage: {
-        "@type": "WebPage",
-        "@id": url,
-      },
-      url,
-    },
-    {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: "Presusimple",
-          item: homeUrl,
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: blogIndexLabel,
-          item: blogIndexUrl,
-        },
-        {
-          "@type": "ListItem",
-          position: 3,
-          name: post.title,
-          item: url,
-        },
-      ],
+      })),
     },
   ];
 
-  if (post.faqs && post.faqs.length > 0) {
-    graph.push(buildFaqPageJsonLd(post.faqs));
+  if (enrichment.howTo) {
+    graph.push({
+      "@type": "HowTo",
+      name: enrichment.howTo.name,
+      description: enrichment.howTo.description,
+      ...(enrichment.howTo.totalTime
+        ? { totalTime: enrichment.howTo.totalTime }
+        : {}),
+      step: enrichment.howTo.steps.map((step) => ({
+        "@type": "HowToStep",
+        name: step.name,
+        text: step.text,
+      })),
+      tool: {
+        "@type": "HowToTool",
+        name: SITE_NAME,
+      },
+    });
   }
 
   return {
     "@context": "https://schema.org",
     "@graph": graph,
+  };
+}
+
+export function getDevelopersMetadata(locale: "en" | "es"): Metadata {
+  const isSpanish = locale === "es";
+  const copy = isSpanish ? ES_DEVELOPERS : EN_DEVELOPERS;
+  const url = isSpanish
+    ? `${PRODUCTION_APP_URL}/es/developers`
+    : `${PRODUCTION_APP_URL}/developers`;
+
+  return {
+    title: copy.title,
+    description: copy.description,
+    alternates: {
+      canonical: url,
+      languages: {
+        en: `${PRODUCTION_APP_URL}/developers`,
+        es: `${PRODUCTION_APP_URL}/es/developers`,
+        "x-default": `${PRODUCTION_APP_URL}/developers`,
+      },
+    },
+    openGraph: buildOpenGraph(copy.title, copy.description, url, locale),
+    twitter: buildTwitter(copy.title, copy.description),
+  };
+}
+
+export function getDevelopersJsonLd(locale: "en" | "es") {
+  const isSpanish = locale === "es";
+  const url = isSpanish
+    ? `${PRODUCTION_APP_URL}/es/developers`
+    : `${PRODUCTION_APP_URL}/developers`;
+  const apiDocsUrl = `${PRODUCTION_APP_URL}/api-docs`;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        name: isSpanish ? ES_DEVELOPERS.title : EN_DEVELOPERS.title,
+        description: isSpanish
+          ? ES_DEVELOPERS.description
+          : EN_DEVELOPERS.description,
+        url,
+        inLanguage: isSpanish ? "es" : "en",
+        isPartOf: {
+          "@type": "WebSite",
+          name: SITE_NAME,
+          url: PRODUCTION_APP_URL,
+        },
+      },
+      {
+        "@type": "TechArticle",
+        headline: isSpanish
+          ? "API REST de Presusimple para presupuestos y gastos"
+          : "Presusimple REST API for budgets and expenses",
+        description: isSpanish
+          ? ES_DEVELOPERS.description
+          : EN_DEVELOPERS.description,
+        url,
+        author: {
+          "@type": "Organization",
+          name: SITE_NAME,
+        },
+        publisher: {
+          "@type": "Organization",
+          name: SITE_NAME,
+          logo: {
+            "@type": "ImageObject",
+            url: `${PRODUCTION_APP_URL}/icons/icon-512x512.png`,
+          },
+        },
+      },
+      softwareApplicationNode(
+        locale,
+        isSpanish ? `${PRODUCTION_APP_URL}/es` : PRODUCTION_APP_URL
+      ),
+      {
+        "@type": "WebAPI",
+        name: "Presusimple API",
+        description: isSpanish
+          ? "API REST con autenticación JWT para presupuestos, gastos y categorías."
+          : "REST API with JWT authentication for budgets, expenses, and categories.",
+        documentation: apiDocsUrl,
+        url: `${PRODUCTION_APP_URL}/api`,
+        provider: {
+          "@type": "Organization",
+          name: SITE_NAME,
+          url: PRODUCTION_APP_URL,
+        },
+      },
+    ],
+  };
+}
+
+export function getApiDocsMetadata(locale: "en" | "es" = "en"): Metadata {
+  const isSpanish = locale === "es";
+  const copy = isSpanish ? ES_API_DOCS : EN_API_DOCS;
+  const url = `${PRODUCTION_APP_URL}/api-docs`;
+
+  return {
+    title: copy.title,
+    description: copy.description,
+    alternates: {
+      canonical: url,
+    },
+    openGraph: buildOpenGraph(copy.title, copy.description, url, locale),
+    twitter: buildTwitter(copy.title, copy.description),
+  };
+}
+
+export function getApiDocsJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        headline: EN_API_DOCS.title,
+        description: EN_API_DOCS.description,
+        url: `${PRODUCTION_APP_URL}/api-docs`,
+        author: {
+          "@type": "Organization",
+          name: SITE_NAME,
+        },
+        publisher: {
+          "@type": "Organization",
+          name: SITE_NAME,
+          logo: {
+            "@type": "ImageObject",
+            url: `${PRODUCTION_APP_URL}/icons/icon-512x512.png`,
+          },
+        },
+      },
+      {
+        "@type": "WebAPI",
+        name: "Presusimple API",
+        description:
+          "OpenAPI/Swagger interactive documentation for budgets, expenses, categories, and auth.",
+        documentation: `${PRODUCTION_APP_URL}/api-docs`,
+        url: `${PRODUCTION_APP_URL}/api`,
+        provider: {
+          "@type": "Organization",
+          name: SITE_NAME,
+          url: PRODUCTION_APP_URL,
+        },
+      },
+    ],
   };
 }
 

@@ -62,14 +62,14 @@ export default function PWALandingPage() {
   // PWA-First Mobile Experience
   if (shouldShowPWAFirst) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 flex flex-col">
         {/* Mobile Header */}
-        <header className="border-b border-white/10 bg-white/5 backdrop-blur-xl sticky top-0 z-50">
+        <header className="border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-50">
           <div className="container mx-auto px-4 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <AppIcon size={24} className="h-6 w-6" />
-                <h1 className="text-lg font-bold text-white">{t('appName')}</h1>
+                <h1 className="text-lg font-bold text-foreground">{t('appName')}</h1>
               </div>
               <div className="flex items-center gap-2">
                 <LanguageSwitcher />
@@ -79,7 +79,6 @@ export default function PWALandingPage() {
                     onClick={handleSignOut}
                     variant="ghost"
                     size="sm"
-                    className="text-white hover:bg-white/10"
                   >
                     {t('signOut')}
                   </Button>
@@ -92,15 +91,15 @@ export default function PWALandingPage() {
         <main className="flex-1 flex flex-col items-center justify-center p-4 text-center">
           {/* PWA Installation Hero */}
           <div className="max-w-md mx-auto space-y-6">
-            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
-              <Smartphone className="h-10 w-10 text-white" />
+            <div className="w-20 h-20 mx-auto bg-accent text-accent-foreground rounded-full flex items-center justify-center shadow-lg">
+              <Smartphone className="h-10 w-10" />
             </div>
             
             <div className="space-y-2">
-              <h1 className="text-2xl font-bold text-white">
+              <h1 className="text-2xl font-bold text-foreground">
                 {t('installPresusimple')}
               </h1>
-              <p className="text-slate-300 text-sm">
+              <p className="text-muted-foreground text-sm">
                 {t('getTheFullAppExperience')}
               </p>
             </div>
@@ -109,10 +108,10 @@ export default function PWALandingPage() {
             <div className="space-y-3">
               {pwaStatus.installBenefits.common.map((benefit, index) => (
                 <div key={index} className="flex items-center gap-3 text-left">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Check className="h-3 w-3 text-white" />
+                  <div className="w-6 h-6 bg-accent text-accent-foreground rounded-full flex items-center justify-center flex-shrink-0">
+                    <Check className="h-3 w-3" />
                   </div>
-                  <span className="text-slate-300 text-sm">{benefit}</span>
+                  <span className="text-muted-foreground text-sm">{benefit}</span>
                 </div>
               ))}
             </div>
@@ -122,7 +121,7 @@ export default function PWALandingPage() {
               {pwaStatus.isInstallable ? (
                 <Button
                   onClick={handleInstall}
-                  className="w-full bg-white hover:bg-gray-100 text-gray-900 font-medium py-3 text-base shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="w-full font-medium py-3 text-base shadow-lg hover:shadow-xl"
                   size="lg"
                 >
                   <Download className="h-5 w-5 mr-2" />
@@ -131,7 +130,7 @@ export default function PWALandingPage() {
               ) : (
                 <Button
                   onClick={() => setShowInstallInstructions(true)}
-                  className="w-full bg-white hover:bg-gray-100 text-gray-900 font-medium py-3 text-base shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="w-full font-medium py-3 text-base shadow-lg hover:shadow-xl"
                   size="lg"
                 >
                   <Share className="h-5 w-5 mr-2" />
@@ -142,7 +141,7 @@ export default function PWALandingPage() {
               <Button
                 onClick={handleLaunchApp}
                 variant="outline"
-                className="w-full border-white/20 text-white hover:bg-white/10"
+                className="w-full"
                 size="lg"
               >
                 {t('continueInBrowser')}
@@ -153,7 +152,7 @@ export default function PWALandingPage() {
           {/* Install Instructions Modal */}
           {showInstallInstructions && (
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <Card className="w-full max-w-sm bg-white/95 backdrop-blur-sm border-white/20">
+              <Card className="w-full max-w-sm bg-card border-border">
                 <CardHeader className="text-center">
                   <CardTitle className="text-lg">{t('installInstructions')}</CardTitle>
                   <CardDescription>
@@ -204,7 +203,7 @@ export default function PWALandingPage() {
               className="flex items-center gap-2 sm:gap-3 hover:opacity-90 transition-opacity"
             >
               <AppIcon size={24} className="h-4 w-4 sm:h-6 sm:w-6" />
-              <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+              <h1 className="text-lg sm:text-2xl font-bold heading-gradient">
                 Presusimple
               </h1>
             </Link>
@@ -245,7 +244,7 @@ export default function PWALandingPage() {
         {/* Hero Section */}
         <section className="py-8 sm:py-12 md:py-20 px-4">
           <div className="container mx-auto text-center">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-gray-200 dark:to-white bg-clip-text text-transparent leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 heading-gradient leading-tight">
               {t('presusimpleHeroTitle')}
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-slate-700 dark:text-white/80 max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-10 px-4">
@@ -322,7 +321,7 @@ export default function PWALandingPage() {
                         <h3 className="font-semibold text-white">{t('appBenefits')}</h3>
                         {pwaStatus.installBenefits.common.map((benefit, index) => (
                           <div key={index} className="flex items-center gap-3">
-                            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <div className="w-6 h-6 bg-accent text-accent-foreground rounded-full flex items-center justify-center flex-shrink-0">
                               <Check className="h-3 w-3 text-white" />
                             </div>
                             <span className="text-slate-300 text-sm">{benefit}</span>

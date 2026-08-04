@@ -3,6 +3,7 @@
 import React from "react";
 import { Progress } from "@/components/ui/progress";
 import { calculatePercentage, getBudgetStatus } from "@/lib/utils/formatMoney";
+import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
 import { cn } from "@/lib/utils";
 
 interface ProgressBarProps {
@@ -18,13 +19,14 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   showPercentage = false,
   className,
 }) => {
+  const { formatPercent, isPrivateMode } = useFormatMoney();
   const percentage = calculatePercentage(spent, budgeted);
   const status = getBudgetStatus(spent, budgeted);
 
   const getStatusColor = () => {
     switch (status) {
       case "success":
-        return "bg-green-500";
+        return "bg-success";
       case "warning":
         return "bg-amber-500";
       case "danger":
@@ -45,7 +47,14 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
         )}
       />
       {showPercentage && (
-        <div className="text-xs text-muted-foreground">{percentage}% used</div>
+        <div
+          className={cn(
+            "text-xs text-muted-foreground",
+            isPrivateMode && "sensitive-amount"
+          )}
+        >
+          {isPrivateMode ? formatPercent(spent, budgeted) : `${percentage}%`} used
+        </div>
       )}
     </div>
   );

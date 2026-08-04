@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { formatMoney } from "@/lib/utils/formatMoney";
+import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
 import { format, parseISO } from "date-fns";
 import Link from "next/link";
 import {
@@ -38,10 +38,17 @@ import {
 } from "recharts";
 import { useMonthlyBudgets, useUserId, useExpenses, useCategories, useCurrentDecimalSeparator } from "@/lib/hooks";
 import { Skeleton } from "@/components/ui/skeleton";
+import MobileHeader from "@/components/MobileHeader";
+import { useTranslation } from "@/lib/i18n";
+import { getHistoryBasePath } from "@/lib/budget-routes";
 
 function InsightsContent() {
+  const { t } = useTranslation();
+  const pathname = usePathname();
+  const historyBase = getHistoryBasePath(pathname);
   const { data: userId } = useUserId();
   const decimalSeparator = useCurrentDecimalSeparator();
+  const { formatAmount, isPrivateMode } = useFormatMoney();
   const { data: budgets = [], isLoading: budgetsLoading, refetch: refetchBudgets } = useMonthlyBudgets(
     userId || ""
   );
@@ -180,13 +187,13 @@ function InsightsContent() {
           <p className="text-sm text-muted-foreground">
             Spent:{" "}
             <span className="font-medium text-foreground">
-              {formatMoney(data.spent, undefined, decimalSeparator)}
+              {formatAmount(data.spent, undefined, decimalSeparator)}
             </span>
           </p>
           <p className="text-sm text-muted-foreground">
             Budgeted:{" "}
             <span className="font-medium text-foreground">
-              {formatMoney(data.budgeted, undefined, decimalSeparator)}
+              {formatAmount(data.budgeted, undefined, decimalSeparator)}
             </span>
           </p>
         </div>
@@ -197,18 +204,19 @@ function InsightsContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
-      <header className="border-b bg-card/80 backdrop-blur-lg sticky top-0 z-50">
+      <MobileHeader />
+      <header className="hidden md:block border-b bg-card/80 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link
-                href="/history"
+                href={historyBase}
                 className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ArrowLeft className="h-5 w-5" />
-                Back to History
+                {t("backToHistory")}
               </Link>
-              <h1 className="text-xl sm:text-2xl font-bold">Budget Insights</h1>
+              <h1 className="text-xl sm:text-2xl font-bold">{t("budgetInsights")}</h1>
             </div>
 
             <Select
@@ -216,7 +224,7 @@ function InsightsContent() {
               onValueChange={setSelectedBudgetId}
             >
               <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Select a month" />
+                <SelectValue placeholder={t("selectAMonth")} />
               </SelectTrigger>
               <SelectContent>
                 {budgets.map((budget) => (
@@ -265,7 +273,7 @@ function InsightsContent() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="h-5 w-5 text-primary" />
-                    Budget Overview
+                    {t("budgetOverview")}
                   </CardTitle>
                   <CardDescription>
                     {format(parseISO(selectedBudget.createdAt), "MMMM yyyy")}
@@ -275,30 +283,30 @@ function InsightsContent() {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">
-                        Total Budgeted
+                        {t("totalBudgeted")}
                       </span>
                       <span className="font-medium">
-                        {formatMoney(selectedBudget.totalBudgeted, undefined, decimalSeparator)}
+                        {formatAmount(selectedBudget.totalBudgeted, undefined, decimalSeparator)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Total Spent</span>
+                      <span className="text-muted-foreground">{t("totalSpent")}</span>
                       <span className="font-medium">
-                        {formatMoney(selectedBudget.totalSpent, undefined, decimalSeparator)}
+                        {formatAmount(selectedBudget.totalSpent, undefined, decimalSeparator)}
                       </span>
                     </div>
                     <div className="flex justify-between pt-2 border-t">
-                      <span className="text-muted-foreground">Difference</span>
+                      <span className="text-muted-foreground">{t("difference")}</span>
                       <span
                         className={`font-medium ${
                           selectedBudget.totalBudgeted -
                             selectedBudget.totalSpent >=
                           0
-                            ? "text-accent-foreground"
+                            ? "text-success"
                             : "text-destructive"
                         }`}
                       >
-                        {formatMoney(
+                        {formatAmount(
                           selectedBudget.totalBudgeted -
                             selectedBudget.totalSpent,
                           undefined,
@@ -313,17 +321,17 @@ function InsightsContent() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <ArrowDownCircle className="h-5 w-5 text-accent" />
-                    Income
+                    <ArrowDownCircle className="h-5 w-5 text-success" />
+                    {t("income")}
                   </CardTitle>
-                  <CardDescription>Total income for the month</CardDescription>
+                  <CardDescription>{t("totalIncomeForMonth")}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-accent-foreground">
-                    {formatMoney(incomeTotal, undefined, decimalSeparator)}
+                  <div className="text-3xl font-bold text-success">
+                    {formatAmount(incomeTotal, undefined, decimalSeparator)}
                   </div>
                   <div className="text-sm text-muted-foreground mt-2">
-                    Total income for {format(parseISO(selectedBudget.createdAt), "MMMM yyyy")}
+                    {t("totalIncomeForMonth")} — {format(parseISO(selectedBudget.createdAt), "MMMM yyyy")}
                   </div>
                 </CardContent>
               </Card>
@@ -332,18 +340,18 @@ function InsightsContent() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <ArrowUpCircle className="h-5 w-5 text-destructive" />
-                    Expenses
+                    {t("expenses")}
                   </CardTitle>
                   <CardDescription>
-                    Total expenses for the month
+                    {t("totalExpensesForMonth")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-destructive">
-                    {formatMoney(finalExpenseTotal, undefined, decimalSeparator)}
+                    {formatAmount(finalExpenseTotal, undefined, decimalSeparator)}
                   </div>
                   <div className="text-sm text-muted-foreground mt-2">
-                    Total expenses for {format(parseISO(selectedBudget.createdAt), "MMMM yyyy")}
+                    {t("totalExpensesForMonth")} — {format(parseISO(selectedBudget.createdAt), "MMMM yyyy")}
                   </div>
                 </CardContent>
               </Card>
@@ -354,10 +362,10 @@ function InsightsContent() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <PieChart className="h-5 w-5 text-primary" />
-                  Category Spending
+                  {t("categorySpending")}
                 </CardTitle>
                 <CardDescription>
-                  Comparison of budgeted vs actual spending by category
+                  {t("categorySpendingDescription")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -392,7 +400,7 @@ function InsightsContent() {
                         textAnchor="middle"
                       />
                       <YAxis
-                        tickFormatter={(value) => formatMoney(value, undefined, decimalSeparator)}
+                        tickFormatter={(value) => formatAmount(value, undefined, decimalSeparator)}
                         tick={{
                           fill: "hsl(var(--muted-foreground))",
                           fontSize: 12,
@@ -436,9 +444,9 @@ function InsightsContent() {
             {/* Top Categories */}
             <Card>
               <CardHeader>
-                <CardTitle>Top Spending Categories</CardTitle>
+                <CardTitle>{t("topSpendingCategories")}</CardTitle>
                 <CardDescription>
-                  Categories where you spent the most
+                  {t("topCategoriesDescription")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -454,7 +462,7 @@ function InsightsContent() {
                               : ""
                           }
                         >
-                          {formatMoney(category.spent, undefined, decimalSeparator)}
+                          {formatAmount(category.spent, undefined, decimalSeparator)}
                         </span>
                       </div>
                       <div className="h-2 rounded-full bg-secondary overflow-hidden">
@@ -473,12 +481,12 @@ function InsightsContent() {
                         />
                       </div>
                       <div className="flex justify-between text-sm text-muted-foreground">
-                        <span>Budgeted: {formatMoney(category.budgeted, undefined, decimalSeparator)}</span>
+                        <span>{t("budgeted")}: {formatAmount(category.budgeted, undefined, decimalSeparator)}</span>
                         <span>
                           {Math.round(
                             (category.spent / category.budgeted) * 100
                           )}
-                          % spent
+                          {t("percentSpent")}
                         </span>
                       </div>
                     </div>
@@ -490,7 +498,7 @@ function InsightsContent() {
         ) : (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              No budget history available. Save a month to see insights.
+              {t("noInsightsYet")}
             </p>
           </div>
         )}

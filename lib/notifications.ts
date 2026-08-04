@@ -146,6 +146,22 @@ export function buildWebPushPayload(payload: NotificationPayload) {
   };
 }
 
+/**
+ * Status codes from the push service that mean the stored subscription can
+ * never be delivered to again and must be recreated by the client:
+ * - 404/410: subscription expired or unsubscribed
+ * - 403: subscription was created with different VAPID keys (e.g. an
+ *   environment with mismatched keys wrote to the shared database)
+ */
+const STALE_SUBSCRIPTION_STATUS_CODES = [403, 404, 410];
+
+export function isStaleSubscriptionError(statusCode?: number): boolean {
+  return (
+    statusCode !== undefined &&
+    STALE_SUBSCRIPTION_STATUS_CODES.includes(statusCode)
+  );
+}
+
 export interface NotificationResult {
   success: boolean;
   sent: number;
@@ -153,90 +169,129 @@ export interface NotificationResult {
   errors: string[];
 }
 
+export interface NotificationFailure {
+  userId: string;
+  error: string;
+  statusCode?: number;
+}
+
+export interface NotificationBatchResult extends NotificationResult {
+  failures: NotificationFailure[];
+}
+
+export interface NotificationRecipient {
+  userId: string;
+  subscription: Record<string, unknown>;
+}
+
+async function sendRawNotification(
+  subscription: Record<string, unknown>,
+  payload: NotificationPayload
+): Promise<{ success: boolean; error?: string; statusCode?: number }> {
+  try {
+    const notificationPayload = JSON.stringify(buildWebPushPayload(payload));
+    await webpush.sendNotification(
+      subscription as unknown as webpush.PushSubscription,
+      notificationPayload
+    );
+    return { success: true };
+  } catch (error: unknown) {
+    const err = error as { message?: string; statusCode?: number };
+    console.error("Error sending notification:", err);
+
+    if (err.statusCode === 410) {
+      return { success: false, error: "Subscription expired", statusCode: 410 };
+    }
+    if (err.statusCode === 404) {
+      return { success: false, error: "Subscription not found", statusCode: 404 };
+    }
+    if (err.statusCode === 403) {
+      return {
+        success: false,
+        error: "Subscription created with different VAPID keys",
+        statusCode: 403,
+      };
+    }
+    if (err.statusCode === 413) {
+      return { success: false, error: "Payload too large", statusCode: 413 };
+    }
+
+    return {
+      success: false,
+      error: err.message || "Unknown error",
+      statusCode: err.statusCode,
+    };
+  }
+}
+
+export interface NotificationSendResult {
+  success: boolean;
+  error?: string;
+  statusCode?: number;
+}
+
 /**
  * Send notification to a single user
  */
 export async function sendNotificationToUser(
-  subscription: any,
+  subscription: Record<string, unknown>,
   payload: NotificationPayload
-): Promise<{ success: boolean; error?: string }> {
-  try {
-    console.log('🚀 Initializing web-push...');
-    if (!initializeWebPush()) {
-      console.error('❌ Web-push initialization failed');
-      return { success: false, error: 'Web-push not initialized' };
-    }
-    console.log('✅ Web-push initialized successfully');
-
-    const notificationPayload = JSON.stringify(buildWebPushPayload(payload));
-    console.log('📤 Sending notification with payload:', notificationPayload);
-    
-    await webpush.sendNotification(subscription, notificationPayload);
-    console.log('✅ Notification sent successfully');
-    
-    return { success: true };
-  } catch (error: any) {
-    console.error('❌ Error sending notification:', error);
-    console.error('❌ Error details:', {
-      message: error.message,
-      statusCode: error.statusCode,
-      headers: error.headers,
-    });
-    
-    // Handle specific web-push errors
-    if (error.statusCode === 410) {
-      return { success: false, error: 'Subscription expired' };
-    } else if (error.statusCode === 404) {
-      return { success: false, error: 'Subscription not found' };
-    } else if (error.statusCode === 413) {
-      return { success: false, error: 'Payload too large' };
-    }
-    
-    return { success: false, error: error.message || 'Unknown error' };
+): Promise<NotificationSendResult> {
+  if (!initializeWebPush()) {
+    return { success: false, error: "Web-push not initialized" };
   }
+
+  return sendRawNotification(subscription, payload);
 }
 
 /**
- * Send notification to multiple users
+ * Send notification to multiple users with per-recipient failure metadata.
  */
-export async function sendNotificationToUsers(
-  subscriptions: any[],
+export async function sendNotificationToRecipients(
+  recipients: NotificationRecipient[],
   payload: NotificationPayload
-): Promise<NotificationResult> {
-  const result: NotificationResult = {
+): Promise<NotificationBatchResult> {
+  const result: NotificationBatchResult = {
     success: true,
     sent: 0,
     failed: 0,
     errors: [],
+    failures: [],
   };
 
   if (!initializeWebPush()) {
     result.success = false;
-    result.errors.push('Web-push not initialized');
+    result.errors.push("Web-push not initialized");
     return result;
   }
 
-  // Send notifications in parallel with a reasonable concurrency limit
   const concurrencyLimit = 10;
-  const chunks = [];
-  
-  for (let i = 0; i < subscriptions.length; i += concurrencyLimit) {
-    chunks.push(subscriptions.slice(i, i + concurrencyLimit));
+  const chunks: NotificationRecipient[][] = [];
+
+  for (let i = 0; i < recipients.length; i += concurrencyLimit) {
+    chunks.push(recipients.slice(i, i + concurrencyLimit));
   }
 
   for (const chunk of chunks) {
-    const promises = chunk.map(async (subscription) => {
-      const notificationResult = await sendNotificationToUser(subscription, payload);
-      
-      if (notificationResult.success) {
-        result.sent++;
-      } else {
-        result.failed++;
-        result.errors.push(notificationResult.error || 'Unknown error');
-      }
-    });
+    await Promise.all(
+      chunk.map(async ({ userId, subscription }) => {
+        const notificationResult = await sendRawNotification(subscription, payload);
 
-    await Promise.all(promises);
+        if (notificationResult.success) {
+          result.sent++;
+          return;
+        }
+
+        result.failed++;
+        const errorMessage = notificationResult.error || "Unknown error";
+        result.errors.push(errorMessage);
+        result.failures.push({
+          userId,
+          error: errorMessage,
+          statusCode: notificationResult.statusCode,
+        });
+      })
+    );
   }
 
   result.success = result.failed === 0;
@@ -244,12 +299,32 @@ export async function sendNotificationToUsers(
 }
 
 /**
+ * @deprecated Use sendNotificationToRecipients for broadcasts.
+ */
+export async function sendNotificationToUsers(
+  subscriptions: Record<string, unknown>[],
+  payload: NotificationPayload
+): Promise<NotificationResult> {
+  const recipients = subscriptions.map((subscription, index) => ({
+    userId: String(index),
+    subscription,
+  }));
+  const batchResult = await sendNotificationToRecipients(recipients, payload);
+  return {
+    success: batchResult.success,
+    sent: batchResult.sent,
+    failed: batchResult.failed,
+    errors: batchResult.errors,
+  };
+}
+
+/**
  * Send test notification
  */
 export async function sendTestNotification(
-  subscription: any,
+  subscription: Record<string, unknown>,
   customMessage?: string
-): Promise<{ success: boolean; error?: string }> {
+): Promise<NotificationSendResult> {
   console.log('🧪 Sending test notification...');
   console.log('📱 Subscription:', subscription ? 'Valid' : 'Invalid');
   
@@ -275,6 +350,10 @@ export async function sendTestNotification(
         title: 'Dismiss',
       },
     ],
+    // Unique tag + renotify so repeated test sends always pop up instead of
+    // silently replacing the previous notification with the same tag
+    tag: `test-${Date.now()}`,
+    renotify: true,
     mutable: true,
   };
 

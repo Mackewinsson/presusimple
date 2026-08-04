@@ -8,7 +8,7 @@ import { useViewport } from "@/hooks/useViewport";
 import { useTranslation } from "@/lib/i18n";
 import { Wallet, Plus, History, Settings, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getBudgetBasePath, isBudgetAddPath } from "@/lib/budget-routes";
+import { getBudgetBasePath, getHistoryBasePath, isBudgetAddPath } from "@/lib/budget-routes";
 import { useIsAdmin } from "@/lib/hooks";
 
 interface TabItem {
@@ -21,6 +21,7 @@ interface TabItem {
 
 function buildTabItems(pathname: string, includeAdmin: boolean): TabItem[] {
   const budgetBase = getBudgetBasePath(pathname);
+  const historyBase = getHistoryBasePath(pathname);
   const items: TabItem[] = [
     {
       href: `${budgetBase}/add`,
@@ -39,11 +40,11 @@ function buildTabItems(pathname: string, includeAdmin: boolean): TabItem[] {
         (p.startsWith(budgetBase + "/") && p !== budgetBase + "/settings" && p !== budgetBase + "/add"),
     },
     {
-      href: "/history",
+      href: historyBase,
       icon: History,
       label: "History",
       translationKey: "history",
-      isActive: (p) => p === "/history" || p.startsWith("/history/"),
+      isActive: (p) => p === historyBase || p.startsWith(historyBase + "/"),
     },
     {
       href: `${budgetBase}/settings`,
@@ -92,11 +93,9 @@ export default function MobileBottomTab() {
   // position bug where the tab bar drifts to the middle of the screen when scrolling.
   const navContent = (
     <nav
-      className="fixed inset-x-0 bottom-0 z-[100] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-700/50 pb-[env(safe-area-inset-bottom)]"
+      className="fixed left-0 right-0 bottom-0 z-[100] bg-background/95 backdrop-blur-xl border-t border-border pb-[env(safe-area-inset-bottom)]"
       style={{
-        transform: "translateZ(0)",
-        WebkitBackfaceVisibility: "hidden",
-        backfaceVisibility: "hidden",
+        willChange: "transform",
       }}
     >
       <div className="flex items-center justify-around px-2 pt-0 pb-2">
@@ -110,8 +109,8 @@ export default function MobileBottomTab() {
               href={item.href}
               className={cn(
                 "relative flex flex-col items-center justify-center min-w-0 flex-1 pt-2 pb-1 px-1 rounded-b-lg transition-all duration-200",
-                "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
-                "active:scale-95 active:bg-slate-200/50 dark:active:bg-slate-700/50",
+                "hover:bg-muted/50",
+                "active:scale-95 active:bg-muted",
               )}
             >
               {/* Active indicator line */}
@@ -124,15 +123,15 @@ export default function MobileBottomTab() {
               <Icon 
                 className={cn(
                   "h-5 w-5 mb-1 transition-colors",
-                  isActive ? "text-black dark:text-white" : "text-slate-600 dark:text-slate-400"
+                  isActive ? "text-foreground" : "text-muted-foreground"
                 )} 
               />
               <span 
                 className={cn(
                   "text-xs font-medium truncate max-w-full transition-colors",
-                  isActive 
-                    ? "text-black dark:text-white" 
-                    : "text-slate-600 dark:text-slate-400"
+                  isActive
+                    ? "text-foreground"
+                    : "text-muted-foreground"
                 )}
               >
                 {t(item.translationKey as any)}

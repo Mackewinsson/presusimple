@@ -33,6 +33,8 @@ export const useCreateExpense = () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       // Also invalidate budget queries since expenses affect budget totals
       queryClient.invalidateQueries({ queryKey: ["budgets"] });
+      // Also invalidate streak queries so the streak updates in real-time
+      queryClient.invalidateQueries({ queryKey: ["streak"] });
       toast.success("Expense added successfully");
     },
     onError: (error) => {

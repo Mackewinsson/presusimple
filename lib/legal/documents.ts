@@ -59,7 +59,7 @@ export const privacyPolicyEn: LegalDocument = {
         "MongoDB Atlas — database hosting for account and budget data.",
         "Vercel — application hosting.",
         "Lemon Squeezy — subscription checkout, billing, and customer portal.",
-        "OpenAI — AI budgeting features for eligible Pro users.",
+        "Google AI (Gemini) — AI budgeting features for eligible Pro users.",
       ],
     },
     {
@@ -154,7 +154,7 @@ export const privacyPolicyEs: LegalDocument = {
         "MongoDB Atlas — alojamiento de base de datos.",
         "Vercel — alojamiento de la aplicación.",
         "Lemon Squeezy — pagos y suscripciones.",
-        "OpenAI — funciones de presupuesto con IA para usuarios Pro.",
+        "Google AI (Gemini) — funciones de presupuesto con IA para usuarios Pro.",
       ],
     },
     {

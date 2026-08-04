@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
 import { requireAdminApi } from "@/lib/auth/admin";
+import { getUserJoinedAt } from "@/lib/admin/user-dates";
 
 /**
  * @swagger
@@ -60,17 +61,25 @@ export async function GET(request: NextRequest) {
     const [users, total] = await Promise.all([
       User.find(filter)
         .select(
-          "email name plan isPaid trialStart trialEnd subscriptionType lemonSqueezyCustomerId lemonSqueezySubscriptionId createdAt updatedAt"
+          "email name plan isPaid trialStart trialEnd subscriptionType lemonSqueezyCustomerId lemonSqueezySubscriptionId streakCount lastActivityDate lastLoginAt createdAt updatedAt"
         )
-        .sort({ createdAt: -1 })
+        .sort({ _id: -1 })
         .skip(skip)
         .limit(limit)
         .lean(),
       User.countDocuments(filter),
     ]);
 
+    const enrichedUsers = users.map((user) => ({
+      ...user,
+      joinedAt: getUserJoinedAt({
+        _id: user._id as string,
+        createdAt: user.createdAt as Date | string | undefined,
+      })?.toISOString() ?? null,
+    }));
+
     return NextResponse.json({
-      users,
+      users: enrichedUsers,
       pagination: {
         page,
         limit,

@@ -18,6 +18,7 @@ import { useSession } from "next-auth/react";
 import { useUserId, useCreateExpense } from "@/lib/hooks";
 import { useTranslation } from "@/lib/i18n";
 import { parseDecimalInput } from "@/lib/utils/formatMoney";
+import { QuickPresetChips } from "./QuickPresetChips";
 
 interface Budget {
   _id: string;
@@ -67,22 +68,34 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [type, setType] = useState<TransactionType>("expense");
 
+  const handleSelectPreset = (preset: {
+    description: string;
+    amount: string;
+    categoryId: string;
+  }) => {
+    setDescription(preset.description);
+    setAmount(preset.amount);
+    if (preset.categoryId) {
+      setCategoryId(preset.categoryId);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!amount || !description || !categoryId) {
-      toast.error("Please fill in all required fields");
+      toast.error(t("fillAllFields"));
       return;
     }
 
     const numAmount = parseDecimalInput(amount);
     if (numAmount <= 0) {
-      toast.error("Please enter a valid amount");
+      toast.error(t("enterValidAmount"));
       return;
     }
 
     if (!userId) {
-      toast.error("You must be signed in to add transactions");
+      toast.error(t("mustBeSignedIn"));
       return;
     }
 
@@ -110,6 +123,11 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4" data-testid="expense-form">
+      <QuickPresetChips
+        categories={categories}
+        onSelectPreset={handleSelectPreset}
+      />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-hidden">
         <div className="space-y-2 min-w-0">
           <Label htmlFor="amount">{t('amount')}</Label>
@@ -150,11 +168,11 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
               </SelectItem>
               <SelectItem
                 value="income"
-                className="[&>span]:text-green-600 [&>span]:dark:text-green-400"
+                className="[&>span]:text-success"
               >
                 <div className="flex items-center gap-2">
-                  <ArrowDownCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-                  <span className="text-green-600 dark:text-green-400">
+                  <ArrowDownCircle className="h-4 w-4 text-success" />
+                  <span className="text-success">
                     {t('income')}
                   </span>
                 </div>
@@ -213,7 +231,7 @@ const NewExpenseForm: React.FC<NewExpenseFormProps> = ({
         type="submit"
         variant="default"
         size="lg"
-        className="w-full font-semibold shadow-md hover:shadow-lg transition-shadow bg-accent text-accent-foreground hover:bg-accent/90"
+        className="w-full font-semibold shadow-md hover:shadow-lg transition-shadow accent-fill hover:bg-accent/90"
         disabled={createExpenseMutation.isPending}
       >
         {createExpenseMutation.isPending ? (

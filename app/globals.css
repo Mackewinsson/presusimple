@@ -30,8 +30,8 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
     
-    /* Primary colors */
-    --primary: 210 40% 98%;
+    /* Primary colors — brand green (#D3FF3D) */
+    --primary: 67 100% 62%;
     --primary-foreground: 222.2 84% 4.9%;
     
     /* Secondary colors */
@@ -42,22 +42,23 @@
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
     
-    /* Accent colors (#D3FF3D) */
-    --accent: 67 100% 67%;
+    /* Accent — bright brand green surface + near-black text */
+    --accent: 67 100% 62%;
     --accent-foreground: 222.2 84% 4.9%;
+    --accent-muted: 67 35% 18%;
     
     /* Destructive colors */
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 65%;
+    --destructive-foreground: 222.2 84% 4.9%;
     
     /* Border and input colors */
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 210 40% 98%;
+    --ring: 67 100% 62%;
     
-    /* Success colors */
-    --success: 142 76% 36%;
-    --success-foreground: 210 40% 98%;
+    /* Success — brand lime for text/icons (same hue as accent) */
+    --success: 67 100% 62%;
+    --success-foreground: 222.2 84% 4.9%;
     
     /* Warning colors */
     --warning: 38 92% 50%;
@@ -68,11 +69,11 @@
     --info-foreground: 210 40% 98%;
     
     /* Chart colors */
-    --chart-1: 210 40% 98%;
+    --chart-1: 67 100% 62%;
     --chart-2: 217 91% 60%;
-    --chart-3: 142 76% 36%;
+    --chart-3: 67 100% 62%;
     --chart-4: 38 92% 50%;
-    --chart-5: 0 62.8% 30.6%;
+    --chart-5: 0 84% 65%;
     
     /* Radius */
     --radius: 0.75rem;
@@ -91,8 +92,8 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
     
-    /* Primary colors */
-    --primary: 210 40% 98%;
+    /* Primary colors — brand green (#D3FF3D) */
+    --primary: 67 100% 62%;
     --primary-foreground: 222.2 84% 4.9%;
     
     /* Secondary colors */
@@ -103,22 +104,23 @@
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
     
-    /* Accent colors (#D3FF3D) */
-    --accent: 67 100% 67%;
+    /* Accent — bright brand green surface + near-black text */
+    --accent: 67 100% 62%;
     --accent-foreground: 222.2 84% 4.9%;
+    --accent-muted: 67 35% 18%;
     
     /* Destructive colors */
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 65%;
+    --destructive-foreground: 222.2 84% 4.9%;
     
     /* Border and input colors */
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 210 40% 98%;
+    --ring: 67 100% 62%;
     
-    /* Success colors */
-    --success: 142 76% 36%;
-    --success-foreground: 210 40% 98%;
+    /* Success — brand lime for text/icons (same hue as accent) */
+    --success: 67 100% 62%;
+    --success-foreground: 222.2 84% 4.9%;
     
     /* Warning colors */
     --warning: 38 92% 50%;
@@ -129,11 +131,11 @@
     --info-foreground: 210 40% 98%;
     
     /* Chart colors */
-    --chart-1: 210 40% 98%;
+    --chart-1: 67 100% 62%;
     --chart-2: 217 91% 60%;
-    --chart-3: 142 76% 36%;
+    --chart-3: 67 100% 62%;
     --chart-4: 38 92% 50%;
-    --chart-5: 0 62.8% 30.6%;
+    --chart-5: 0 84% 65%;
   }
 
   .light {
@@ -149,9 +151,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
     
-    /* Primary colors */
-    --primary: 222.2 84% 4.9%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary colors — brand green (#D3FF3D) */
+    --primary: 67 100% 62%;
+    --primary-foreground: 222.2 84% 4.9%;
     
     /* Secondary colors */
     --secondary: 210 40% 96.1%;
@@ -161,9 +163,10 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
     
-    /* Accent colors (#D3FF3D) */
-    --accent: 67 100% 67%;
+    /* Accent — bright brand green surface + near-black text (same in both modes) */
+    --accent: 67 100% 62%;
     --accent-foreground: 222.2 84% 4.9%;
+    --accent-muted: 67 45% 94%;
     
     /* Destructive colors */
     --destructive: 0 84.2% 60.2%;
@@ -172,10 +175,10 @@
     /* Border and input colors */
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --ring: 68 100% 27%;
     
-    /* Success colors */
-    --success: 142 76% 36%;
+    /* Success — darker lime readable on white backgrounds */
+    --success: 68 100% 27%;
     --success-foreground: 210 40% 98%;
     
     /* Warning colors */
@@ -187,9 +190,9 @@
     --info-foreground: 210 40% 98%;
     
     /* Chart colors */
-    --chart-1: 222.2 84% 4.9%;
+    --chart-1: 68 100% 27%;
     --chart-2: 217 91% 60%;
-    --chart-3: 142 76% 36%;
+    --chart-3: 68 100% 27%;
     --chart-4: 38 92% 50%;
     --chart-5: 0 84.2% 60.2%;
   }
@@ -422,15 +425,7 @@
 }
 
 .btn-outline {
-  @apply rounded-xl px-6 py-3 transition-all duration-200;
-}
-
-.dark .btn-outline {
-  @apply border border-white/20 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 hover:border-white/30;
-}
-
-.light .btn-outline {
-  @apply border border-gray-300 bg-white/50 backdrop-blur-sm text-slate-900 hover:bg-white/80 hover:border-gray-400;
+  @apply rounded-xl px-6 py-3 border border-input bg-background/80 backdrop-blur-sm text-foreground transition-all duration-200 hover:bg-muted hover:border-border;
 }
 
 /* Form inputs */
@@ -438,34 +433,13 @@ input,
 .input,
 textarea,
 select {
-  @apply rounded-xl px-4 py-3 transition-all duration-200;
-}
-
-.dark input,
-.dark .input,
-.dark textarea,
-.dark select {
-  @apply border border-white/20 bg-white/10 backdrop-blur-sm text-white placeholder:text-white/50 focus:ring-2 focus:ring-white focus:border-white focus:outline-none;
-}
-
-.light input,
-.light .input,
-.light textarea,
-.light select {
-  @apply border border-gray-300 bg-white/80 backdrop-blur-sm text-slate-900 placeholder:text-gray-500 focus:ring-2 focus:ring-slate-900 focus:border-slate-900 focus:outline-none;
+  @apply rounded-xl px-4 py-3 border border-input bg-background text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:ring-2 focus:ring-ring focus:border-ring focus:outline-none;
 }
 
 /* Custom scrollbar styles */
 .scrollbar-thin {
   scrollbar-width: thin;
-}
-
-.dark .scrollbar-thin {
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-}
-
-.light .scrollbar-thin {
-  scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.35) transparent;
 }
 
 .scrollbar-thin::-webkit-scrollbar {
@@ -476,22 +450,13 @@ select {
   background: transparent;
 }
 
-.dark .scrollbar-thin::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--muted-foreground) / 0.35);
   border-radius: 20px;
 }
 
-.dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-.light .scrollbar-thin::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 20px;
-}
-
-.light .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0, 0, 0, 0.5);
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--muted-foreground) / 0.55);
 }
 
 /* Modern gradient backgrounds */
@@ -578,10 +543,53 @@ select {
   @apply bg-[hsl(var(--destructive))] text-[hsl(var(--destructive-foreground))];
 }
 
-/* Select item highlight: use readable colors in light mode (accent green fails on white popover) */
+/* Select/dropdown highlight: muted in light (subtle), accent in dark (on-brand) */
 .light .radix-select-item[data-highlighted],
 .light .radix-select-item[data-state="checked"]:focus,
 .light .radix-select-item:focus-visible {
-  background-color: hsl(var(--muted)) !important;
+  background-color: hsl(var(--accent-muted)) !important;
   color: hsl(var(--foreground)) !important;
+}
+
+@layer utilities {
+  /* Filled accent surface — always pairs green bg with readable dark text */
+  .accent-fill {
+    @apply bg-accent text-accent-foreground border border-black/10 dark:border-transparent;
+  }
+
+  /* AI feature signature — single purple/pink gradient pair */
+  .ai-gradient {
+    @apply bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700;
+  }
+
+  .ai-gradient-text {
+    @apply bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent;
+  }
+
+  .ai-gradient-glow {
+    @apply bg-gradient-to-r from-purple-500/40 to-pink-500/40;
+  }
+
+  .ai-gradient-glow-active {
+    @apply bg-gradient-to-r from-accent via-purple-500 to-pink-500;
+  }
+
+  .ai-tab-trigger {
+    @apply bg-gradient-to-r from-purple-600/20 to-pink-600/20 hover:from-purple-600/30 hover:to-pink-600/30 border-purple-500/30 data-[state=active]:from-purple-600/40 data-[state=active]:to-pink-600/40 data-[state=active]:border-purple-500/50;
+  }
+
+  .ai-card-bg {
+    @apply bg-gradient-to-br from-white via-purple-50/50 to-white dark:from-card dark:via-purple-900/20 dark:to-card border-purple-500/20;
+  }
+
+  /* Theme-aware heading gradient for marketing pages */
+  .heading-gradient {
+    @apply bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent;
+  }
+
+  .private-mode .sensitive-amount {
+    filter: blur(4px);
+    user-select: none;
+    transition: filter 200ms ease;
+  }
 }

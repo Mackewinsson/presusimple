@@ -2,11 +2,13 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import Summary from './Summary';
 
 // Mock the dependencies
-jest.mock('@/lib/utils/formatMoney', () => ({
-  formatMoney: (amount: number) => {
-    // Add commas for thousands
-    return '$' + amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  },
+jest.mock('@/lib/hooks/useFormatMoney', () => ({
+  useFormatMoney: () => ({
+    formatAmount: (amount: number) =>
+      '$' + amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+    formatPercent: () => '0%',
+    isPrivateMode: false,
+  }),
 }));
 
 jest.mock('@/lib/hooks', () => ({

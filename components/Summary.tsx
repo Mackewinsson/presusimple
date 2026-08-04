@@ -7,22 +7,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { formatMoney } from "@/lib/utils/formatMoney";
-import { SpendingChart } from "@/components/ui/SpendingChart";
+import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
 import { useCurrentCurrency, useCurrentDecimalSeparator } from "@/lib/hooks";
 import { useTranslation } from "@/lib/i18n";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DistributionChart } from "@/components/ui/DistributionChart";
-import { TrendChart } from "@/components/ui/TrendChart";
-import { BurndownChart } from "@/components/ui/BurndownChart";
-import { CashFlowChart } from "@/components/ui/CashFlowChart";
-import { PieChart, TrendingUp, Activity, BarChart3, BarChart } from "lucide-react";
-import { motion } from "framer-motion";
-import { format, parseISO } from "date-fns";
+import { BudgetChartsPanel } from "@/components/budget/BudgetChartsPanel";
 import { Button } from "./ui/button";
 import { FileSpreadsheet } from "lucide-react";
 import { utils, writeFile } from "xlsx";
 import { toast } from "sonner";
+import { format, parseISO } from "date-fns";
+import { cn } from "@/lib/utils";
 import type { Budget } from "@/lib/api";
 
 const EXCEL_SHEET_NAME_MAX_LENGTH = 31;
@@ -53,6 +47,7 @@ interface SummaryProps {
 
 const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
   const { t } = useTranslation();
+  const { formatAmount, isPrivateMode } = useFormatMoney();
   const currentCurrency = useCurrentCurrency();
   const decimalSeparator = useCurrentDecimalSeparator();
   // Calculate total spent from expenses
@@ -81,38 +76,13 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
   });
 
   // Get top spending categories for chart
-  const chartCategories = [...categoriesWithSpent]
-    .filter(cat => cat.spent > 0) // Only show categories with spending
-    .sort((a, b) => b.spent - a.spent) // Sort by spent amount (highest first)
-    .slice(0, 8); // Show top 8 spending categories (increased for better coverage)
+  const chartExpenseInputs = expenses.map((e) => ({
+    amount: e.amount,
+    date: e.date,
+    type: e.type,
+  }));
 
-  // Handle edge cases
-  const hasSpendingData = chartCategories.length > 0;
-  const hasMultipleCategories = chartCategories.length > 1;
-
-  const chartData = chartCategories.map((cat) => ({
-    name: cat.name,
-    spent: Number(cat.spent) || 0,
-    budgeted: Number(cat.budgeted) || 0,
-    overBudget: (Number(cat.spent) || 0) > (Number(cat.budgeted) || 0),
-  })).filter(item => item.budgeted > 0 || item.spent > 0);
-
-  const trendData = expenses
-    .filter(e => e.type === "expense")
-    .map(e => ({ date: e.date, amount: e.amount }));
-
-  const burndownData = expenses
-    .filter(e => e.type === "expense")
-    .map(e => ({ date: e.date, spent: e.amount }));
-
-  const cashFlowData = expenses.map(e => {
-    const isIncome = e.type?.toLowerCase() === "income";
-    return {
-      date: e.date,
-      income: isIncome ? e.amount : 0,
-      expense: !isIncome ? e.amount : 0,
-    };
-  });  const handleExportToExcel = () => {
+  const handleExportToExcel = () => {
     try {
       const wb = utils.book_new();
 
@@ -122,12 +92,15 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
           ? `"${currentCurrency.symbol}"#.##0,00`
           : `"${currentCurrency.symbol}"#,##0.00`;
 
+      const maskedValue = isPrivateMode ? formatAmount(0) : undefined;
+      const amountCell = (value: number) => (isPrivateMode ? maskedValue! : value);
+
       // --- Budget Summary sheet ---
       const summaryData = [
         [t('budgetSummary'), ""],
-        [t('totalBudgeted'), budget.totalBudgeted],
-        [t('totalSpent'), totalSpent],
-        [t('remaining'), budget.totalBudgeted - totalSpent],
+        [t('totalBudgeted'), amountCell(budget.totalBudgeted)],
+        [t('totalSpent'), amountCell(totalSpent)],
+        [t('remaining'), amountCell(budget.totalBudgeted - totalSpent)],
         [],
         [t('category'), t('budgeted'), t('totalSpent'), t('remaining')],
       ];
@@ -135,9 +108,9 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
       categoriesWithSpent.forEach((category) => {
         summaryData.push([
           category.name,
-          category.budgeted,
-          category.spent,
-          category.budgeted - category.spent,
+          amountCell(category.budgeted),
+          amountCell(category.spent),
+          amountCell(category.budgeted - category.spent),
         ]);
       });
 
@@ -175,7 +148,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
           format(parseISO(expense.date), "yyyy-MM-dd"),
           category?.name || t('unknown'),
           expense.description || "-",
-          signedAmount,
+          isPrivateMode ? maskedValue! : signedAmount,
           expense.type,
         ]);
       });
@@ -218,7 +191,7 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-0">
           <div>
-            <CardTitle className="text-xl sm:text-2xl font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            <CardTitle className="text-xl sm:text-2xl font-semibold text-foreground">
               {t('budgetSummary')}
             </CardTitle>
             <CardDescription className="text-sm sm:text-base">
@@ -247,7 +220,9 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
               {t('totalBudgeted')}
             </div>
             <div className="text-lg sm:text-xl md:text-2xl font-semibold">
-                              {formatMoney(calculatedTotalBudgeted, currentCurrency, decimalSeparator)}
+                              <span className={cn(isPrivateMode && "sensitive-amount")}>
+                                {formatAmount(calculatedTotalBudgeted, currentCurrency, decimalSeparator)}
+                              </span>
             </div>
           </div>
 
@@ -256,7 +231,9 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
               {t('totalSpent')}
             </div>
             <div className="text-lg sm:text-xl md:text-2xl font-semibold">
-                              {formatMoney(totalSpent, currentCurrency, decimalSeparator)}
+                              <span className={cn(isPrivateMode && "sensitive-amount")}>
+                                {formatAmount(totalSpent, currentCurrency, decimalSeparator)}
+                              </span>
             </div>
           </div>
 
@@ -270,116 +247,27 @@ const Summary: React.FC<SummaryProps> = ({ budget, categories, expenses }) => {
               className={`text-lg sm:text-xl md:text-2xl font-semibold ${
                 calculatedTotalBudgeted - totalSpent < 0
                   ? "text-destructive"
-                  : "text-accent-foreground"
+                  : "text-success"
               }`}
             >
-                              {formatMoney(calculatedTotalBudgeted - totalSpent, currentCurrency, decimalSeparator)}
+                              <span className={cn(isPrivateMode && "sensitive-amount")}>
+                                {formatAmount(calculatedTotalBudgeted - totalSpent, currentCurrency, decimalSeparator)}
+                              </span>
             </div>
           </div>
         </div>
 
         {categories.length > 0 ? (
-          <div className="mt-6 sm:mt-8">
-            <Tabs defaultValue="categories" className="w-full">
-              <div className="flex justify-between items-center mb-4 sm:mb-6 flex-wrap gap-4">
-                <h3 className="text-base sm:text-lg font-medium">
-                  {t('topSpendingCategories')}
-                </h3>
-                <TabsList className="bg-muted/50 h-9 p-1">
-                  <TabsTrigger value="categories" className="h-7 text-xs px-2 sm:px-3 gap-1.5" title={t('tabCategories')}>
-                    <BarChart className="h-3.5 w-3.5 hidden sm:inline-block" />
-                    <span className="sm:hidden">{t('tabCategoriesShort')}</span>
-                    <span className="hidden sm:inline">{t('tabCategories')}</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="distribution" className="h-7 text-xs px-2 sm:px-3 gap-1.5" title={t('tabDistribution')}>
-                    <PieChart className="h-3.5 w-3.5 hidden sm:inline-block" />
-                    <span className="sm:hidden">{t('tabDistributionShort')}</span>
-                    <span className="hidden sm:inline">{t('tabDistribution')}</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="trend" className="hidden h-7 text-xs px-2 sm:px-3 gap-1.5" title={t('tabTrend')}>
-                    <TrendingUp className="h-3.5 w-3.5 hidden sm:inline-block" />
-                    <span className="sm:hidden">{t('tabTrendShort')}</span>
-                    <span className="hidden sm:inline">{t('tabTrend')}</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="burndown" className="hidden h-7 text-xs px-2 sm:px-3 gap-1.5" title={t('tabBurndown')}>
-                    <Activity className="h-3.5 w-3.5 hidden sm:inline-block" />
-                    <span className="sm:hidden">{t('tabBurndownShort')}</span>
-                    <span className="hidden sm:inline">{t('tabBurndown')}</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="cashflow" className="h-7 text-xs px-2 sm:px-3 gap-1.5" title={t('tabCashFlow')}>
-                    <BarChart3 className="h-3.5 w-3.5 hidden sm:inline-block" />
-                    <span className="sm:hidden">{t('tabCashFlowShort')}</span>
-                    <span className="hidden sm:inline">{t('tabCashFlow')}</span>
-                  </TabsTrigger>
-                </TabsList>
-              </div>
-
-              <div className="h-[250px] sm:h-[300px] md:h-[350px] flex flex-col" data-testid="summary-chart">
-                {hasSpendingData ? (
-                  <>
-                    <TabsContent value="categories" className="flex-1 overflow-x-auto overflow-y-hidden mt-0 h-full border-none p-0 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
-                      <div className="min-w-full h-full" style={{ minWidth: `${Math.max(chartCategories.length * 120, 400)}px` }}>
-                        <SpendingChart 
-                          data={chartData}
-                          showBudgeted={true}
-                          showLegend={false}
-                          height="100%"
-                        />
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="distribution" className="flex-1 mt-0 h-full">
-                      {hasMultipleCategories ? (
-                        <DistributionChart data={chartData} height="100%" />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">{t('noSpendingDataAvailable')}</div>
-                      )}
-                    </TabsContent>
-
-                    <TabsContent value="trend" className="hidden flex-1 mt-0 h-full">
-                      {trendData.length > 0 ? (
-                        <TrendChart data={trendData} height="100%" />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">{t('noSpendingDataAvailable')}</div>
-                      )}
-                    </TabsContent>
-
-                    <TabsContent value="burndown" className="hidden flex-1 mt-0 h-full">
-                      {burndownData.length > 0 ? (
-                        <BurndownChart data={burndownData} totalBudget={calculatedTotalBudgeted} height="100%" />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">{t('noSpendingDataAvailable')}</div>
-                      )}
-                    </TabsContent>
-
-                    <TabsContent value="cashflow" className="flex-1 mt-0 h-full">
-                      {cashFlowData.length > 0 ? (
-                        <CashFlowChart data={cashFlowData} height="100%" />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">{t('noSpendingDataAvailable')}</div>
-                      )}
-                    </TabsContent>
-                  </>
-                ) : (
-                  <div className="flex-1 flex items-center justify-center">
-                    <div className="text-center">
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {categories.length === 0 
-                          ? t('noCategoriesAvailable') 
-                          : t('noSpendingDataAvailable')
-                        }
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {categories.length === 0 
-                          ? t('addBudgetCategoriesToSee') 
-                          : t('addExpensesToSeePatterns')
-                        }
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </Tabs>
+          <div className="mt-6 sm:mt-8" data-testid="summary-chart">
+            <BudgetChartsPanel
+              categories={categoriesWithSpent}
+              expenses={chartExpenseInputs}
+              totalBudgeted={calculatedTotalBudgeted}
+              showTimelineCharts={true}
+              showTrendTab={false}
+              showBurndownTab={false}
+              showCashFlowTab={true}
+            />
           </div>
         ) : (
           <div className="text-center py-8 sm:py-12 px-4 rounded-lg bg-muted/30">

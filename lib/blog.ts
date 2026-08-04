@@ -17,6 +17,8 @@ export interface BlogPostMeta {
   author: string;
   tags: string[];
   faqs?: BlogFaq[];
+  /** Slug of the translated counterpart in the other locale (optional). */
+  translationSlug?: string;
 }
 
 export interface BlogPost extends BlogPostMeta {
@@ -64,6 +66,7 @@ function parsePostFile(filePath: string, slug: string): BlogPost {
     author: String(data.author ?? "Presusimple"),
     tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
     faqs: parseFaqs(data as Record<string, unknown>),
+    translationSlug: data.translationSlug ? String(data.translationSlug) : undefined,
     content,
   };
 }

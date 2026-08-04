@@ -19,9 +19,9 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      await signIn("google", { 
+      await signIn("google", {
         callbackUrl: "/budget",
-        redirect: true 
+        redirect: true,
       });
     } catch (error) {
       console.error("Sign in error:", error);
@@ -30,24 +30,24 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-white/5 border-white/10 backdrop-blur-sm">
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md border-border bg-card/95 backdrop-blur-sm">
         <CardHeader className="text-center space-y-4 pb-6">
           <div className="flex justify-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
-              <Crown className="h-8 w-8 text-white" />
+            <div className="w-16 h-16 bg-accent text-accent-foreground rounded-full flex items-center justify-center shadow-lg">
+              <Crown className="h-8 w-8" />
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <div className="flex items-center justify-center gap-3 mb-2">
               <AppIcon size={24} />
-              <CardTitle className="text-2xl font-bold text-white">
-                {t('welcomeToPresusimple')}
+              <CardTitle className="text-2xl font-bold text-foreground">
+                {t("welcomeToPresusimple")}
               </CardTitle>
             </div>
-            <p className="text-slate-300 text-sm">
-              {t('signInToStartManaging')}
+            <p className="text-muted-foreground text-sm">
+              {t("signInToStartManaging")}
             </p>
           </div>
         </CardHeader>
@@ -56,13 +56,13 @@ export default function LoginPage() {
           <Button
             onClick={handleGoogleSignIn}
             disabled={isLoading}
-            className="w-full bg-white hover:bg-gray-100 text-gray-900 font-medium py-3 text-base shadow-lg hover:shadow-xl transition-all duration-200"
+            className="w-full font-medium py-3 text-base shadow-lg hover:shadow-xl"
             size="lg"
           >
             {isLoading ? (
               <div className="flex items-center gap-3">
-                <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
-                <span>{t('loading')}</span>
+                <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                <span>{t("loading")}</span>
               </div>
             ) : (
               <>
@@ -84,20 +84,26 @@ export default function LoginPage() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                {t('signInWithGoogle')}
+                {t("signInWithGoogle")}
                 <ArrowRight className="h-4 w-4 ml-2" />
               </>
             )}
           </Button>
-          
+
           <div className="text-center">
-            <p className="text-slate-400 text-xs">
+            <p className="text-muted-foreground text-xs">
               {t("agreeToTermsPrefix")}{" "}
-              <Link href={`${localePrefix}/terms`} className="text-white hover:underline font-medium">
+              <Link
+                href={`${localePrefix}/terms`}
+                className="text-foreground hover:underline font-medium"
+              >
                 {t("termsOfService")}
               </Link>{" "}
               {t("agreeToTermsAnd")}{" "}
-              <Link href={`${localePrefix}/privacy`} className="text-white hover:underline font-medium">
+              <Link
+                href={`${localePrefix}/privacy`}
+                className="text-foreground hover:underline font-medium"
+              >
                 {t("privacyPolicy")}
               </Link>
             </p>

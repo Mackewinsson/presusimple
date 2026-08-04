@@ -2,10 +2,13 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import ExpenseItem from './ExpenseItem';
 
 // Mock the dependencies
-jest.mock('@/lib/utils/formatMoney', () => ({
-  formatMoney: (amount: number) => {
-    return '$' + amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  },
+jest.mock('@/lib/hooks/useFormatMoney', () => ({
+  useFormatMoney: () => ({
+    formatAmount: (amount: number) =>
+      '$' + amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+    formatPercent: () => '0%',
+    isPrivateMode: false,
+  }),
 }));
 
 jest.mock('@/lib/hooks', () => ({

@@ -68,7 +68,7 @@ export default function SignIn() {
       progress: 50
     },
     {
-      icon: <TrendingUp className="h-10 w-10 text-green-400" />,
+      icon: <TrendingUp className="h-10 w-10 text-success" />,
       title: t('smartAutomation'),
       description: t('automatedCategorizationAndTracking'),
       progress: 75
@@ -82,17 +82,17 @@ export default function SignIn() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 flex items-center justify-center p-6">
       <div className="w-full max-w-4xl space-y-8">
         {/* Header */}
         <div className="text-center space-y-6">
           <div className="flex justify-center">
             <div className="relative">
-              <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-2xl">
-                <Crown className="h-10 w-10 text-white" />
+              <div className="w-20 h-20 bg-accent text-accent-foreground rounded-full flex items-center justify-center shadow-2xl">
+                <Crown className="h-10 w-10" />
               </div>
-              <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
-                <CheckCircle className="h-5 w-5 text-white" />
+              <div className="absolute -top-2 -right-2 w-8 h-8 bg-accent text-accent-foreground rounded-full flex items-center justify-center shadow-lg">
+                <CheckCircle className="h-5 w-5" />
               </div>
             </div>
           </div>
@@ -100,11 +100,11 @@ export default function SignIn() {
           <div className="space-y-4">
             <div className="flex items-center justify-center gap-4">
               <AppIcon size={32} />
-              <h1 className="text-5xl font-bold text-white leading-tight">
+              <h1 className="text-5xl font-bold text-foreground leading-tight">
                 Presusimple
               </h1>
             </div>
-            <p className="text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               {t('professionalBudgetingPlatform')}
             </p>
           </div>
@@ -114,7 +114,7 @@ export default function SignIn() {
               <Crown className="h-4 w-4 mr-2" />
               {t('thirtyDayFreeTrial')}
             </Badge>
-            <Badge variant="outline" className="border-green-500 text-green-400 px-4 py-2 text-sm font-medium">
+            <Badge variant="outline" className="border-accent text-success px-4 py-2 text-sm font-medium">
               <Shield className="h-4 w-4 mr-2" />
               {t('enterpriseSecurity')}
             </Badge>
@@ -123,24 +123,24 @@ export default function SignIn() {
 
         {/* Progress */}
         <div className="space-y-4 max-w-2xl mx-auto">
-          <div className="flex justify-between text-sm text-slate-400 font-medium">
+          <div className="flex justify-between text-sm text-muted-foreground font-medium">
             <span>Initializing your workspace...</span>
             <span>{currentStep + 1} of {steps.length}</span>
           </div>
-          <Progress value={steps[currentStep]?.progress || 0} className="h-3 bg-slate-700" />
+          <Progress value={steps[currentStep]?.progress || 0} className="h-3 bg-muted" />
         </div>
 
         {/* Current Step */}
-        <Card className="bg-white/5 border-white/10 backdrop-blur-sm max-w-3xl mx-auto">
+        <Card className="bg-card border-border backdrop-blur-sm max-w-3xl mx-auto">
           <CardHeader className="text-center space-y-6 pb-8">
             <div className="flex justify-center">
               {steps[currentStep]?.icon}
             </div>
             <div className="space-y-3">
-              <CardTitle className="text-3xl text-white font-bold">
+              <CardTitle className="text-3xl text-foreground font-bold">
                 {steps[currentStep]?.title}
               </CardTitle>
-              <CardDescription className="text-lg text-slate-300 leading-relaxed">
+              <CardDescription className="text-lg text-muted-foreground leading-relaxed">
                 {steps[currentStep]?.description}
               </CardDescription>
             </div>
@@ -149,43 +149,43 @@ export default function SignIn() {
 
         {/* Features Grid */}
         <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all duration-300">
+          <Card className="bg-card border-border backdrop-blur-sm hover:bg-muted/50 transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
-                  <Zap className="h-5 w-5 text-white" />
+                <div className="w-10 h-10 bg-accent text-accent-foreground rounded-lg flex items-center justify-center">
+                  <Zap className="h-5 w-5" />
                 </div>
-                <h3 className="font-semibold text-white text-lg">AI Budget Creation</h3>
+                <h3 className="font-semibold text-foreground text-lg">AI Budget Creation</h3>
               </div>
-              <p className="text-slate-300 text-sm leading-relaxed">
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 Describe your financial goals in natural language and our AI creates personalized budgets instantly.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all duration-300">
+          <Card className="bg-card border-border backdrop-blur-sm hover:bg-muted/50 transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="h-5 w-5 text-white" />
+                <div className="w-10 h-10 bg-accent text-accent-foreground rounded-lg flex items-center justify-center">
+                  <BarChart3 className="h-5 w-5" />
                 </div>
-                <h3 className="font-semibold text-white text-lg">Advanced Analytics</h3>
+                <h3 className="font-semibold text-foreground text-lg">Advanced Analytics</h3>
               </div>
-              <p className="text-slate-300 text-sm leading-relaxed">
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 Get deep insights into spending patterns with professional-grade charts and reports.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all duration-300">
+          <Card className="bg-card border-border backdrop-blur-sm hover:bg-muted/50 transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
-                  <Shield className="h-5 w-5 text-white" />
+                <div className="w-10 h-10 bg-primary text-primary-foreground rounded-lg flex items-center justify-center">
+                  <Shield className="h-5 w-5" />
                 </div>
-                <h3 className="font-semibold text-white text-lg">Enterprise Security</h3>
+                <h3 className="font-semibold text-foreground text-lg">Enterprise Security</h3>
               </div>
-              <p className="text-slate-300 text-sm leading-relaxed">
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 Bank-level encryption and security protocols protect your financial data at all times.
               </p>
             </CardContent>
@@ -197,12 +197,12 @@ export default function SignIn() {
           <Button
             onClick={handleGoogleSignIn}
             disabled={isLoading}
-            className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold px-12 py-4 text-lg shadow-2xl hover:shadow-amber-500/25 transition-all duration-300"
+            className="font-semibold px-12 py-4 text-lg shadow-lg"
             size="lg"
           >
             {isLoading ? (
               <div className="flex items-center gap-3">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
                 <span>Authenticating...</span>
               </div>
             ) : (
@@ -231,27 +231,27 @@ export default function SignIn() {
             )}
           </Button>
           
-          <p className="text-slate-400 text-sm">
+          <p className="text-muted-foreground text-sm">
             Secure authentication powered by Google
           </p>
         </div>
 
         {/* Trial Info */}
         <div className="text-center space-y-4 max-w-2xl mx-auto">
-          <div className="bg-white/5 border border-white/10 rounded-lg p-6 backdrop-blur-sm">
-            <p className="text-slate-300 text-sm leading-relaxed">
+          <div className="bg-card border border-border rounded-lg p-6">
+            <p className="text-muted-foreground text-sm leading-relaxed">
               Your 30-day free trial includes all enterprise features. No credit card required. 
               Cancel anytime during your trial period.
             </p>
           </div>
           
-          <p className="text-slate-400 text-xs">
+          <p className="text-muted-foreground text-xs">
             {t("agreeToTermsPrefix")}{" "}
-            <Link href={`${localePrefix}/terms`} className="text-white hover:underline font-medium">
+            <Link href={`${localePrefix}/terms`} className="text-foreground hover:underline font-medium">
               {t("termsOfService")}
             </Link>{" "}
             {t("agreeToTermsAnd")}{" "}
-            <Link href={`${localePrefix}/privacy`} className="text-white hover:underline font-medium">
+            <Link href={`${localePrefix}/privacy`} className="text-foreground hover:underline font-medium">
               {t("privacyPolicy")}
             </Link>
           </p>

@@ -37,6 +37,14 @@ const monthlyBudgetSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  expenses: [
+    {
+      amount: Number,
+      date: Date,
+      type: { type: String, enum: ["expense", "income"] },
+      categoryName: String,
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,

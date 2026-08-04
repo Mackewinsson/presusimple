@@ -45,8 +45,8 @@ export default function PWAInstallPrompt() {
       <div className="bg-background/95 backdrop-blur-sm border border-border rounded-xl shadow-lg px-4 py-3 flex items-center gap-3">
         <div className="p-1.5 bg-accent/10 rounded-lg flex-shrink-0">
           {isIOSFlow
-            ? <Smartphone className="w-5 h-5 text-accent" />
-            : <Download className="w-5 h-5 text-accent" />
+            ? <Smartphone className="w-5 h-5 text-success" />
+            : <Download className="w-5 h-5 text-success" />
           }
         </div>
         <div className="flex-1 min-w-0">
@@ -57,7 +57,7 @@ export default function PWAInstallPrompt() {
           <Button
             size="sm"
             onClick={isIOSFlow ? dismissPrompt : handleInstall}
-            className="h-8 px-3 text-xs bg-accent text-accent-foreground hover:bg-accent/90"
+            className="h-8 px-3 text-xs accent-fill hover:bg-accent/90"
           >
             {isIOSFlow ? t('gotIt') : t('installNow')}
           </Button>

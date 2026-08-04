@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import SignOutButton from "@/components/SignOutButton";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/lib/i18n";
 
 export default function Navigation() {
@@ -11,12 +12,12 @@ export default function Navigation() {
   const { t } = useTranslation();
 
   return (
-    <nav className="bg-white shadow-lg">
+    <nav className="bg-background border-b border-border shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold text-gray-800">
-              {t('budgetApp')}
+            <Link href="/" className="text-xl font-bold text-foreground">
+              {t("budgetApp")}
             </Link>
           </div>
 
@@ -26,24 +27,21 @@ export default function Navigation() {
               <>
                 <Link
                   href="/dashboard"
-                  className="text-gray-600 hover:text-gray-900"
+                  className="text-muted-foreground hover:text-foreground"
                 >
-                  {t('dashboard')}
+                  {t("dashboard")}
                 </Link>
                 <SignOutButton
-                  variant="default"
+                  variant="outline"
                   size="sm"
                   showText={true}
-                  className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500"
+                  className="text-destructive border-destructive hover:bg-destructive/10"
                 />
               </>
             ) : (
-              <Link
-                href="/auth/login"
-                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500"
-              >
-                {t('signIn')}
-              </Link>
+              <Button asChild size="sm">
+                <Link href="/auth/login">{t("signIn")}</Link>
+              </Button>
             )}
           </div>
         </div>

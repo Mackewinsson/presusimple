@@ -19,6 +19,17 @@ Guidance for AI coding assistants working on the Presusimple codebase.
 | Type check | `npm run type-check` |
 | Path alias | Use `@/` for imports from project root |
 
+## ⚠️ Regla Obligatoria para Agentes IA (Mandatory Pre-Commit Rule)
+
+**ANTES DE REALIZAR CUALQUIER COMMIT O DESPLIEGUE**:
+Los agentes IA **DEBEN OBLIGATORIAMENTE** ejecutar la verificación completa de tests y el build del proyecto antes de confirmar cambios.
+
+- **Comandos de Verificación en presusimple**:
+  - `npm test && npm run type-check && npm run build` (o `pnpm check && pnpm build`).
+- **Instrucciones Estrictas**:
+  1. **NUNCA** realizar `git commit` ni `git push` si existen errores de linter, tipos (TypeScript), tests fallidos o errores en la compilación del paquete de producción.
+  2. Si la verificación detecta fallos, el agente debe corregir la causa raíz del error y **volver a ejecutar la verificación** hasta obtener un resultado 100% limpio antes de proceder con el commit o despliegue.
+
 ---
 
 ## Project Overview

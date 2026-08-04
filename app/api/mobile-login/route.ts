@@ -3,6 +3,7 @@ import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
 import { signJwt } from "@/lib/jwt";
 import { comparePassword } from "@/lib/password";
+import { recordUserLogin } from "@/lib/auth/record-login";
 
 /**
  * @swagger
@@ -111,6 +112,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate JWT token
+    await recordUserLogin(user.email);
+
     const token = signJwt({
       id: user._id.toString(),
       email: user.email,

@@ -110,7 +110,7 @@ function ResetPasswordContent() {
           )}
           {successMessage ? (
             <div className="space-y-4 text-center">
-              <CheckCircle2 className="mx-auto h-10 w-10 text-green-600" />
+              <CheckCircle2 className="mx-auto h-10 w-10 text-success" />
               <p className="text-sm text-muted-foreground">{successMessage}</p>
               <Button asChild className="w-full">
                 <Link href="/auth/login">Go to sign in</Link>
@@ -175,7 +175,7 @@ function ResetPasswordContent() {
         )}
         {successMessage ? (
           <div className="space-y-4 text-center">
-            <CheckCircle2 className="mx-auto h-10 w-10 text-green-600" />
+            <CheckCircle2 className="mx-auto h-10 w-10 text-success" />
             <p className="text-sm text-muted-foreground">{successMessage}</p>
             <Button asChild variant="outline" className="w-full">
               <Link href="/auth/login">Back to sign in</Link>

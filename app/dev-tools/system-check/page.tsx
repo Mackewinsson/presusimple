@@ -199,7 +199,7 @@ export default function SystemCheckPage() {
             <p className="text-muted-foreground mt-2">
               Comprehensive test of all admin dashboard and feature flag functionality
             </p>
-            <p className="text-sm text-green-600 mt-1">
+            <p className="text-sm text-success mt-1">
               Logged in as: {session?.user?.email}
             </p>
             {isAdmin ? (
@@ -228,7 +228,7 @@ export default function SystemCheckPage() {
               <CardContent>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">{successCount}</div>
+                    <div className="text-2xl font-bold text-success">{successCount}</div>
                     <div className="text-sm text-muted-foreground">Passed</div>
                   </div>
                   <div className="text-center p-4 border rounded-lg">
@@ -282,7 +282,7 @@ export default function SystemCheckPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         {test.status === 'pending' && <Clock className="h-5 w-5 text-yellow-500 animate-spin" />}
-                        {test.status === 'success' && <CheckCircle className="h-5 w-5 text-green-500" />}
+                        {test.status === 'success' && <CheckCircle className="h-5 w-5 text-success" />}
                         {test.status === 'error' && <XCircle className="h-5 w-5 text-red-500" />}
                         <div>
                           <h3 className="font-semibold">{test.name}</h3>

@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { formatMoney, parseDecimalInput } from "@/lib/utils/formatMoney";
+import { parseDecimalInput } from "@/lib/utils/formatMoney";
+import { useFormatMoney } from "@/lib/hooks/useFormatMoney";
 import { useCurrentCurrency, useCurrentDecimalSeparator } from "@/lib/hooks";
+import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -65,6 +67,7 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
   const { t } = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const decimalSeparator = useCurrentDecimalSeparator();
+  const { formatAmount, isPrivateMode } = useFormatMoney();
   const updateExpenseMutation = useUpdateExpense();
   const deleteExpenseMutation = useDeleteExpense();
 
@@ -93,7 +96,7 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
     const newAmount = parseDecimalInput(editedAmount);
 
     if (newAmount <= 0) {
-      toast.error("Please enter a valid amount");
+      toast.error(t("enterValidAmount"));
       return;
     }
 
@@ -215,7 +218,7 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
   }
 
   return (
-    <div className="p-4 border rounded-lg bg-card hover:bg-accent/50 transition-colors">
+    <div className="p-4 border rounded-lg bg-card hover:bg-accent-muted transition-colors">
       <div className="flex justify-between items-start">
         <div className="space-y-1">
           <div className="font-medium">
@@ -234,15 +237,17 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense, categories }) => {
               className={`font-medium flex items-center gap-1 ${
                 expense.type === "expense"
                   ? "text-destructive"
-                  : "text-green-600 dark:text-green-400"
+                  : "text-success"
               }`}
             >
               {expense.type === "expense" ? (
                 <ArrowUpCircle className="h-4 w-4 text-destructive" />
               ) : (
-                <ArrowDownCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <ArrowDownCircle className="h-4 w-4 text-success" />
               )}
-                                {formatMoney(expense.amount, currentCurrency, decimalSeparator)}
+              <span className={cn(isPrivateMode && "sensitive-amount")}>
+                {formatAmount(expense.amount, currentCurrency, decimalSeparator)}
+              </span>
             </div>
           </div>
           <div className="flex items-center gap-1">

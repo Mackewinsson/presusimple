@@ -5,15 +5,10 @@
 /* eslint-disable no-restricted-globals */
 self.__WB_DISABLE_DEV_LOGS = true;
 
-// Import workbox modules
-importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js');
-
-// Ensure workbox is loaded
-if (workbox) {
-  console.log('✅ Workbox loaded successfully');
-} else {
-  console.error('❌ Workbox failed to load');
-}
+// NOTE: Do not importScripts external CDNs here. If the request fails (offline,
+// ad blocker, proxy), the whole worker script throws and the push handlers
+// below are never registered — notifications silently stop working.
+// Workbox is already bundled locally by next-pwa in the generated sw.js.
 
 // ===== NOTIFICATION HANDLING =====
 
