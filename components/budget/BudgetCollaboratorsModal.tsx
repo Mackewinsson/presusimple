@@ -37,12 +37,8 @@ export function BudgetCollaboratorsModal({ budgetId }: BudgetCollaboratorsModalP
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!isEnabled) {
-    return null;
-  }
-
   useEffect(() => {
-    if (!open || !budgetId) return;
+    if (!isEnabled || !open || !budgetId) return;
 
     async function fetchCollaborators() {
       try {
@@ -57,7 +53,11 @@ export function BudgetCollaboratorsModal({ budgetId }: BudgetCollaboratorsModalP
     }
 
     fetchCollaborators();
-  }, [open, budgetId]);
+  }, [isEnabled, open, budgetId]);
+
+  if (!isEnabled) {
+    return null;
+  }
 
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();

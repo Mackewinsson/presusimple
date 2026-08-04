@@ -43,12 +43,8 @@ export function CategoryCollaboratorsModal({
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!isEnabled) {
-    return null;
-  }
-
   useEffect(() => {
-    if (!open || !categoryId) return;
+    if (!isEnabled || !open || !categoryId) return;
 
     async function fetchCollaborators() {
       try {
@@ -63,7 +59,11 @@ export function CategoryCollaboratorsModal({
     }
 
     fetchCollaborators();
-  }, [open, categoryId]);
+  }, [isEnabled, open, categoryId]);
+
+  if (!isEnabled) {
+    return null;
+  }
 
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
