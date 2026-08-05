@@ -182,6 +182,52 @@ const ENRICHMENT: Record<string, BlogSeoEnrichment> = {
       },
     ],
   },
+  "es:como-dejar-de-gastar-de-mas": {
+    faqs: [
+      {
+        question: "¿Por qué me paso aunque tengo presupuesto?",
+        answer:
+          "Suele ser porque los límites son vagos, el seguimiento es mensual en vez de semanal, o no hay categoría de gustos. Un presupuesto sin feedback es lista de deseos.",
+      },
+      {
+        question: "¿Cuánto tarda en mejorar?",
+        answer:
+          "La mayoría nota cambio en 4–6 semanas con revisión semanal y categorías claras. El hábito pleno tarda 2–3 meses. Una mala semana no reinicia el reloj.",
+      },
+      {
+        question: "¿Debo cortar las tarjetas de crédito?",
+        answer:
+          "No necesariamente. Las tarjetas son herramientas; el problema es conducta. Prueba quitar tarjetas guardadas, límites por categoría y alertas antes de cortarlas.",
+      },
+      {
+        question: "¿Y si mis ingresos no cubren los gastos?",
+        answer:
+          "Eso no es gastar de más: es problema de ingresos o costes fijos. Recorta fijos, sube ingresos o ambos. Ningún método arregla un déficit estructural sin eso.",
+      },
+    ],
+    howTo: {
+      name: "Cómo dejar de gastar de más",
+      description: "7 soluciones prácticas para frenar compras impulsivas y cumplir el presupuesto.",
+      steps: [
+        {
+          name: "Asigna cada euro a una categoría antes del mes",
+          text: "Usa presupuesto base cero: comidas fuera, supermercado y gustos con límites con nombre antes del día 1.",
+        },
+        {
+          name: "Aplica la regla de las 24 horas",
+          text: "Para compras no esenciales por encima de tu umbral, espera 24 horas antes de comprar.",
+        },
+        {
+          name: "Elimina la compra en un clic",
+          text: "Borra tarjetas guardadas y desactiva compra en un clic para añadir fricción consciente.",
+        },
+        {
+          name: "Revisa el gasto cada semana",
+          text: "10 minutos cada domingo comparando gasto real vs límites para ajustar a mitad de mes, no al final.",
+        },
+      ],
+    },
+  },
   "en:how-to-make-a-monthly-budget": {
     faqs: [
       {

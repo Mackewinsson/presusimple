@@ -6,6 +6,8 @@ export const BLOG_EN_TO_ES_SLUGS: Record<string, string> = {
   "how-to-track-expenses-daily": "como-controlar-gastos-diarios",
   "emergency-fund-how-much-to-save": "fondo-de-emergencia-cuanto-ahorrar",
   "how-to-stop-overspending": "como-dejar-de-gastar-de-mas",
+  "how-to-budget-with-irregular-income": "como-presupuestar-con-ingresos-variables",
+  "what-are-sinking-funds-how-to-use-them": "que-son-los-fondos-hundimiento",
 };
 
 const ES_TO_EN_SLUGS = Object.fromEntries(
