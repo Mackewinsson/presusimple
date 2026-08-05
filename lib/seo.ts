@@ -59,9 +59,9 @@ const EN_LANDING = {
 };
 
 const ES_LANDING = {
-  title: "Presupuesto online gratis | Presusimple",
+  title: "Presupuesto online gratis | Control de gastos",
   description:
-    "Crea tu presupuesto mensual online gratis. Control de gastos, categorías y base cero. Prueba Presusimple 30 días sin tarjeta.",
+    "Crea tu presupuesto mensual online gratis en español. Control de gastos, finanzas en pareja y ahorro para emergencias. Prueba Presusimple 30 días sin tarjeta.",
 };
 
 const EN_DEVELOPERS = {

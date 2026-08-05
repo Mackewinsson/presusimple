@@ -24,6 +24,30 @@ export type BlogSeoEnrichment = {
 };
 
 const ENRICHMENT: Record<string, BlogSeoEnrichment> = {
+  "es:fondo-de-emergencia-cuanto-ahorrar": {
+    faqs: [
+      {
+        question: "¿Cuánto debe ser el ahorro para emergencias?",
+        answer:
+          "La mayoría de expertos recomienda 3–6 meses de gastos esenciales. Empieza con un mini fondo de 1.000 € y constrúyelo mes a mes.",
+      },
+      {
+        question: "¿Fondo de emergencia o pagar deuda primero?",
+        answer:
+          "Mini fondo de 1.000 €, luego deuda de alto interés (tarjetas por encima del 15 %). Con la deuda controlada, crece el fondo a 3 meses.",
+      },
+      {
+        question: "¿Dónde guardar el ahorro para emergencias?",
+        answer:
+          "En una cuenta de ahorro líquida y separada de la corriente, no en inversiones de riesgo ni en crédito disponible.",
+      },
+      {
+        question: "¿Puedo contar el crédito disponible como fondo de emergencia?",
+        answer:
+          "No. El crédito es deuda con intereses. Solo el efectivo es fondo de emergencia de verdad.",
+      },
+    ],
+  },
   "es:presupuesto-en-pareja-dividir-gastos": {
     faqs: [
       {
