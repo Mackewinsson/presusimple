@@ -58,7 +58,7 @@ describe("signup billing defaults", () => {
   });
 
   it("keeps trial dates so effective access can still be trial-based", () => {
-    const now = new Date("2026-01-15T00:00:00.000Z");
+    const now = new Date();
     const billing = buildForcedFreeSignupBilling({
       subscriptionType: "trial_signup",
       now,

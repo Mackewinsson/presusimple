@@ -4,7 +4,7 @@ export const USER_PLAN_PRO = "pro" as const;
 export type UserPlan = typeof USER_PLAN_FREE | typeof USER_PLAN_PRO;
 
 /** Stored plan for every new registration. Never write "pro" at signup. */
-export const DEFAULT_SIGNUP_PLAN: UserPlan = USER_PLAN_FREE;
+export const DEFAULT_SIGNUP_PLAN = USER_PLAN_FREE;
 
 export const SIGNUP_TRIAL_DAYS = 30;
 export const SIGNUP_TRIAL_MS = SIGNUP_TRIAL_DAYS * 24 * 60 * 60 * 1000;
