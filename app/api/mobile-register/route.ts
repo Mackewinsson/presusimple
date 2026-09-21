@@ -3,6 +3,10 @@ import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
 import { hashPassword, validatePassword } from "@/lib/password";
 import { sendWelcomeEmail } from "@/lib/email";
+import {
+  buildForcedFreeSignupBilling,
+  omitClientBillingFields,
+} from "@/lib/billing/user-defaults";
 
 /**
  * @swagger
@@ -40,7 +44,7 @@ import { sendWelcomeEmail } from "@/lib/email";
  *                 id: "688250e72a4d1976843ee892"
  *                 email: "newuser@example.com"
  *                 name: "John Doe"
- *                 plan: "pro"
+ *                 plan: "free"
  *                 isPaid: false
  *                 trialEnd: "2025-09-26T08:55:44.965Z"
  *       400:
@@ -78,8 +82,12 @@ import { sendWelcomeEmail } from "@/lib/email";
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { email, password, name } = body;
+    const body = omitClientBillingFields(
+      (await request.json()) as Record<string, unknown>
+    );
+    const email = typeof body.email === "string" ? body.email : "";
+    const password = typeof body.password === "string" ? body.password : "";
+    const name = typeof body.name === "string" ? body.name : undefined;
 
     if (!email || !password) {
       return NextResponse.json(
@@ -112,19 +120,14 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await hashPassword(password);
 
-    // Create new user with trial activation
-    const trialEnd = new Date();
-    trialEnd.setTime(trialEnd.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days
-    
+    // Stored plan is always free. Client plan/isPaid/trial fields are ignored.
     const user = new User({
       email,
       password: hashedPassword,
-      name: name || email.split('@')[0], // Use email prefix as name if not provided
-      isPaid: false,
-      plan: "pro", // Trial users get pro features
-      trialStart: new Date(),
-      trialEnd: trialEnd,
-      subscriptionType: "mobile_signup",
+      name: name || email.split("@")[0],
+      ...buildForcedFreeSignupBilling({
+        subscriptionType: "mobile_signup",
+      }),
     });
     
     await user.save();

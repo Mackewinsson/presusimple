@@ -45,6 +45,8 @@ const UserSchema = new Schema<IUser>({
   plan: {
     type: String,
     enum: ["free", "pro"],
+    // Never default to "pro". Signup helpers force "free"; only the
+    // Lemon Squeezy webhook and admin subscription routes may escalate.
     default: "free"
   },
   currency: { type: String, default: "USD" },

@@ -15,6 +15,16 @@ describe("getEffectiveUserTier for feature flags", () => {
     ).toBe("pro");
   });
 
+  it("returns pro for active trial even when stored plan is free", () => {
+    expect(
+      getEffectiveUserTier({
+        isPaid: false,
+        plan: "free",
+        trialEnd: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+      } as any)
+    ).toBe("pro");
+  });
+
   it("returns free for expired trial users even when plan is pro", () => {
     expect(
       getEffectiveUserTier({
