@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongoose";
 import User from "@/models/User";
 import { requireAdminApi } from "@/lib/auth/admin";
+import {
+  buildForcedFreeSignupBilling,
+  omitClientBillingFields,
+} from "@/lib/billing/user-defaults";
 
 /**
  * @swagger
@@ -71,8 +75,11 @@ export async function POST(request: NextRequest) {
   try {
     await dbConnect();
 
-    const body = await request.json();
-    const { email, name } = body;
+    const body = omitClientBillingFields(
+      (await request.json()) as Record<string, unknown>
+    );
+    const email = typeof body.email === "string" ? body.email : "";
+    const name = typeof body.name === "string" ? body.name : undefined;
 
     if (!email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
@@ -87,7 +94,7 @@ export async function POST(request: NextRequest) {
     const user = new User({
       email,
       name: name || "Test User",
-      isPaid: false,
+      ...buildForcedFreeSignupBilling({ includeTrial: false }),
     });
 
     const savedUser = await user.save();

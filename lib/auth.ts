@@ -6,6 +6,7 @@ import {
   buildGracePeriodUpdate,
   shouldReceiveBillingGracePeriod,
 } from "@/lib/billing/grace-period";
+import { buildForcedFreeSignupBilling } from "@/lib/billing/user-defaults";
 import { sendWelcomeEmail } from "@/lib/email";
 import { recordUserLogin } from "@/lib/auth/record-login";
 
@@ -32,19 +33,14 @@ export const authOptions = {
           const existingUser = await User.findOne({ email: user.email });
           
           if (!existingUser) {
-            // Create new user with trial activation
-            const trialEnd = new Date();
-            trialEnd.setTime(trialEnd.getTime() + (30 * 24 * 60 * 60 * 1000)); // Exactly 30 days in milliseconds
-            
+            // Stored plan is always free. Trial access is derived from trialEnd.
             const newUser = new User({
               email: user.email,
               name: user.name,
-              isPaid: false,
-              plan: "pro", // Trial users get pro features
-              trialStart: new Date(),
-              trialEnd: trialEnd,
-              subscriptionType: "trial_signup",
               lastLoginAt: new Date(),
+              ...buildForcedFreeSignupBilling({
+                subscriptionType: "trial_signup",
+              }),
             });
             
             await newUser.save();
