@@ -9,6 +9,10 @@ import {
 import { buildForcedFreeSignupBilling } from "@/lib/billing/user-defaults";
 import { sendWelcomeEmail } from "@/lib/email";
 import { recordUserLogin } from "@/lib/auth/record-login";
+import {
+  claimReferralForNewUser,
+  clearReferralAfterAuth,
+} from "@/lib/referrals/claim";
 
 export const authOptions = {
   providers: [
@@ -34,6 +38,8 @@ export const authOptions = {
           
           if (!existingUser) {
             // Stored plan is always free. Trial access is derived from trialEnd.
+            // A pending ?ref= cookie credits the referrer without changing plan.
+            const referredBy = await claimReferralForNewUser(user.email);
             const newUser = new User({
               email: user.email,
               name: user.name,
@@ -41,6 +47,7 @@ export const authOptions = {
               ...buildForcedFreeSignupBilling({
                 subscriptionType: "trial_signup",
               }),
+              ...(referredBy ? { referredBy } : {}),
             });
             
             await newUser.save();
@@ -57,6 +64,7 @@ export const authOptions = {
             await existingUser.save();
           }
 
+          await clearReferralAfterAuth();
           await recordUserLogin(user.email);
         } catch (error) {
           console.error("Error during sign in:", error);

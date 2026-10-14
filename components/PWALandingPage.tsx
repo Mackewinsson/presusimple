@@ -26,6 +26,11 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useTranslation } from '@/lib/i18n';
 import { usePathname } from 'next/navigation';
 import { LandingFaq } from '@/components/marketing/LandingFaq';
+import { ReferralInviteBanner } from '@/components/referral/ReferralInviteBanner';
+import {
+  REFERRAL_QUERY_PARAM,
+  normalizeReferralCode,
+} from '@/lib/referrals/constants';
 
 export default function PWALandingPage() {
   const { t } = useTranslation();
@@ -35,6 +40,14 @@ export default function PWALandingPage() {
   const { isMobile } = useViewport();
   const pwaStatus = usePWAStatus();
   const [showInstallInstructions, setShowInstallInstructions] = useState(false);
+  const [referralQuery, setReferralQuery] = useState("");
+
+  useEffect(() => {
+    const code = normalizeReferralCode(
+      new URLSearchParams(window.location.search).get(REFERRAL_QUERY_PARAM)
+    );
+    setReferralQuery(code ? `?${REFERRAL_QUERY_PARAM}=${code}` : "");
+  }, []);
 
   // Show PWA-first experience for mobile users who haven't installed the app
   const shouldShowPWAFirst = pwaStatus.shouldShowPWAFirst && isMobile;
@@ -55,7 +68,7 @@ export default function PWALandingPage() {
     if (session) {
       window.location.href = "/budget";
     } else {
-      window.location.href = "/auth/login";
+      window.location.href = `/auth/login${referralQuery}`;
     }
   };
 
@@ -63,6 +76,7 @@ export default function PWALandingPage() {
   if (shouldShowPWAFirst) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 flex flex-col">
+        <ReferralInviteBanner />
         {/* Mobile Header */}
         <header className="border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-50">
           <div className="container mx-auto px-4 py-3">
@@ -195,6 +209,7 @@ export default function PWALandingPage() {
   // Standard Desktop/Web Experience
   return (
     <div className="min-h-screen gradient-bg-dark flex flex-col">
+      <ReferralInviteBanner />
       <header className="border-b border-white/10 dark:border-white/10 bg-white/5 dark:bg-white/5 backdrop-blur-xl sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
@@ -220,7 +235,7 @@ export default function PWALandingPage() {
                 </button>
               ) : (
                 <Link
-                  href="/auth/login"
+                  href={`/auth/login${referralQuery}`}
                   className="inline-flex items-center gap-1.5 bg-white/10 dark:bg-white/10 backdrop-blur-sm text-slate-900 dark:text-white border border-gray-300/50 dark:border-white/20 px-2 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-white/20 dark:hover:bg-white/20 transition-all duration-200 text-xs sm:text-sm"
                 >
                   <span className="hidden sm:inline">{t('signIn')}</span>
