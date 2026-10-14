@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { applyReferralCookie } from "@/lib/referrals/capture";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -27,18 +28,24 @@ export async function middleware(request: NextRequest) {
   if (isProtectedRoute && !token && !isWelcomePage) {
     const loginUrl = new URL("/auth/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(loginUrl);
+    return applyReferralCookie(request, NextResponse.redirect(loginUrl));
   }
 
   // Redirect to budget if accessing auth routes with valid token
   // But don't redirect if they're in the middle of the auth flow
   if (isAuthRoute && token && !pathname.includes("callback")) {
-    return NextResponse.redirect(new URL("/budget", request.url));
+    return applyReferralCookie(
+      request,
+      NextResponse.redirect(new URL("/budget", request.url))
+    );
   }
 
   // Redirect to budget if accessing home page with valid token (but not welcome page)
   if (pathname === "/" && token && !isWelcomePage) {
-    return NextResponse.redirect(new URL("/budget", request.url));
+    return applyReferralCookie(
+      request,
+      NextResponse.redirect(new URL("/budget", request.url))
+    );
   }
 
   // Add security headers
@@ -57,7 +64,7 @@ export async function middleware(request: NextRequest) {
   response.headers.set("Cache-Control", "public, max-age=300, s-maxage=300"); // 5 minutes cache
   response.headers.set("Vary", "Accept-Encoding, User-Agent");
 
-  return response;
+  return applyReferralCookie(request, response);
 }
 
 export const config = {
